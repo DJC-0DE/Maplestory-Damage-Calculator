@@ -1712,7 +1712,7 @@
             // Attack row
             html += `<tr><td class="stat-name">Attack</td>`;
             attackIncreases.forEach(increase => {
-                const modifiedStats = {...stats};
+                const modifiedStats = { ...stats };
                 const oldValue = stats.attack;
                 const effectiveIncrease = increase * (1 + weaponAttackBonus / 100);
                 modifiedStats.attack = stats.attack + effectiveIncrease;
@@ -1762,14 +1762,34 @@
             });
             html += '</tr>';
 
+            const multiplicativeStats = {
+                'attackSpeed': { denominator: 150, },
+                'defPen': { denominator: 100, }
+            };
+
             // Percentage stats
             percentageStats.forEach(stat => {
-                html += `<tr><td class="stat-name">${stat.label}</td>`;
+                let labelContent = stat.label;
+                if (multiplicativeStats[stat.key]) {
+                    const info = multiplicativeStats[stat.key];
+                    labelContent += ` <span title="Increases to this stat are multiplicative rather than additive, but also have dimminishing returns. A line item with 10% in this stat will translate to less than 10% increase on the stats page. Final increase = y% × (1 - x/${info.denominator}), where x is the current value and y is the increase amount." style="cursor: help; color: var(--accent-primary); font-weight: bold; margin-left: 4px;">?</span>`;
+                }
+
+                html += `<tr><td class="stat-name">${labelContent}</td>`;
 
                 percentIncreases.forEach(increase => {
-                    const modifiedStats = {...stats};
+                    const modifiedStats = { ...stats };
                     const oldValue = stats[stat.key];
-                    modifiedStats[stat.key] = stats[stat.key] + increase;
+
+                    // Special handling for multiplicative stats with diminishing returns
+                    if (multiplicativeStats[stat.key]) {
+                        const denominator = multiplicativeStats[stat.key].denominator;
+                        const effectiveIncrease = increase * (1 - oldValue / denominator);
+                        modifiedStats[stat.key] = oldValue + effectiveIncrease;
+                    } else {
+                        modifiedStats[stat.key] = oldValue + increase;
+                    }
+
                     const newValue = modifiedStats[stat.key];
 
                     const newDPS = calculateDamage(modifiedStats, 'boss').dps;
