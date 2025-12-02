@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -533,6 +534,7 @@
         }
 
         @media (max-width: 1200px) {
+
             .setups-container,
             .results-container,
             .stat-weights-grid {
@@ -545,9 +547,9 @@
         }
     </style>
 </head>
+
 <body data-theme="light">
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌙</button>
-
     <div class="container">
         <h1>Damage Calculator</h1>
 
@@ -626,10 +628,14 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <!-- Equipped Item -->
                 <div>
-                    <h3 style="color: var(--accent-success); margin-bottom: 8px; font-size: 1em; font-weight: 600;">Currently Equipped</h3>
-                    <div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 1px solid var(--accent-success); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped Item</span>
+                    <h3 style="color: var(--accent-success); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
+                        Currently Equipped</h3>
+                    <div
+                        style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 1px solid var(--accent-success); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped
+                                Item</span>
                             <span style="color: var(--text-secondary); font-size: 0.8em;">(stats in base setup)</span>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -643,15 +649,21 @@
                             </div>
                         </div>
                         <div id="equipped-stats-container"></div>
-                        <button onclick="addEquippedStat()" style="background: var(--accent-success); border: none; padding: 10px 15px; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; margin-top: 8px; font-size: 0.9em; width: 100%; box-shadow: 0 2px 8px var(--shadow); transition: all 0.3s ease;">+ Add Stat</button>
+                        <button onclick="addEquippedStat()"
+                            style="background: var(--accent-success); border: none; padding: 10px 15px; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; margin-top: 8px; font-size: 0.9em; width: 100%; box-shadow: 0 2px 8px var(--shadow); transition: all 0.3s ease;">+
+                            Add Stat</button>
                     </div>
                 </div>
 
                 <!-- Comparison Items Column -->
                 <div>
-                    <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">Comparison Items</h3>
-                    <div id="comparison-items-container" style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
-                    <button class="calculate-btn" onclick="addComparisonItem()" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 10px 15px; font-size: 0.95em;">+ Add Item</button>
+                    <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
+                        Comparison Items</h3>
+                    <div id="comparison-items-container"
+                        style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
+                    <button class="calculate-btn" onclick="addComparisonItem()"
+                        style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 10px 15px; font-size: 0.95em;">+
+                        Add Item</button>
                 </div>
             </div>
             <button class="calculate-btn" onclick="calculate()" style="margin-top: 15px;">Calculate All</button>
@@ -659,31 +671,43 @@
 
         <!-- Weapon Levels Section -->
         <div class="stat-weights-container" style="margin-bottom: 20px;">
-            <div class="stat-weights-header" onclick="toggleWeaponSection()" style="cursor: pointer; user-select: none;">
+            <div class="stat-weights-header" onclick="toggleWeaponSection()"
+                style="cursor: pointer; user-select: none;">
                 Weapon Levels (For Stat Damage Predictions) <span id="weapon-toggle-icon">▼</span>
             </div>
             <div id="weapon-section-content" style="display: none;">
                 <div id="weapons-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
                     <!-- Weapons will be generated by JavaScript -->
                 </div>
-                <div style="margin-top: 20px; background: linear-gradient(135deg, rgba(52, 199, 89, 0.15), rgba(0, 122, 255, 0.1)); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px var(--shadow);">
-                <div style="color: var(--text-secondary); font-size: 0.9em; text-align: center; margin-bottom: 15px; font-weight: 500;">
-                    Applied to Attack row in Stat Damage Predictions below
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
-                    <div>
-                        <div style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">Total Inventory Attack %</div>
-                        <div id="total-inventory-attack" style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
+                <div
+                    style="margin-top: 20px; background: linear-gradient(135deg, rgba(52, 199, 89, 0.15), rgba(0, 122, 255, 0.1)); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px var(--shadow);">
+                    <div
+                        style="color: var(--text-secondary); font-size: 0.9em; text-align: center; margin-bottom: 15px; font-weight: 500;">
+                        Applied to Attack row in Stat Damage Predictions below
                     </div>
-                    <div>
-                        <div style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">Equipped Attack %</div>
-                        <div id="equipped-attack" style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
+                        <div>
+                            <div
+                                style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">
+                                Total Inventory Attack %</div>
+                            <div id="total-inventory-attack"
+                                style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
+                        </div>
+                        <div>
+                            <div
+                                style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">
+                                Equipped Attack %</div>
+                            <div id="equipped-attack"
+                                style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
+                        </div>
+                        <div>
+                            <div
+                                style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">
+                                Total Weapon Attack %</div>
+                            <div id="total-weapon-attack"
+                                style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="color: var(--accent-success); font-size: 0.95em; font-weight: 600; margin-bottom: 5px;">Total Weapon Attack %</div>
-                        <div id="total-weapon-attack" style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>
@@ -691,7 +715,8 @@
         <!-- Results -->
         <div class="stat-weights-container">
             <div class="stat-weights-header">Item Comparison Results</div>
-            <div id="results-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;"></div>
+            <div id="results-container"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;"></div>
         </div>
 
         <!-- Stat Damage Predictions -->
@@ -1412,7 +1437,7 @@
 
         function applyItemToStats(baseStats, equippedItem, comparisonItem) {
             // Start with base stats
-            const newStats = {...baseStats};
+            const newStats = { ...baseStats };
 
             // Get weapon attack bonus
             const weaponAttackBonus = getWeaponAttackBonus();
@@ -1663,7 +1688,8 @@
         }
 
         function calculateStatWeights(setup, stats) {
-            const baseDPS = calculateDamage(stats, 'boss').dps;
+            const baseBossDPS = calculateDamage(stats, 'boss').dps;
+            const baseNormalDPS = calculateDamage(stats, 'normal').dps;
             const weaponAttackBonus = getWeaponAttackBonus();
 
             // Flat attack increases
@@ -1678,6 +1704,7 @@
                 { key: 'skillMastery', label: 'Skill Mastery' },
                 { key: 'damage', label: 'Damage' },
                 { key: 'bossDamage', label: 'Boss Damage' },
+                { key: 'normalDamage', label: 'Monster Damage' },
                 { key: 'damageAmp', label: 'Damage Amplification' },
                 { key: 'defPen', label: 'Defense Penetration' },
                 { key: 'minDamage', label: 'Min Damage Multiplier' },
@@ -1719,9 +1746,9 @@
                 const newValue = modifiedStats.attack;
 
                 const newDPS = calculateDamage(modifiedStats, 'boss').dps;
-                const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
+                const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100).toFixed(2);
 
-                const tooltip = `+${formatNumber(increase)} Attack\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nEffective increase (with ${weaponAttackBonus.toFixed(1)}% weapon bonus): +${formatNumber(effectiveIncrease)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+                const tooltip = `+${formatNumber(increase)} Attack\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nEffective increase (with ${weaponAttackBonus.toFixed(1)}% weapon bonus): +${formatNumber(effectiveIncrease)}\nOld DPS: ${formatNumber(baseBossDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
 
                 html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
             });
@@ -1737,16 +1764,16 @@
             // Main Stat row
             html += `<tr><td class="stat-name">Main Stat (100 = 1% Stat Dmg)</td>`;
             mainStatIncreases.forEach(increase => {
-                const modifiedStats = {...stats};
+                const modifiedStats = { ...stats };
                 const oldValue = stats.statDamage;
                 const statDamageIncrease = increase / 100; // 100 main stat = 1% stat damage
                 modifiedStats.statDamage = stats.statDamage + statDamageIncrease;
                 const newValue = modifiedStats.statDamage;
 
                 const newDPS = calculateDamage(modifiedStats, 'boss').dps;
-                const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
+                const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100).toFixed(2);
 
-                const tooltip = `+${formatNumber(increase)} Main Stat\n+${statDamageIncrease.toFixed(2)}% Stat Damage\nOld Stat Damage: ${oldValue.toFixed(2)}%, New: ${newValue.toFixed(2)}%\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+                const tooltip = `+${formatNumber(increase)} Main Stat\n+${statDamageIncrease.toFixed(2)}% Stat Damage\nOld Stat Damage: ${oldValue.toFixed(2)}%, New: ${newValue.toFixed(2)}%\nOld DPS: ${formatNumber(baseBossDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
 
                 html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
             });
@@ -1789,11 +1816,12 @@
                     } else {
                         modifiedStats[stat.key] = oldValue + increase;
                     }
-
                     const newValue = modifiedStats[stat.key];
 
-                    const newDPS = calculateDamage(modifiedStats, 'boss').dps;
+                    const newDPS = calculateDamage(modifiedStats, stat.key === "bossDamage" ? 'boss' : 'normal').dps;
+                    const baseDPS = stat.key === "bossDamage" ? baseBossDPS : baseNormalDPS;
                     const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
+
 
                     const tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
 
@@ -1909,18 +1937,14 @@
         }
 
         // Calculate on page load
-        window.onload = function() {
+        window.onload = function () {
             // Load theme first
             loadTheme();
-
             initializeWeapons();
-
             // Load saved data from localStorage
             const loaded = loadFromLocalStorage();
-
             // Attach save listeners to all inputs
             attachSaveListeners();
-
             // Update weapon bonuses if data was loaded
             if (loaded) {
                 updateWeaponBonuses();
@@ -1930,4 +1954,5 @@
         };
     </script>
 </body>
+
 </html>
