@@ -760,6 +760,7 @@
 
         const availableStats = [
             { value: 'attack', label: 'Attack' },
+            { value: 'attack-speed', label: 'Attack Speed (%)' },
             { value: 'crit-rate', label: 'Critical Rate (%)' },
             { value: 'crit-damage', label: 'Critical Damage (%)' },
             { value: 'skill-level', label: '3rd Job Skill Level' },
@@ -902,6 +903,7 @@
             const stats = {
                 name: document.getElementById(`${prefix}-name`)?.value || '',
                 attack: parseFloat(document.getElementById(`${prefix}-attack`)?.value) || 0,
+                attackSpeed: 0,
                 critRate: 0,
                 critDamage: 0,
                 skillLevel: 0,
@@ -924,6 +926,10 @@
                         switch (statType) {
                             case 'attack':
                                 stats.attack += value;
+                                break;
+                            case 'attack-speed':
+                                console.log("woo" + value)
+                                stats.attackSpeed += value;
                                 break;
                             case 'crit-rate':
                                 stats.critRate += value;
@@ -960,6 +966,9 @@
                         switch (statType) {
                             case 'attack':
                                 stats.attack += value;
+                                break;
+                            case 'attack-speed':
+                                stats.attackSpeed += value;
                                 break;
                             case 'crit-rate':
                                 stats.critRate += value;
@@ -1451,6 +1460,7 @@
             newStats.normalDamage -= equippedItem.normalDamage;
             newStats.bossDamage -= equippedItem.bossDamage;
             newStats.damage -= equippedItem.damage;
+            newStats.attackSpeed -= equippedItem.attackSpeed;
 
             // Add comparison item stats (apply weapon bonus to attack)
             newStats.attack += comparisonItem.attack * weaponMultiplier;
@@ -1460,6 +1470,7 @@
             newStats.normalDamage += comparisonItem.normalDamage;
             newStats.bossDamage += comparisonItem.bossDamage;
             newStats.damage += comparisonItem.damage;
+            newStats.attackSpeed += comparisonItem.attackSpeed;
 
             return newStats;
         }
@@ -1691,7 +1702,6 @@
             const baseBossDPS = calculateDamage(stats, 'boss').dps;
             const baseNormalDPS = calculateDamage(stats, 'normal').dps;
             const weaponAttackBonus = getWeaponAttackBonus();
-
             // Flat attack increases
             const attackIncreases = [500, 1000, 2500, 5000, 10000, 15000, 25000];
 
@@ -1806,7 +1816,6 @@
 
 
                     const tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
-
                     html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
                 });
 
