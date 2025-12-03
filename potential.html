@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapleStory Potential Optimizer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        input, select, button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .strategy {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .strategy.best {
+            border-left-color: #2ecc71;
+            background: #d5f4e6;
+        }
+        .strategy h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .stat-line {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 5px;
+            margin: 3px 0;
+            border-radius: 3px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .metric {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .progress {
+            width: 100%;
+            height: 4px;
+            background: #ecf0f1;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #3498db;
+            transition: width 0.3s;
+        }
+        .distribution {
+            margin-top: 15px;
+        }
+        .distribution-bar {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .distribution-label {
+            min-width: 120px;
+            font-size: 12px;
+        }
+        .distribution-visual {
+            flex-grow: 1;
+            height: 20px;
+            background: #e8f4f8;
+            border-radius: 3px;
+            position: relative;
+            margin: 0 10px;
+        }
+        .distribution-fill {
+            height: 100%;
+            background: #3498db;
+            border-radius: 3px;
+        }
+        .distribution-percent {
+            font-size: 12px;
+            min-width: 50px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>MapleStory Potential Optimizer</h1>
+
+    <div class="container">
+        <h2>Stat Weights</h2>
+        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">
+            Set the value/score for each stat. For % stats, specify value per 1%. For flat stats, specify value per 100. Uncheck stats you don't want.
+        </p>
+        <div id="statPriorities" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Simulation Settings</h2>
+        <div class="controls">
+            <div class="control-group">
+                <label for="numSlots">Number of Equipment Slots:</label>
+                <input type="number" id="numSlots" value="9" min="1" max="9">
+            </div>
+            <div class="control-group">
+                <label for="simulations">Number of Simulations:</label>
+                <input type="number" id="simulations" value="10000" min="1000" max="100000" step="1000">
+            </div>
+            <div class="control-group">
+                <label for="totalCubes">Total Cube Budget:</label>
+                <input type="number" id="totalCubes" value="1000" min="100" max="10000" step="100">
+            </div>
+        </div>
+        <button id="runSimulation" onclick="runSimulation()">Run Simulation</button>
+        <div id="progressContainer" style="display: none;">
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="progressText" style="text-align: center; color: #7f8c8d;"></p>
+        </div>
+    </div>
+
+    <div class="container results" id="results" style="display: none;">
+        <h2>Strategy Comparison Results</h2>
+        <div id="strategyResults"></div>
+    </div>
+
+    <script>
+        // Potential line data from the file
+        const TIER_UPGRADE_RATES = {
+            'normal': { next: 'rare', rate: 0.06 },
+            'rare': { next: 'epic', rate: 0.03333 }
+        };
+
+        const POTENTIAL_DATA = {
+            normal: {
+                line1: [
+                    { name: 'Critical Rate', value: 3, type: 'crit', chance: 2.5 },
+                    { name: 'Attack Speed', value: 3, type: 'attackSpeed', chance: 2.5 },
+                    { name: 'Damage', value: 5, type: 'damage', chance: 4 },
+                    { name: 'Min Damage Multiplier', value: 3, type: 'minDmg', chance: 4 },
+                    { name: 'Max Damage Multiplier', value: 3, type: 'maxDmg', chance: 4 },
+                    { name: 'Str%', value: 3, type: 'strPercent', chance: 4.5 },
+                    { name: 'Dex%', value: 3, type: 'dexPercent', chance: 4.5 },
+                    { name: 'Int%', value: 3, type: 'intPercent', chance: 4.5 },
+                    { name: 'Luk%', value: 3, type: 'lukPercent', chance: 4.5 },
+                    { name: 'Defense', value: 3, type: 'defense', chance: 9 },
+                    { name: 'Max HP', value: 6, type: 'hp', chance: 9 },
+                    { name: 'Max MP', value: 3, type: 'mp', chance: 9 },
+                    { name: 'Str', value: 50, type: 'strFlat', chance: 9.5 },
+                    { name: 'Dex', value: 50, type: 'dexFlat', chance: 9.5 },
+                    { name: 'Int', value: 50, type: 'intFlat', chance: 9.5 },
+                    { name: 'Luk', value: 50, type: 'lukFlat', chance: 9.5 }
+                ],
+                line2: null, // Same as line1
+                line3: null  // Same as line1
+            },
+            rare: {
+                line1: [
+                    { name: 'Critical Rate', value: 4.5, type: 'crit', chance: 2.5 },
+                    { name: 'Attack Speed', value: 3.5, type: 'attackSpeed', chance: 2.5 },
+                    { name: 'Damage', value: 8, type: 'damage', chance: 4 },
+                    { name: 'Min Damage Multiplier', value: 6, type: 'minDmg', chance: 4 },
+                    { name: 'Max Damage Multiplier', value: 6, type: 'maxDmg', chance: 4 },
+                    { name: 'Str%', value: 4.5, type: 'strPercent', chance: 4.5 },
+                    { name: 'Dex%', value: 4.5, type: 'dexPercent', chance: 4.5 },
+                    { name: 'Int%', value: 4.5, type: 'intPercent', chance: 4.5 },
+                    { name: 'Luk%', value: 4.5, type: 'lukPercent', chance: 4.5 },
+                    { name: 'Defense', value: 4.5, type: 'defense', chance: 9 },
+                    { name: 'Max HP', value: 9, type: 'hp', chance: 9 },
+                    { name: 'Max MP', value: 4.5, type: 'mp', chance: 9 },
+                    { name: 'Str', value: 100, type: 'strFlat', chance: 9.5 },
+                    { name: 'Dex', value: 100, type: 'dexFlat', chance: 9.5 },
+                    { name: 'Int', value: 100, type: 'intFlat', chance: 9.5 },
+                    { name: 'Luk', value: 100, type: 'lukFlat', chance: 9.5 }
+                ],
+                line2: [
+                    { name: 'Critical Rate', value: 3, type: 'crit', chance: 1.9, prime: false },
+                    { name: 'Critical Rate (P)', value: 4.5, type: 'crit', chance: 0.6, prime: true },
+                    { name: 'Attack Speed', value: 3, type: 'attackSpeed', chance: 1.9, prime: false },
+                    { name: 'Attack Speed (P)', value: 3.5, type: 'attackSpeed', chance: 0.6, prime: true },
+                    { name: 'Damage', value: 5, type: 'damage', chance: 3.04, prime: false },
+                    { name: 'Damage (P)', value: 8, type: 'damage', chance: 0.96, prime: true },
+                    { name: 'Min Damage Multiplier', value: 3, type: 'minDmg', chance: 3.04, prime: false },
+                    { name: 'Min Damage Multiplier (P)', value: 6, type: 'minDmg', chance: 0.96, prime: true },
+                    { name: 'Max Damage Multiplier', value: 3, type: 'maxDmg', chance: 3.04, prime: false },
+                    { name: 'Max Damage Multiplier (P)', value: 6, type: 'maxDmg', chance: 0.96, prime: true },
+                    { name: 'Str%', value: 3, type: 'strPercent', chance: 3.42, prime: false },
+                    { name: 'Str% (P)', value: 4.5, type: 'strPercent', chance: 1.08, prime: true },
+                    { name: 'Dex%', value: 3, type: 'dexPercent', chance: 3.42, prime: false },
+                    { name: 'Dex% (P)', value: 4.5, type: 'dexPercent', chance: 1.08, prime: true },
+                    { name: 'Int%', value: 3, type: 'intPercent', chance: 3.42, prime: false },
+                    { name: 'Int% (P)', value: 4.5, type: 'intPercent', chance: 1.08, prime: true },
+                    { name: 'Luk%', value: 3, type: 'lukPercent', chance: 3.42, prime: false },
+                    { name: 'Luk% (P)', value: 4.5, type: 'lukPercent', chance: 1.08, prime: true },
+                    { name: 'Defense', value: 3, type: 'defense', chance: 6.84, prime: false },
+                    { name: 'Defense (P)', value: 4.5, type: 'defense', chance: 2.16, prime: true },
+                    { name: 'Max HP', value: 3, type: 'hp', chance: 6.84, prime: false },
+                    { name: 'Max HP (P)', value: 9, type: 'hp', chance: 2.16, prime: true },
+                    { name: 'Max MP', value: 3, type: 'mp', chance: 6.84, prime: false },
+                    { name: 'Max MP (P)', value: 4.5, type: 'mp', chance: 2.16, prime: true },
+                    { name: 'Str', value: 50, type: 'strFlat', chance: 7.22, prime: false },
+                    { name: 'Str (P)', value: 100, type: 'strFlat', chance: 2.28, prime: true },
+                    { name: 'Dex', value: 50, type: 'dexFlat', chance: 7.22, prime: false },
+                    { name: 'Dex (P)', value: 100, type: 'dexFlat', chance: 2.28, prime: true },
+                    { name: 'Int', value: 50, type: 'intFlat', chance: 7.22, prime: false },
+                    { name: 'Int (P)', value: 100, type: 'intFlat', chance: 2.28, prime: true },
+                    { name: 'Luk', value: 50, type: 'lukFlat', chance: 7.22, prime: false },
+                    { name: 'Luk (P)', value: 100, type: 'lukFlat', chance: 2.28, prime: true }
+                ],
+                line3: [
+                    { name: 'Critical Rate', value: 3, type: 'crit', chance: 2.3, prime: false },
+                    { name: 'Critical Rate (P)', value: 4.5, type: 'crit', chance: 0.2, prime: true },
+                    { name: 'Attack Speed', value: 3, type: 'attackSpeed', chance: 2.3, prime: false },
+                    { name: 'Attack Speed (P)', value: 3.5, type: 'attackSpeed', chance: 0.2, prime: true },
+                    { name: 'Damage', value: 5, type: 'damage', chance: 3.68, prime: false },
+                    { name: 'Damage (P)', value: 8, type: 'damage', chance: 0.32, prime: true },
+                    { name: 'Min Damage Multiplier', value: 3, type: 'minDmg', chance: 3.68, prime: false },
+                    { name: 'Min Damage Multiplier (P)', value: 6, type: 'minDmg', chance: 0.32, prime: true },
+                    { name: 'Max Damage Multiplier', value: 3, type: 'maxDmg', chance: 3.68, prime: false },
+                    { name: 'Max Damage Multiplier (P)', value: 6, type: 'maxDmg', chance: 0.32, prime: true },
+                    { name: 'Str%', value: 3, type: 'strPercent', chance: 4.14, prime: false },
+                    { name: 'Str% (P)', value: 4.5, type: 'strPercent', chance: 0.36, prime: true },
+                    { name: 'Dex%', value: 3, type: 'dexPercent', chance: 4.14, prime: false },
+                    { name: 'Dex% (P)', value: 4.5, type: 'dexPercent', chance: 0.36, prime: true },
+                    { name: 'Int%', value: 3, type: 'intPercent', chance: 4.14, prime: false },
+                    { name: 'Int% (P)', value: 4.5, type: 'intPercent', chance: 0.36, prime: true },
+                    { name: 'Luk%', value: 3, type: 'lukPercent', chance: 4.14, prime: false },
+                    { name: 'Luk% (P)', value: 4.5, type: 'lukPercent', chance: 0.36, prime: true },
+                    { name: 'Defense', value: 3, type: 'defense', chance: 8.28, prime: false },
+                    { name: 'Defense (P)', value: 4.5, type: 'defense', chance: 0.72, prime: true },
+                    { name: 'Max HP', value: 3, type: 'hp', chance: 8.28, prime: false },
+                    { name: 'Max HP (P)', value: 9, type: 'hp', chance: 0.72, prime: true },
+                    { name: 'Max MP', value: 3, type: 'mp', chance: 8.28, prime: false },
+                    { name: 'Max MP (P)', value: 4.5, type: 'mp', chance: 0.72, prime: true },
+                    { name: 'Str', value: 50, type: 'strFlat', chance: 8.74, prime: false },
+                    { name: 'Str (P)', value: 100, type: 'strFlat', chance: 0.76, prime: true },
+                    { name: 'Dex', value: 50, type: 'dexFlat', chance: 8.74, prime: false },
+                    { name: 'Dex (P)', value: 100, type: 'dexFlat', chance: 0.76, prime: true },
+                    { name: 'Int', value: 50, type: 'intFlat', chance: 8.74, prime: false },
+                    { name: 'Int (P)', value: 100, type: 'intFlat', chance: 0.76, prime: true },
+                    { name: 'Luk', value: 50, type: 'lukFlat', chance: 8.74, prime: false },
+                    { name: 'Luk (P)', value: 100, type: 'lukFlat', chance: 0.76, prime: true }
+                ]
+            }
+        };
+
+        // Normal tier has same lines for all positions
+        POTENTIAL_DATA.normal.line2 = POTENTIAL_DATA.normal.line1;
+        POTENTIAL_DATA.normal.line3 = POTENTIAL_DATA.normal.line1;
+
+        // Pre-compute cumulative probability distributions for faster rolling
+        const CUMULATIVE_PROBS = {};
+
+        function precomputeProbabilities() {
+            for (const tier in POTENTIAL_DATA) {
+                CUMULATIVE_PROBS[tier] = {};
+                for (let lineNum = 1; lineNum <= 3; lineNum++) {
+                    const lineKey = `line${lineNum}`;
+                    const lines = POTENTIAL_DATA[tier][lineKey];
+
+                    // Build cumulative distribution
+                    const cumulative = [];
+                    let sum = 0;
+                    for (const line of lines) {
+                        sum += line.chance;
+                        cumulative.push({ ...line, cumulativeChance: sum });
+                    }
+
+                    CUMULATIVE_PROBS[tier][lineKey] = {
+                        lines: cumulative,
+                        total: sum
+                    };
+                }
+            }
+        }
+
+        console.log('Precomputing probabilities...');
+        precomputeProbabilities();
+        console.log('CUMULATIVE_PROBS:', CUMULATIVE_PROBS);
+        console.log('Precomputation complete');
+
+        // Stat configuration
+        const STAT_CONFIG = {
+            damage: { name: 'Damage', unit: 'per 1%', defaultWeight: 10, defaultEnabled: true },
+            strPercent: { name: 'Str', unit: 'per 1%', defaultWeight: 10, defaultEnabled: true },
+            dexPercent: { name: 'Dex', unit: 'per 1%', defaultWeight: 0, defaultEnabled: false },
+            intPercent: { name: 'Int', unit: 'per 1%', defaultWeight: 0, defaultEnabled: false },
+            lukPercent: { name: 'Luk', unit: 'per 1%', defaultWeight: 0, defaultEnabled: false },
+            crit: { name: 'Critical Rate', unit: 'per 1%', defaultWeight: 5, defaultEnabled: true },
+            attackSpeed: { name: 'Attack Speed', unit: 'per 1%', defaultWeight: 3, defaultEnabled: true },
+            strFlat: { name: 'Flat Str', unit: 'per 100', defaultWeight: 2, defaultEnabled: true },
+            dexFlat: { name: 'Flat Dex', unit: 'per 100', defaultWeight: 0, defaultEnabled: false },
+            intFlat: { name: 'Flat Int', unit: 'per 100', defaultWeight: 0, defaultEnabled: false },
+            lukFlat: { name: 'Flat Luk', unit: 'per 100', defaultWeight: 0, defaultEnabled: false },
+            minDmg: { name: 'Min Damage Multiplier', unit: 'per 1%', defaultWeight: 0, defaultEnabled: false },
+            maxDmg: { name: 'Max Damage Multiplier', unit: 'per 1%', defaultWeight: 0, defaultEnabled: false }
+        };
+
+        // Save settings to localStorage
+        function saveSettings() {
+            const settings = {
+                weights: {},
+                numSlots: document.getElementById('numSlots').value,
+                simulations: document.getElementById('simulations').value,
+                totalCubes: document.getElementById('totalCubes').value
+            };
+
+            for (const key of Object.keys(STAT_CONFIG)) {
+                settings.weights[key] = {
+                    enabled: document.getElementById(`enable_${key}`).checked,
+                    weight: document.getElementById(`weight_${key}`).value
+                };
+            }
+
+            localStorage.setItem('maplestory_potential_settings', JSON.stringify(settings));
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const saved = localStorage.getItem('maplestory_potential_settings');
+            if (!saved) return false;
+
+            try {
+                const settings = JSON.parse(saved);
+
+                // Load simulation settings
+                if (settings.numSlots) document.getElementById('numSlots').value = settings.numSlots;
+                if (settings.simulations) document.getElementById('simulations').value = settings.simulations;
+                if (settings.totalCubes) document.getElementById('totalCubes').value = settings.totalCubes;
+
+                // Load stat weights
+                if (settings.weights) {
+                    for (const [key, data] of Object.entries(settings.weights)) {
+                        const checkbox = document.getElementById(`enable_${key}`);
+                        const input = document.getElementById(`weight_${key}`);
+                        if (checkbox && input) {
+                            checkbox.checked = data.enabled;
+                            input.value = data.weight;
+                            input.disabled = !data.enabled;
+                        }
+                    }
+                }
+
+                return true;
+            } catch (e) {
+                console.error('Error loading settings:', e);
+                return false;
+            }
+        }
+
+        // Initialize stat priority UI
+        function initStatPriorityUI() {
+            const container = document.getElementById('statPriorities');
+            container.innerHTML = '';
+
+            for (const [key, config] of Object.entries(STAT_CONFIG)) {
+                const div = document.createElement('div');
+                div.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;';
+
+                const displayName = config.unit.includes('per 1%') ? config.name + '%' : config.name;
+
+                div.innerHTML = `
+                    <input type="checkbox" id="enable_${key}" ${config.defaultEnabled ? 'checked' : ''}
+                           style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="enable_${key}" style="flex: 1; margin: 0; cursor: pointer; font-weight: 500;">${displayName}</label>
+                    <span style="font-size: 12px; color: #7f8c8d; white-space: nowrap;">${config.unit}:</span>
+                    <input type="number" id="weight_${key}" value="${config.defaultWeight}" min="0" step="0.1"
+                           style="width: 70px; padding: 4px;" ${!config.defaultEnabled ? 'disabled' : ''}>
+                `;
+
+                // Enable/disable weight input based on checkbox
+                const checkbox = div.querySelector(`#enable_${key}`);
+                const input = div.querySelector(`#weight_${key}`);
+                checkbox.addEventListener('change', () => {
+                    input.disabled = !checkbox.checked;
+                    if (!checkbox.checked) input.value = '0';
+                    saveSettings(); // Auto-save on change
+                });
+
+                // Auto-save when weight changes
+                input.addEventListener('input', () => {
+                    saveSettings();
+                });
+
+                container.appendChild(div);
+            }
+
+            // Load saved settings after UI is initialized
+            loadSettings();
+        }
+
+        // Get stat weights from UI
+        function getStatWeights() {
+            const weights = {};
+            for (const key of Object.keys(STAT_CONFIG)) {
+                const enabled = document.getElementById(`enable_${key}`).checked;
+                const weight = parseFloat(document.getElementById(`weight_${key}`).value);
+                weights[key] = enabled && weight > 0 ? weight : 0;
+            }
+            return weights;
+        }
+
+        // Stat scoring based on user-defined weights
+        function scoreStats(damage, strPercent, crit, attackSpeed, strFlat, dexPercent, intPercent, lukPercent, dexFlat, intFlat, lukFlat, minDmg, maxDmg) {
+            const weights = getStatWeights();
+
+            // Apply weights directly
+            // For % stats: weight is per 1%
+            // For flat stats: weight is per 100, so divide stat by 100
+            let score = 0;
+            score += damage * weights.damage;
+            score += strPercent * weights.strPercent;
+            score += (dexPercent || 0) * weights.dexPercent;
+            score += (intPercent || 0) * weights.intPercent;
+            score += (lukPercent || 0) * weights.lukPercent;
+            score += crit * weights.crit;
+            score += attackSpeed * weights.attackSpeed;
+            score += (strFlat / 100) * weights.strFlat;
+            score += ((dexFlat || 0) / 100) * weights.dexFlat;
+            score += ((intFlat || 0) / 100) * weights.intFlat;
+            score += ((lukFlat || 0) / 100) * weights.lukFlat;
+            score += (minDmg || 0) * weights.minDmg;
+            score += (maxDmg || 0) * weights.maxDmg;
+
+            return score;
+        }
+
+        // Calculate minimum acceptable score for a tier based on user weights
+        function getMinimumScoreForTier(tier) {
+            const weights = getStatWeights();
+
+            // Find top 2 highest weights to estimate "at least 2 decent lines"
+            const weightValues = Object.values(weights).filter(w => w > 0).sort((a, b) => b - a);
+            if (weightValues.length === 0) return 10; // Fallback
+
+            const topWeight = weightValues[0] || 0;
+            const secondWeight = weightValues[1] || topWeight;
+
+            if (tier === 'normal') {
+                // Normal tier: expect something like 5% top stat + 3% second stat
+                // Threshold = 60% of that to allow for some unlucky rolls
+                return (topWeight * 5 + secondWeight * 3) * 0.6;
+            } else if (tier === 'rare') {
+                // Rare tier: expect something like 8% top stat + 4.5% second stat
+                // Threshold = 70% of that
+                return (topWeight * 8 + secondWeight * 4.5) * 0.7;
+            }
+
+            return 10; // Fallback
+        }
+
+        // Initialize UI on page load
+        initStatPriorityUI();
+
+        // Auto-save simulation settings when they change
+        document.addEventListener('DOMContentLoaded', () => {
+            ['numSlots', 'simulations', 'totalCubes'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', saveSettings);
+                }
+            });
+        });
+
+        // Optimized roll - filter and roll in single pass (no array allocation)
+        function rollLine(tier, lineNumber, excludedTypes) {
+            const lineKey = `line${lineNumber}`;
+            const allLines = CUMULATIVE_PROBS[tier][lineKey].lines;
+
+            // First pass: calculate total probability of valid lines
+            let totalValidProb = 0;
+            for (let i = 0; i < allLines.length; i++) {
+                if (!excludedTypes[allLines[i].type]) {
+                    totalValidProb += allLines[i].chance;
+                }
+            }
+
+            // Second pass: roll from valid lines
+            const roll = Math.random() * totalValidProb;
+            let cumulative = 0;
+
+            for (let i = 0; i < allLines.length; i++) {
+                const line = allLines[i];
+                if (!excludedTypes[line.type]) {
+                    cumulative += line.chance;
+                    if (roll <= cumulative) {
+                        return line;
+                    }
+                }
+            }
+
+            // Fallback - return last valid line
+            for (let i = allLines.length - 1; i >= 0; i--) {
+                if (!excludedTypes[allLines[i].type]) {
+                    return allLines[i];
+                }
+            }
+            return allLines[0];
+        }
+
+        // Roll all 3 lines and return both lines and stats
+        function rollItem(tier) {
+            const excludedTypes = {};
+            const rolledLines = [];
+            const stats = {
+                damage: 0, strPercent: 0, dexPercent: 0, intPercent: 0, lukPercent: 0,
+                crit: 0, attackSpeed: 0,
+                strFlat: 0, dexFlat: 0, intFlat: 0, lukFlat: 0,
+                minDmg: 0, maxDmg: 0
+            };
+
+            for (let i = 1; i <= 3; i++) {
+                const line = rollLine(tier, i, excludedTypes);
+                rolledLines.push(line);
+
+                // Exclude this stat type from future lines
+                excludedTypes[line.type] = true;
+
+                // Accumulate stats inline
+                if (stats.hasOwnProperty(line.type)) {
+                    stats[line.type] += line.value;
+                }
+            }
+
+            stats.lines = rolledLines;
+            return stats;
+        }
+
+        // Roll a single cube on a slot (optimized, in-place mutation)
+        function rollCube(slot) {
+            slot.cubesUsed++;
+
+            // Try to upgrade tier (capped at rare since we only have normal/rare data)
+            if (slot.tier === 'normal' && Math.random() < 0.06) {
+                slot.tier = 'rare';
+            }
+            // Note: rare->epic upgrade removed because we don't have epic+ data
+
+            // Roll all 3 lines at current tier
+            const result = rollItem(slot.tier);
+
+            // Copy all stats to slot
+            slot.damage = result.damage;
+            slot.strPercent = result.strPercent;
+            slot.dexPercent = result.dexPercent;
+            slot.intPercent = result.intPercent;
+            slot.lukPercent = result.lukPercent;
+            slot.crit = result.crit;
+            slot.attackSpeed = result.attackSpeed;
+            slot.strFlat = result.strFlat;
+            slot.dexFlat = result.dexFlat;
+            slot.intFlat = result.intFlat;
+            slot.lukFlat = result.lukFlat;
+            slot.minDmg = result.minDmg;
+            slot.maxDmg = result.maxDmg;
+            slot.lines = result.lines;
+
+            // Calculate score
+            slot.score = scoreStats(
+                result.damage, result.strPercent, result.crit, result.attackSpeed, result.strFlat,
+                result.dexPercent, result.intPercent, result.lukPercent,
+                result.dexFlat, result.intFlat, result.lukFlat,
+                result.minDmg, result.maxDmg
+            );
+        }
+
+        // Initialize a slot (flat structure for performance)
+        function initSlot() {
+            return {
+                tier: 'normal',
+                cubesUsed: 0,
+                damage: 0, strPercent: 0, dexPercent: 0, intPercent: 0, lukPercent: 0,
+                crit: 0, attackSpeed: 0,
+                strFlat: 0, dexFlat: 0, intFlat: 0, lukFlat: 0,
+                minDmg: 0, maxDmg: 0,
+                score: 0,
+                lines: []
+            };
+        }
+
+        // Simulate cubing with different allocation strategies (optimized)
+        function simulateWithBudget(allocationStrategy, totalCubes, numSlots) {
+            const slots = [];
+            for (let i = 0; i < numSlots; i++) {
+                slots[i] = initSlot();
+            }
+
+            let cubesRemaining = totalCubes;
+
+            // Roll initial state for all slots
+            for (let i = 0; i < numSlots && cubesRemaining > 0; i++) {
+                rollCube(slots[i]);
+                cubesRemaining--;
+            }
+
+            // Main allocation loop (optimized for each strategy)
+            if (allocationStrategy === 'equal') {
+                // Equal: round-robin
+                while (cubesRemaining > 0) {
+                    let minCubes = slots[0].cubesUsed;
+                    let minIdx = 0;
+                    for (let i = 1; i < numSlots; i++) {
+                        if (slots[i].cubesUsed < minCubes) {
+                            minCubes = slots[i].cubesUsed;
+                            minIdx = i;
+                        }
+                    }
+                    rollCube(slots[minIdx]);
+                    cubesRemaining--;
+                }
+            } else if (allocationStrategy === 'worst_first') {
+                // Worst-first: always improve lowest score
+                while (cubesRemaining > 0) {
+                    let minScore = slots[0].score;
+                    let minIdx = 0;
+                    for (let i = 1; i < numSlots; i++) {
+                        if (slots[i].score < minScore) {
+                            minScore = slots[i].score;
+                            minIdx = i;
+                        }
+                    }
+                    rollCube(slots[minIdx]);
+                    cubesRemaining--;
+                }
+            } else if (allocationStrategy === 'greedy_threshold') {
+                // Greedy: get all slots to tier-appropriate minimum, then improve worst
+                while (cubesRemaining > 0) {
+                    let targetIdx = -1;
+
+                    // Find all slots under their tier's threshold
+                    const slotsUnderThreshold = [];
+                    for (let i = 0; i < numSlots; i++) {
+                        const minScore = getMinimumScoreForTier(slots[i].tier);
+                        if (slots[i].score < minScore) {
+                            slotsUnderThreshold.push(i);
+                        }
+                    }
+
+                    // Pick a random slot from those under threshold
+                    if (slotsUnderThreshold.length > 0) {
+                        targetIdx = slotsUnderThreshold[Math.floor(Math.random() * slotsUnderThreshold.length)];
+                    } else {
+                        // If all above threshold, find worst
+                        let minScore = slots[0].score;
+                        targetIdx = 0;
+                        for (let i = 1; i < numSlots; i++) {
+                            if (slots[i].score < minScore) {
+                                minScore = slots[i].score;
+                                targetIdx = i;
+                            }
+                        }
+                    }
+                    rollCube(slots[targetIdx]);
+                    cubesRemaining--;
+                }
+            } else if (allocationStrategy === 'tier_priority') {
+                // Tier priority: get all to rare, then improve worst
+                while (cubesRemaining > 0) {
+                    let targetIdx = -1;
+
+                    // Find all normal slots
+                    const normalSlots = [];
+                    for (let i = 0; i < numSlots; i++) {
+                        if (slots[i].tier === 'normal') {
+                            normalSlots.push(i);
+                        }
+                    }
+
+                    // Pick a random normal slot
+                    if (normalSlots.length > 0) {
+                        targetIdx = normalSlots[Math.floor(Math.random() * normalSlots.length)];
+                    } else {
+                        // If all rare, find worst score
+                        let minScore = slots[0].score;
+                        targetIdx = 0;
+                        for (let i = 1; i < numSlots; i++) {
+                            if (slots[i].score < minScore) {
+                                minScore = slots[i].score;
+                                targetIdx = i;
+                            }
+                        }
+                    }
+                    rollCube(slots[targetIdx]);
+                    cubesRemaining--;
+                }
+            }
+
+            // Calculate totals for all stats
+            const totals = {
+                damage: 0, strPercent: 0, dexPercent: 0, intPercent: 0, lukPercent: 0,
+                crit: 0, attackSpeed: 0,
+                strFlat: 0, dexFlat: 0, intFlat: 0, lukFlat: 0,
+                minDmg: 0, maxDmg: 0,
+                score: 0
+            };
+
+            for (let i = 0; i < numSlots; i++) {
+                totals.damage += slots[i].damage;
+                totals.strPercent += slots[i].strPercent;
+                totals.dexPercent += slots[i].dexPercent;
+                totals.intPercent += slots[i].intPercent;
+                totals.lukPercent += slots[i].lukPercent;
+                totals.crit += slots[i].crit;
+                totals.attackSpeed += slots[i].attackSpeed;
+                totals.strFlat += slots[i].strFlat;
+                totals.dexFlat += slots[i].dexFlat;
+                totals.intFlat += slots[i].intFlat;
+                totals.lukFlat += slots[i].lukFlat;
+                totals.minDmg += slots[i].minDmg;
+                totals.maxDmg += slots[i].maxDmg;
+                totals.score += slots[i].score;
+            }
+
+            return {
+                slots,
+                ...totals
+            };
+        }
+
+        // Run full simulation
+        async function runSimulation() {
+            // Save settings before running
+            saveSettings();
+
+            console.time('Total Simulation');
+            const numSlots = parseInt(document.getElementById('numSlots').value);
+            const numSimulations = parseInt(document.getElementById('simulations').value);
+            const totalCubes = parseInt(document.getElementById('totalCubes').value);
+
+            console.log(`Starting: ${numSimulations} simulations, ${totalCubes} cubes, ${numSlots} slots`);
+
+            const button = document.getElementById('runSimulation');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            button.disabled = true;
+            progressContainer.style.display = 'block';
+
+            const strategies = [
+                { id: 'equal', name: 'Equal Distribution', description: 'Distribute cubes evenly across all slots' },
+                { id: 'worst_first', name: 'Worst-First', description: 'Always improve the slot with the lowest score' },
+                { id: 'greedy_threshold', name: 'Greedy Threshold', description: 'Get each slot to tier-appropriate minimum score, then improve worst' },
+                { id: 'tier_priority', name: 'Tier Priority', description: 'Get all slots to Rare tier first, then optimize stats' }
+            ];
+
+            const results = {};
+
+            for (const strategy of strategies) {
+                results[strategy.id] = {
+                    strategy,
+                    simulations: [],
+                    totalScores: [],
+                    avgStats: {
+                        damage: 0, strPercent: 0, dexPercent: 0, intPercent: 0, lukPercent: 0,
+                        crit: 0, attackSpeed: 0,
+                        strFlat: 0, dexFlat: 0, intFlat: 0, lukFlat: 0,
+                        minDmg: 0, maxDmg: 0
+                    },
+                    avgCubeDistribution: Array(numSlots).fill(0),
+                    tierCounts: { normal: 0, rare: 0 }
+                };
+            }
+
+            // Run simulations (optimized - update UI less frequently)
+            for (let sim = 0; sim < numSimulations; sim++) {
+                console.log(`Simulation ${sim + 1}/${numSimulations}`);
+
+                // Update UI every 1000 simulations instead of 100
+                if (sim % 1000 === 0) {
+                    const progress = (sim / numSimulations) * 100;
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `${sim} / ${numSimulations}`;
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+
+                for (const strategy of strategies) {
+                    console.log(`  Strategy: ${strategy.id}`);
+                    console.time(`  ${strategy.id}`);
+                    const result = simulateWithBudget(strategy.id, totalCubes, numSlots);
+                    console.timeEnd(`  ${strategy.id}`);
+
+                    results[strategy.id].totalScores.push(result.score);
+
+                    // Accumulate all stats
+                    const data = results[strategy.id];
+                    data.avgStats.damage += result.damage / numSimulations;
+                    data.avgStats.strPercent += result.strPercent / numSimulations;
+                    data.avgStats.dexPercent += result.dexPercent / numSimulations;
+                    data.avgStats.intPercent += result.intPercent / numSimulations;
+                    data.avgStats.lukPercent += result.lukPercent / numSimulations;
+                    data.avgStats.crit += result.crit / numSimulations;
+                    data.avgStats.attackSpeed += result.attackSpeed / numSimulations;
+                    data.avgStats.strFlat += result.strFlat / numSimulations;
+                    data.avgStats.dexFlat += result.dexFlat / numSimulations;
+                    data.avgStats.intFlat += result.intFlat / numSimulations;
+                    data.avgStats.lukFlat += result.lukFlat / numSimulations;
+                    data.avgStats.minDmg += result.minDmg / numSimulations;
+                    data.avgStats.maxDmg += result.maxDmg / numSimulations;
+
+                    // Track cube distribution and tiers
+                    for (let i = 0; i < numSlots; i++) {
+                        data.avgCubeDistribution[i] += result.slots[i].cubesUsed / numSimulations;
+                        data.tierCounts[result.slots[i].tier]++;
+                    }
+
+                    // Store last simulation's slots for display
+                    if (sim === numSimulations - 1) {
+                        data.exampleSlots = result.slots;
+                    }
+                }
+            }
+
+            // Normalize tier counts
+            for (const strategyId in results) {
+                const data = results[strategyId];
+                data.tierCounts.normal /= numSimulations;
+                data.tierCounts.rare /= numSimulations;
+            }
+
+            console.log('Displaying results...');
+            displayResults(results, totalCubes, numSimulations);
+            console.timeEnd('Total Simulation');
+
+            button.disabled = false;
+            progressContainer.style.display = 'none';
+        }
+
+        function displayResults(results, totalCubes, numSimulations) {
+            const container = document.getElementById('strategyResults');
+            const resultsDiv = document.getElementById('results');
+
+            resultsDiv.style.display = 'block';
+            container.innerHTML = '';
+
+            // Find best strategy by score
+            let bestStrategy = null;
+            let bestAvgScore = -Infinity;
+
+            for (const strategyId in results) {
+                const avgScore = results[strategyId].totalScores.reduce((a, b) => a + b, 0) / results[strategyId].totalScores.length;
+                if (avgScore > bestAvgScore) {
+                    bestAvgScore = avgScore;
+                    bestStrategy = strategyId;
+                }
+            }
+
+            // Display each strategy
+            for (const strategyId in results) {
+                const data = results[strategyId];
+                const strategy = data.strategy;
+                const isBest = strategyId === bestStrategy;
+
+                const avgScore = data.totalScores.reduce((a, b) => a + b, 0) / data.totalScores.length;
+
+                // Calculate percentiles for score
+                const sortedScores = [...data.totalScores].sort((a, b) => a - b);
+                const p10 = sortedScores[Math.floor(sortedScores.length * 0.10)];
+                const p25 = sortedScores[Math.floor(sortedScores.length * 0.25)];
+                const p50 = sortedScores[Math.floor(sortedScores.length * 0.50)];
+                const p75 = sortedScores[Math.floor(sortedScores.length * 0.75)];
+                const p90 = sortedScores[Math.floor(sortedScores.length * 0.90)];
+
+                // Get enabled stats with weights for display
+                const weights = getStatWeights();
+                const enabledStats = Object.entries(STAT_CONFIG)
+                    .filter(([key, config]) => weights[key] > 0)
+                    .map(([key, config]) => ({
+                        key,
+                        name: config.name,
+                        value: data.avgStats[key] || 0,
+                        unit: config.unit.includes('per 100') ? '' : '%'
+                    }));
+
+                const strategyDiv = document.createElement('div');
+                strategyDiv.className = 'strategy' + (isBest ? ' best' : '');
+
+                const statsHTML = enabledStats.map(stat => {
+                    const displayValue = stat.unit === '%' ? stat.value.toFixed(1) + '%' : Math.round(stat.value);
+                    return `${stat.name}: ${displayValue}`;
+                }).join(' | ');
+
+                strategyDiv.innerHTML = `
+                    <h3>${strategy.name} ${isBest ? '⭐ (Best Strategy)' : ''}</h3>
+                    <p style="color: #7f8c8d; margin: 5px 0;">${strategy.description}</p>
+
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">${totalCubes}</div>
+                            <div class="metric-label">Total Cubes</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${avgScore.toFixed(1)}</div>
+                            <div class="metric-label">Avg Total Score</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <strong>Average Tier Distribution (across ${numSimulations.toLocaleString()} simulations):</strong>
+                        <div class="stat-line">
+                            Normal: ${data.tierCounts.normal.toFixed(1)} slots |
+                            Rare: ${data.tierCounts.rare.toFixed(1)} slots
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <strong>Average Stats (total across all slots):</strong>
+                        <div class="stat-line">
+                            ${statsHTML}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <strong>Example Final Lines (from last simulation):</strong>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                            ${data.exampleSlots ? data.exampleSlots.map((slot, idx) => {
+                                const slotNames = ['Head', 'Cloak', 'Chest', 'Shoulder', 'Leg', 'Belt', 'Glove', 'Ring', 'Boot'];
+                                const slotName = idx < slotNames.length ? slotNames[idx] : `Slot ${idx + 1}`;
+                                const linesHTML = slot.lines && slot.lines.length > 0
+                                    ? slot.lines.map((line, i) => {
+                                        const displayValue = line.type.includes('Flat') || line.type.includes('hp') || line.type.includes('mp') || line.type.includes('str') && !line.type.includes('%')
+                                            ? Math.round(line.value)
+                                            : line.value.toFixed(1) + '%';
+                                        return `L${i+1}: ${line.name} ${displayValue}`;
+                                    }).join('<br>')
+                                    : 'No lines';
+                                return `
+                                    <div class="stat-line" style="padding: 8px; font-size: 11px;">
+                                        <strong>${slotName}</strong> [${slot.tier.toUpperCase()}] (${slot.cubesUsed} cubes)<br>
+                                        ${linesHTML}<br>
+                                        <span style="color: #3498db; font-weight: bold;">Score: ${slot.score.toFixed(1)}</span>
+                                    </div>
+                                `;
+                            }).join('') : 'No data'}
+                        </div>
+                    </div>
+
+                    <div class="distribution" style="margin-top: 15px;">
+                        <strong>Score Distribution (percentiles across simulations):</strong>
+                        <div class="stat-line" style="margin-top: 5px;">
+                            10th percentile: ${p10.toFixed(1)} |
+                            25th percentile: ${p25.toFixed(1)} |
+                            50th percentile (median): ${p50.toFixed(1)} |
+                            75th percentile: ${p75.toFixed(1)} |
+                            90th percentile: ${p90.toFixed(1)}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(strategyDiv);
+            }
+        }
+    </script>
+</body>
+</html>
