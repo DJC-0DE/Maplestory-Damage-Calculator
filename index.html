@@ -13,129 +13,84 @@
     <div class="container">
         <h1>Damage Calculator</h1>
 
-        <!-- Base Setup -->
-        <div class="stat-weights-container" style="margin-bottom: 20px;">
-            <div class="stat-weights-header">Base Setup</div>
-            <div class="setup-panel" style="background: transparent; padding: 15px;">
-                <div class="input-grid" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    <div class="input-group">
-                        <label>Attack</label>
-                        <input type="number" id="attack-base" value="1874607">
-                    </div>
-                    <div class="input-group">
-                        <label>Critical Rate (%)</label>
-                        <input type="number" step="0.1" id="crit-rate-base" value="26.1">
-                    </div>
-                    <div class="input-group">
-                        <label>Critical Damage (%)</label>
-                        <input type="number" step="0.1" id="crit-damage-base" value="54.2">
-                    </div>
-                    <div class="input-group">
-                        <label>Stat Damage (%)</label>
-                        <input type="number" step="0.1" id="stat-damage-base" value="72.1">
-                    </div>
-                    <div class="input-group">
-                        <label>Damage (%)</label>
-                        <input type="number" step="0.1" id="damage-base" value="132.8">
-                    </div>
-                    <div class="input-group">
-                        <label>Damage Amplification (x)</label>
-                        <input type="number" step="0.1" id="damage-amp-base" value="0.8">
-                    </div>
-                    <div class="input-group">
-                        <label>Attack Speed (%)</label>
-                        <input type="number" step="0.1" id="attack-speed-base" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label>Defense Penetration (%)</label>
-                        <input type="number" step="0.1" id="def-pen-base" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label>Boss Monster Damage (%)</label>
-                        <input type="number" step="0.1" id="boss-damage-base" value="26.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Normal Monster Damage (%)</label>
-                        <input type="number" step="0.1" id="normal-damage-base" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label>Skill Coefficient (%)</label>
-                        <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
-                    </div>
-                    <div class="input-group">
-                        <label>Skill Mastery Bonus (%)</label>
-                        <input type="number" step="0.1" id="skill-mastery-base" value="21">
-                    </div>
-                    <div class="input-group">
-                        <label>Skill Mastery Bonus - Boss Only (%)</label>
-                        <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
-                    </div>
-                    <div class="input-group">
-                        <label>Min Damage Multiplier (%)</label>
-                        <input type="number" step="0.1" id="min-damage-base" value="98">
-                    </div>
-                    <div class="input-group">
-                        <label>Max Damage Multiplier (%)</label>
-                        <input type="number" step="0.1" id="max-damage-base" value="131">
-                    </div>
-                </div>
+        <!-- First Tabbed Area: Character Setup -->
+        <div class="stat-weights-container tab-container">
+            <div class="stat-weights-header">Character Setup</div>
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('setup', 'base-stats')">Base Stats</button>
+                <button class="tab-button" onclick="switchTab('setup', 'weapon-levels')">Weapon Levels</button>
             </div>
-        </div>
 
-        <!-- Item Comparison -->
-        <div class="stat-weights-container" style="margin-bottom: 20px;">
-            <div class="stat-weights-header">Item Comparison</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <!-- Equipped Item -->
-                <div>
-                    <h3 style="color: var(--accent-success); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
-                        Currently Equipped</h3>
-                    <div
-                        style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 1px solid var(--accent-success); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow);">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped
-                                Item</span>
-                            <span style="color: var(--text-secondary); font-size: 0.8em;">(stats in base setup)</span>
+            <!-- Base Stats Tab -->
+            <div id="setup-base-stats" class="tab-content active">
+                <div class="setup-panel" style="background: transparent; padding: 15px;">
+                    <div class="input-grid" style="grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        <div class="input-group">
+                            <label>Attack</label>
+                            <input type="number" id="attack-base" value="1874607">
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <div class="input-group">
-                                <label>Name</label>
-                                <input type="text" id="equipped-name" value="Current Item">
-                            </div>
-                            <div class="input-group">
-                                <label>Attack</label>
-                                <input type="number" id="equipped-attack" value="0">
-                            </div>
+                        <div class="input-group">
+                            <label>Critical Rate (%)</label>
+                            <input type="number" step="0.1" id="crit-rate-base" value="26.1">
                         </div>
-                        <div id="equipped-stats-container"></div>
-                        <button onclick="addEquippedStat()"
-                            style="background: var(--accent-success); border: none; padding: 10px 15px; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; margin-top: 8px; font-size: 0.9em; width: 100%; box-shadow: 0 2px 8px var(--shadow); transition: all 0.3s ease;">+
-                            Add Stat</button>
+                        <div class="input-group">
+                            <label>Critical Damage (%)</label>
+                            <input type="number" step="0.1" id="crit-damage-base" value="54.2">
+                        </div>
+                        <div class="input-group">
+                            <label>Stat Damage (%)</label>
+                            <input type="number" step="0.1" id="stat-damage-base" value="72.1">
+                        </div>
+                        <div class="input-group">
+                            <label>Damage (%)</label>
+                            <input type="number" step="0.1" id="damage-base" value="132.8">
+                        </div>
+                        <div class="input-group">
+                            <label>Damage Amplification (x)</label>
+                            <input type="number" step="0.1" id="damage-amp-base" value="0.8">
+                        </div>
+                        <div class="input-group">
+                            <label>Attack Speed (%)</label>
+                            <input type="number" step="0.1" id="attack-speed-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Defense Penetration (%)</label>
+                            <input type="number" step="0.1" id="def-pen-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Boss Monster Damage (%)</label>
+                            <input type="number" step="0.1" id="boss-damage-base" value="26.5">
+                        </div>
+                        <div class="input-group">
+                            <label>Normal Monster Damage (%)</label>
+                            <input type="number" step="0.1" id="normal-damage-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Skill Coefficient (%)</label>
+                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
+                        </div>
+                        <div class="input-group">
+                            <label>Skill Mastery Bonus (%)</label>
+                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
+                        </div>
+                        <div class="input-group">
+                            <label>Skill Mastery Bonus - Boss Only (%)</label>
+                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Min Damage Multiplier (%)</label>
+                            <input type="number" step="0.1" id="min-damage-base" value="98">
+                        </div>
+                        <div class="input-group">
+                            <label>Max Damage Multiplier (%)</label>
+                            <input type="number" step="0.1" id="max-damage-base" value="131">
+                        </div>
                     </div>
                 </div>
-
-                <!-- Comparison Items Column -->
-                <div>
-                    <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
-                        Comparison Items</h3>
-                    <div id="comparison-items-container"
-                        style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
-                    <button class="calculate-btn" onclick="addComparisonItem()"
-                        style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 10px 15px; font-size: 0.95em;">+
-                        Add Item</button>
-                </div>
             </div>
-            <button class="calculate-btn" onclick="calculate()" style="margin-top: 15px;">Calculate All</button>
-        </div>
 
-        <!-- Weapon Levels Section -->
-        <div class="stat-weights-container" style="margin-bottom: 20px;">
-            <div class="stat-weights-header" onclick="toggleWeaponSection()"
-                style="cursor: pointer; user-select: none;">
-                Weapon Levels (For Stat Damage Predictions) <span id="weapon-toggle-icon">▼</span>
-            </div>
-            <div id="weapon-section-content" style="display: none;">
+            <!-- Weapon Levels Tab -->
+            <div id="setup-weapon-levels" class="tab-content">
                 <div id="weapons-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
                     <!-- Weapons will be generated by JavaScript -->
                 </div>
@@ -172,11 +127,65 @@
             </div>
         </div>
 
-        <!-- Results -->
-        <div class="stat-weights-container">
-            <div class="stat-weights-header">Item Comparison Results</div>
-            <div id="results-container"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;"></div>
+        <!-- Second Tabbed Area: Item Comparison -->
+        <div class="stat-weights-container tab-container">
+            <div class="stat-weights-header">Item Analysis</div>
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('analysis', 'item-comparison')">Item Comparison</button>
+            </div>
+
+            <!-- Item Comparison Tab -->
+            <div id="analysis-item-comparison" class="tab-content active">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <!-- Equipped Item -->
+                    <div>
+                        <h3 style="color: var(--accent-success); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
+                            Currently Equipped</h3>
+                        <div
+                            style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 1px solid var(--accent-success); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow);">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped
+                                    Item</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8em;">(stats in base setup)</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div class="input-group">
+                                    <label>Name</label>
+                                    <input type="text" id="equipped-name" value="Current Item">
+                                </div>
+                                <div class="input-group">
+                                    <label>Attack</label>
+                                    <input type="number" id="equipped-attack" value="0">
+                                </div>
+                            </div>
+                            <div id="equipped-stats-container"></div>
+                            <button onclick="addEquippedStat()"
+                                style="background: var(--accent-success); border: none; padding: 10px 15px; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; margin-top: 8px; font-size: 0.9em; width: 100%; box-shadow: 0 2px 8px var(--shadow); transition: all 0.3s ease;">+
+                                Add Stat</button>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Items Column -->
+                    <div>
+                        <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
+                            Comparison Items</h3>
+                        <div id="comparison-items-container"
+                            style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
+                        <button class="calculate-btn" onclick="addComparisonItem()"
+                            style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 10px 15px; font-size: 0.95em;">+
+                            Add Item</button>
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="calculate()" style="margin-bottom: 20px;">Calculate All</button>
+
+                <!-- Results within the same tab -->
+                <div style="border-top: 2px solid var(--border-color); padding-top: 20px;">
+                    <h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.3em; font-weight: 600; text-align: center;">Comparison Results</h3>
+                    <div id="results-container"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Stat Damage Predictions -->

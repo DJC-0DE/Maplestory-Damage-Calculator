@@ -24,4 +24,3 @@ const availableStats = [
 // Global state variables
 let comparisonItemCount = 0;
 let equippedStatCount = 0;
-let weaponSectionVisible = false;

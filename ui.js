@@ -1,3 +1,33 @@
+// Tab switching function
+function switchTab(group, tabName) {
+    // Get all tab contents and buttons within the group
+    const tabContents = document.querySelectorAll(`#${group}-${tabName}`).length > 0
+        ? document.querySelectorAll(`[id^="${group}-"]`)
+        : [];
+    const tabButtons = event.currentTarget.parentElement.querySelectorAll('.tab-button');
+
+    // Hide all tab contents in this group
+    tabContents.forEach(content => {
+        if (content.classList.contains('tab-content')) {
+            content.classList.remove('active');
+        }
+    });
+
+    // Remove active class from all buttons in this group
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show the selected tab content
+    const selectedTab = document.getElementById(`${group}-${tabName}`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+
+    // Add active class to clicked button
+    event.currentTarget.classList.add('active');
+}
+
 // Theme toggle functions
 function toggleTheme() {
     const body = document.body;
@@ -22,21 +52,6 @@ function loadTheme() {
 
     body.setAttribute('data-theme', savedTheme);
     themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-}
-
-// Weapon section toggle
-function toggleWeaponSection() {
-    weaponSectionVisible = !weaponSectionVisible;
-    const content = document.getElementById('weapon-section-content');
-    const icon = document.getElementById('weapon-toggle-icon');
-
-    if (weaponSectionVisible) {
-        content.style.display = 'block';
-        icon.textContent = '▲';
-    } else {
-        content.style.display = 'none';
-        icon.textContent = '▼';
-    }
 }
 
 // Equipped item stat management

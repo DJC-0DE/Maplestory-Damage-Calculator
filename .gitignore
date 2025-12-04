@@ -1,0 +1,17 @@
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Node modules (if added in future)
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
