@@ -929,3 +929,15 @@ select option {
         gap: 8px;
     }
 }
+
+.info-icon {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 0.95em;
+    color: var(--accent-primary);
+    cursor: help; 
+    vertical-align: middle;
+    line-height: 1;
+    opacity: 0.95;
+}
+

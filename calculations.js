@@ -213,7 +213,7 @@ function calculateStatWeights(setup, stats) {
         let labelContent = stat.label;
         if (multiplicativeStats[stat.key]) {
             const info = multiplicativeStats[stat.key];
-            labelContent += ` <span title="Increases to this stat are multiplicative rather than additive, but also have dimminishing returns. A line item with 10% in this stat will translate to less than 10% increase on the stats page. Final increase = y% × (1 - x/${info.denominator}), where x is the current value and y is the increase amount." style="cursor: help; color: var(--accent-primary); font-weight: bold; margin-left: 4px;">?</span>`;
+            labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive, but also have diminishing returns. A line item with 10% in this stat will translate to less than 10% increase on the stats page. Final increase = y% × (1 - x/${info.denominator}), where x is the current value and y is the increase amount.">ℹ️</span>`;
         }
 
         html += `<tr><td class="stat-name">${labelContent}</td>`;
