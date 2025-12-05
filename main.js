@@ -139,8 +139,18 @@ function calculate() {
 
     let resultsHTML = '';
 
+    // Calculate equipped item's reference values for comparison
+    const equippedBossResults = calculateDamage(baseStats, 'boss');
+    const equippedNormalResults = calculateDamage(baseStats, 'normal');
+    const equippedDamageValues = {
+        expectedDamageBoss: equippedBossResults.expectedDamage,
+        dpsBoss: equippedBossResults.dps,
+        expectedDamageNormal: equippedNormalResults.expectedDamage,
+        dpsNormal: equippedNormalResults.dps
+    };
+
     // Display equipped item results
-    resultsHTML += displayResults(equippedItem.name || 'Currently Equipped', baseStats, 'equipped', true);
+    resultsHTML += displayResults(equippedItem.name || 'Currently Equipped', baseStats, 'equipped', true, null);
 
     // Get all comparison items
     const comparisonItems = [];
@@ -156,7 +166,7 @@ function calculate() {
     // Display each comparison item
     comparisonItems.forEach(item => {
         const itemStats = applyItemToStats(baseStats, equippedItem, item);
-        resultsHTML += displayResults(item.name || `Item ${item.id}`, itemStats, `item-${item.id}`, false);
+        resultsHTML += displayResults(item.name || `Item ${item.id}`, itemStats, `item-${item.id}`, false, equippedDamageValues);
     });
 
     document.getElementById('results-container').innerHTML = resultsHTML || '<p style="text-align: center; color: #b3d9ff;">Add comparison items to see results</p>';
