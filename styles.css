@@ -838,6 +838,29 @@ select option {
     box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
 }
 
+/* Visual badge for the equipped preset in Inner Ability */
+.preset-equipped-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--accent-primary);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.78em;
+    letter-spacing: 0.2px;
+    box-shadow: none;
+    border: 1px solid var(--accent-primary);
+    /* ensure the badge sits inline and vertically centered with text */
+    vertical-align: middle;
+    line-height: 1;
+    /* Use a subtle transform to vertically align the badge with surrounding text more reliably across fonts */
+    transform: translateY(-1px);
+    margin-left: 8px; /* keep consistent spacing from JS inline margin */
+}
+
+
 .line-breakdown {
     display: none;
     background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), rgba(0, 122, 255, 0.05));

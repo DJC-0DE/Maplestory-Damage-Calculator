@@ -314,7 +314,7 @@ function updateWeaponBonuses() {
 }
 
 // Display functions
-function displayResults(itemName, stats, uniqueId, isEquipped = false) {
+function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedDamageValues = null) {
     const bossResults = calculateDamage(stats, 'boss');
     const normalResults = calculateDamage(stats, 'normal');
 
@@ -323,27 +323,44 @@ function displayResults(itemName, stats, uniqueId, isEquipped = false) {
         ? 'linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05))'
         : 'linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05))';
 
+    const getPercentChangeDisplay = (currentValue, referenceValue) => {
+        if (!referenceValue || referenceValue === 0) return '';
+        const changePercentage = ((currentValue - referenceValue) / referenceValue) * 100;
+        const changeColor = changePercentage >= 0 ? 'var(--accent-success)' : 'var(--accent-warning)';
+        const changeSign = changePercentage >= 0 ? '+' : '';
+        return `<div style="color: ${changeColor}; font-weight: 600; margin-top: 4px; font-size: 0.95em;">${changeSign}${changePercentage.toFixed(2)}%</div>`;
+    };
+
+    const expectedBossDamagePercentChange = equippedDamageValues ? getPercentChangeDisplay(bossResults.expectedDamage, equippedDamageValues.expectedDamageBoss) : '';
+    const bossDpsPercentChange = equippedDamageValues ? getPercentChangeDisplay(bossResults.dps, equippedDamageValues.dpsBoss) : '';
+    const expectedNormalDamagePercentChange = equippedDamageValues ? getPercentChangeDisplay(normalResults.expectedDamage, equippedDamageValues.expectedDamageNormal) : '';
+    const normalDpsPercentChjange = equippedDamageValues ? getPercentChangeDisplay(normalResults.dps, equippedDamageValues.dpsNormal) : '';
+
     const html = `
         <div style="background: ${bgGradient}; border: 2px solid ${borderColor}; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px var(--shadow); transition: all 0.3s ease;">
             <h3 style="color: ${borderColor}; margin-bottom: 15px; text-align: center; font-size: 1.2em; font-weight: 600;">${itemName}</h3>
         <div class="expected-damage">
             <div class="label">Expected Damage (Boss)</div>
             <div class="value">${formatNumber(bossResults.expectedDamage)}</div>
+            ${expectedBossDamagePercentChange}
         </div>
 
         <div class="expected-damage" style="margin-top: 10px; background: rgba(67, 233, 123, 0.3);">
             <div class="label">DPS (Boss)</div>
             <div class="value">${formatNumber(bossResults.dps)}</div>
+            ${bossDpsPercentChange}
         </div>
 
         <div class="expected-damage" style="margin-top: 10px;">
             <div class="label">Expected Damage (Normal)</div>
             <div class="value">${formatNumber(normalResults.expectedDamage)}</div>
+            ${expectedNormalDamagePercentChange}
         </div>
 
         <div class="expected-damage" style="margin-top: 10px; background: rgba(67, 233, 123, 0.3);">
             <div class="label">DPS (Normal)</div>
             <div class="value">${formatNumber(normalResults.dps)}</div>
+            ${normalDpsPercentChjange}
         </div>
 
         <div class="toggle-details" onclick="toggleDetails('${uniqueId}')">

@@ -341,6 +341,23 @@ function renderPresetComparison() {
     html += '<th class="sortable" onclick="sortPresetTable(3)">Normal DPS Gain</th>';
     html += '</tr></thead><tbody>';
 
+    // Find equipped preset for percent difference calculation
+    const equippedComp = comparisons.find(c => c.isEquipped);
+    const equippedBossDPS = equippedComp ? equippedComp.bossDPSGain : null;
+    const equippedNormalDPS = equippedComp ? equippedComp.normalDPSGain : null;
+
+    // helper to render a DPS cell (numeric + percent vs equipped when applicable)
+    function makeDpsCell(gain, equippedGain, isEquippedRow) {
+        if (equippedComp && !isEquippedRow) {
+            const percent = equippedGain !== 0 ? ((gain - equippedGain) / equippedGain) * 100 : 0;
+            const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
+            return `<td><span class="${cls}">+${formatNumber(gain)} <span style="font-weight:600; opacity:0.85; font-size:0.85em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></span></td>`;
+        } else {
+            // No equipped preset or this is the equipped row — plain value
+            return `<td>+${formatNumber(gain)}</td>`;
+        }
+    }
+
     comparisons.forEach((comp, index) => {
         const rankBadge = index < 3 ? `<span class="preset-rank rank-${index + 1}">${index + 1}</span>` : `<span class="preset-rank">${index + 1}</span>`;
         const equippedBadge = comp.isEquipped ? '<span class="preset-equipped-badge" style="margin-left: 8px;">Equipped</span>' : '';
@@ -348,8 +365,9 @@ function renderPresetComparison() {
         html += `<tr class="expandable" onclick="toggleLineBreakdown(${comp.id})">`;
         html += `<td>${rankBadge}</td>`;
         html += `<td>Preset ${comp.id}${equippedBadge}</td>`;
-        html += `<td class="dps-positive">+${formatNumber(comp.bossDPSGain)}</td>`;
-        html += `<td class="dps-positive">+${formatNumber(comp.normalDPSGain)}</td>`;
+
+        html += makeDpsCell(comp.bossDPSGain, equippedBossDPS, comp.isEquipped);
+        html += makeDpsCell(comp.normalDPSGain, equippedNormalDPS, comp.isEquipped);
         html += '</tr>';
 
         // Line breakdown row
