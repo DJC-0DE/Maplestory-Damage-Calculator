@@ -39,7 +39,19 @@
                             <input type="number" step="0.1" id="crit-damage-base" value="54.2">
                         </div>
                         <div class="input-group">
-                            <label>Stat Damage (%)</label>
+                            <label>Attack Speed (%)</label>
+                            <input type="number" step="0.1" id="attack-speed-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Primary Main Stat</label>
+                            <input type="number" id="primary-main-stat-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Secondary Main Stat</label>
+                            <input type="number" id="secondary-main-stat-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Stat Prop. Damage (%)</label>
                             <input type="number" step="0.1" id="stat-damage-base" value="72.1">
                         </div>
                         <div class="input-group">
@@ -51,32 +63,12 @@
                             <input type="number" step="0.1" id="damage-amp-base" value="0.8">
                         </div>
                         <div class="input-group">
-                            <label>Attack Speed (%)</label>
-                            <input type="number" step="0.1" id="attack-speed-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Defense Penetration (%)</label>
-                            <input type="number" step="0.1" id="def-pen-base" value="0">
-                        </div>
-                        <div class="input-group">
                             <label>Boss Monster Damage (%)</label>
                             <input type="number" step="0.1" id="boss-damage-base" value="26.5">
                         </div>
                         <div class="input-group">
                             <label>Normal Monster Damage (%)</label>
                             <input type="number" step="0.1" id="normal-damage-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Coefficient (%)</label>
-                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus (%)</label>
-                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus - Boss Only (%)</label>
-                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
                         </div>
                         <div class="input-group">
                             <label>Min Damage Multiplier (%)</label>
@@ -86,13 +78,28 @@
                             <label>Max Damage Multiplier (%)</label>
                             <input type="number" step="0.1" id="max-damage-base" value="131">
                         </div>
-                        <div class="input-group">
-                            <label>Primary Main Stat</label>
-                            <input type="number" id="primary-main-stat-base" value="0">
+                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
                         </div>
                         <div class="input-group">
-                            <label>Secondary Main Stat</label>
-                            <input type="number" id="secondary-main-stat-base" value="0">
+                            <label>Skill Coefficient (%) <span class="info-icon" role="img" aria-label="Info"
+                                    title="This value can be found in the description of your Basic Attack.">?</span></label>
+                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
+                        </div>
+                        <div class="input-group">
+                            <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
+                                    title="This value must be manually summed from your Artifact/item potential and Hero Ability.">?</span></label>
+                            <input type="number" step="0.1" id="def-pen-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Skill Mastery Bonus (%) <span class="info-icon" role="img" aria-label="Info"
+                                    title="This value must be manually summed from Mastery skills that enhance your Basic Attack damage">?</span></label>
+                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
+                        </div>
+                        <div class="input-group">
+                            <label>Skill Mastery Bonus - Boss Only (%) <span class="info-icon" role="img"
+                                    aria-label="Info"
+                                    title="This value must be manually summed from Mastery skills that enhance your Basic Attack damage">?</span></label>
+                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
                         </div>
                     </div>
                 </div>
@@ -147,8 +154,10 @@
         <div class="stat-weights-container tab-container">
             <div class="stat-weights-header">Item Analysis</div>
             <div class="tab-buttons">
-                <button class="tab-button active" onclick="switchTab('analysis', 'item-comparison')">Item Comparison</button>
-                <button class="tab-button" onclick="switchTab('analysis', 'inner-ability')">Inner Ability Analysis</button>
+                <button class="tab-button active" onclick="switchTab('analysis', 'item-comparison')">Item
+                    Comparison</button>
+                <button class="tab-button" onclick="switchTab('analysis', 'inner-ability')">Inner Ability
+                    Analysis</button>
             </div>
 
             <!-- Item Comparison Tab -->
@@ -162,9 +171,11 @@
                             style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 1px solid var(--accent-success); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow);">
                             <div
                                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped
+                                <span
+                                    style="color: var(--accent-success); font-weight: 600; font-size: 0.95em;">Equipped
                                     Item</span>
-                                <span style="color: var(--text-secondary); font-size: 0.8em;">(stats in base setup)</span>
+                                <span style="color: var(--text-secondary); font-size: 0.8em;">(stats in base
+                                    setup)</span>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                                 <div class="input-group">
@@ -198,17 +209,22 @@
 
                 <!-- Results within the same tab -->
                 <div style="border-top: 2px solid var(--border-color); padding-top: 20px;">
-                    <h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.3em; font-weight: 600; text-align: center;">Comparison Results</h3>
+                    <h3
+                        style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.3em; font-weight: 600; text-align: center;">
+                        Comparison Results</h3>
                     <div id="results-container"
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;"></div>
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;">
+                    </div>
                 </div>
             </div>
 
             <!-- Inner Ability Analysis Tab -->
             <div id="analysis-inner-ability" class="tab-content">
                 <div class="tab-buttons" style="border-bottom: 1px solid var(--border-color); margin-bottom: 20px;">
-                    <button class="tab-button active" onclick="switchInnerAbilityTab('preset-comparison')">Preset Comparison</button>
-                    <button class="tab-button" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical Best</button>
+                    <button class="tab-button active" onclick="switchInnerAbilityTab('preset-comparison')">Preset
+                        Comparison</button>
+                    <button class="tab-button" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical
+                        Best</button>
                 </div>
 
                 <!-- Preset Comparison Sub-Tab -->
