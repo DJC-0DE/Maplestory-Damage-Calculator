@@ -82,6 +82,10 @@ function calculateArtifactPotentialRankings() {
             const normalDPSGain = normalDamage.dps - baselineNormalDamage.dps;
             const avgDPSGain = (bossDPSGain + normalDPSGain) / 2;
 
+            const bossDPSPercentChange = baselineBossDamage.dps > 0 ? (bossDPSGain / baselineBossDamage.dps) * 100 : 0;
+            const normalDPSPercentChange = baselineNormalDamage.dps > 0 ? (normalDPSGain / baselineNormalDamage.dps) * 100 : 0;
+            const avgDPSPercentChange = (bossDPSPercentChange + normalDPSPercentChange) / 2;
+
             // Only include stats that give positive DPS gain
             if (avgDPSGain > 0) {
                 // Format the display name
@@ -96,7 +100,10 @@ function calculateArtifactPotentialRankings() {
                     value: value + '%',
                     bossDPSGain,
                     normalDPSGain,
-                    avgDPSGain
+                    avgDPSGain,
+                    bossDPSPercentChange,
+                    normalDPSPercentChange,
+                    avgDPSPercentChange
                 });
             }
         });
@@ -179,9 +186,9 @@ function renderArtifactPotential() {
         html += `<td>${rankBadge}</td>`;
         html += `<td>${badge}${result.stat}</td>`;
         html += `<td>${result.value}</td>`;
-        html += `<td class="dps-positive">+${formatNumber(result.bossDPSGain)}</td>`;
-        html += `<td class="dps-positive">+${formatNumber(result.normalDPSGain)}</td>`;
-        html += `<td class="dps-positive"><strong>+${formatNumber(result.avgDPSGain)}</strong></td>`;
+        html += `<td>+${formatNumber(result.bossDPSGain)}${result.bossDPSPercentChange !== 0 ? ` <span class="dps-positive" style="font-weight:600; opacity:0.85; font-size:0.85em;">(+${result.bossDPSPercentChange.toFixed(2)}%)</span>` : ''}</td>`;
+        html += `<td>+${formatNumber(result.normalDPSGain)}${result.normalDPSPercentChange !== 0 ? ` <span class="dps-positive" style="font-weight:600; opacity:0.85; font-size:0.85em;">(+${result.normalDPSPercentChange.toFixed(2)}%)</span>` : ''}</td>`;
+        html += `<td><strong>+${formatNumber(result.avgDPSGain)}</strong>${result.avgDPSPercentChange !== 0 ? ` <span class="dps-positive" style="font-weight:600; opacity:0.85; font-size:0.85em;">(+${result.avgDPSPercentChange.toFixed(2)}%)</span>` : ''}</td>`;
         html += '</tr>';
     });
 

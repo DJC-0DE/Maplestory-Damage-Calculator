@@ -58,6 +58,22 @@ function applyInnerAbilityLines(baseStats, lines) {
     return modifiedStats;
 }
 
+// Compute baseline stats (base minus equipped inner ability lines)
+function getBaselineStats() {
+    const baseStats = getStats('base');
+    const presets = getAllPresets();
+    const equippedPreset = presets.find(p => p.isEquipped);
+
+    let baseline = { ...baseStats };
+    if (equippedPreset) {
+        equippedPreset.lines.forEach(line => {
+            baseline = mapInnerAbilityStat(line.stat, -line.value, baseline);
+        });
+    }
+
+    return baseline;
+}
+
 // Get all configured presets
 function getAllPresets() {
     const presets = [];
@@ -96,13 +112,7 @@ function calculatePresetComparisons() {
     const equippedPreset = presets.find(p => p.isEquipped);
 
     // Calculate baseline (base stats without equipped IA)
-    let baseline = { ...baseStats };
-    if (equippedPreset) {
-        // Subtract equipped stats to get baseline
-        equippedPreset.lines.forEach(line => {
-            baseline = mapInnerAbilityStat(line.stat, -line.value, baseline);
-        });
-    }
+    let baseline = getBaselineStats();
 
     // Calculate baseline damage
     const baselineBossDamage = calculateDamage(baseline, 'boss');
@@ -164,15 +174,7 @@ function calculateTheoreticalBest() {
     const results = [];
 
     // Get equipped preset to subtract from base
-    const presets = getAllPresets();
-    const equippedPreset = presets.find(p => p.isEquipped);
-
-    let baseline = { ...baseStats };
-    if (equippedPreset) {
-        equippedPreset.lines.forEach(line => {
-            baseline = mapInnerAbilityStat(line.stat, -line.value, baseline);
-        });
-    }
+    const baseline = getBaselineStats();
 
     // Calculate baseline damage
     const baselineBossDamage = calculateDamage(baseline, 'boss');
@@ -193,13 +195,15 @@ function calculateTheoreticalBest() {
                 const modifiedStats = mapInnerAbilityStat(statName, value, baseline);
                 const damage = calculateDamage(modifiedStats, 'boss');
                 const dpsGain = damage.dps - baselineBossDamage.dps;
+                const percentIncrease = dpsGain / baselineBossDamage.dps * 100;
 
                 results.push({
                     stat: statName,
                     rarity,
                     roll,
                     value,
-                    dpsGain
+                    dpsGain,
+                    percentIncrease
                 });
             });
         });
@@ -214,16 +218,7 @@ function calculateTheoreticalBest() {
 
 // Calculate best possible combinations
 function calculateBestCombinations() {
-    const baseStats = getStats('base');
-    const presets = getAllPresets();
-    const equippedPreset = presets.find(p => p.isEquipped);
-
-    let baseline = { ...baseStats };
-    if (equippedPreset) {
-        equippedPreset.lines.forEach(line => {
-            baseline = mapInnerAbilityStat(line.stat, -line.value, baseline);
-        });
-    }
+    const baseline = getBaselineStats();
 
     const baselineBossDamage = calculateDamage(baseline, 'boss');
 
@@ -424,6 +419,8 @@ function renderTheoreticalBest() {
     const results = calculateTheoreticalBest();
     const combinations = calculateBestCombinations();
 
+    const baselineBossDamage = calculateDamage(getBaselineStats(), 'boss');
+    const baselineBossDps = baselineBossDamage.dps;
     // Apply sorting based on current column and direction
     if (theoreticalSortColumn === 2) {
         results.sort((a, b) => {
@@ -447,7 +444,7 @@ function renderTheoreticalBest() {
         html += '<tr>';
         html += `<td>${badge}${result.stat} ${result.roll} Roll</td>`;
         html += `<td>${result.value}</td>`;
-        html += `<td class="dps-positive">+${formatNumber(result.dpsGain)}</td>`;
+        html += `<td>+${formatNumber(result.dpsGain)} <span class="${result.percentIncrease > 0 ? 'dps-positive' : 'dps-negative'}" style="font-weight:600; opacity:0.85; font-size:0.85em;"> (${result.percentIncrease >= 0 ? '+' : ''}${result.percentIncrease.toFixed(2)}%)</span></td>`;
         html += '</tr>';
     });
 
@@ -465,7 +462,11 @@ function renderTheoreticalBest() {
         html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
-    html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueOnly.totalDPS)}</div>`;
+    {
+        const percent = (combinations.uniqueOnly.totalDPS / baselineBossDps) * 100;
+        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
+        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueOnly.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+    }
     html += '</div>';
 
     // Unique + Legendary
@@ -477,7 +478,11 @@ function renderTheoreticalBest() {
         html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
-    html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueLegendary.totalDPS)}</div>`;
+    {
+        const percent = (combinations.uniqueLegendary.totalDPS / baselineBossDps) * 100;
+        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
+        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueLegendary.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+    }
     html += '</div>';
 
     // All Rarities
@@ -489,7 +494,11 @@ function renderTheoreticalBest() {
         html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
-    html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.allRarities.totalDPS)}</div>`;
+    {
+        const percent = (combinations.allRarities.totalDPS / baselineBossDps) * 100;
+        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
+        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.allRarities.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+    }
     html += '</div>';
 
     container.innerHTML = html;
