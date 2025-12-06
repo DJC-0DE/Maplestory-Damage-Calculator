@@ -182,6 +182,8 @@ window.onload = function () {
     // Initialize hero power presets
     initializeHeroPowerPresets();
     initializeWeapons();
+    // Enable auto-select for all numeric inputs across the app
+    enableGlobalNumberInputAutoSelect();
     // Load saved data from localStorage
     const loaded = loadFromLocalStorage();
     // Load hero power presets from localStorage
@@ -199,3 +201,12 @@ window.onload = function () {
         calculate();
     }
 };
+
+function enableGlobalNumberInputAutoSelect() {
+    document.addEventListener('focusin', (e) => {
+        const t = e.target;
+        if (t && t.tagName === 'INPUT' && t.type === 'number') {
+            t.select();
+        }
+    });
+}
