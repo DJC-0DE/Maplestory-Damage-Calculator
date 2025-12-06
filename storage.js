@@ -187,6 +187,19 @@ function loadFromLocalStorage() {
     }
 }
 
+// Update analysis tabs when base stats change
+function updateAnalysisTabs() {
+    // Update Inner Ability Analysis
+    renderPresetComparison();
+    renderTheoreticalBest();
+
+    // Update Artifact Potential
+    renderArtifactPotential();
+
+    // Recalculate all comparisons
+    calculate();
+}
+
 // Attach save listeners to base setup inputs
 function attachSaveListeners() {
     // Attach to base setup inputs
@@ -200,7 +213,10 @@ function attachSaveListeners() {
     fields.forEach(field => {
         const element = document.getElementById(`${field}-base`);
         if (element) {
-            element.addEventListener('input', saveToLocalStorage);
+            element.addEventListener('input', () => {
+                saveToLocalStorage();
+                updateAnalysisTabs();
+            });
         }
     });
 

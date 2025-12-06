@@ -108,6 +108,20 @@ function calculateArtifactPotentialRankings() {
     return results;
 }
 
+// Sort artifact potential table
+let artifactSortColumn = 5;
+let artifactSortAsc = false;
+
+function sortArtifactTable(column) {
+    if (artifactSortColumn === column) {
+        artifactSortAsc = !artifactSortAsc;
+    } else {
+        artifactSortColumn = column;
+        artifactSortAsc = false;
+    }
+    renderArtifactPotential();
+}
+
 // Render the Artifact Potential rankings table
 function renderArtifactPotential() {
     const container = document.getElementById('artifact-potential-container');
@@ -115,15 +129,37 @@ function renderArtifactPotential() {
 
     const results = calculateArtifactPotentialRankings();
 
+    // Apply sorting based on current column and direction
+    results.sort((a, b) => {
+        let valA, valB;
+        switch (artifactSortColumn) {
+            case 3: // Boss DPS Gain
+                valA = a.bossDPSGain;
+                valB = b.bossDPSGain;
+                break;
+            case 4: // Normal DPS Gain
+                valA = a.normalDPSGain;
+                valB = b.normalDPSGain;
+                break;
+            case 5: // Avg DPS Gain
+                valA = a.avgDPSGain;
+                valB = b.avgDPSGain;
+                break;
+            default:
+                return 0;
+        }
+        return artifactSortAsc ? valA - valB : valB - valA;
+    });
+
     let html = '<h3 style="margin-bottom: 15px;">All Possible Rolls Ranked</h3>';
     html += '<div style="max-height: 600px; overflow-y: auto; border-radius: 12px;">';
     html += '<table class="ia-table"><thead><tr>';
     html += '<th>Rank</th>';
     html += '<th>Rarity & Stat</th>';
     html += '<th>Value</th>';
-    html += '<th class="sortable">Boss DPS Gain</th>';
-    html += '<th class="sortable">Normal DPS Gain</th>';
-    html += '<th class="sortable">Avg DPS Gain</th>';
+    html += '<th class="sortable" onclick="sortArtifactTable(3)">Boss DPS Gain</th>';
+    html += '<th class="sortable" onclick="sortArtifactTable(4)">Normal DPS Gain</th>';
+    html += '<th class="sortable" onclick="sortArtifactTable(5)">Avg DPS Gain</th>';
     html += '</tr></thead><tbody>';
 
     results.forEach((result, index) => {

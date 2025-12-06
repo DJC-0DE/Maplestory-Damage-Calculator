@@ -334,6 +334,32 @@ function renderPresetComparison() {
         return;
     }
 
+    // Apply sorting based on current column and direction
+    comparisons.sort((a, b) => {
+        let valA, valB;
+        switch (presetSortColumn) {
+            case 0: // Rank - sort by boss DPS gain (already sorted)
+                valA = a.bossDPSGain;
+                valB = b.bossDPSGain;
+                break;
+            case 1: // Preset
+                valA = a.id;
+                valB = b.id;
+                break;
+            case 2: // Boss DPS Gain
+                valA = a.bossDPSGain;
+                valB = b.bossDPSGain;
+                break;
+            case 3: // Normal DPS Gain
+                valA = a.normalDPSGain;
+                valB = b.normalDPSGain;
+                break;
+            default:
+                return 0;
+        }
+        return presetSortAsc ? valA - valB : valB - valA;
+    });
+
     let html = '<table class="ia-table"><thead><tr>';
     html += '<th class="sortable" onclick="sortPresetTable(0)">Rank</th>';
     html += '<th class="sortable" onclick="sortPresetTable(1)">Preset</th>';
@@ -397,6 +423,13 @@ function renderTheoreticalBest() {
 
     const results = calculateTheoreticalBest();
     const combinations = calculateBestCombinations();
+
+    // Apply sorting based on current column and direction
+    if (theoreticalSortColumn === 2) {
+        results.sort((a, b) => {
+            return theoreticalSortAsc ? a.dpsGain - b.dpsGain : b.dpsGain - a.dpsGain;
+        });
+    }
 
     let html = '<h3 style="margin-bottom: 15px;">All Possible Rolls Ranked</h3>';
     html += '<div style="max-height: 600px; overflow-y: auto; border-radius: 12px;">';

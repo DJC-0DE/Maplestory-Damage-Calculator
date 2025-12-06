@@ -817,6 +817,10 @@ function saveHeroPowerPresets() {
     }
 
     localStorage.setItem('heroPowerPresets', JSON.stringify(presets));
+
+    // Update Inner Ability Analysis when presets change
+    renderPresetComparison();
+    renderTheoreticalBest();
 }
 
 function loadHeroPowerPresets() {
