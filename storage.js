@@ -1,7 +1,7 @@
 // Base setup fields that need to be saved/loaded/monitored
 const BASE_SETUP_FIELDS = [
     'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
-    'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
+    'damage-amp', 'attack-speed', 'def-pen', 'stage-select', 'boss-damage',
     'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
     'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat', 'final-damage'
 ];
