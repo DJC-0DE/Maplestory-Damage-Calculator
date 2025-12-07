@@ -26,13 +26,15 @@ function calculateDamage(stats, monsterType) {
 
     const monsterDamage = monsterType === 'boss' ? stats.bossDamage : stats.normalDamage;
 
+    const finalDamageMultiplier = 1 + (stats.finalDamage / 100);
+
     const baseHitDamage = baseDamage *
         (1 + stats.statDamage / 100) * 1.004 *
         (1 + stats.damage / 100) *
-        (stats.finalDamage / 100) *
         (1 + monsterDamage / 100) *
         damageAmpMultiplier *
-        defPenMultiplier;
+        defPenMultiplier *
+        finalDamageMultiplier;
 
     // Step 3: Calculate Non-Crit Damage Range
     const nonCritMin = baseHitDamage * (stats.minDamage / 100);
@@ -68,7 +70,8 @@ function calculateDamage(stats, monsterType) {
         dps,
         damageAmpMultiplier,
         defPenMultiplier,
-        attackSpeedMultiplier
+        attackSpeedMultiplier,
+        finalDamageMultiplier
     };
 }
 
@@ -232,7 +235,7 @@ function calculateStatWeights(setup, stats) {
             const oldValue = stats[stat.key];
             if (multiplicativeStats[stat.key]) {
                 // multiplicative
-                modifiedStats[stat.key] *= (1 + increase / 100);
+                modifiedStats[stat.key] = ((1 + oldValue / 100) *  (1 + increase / 100)) * 100 - 100;
             } else if (diminishingReturnStats[stat.key]) {
                 // additive with diminishing returns
                 const denominator = diminishingReturnStats[stat.key].denominator;
@@ -242,23 +245,13 @@ function calculateStatWeights(setup, stats) {
                 // regular additive
                 modifiedStats[stat.key] = oldValue + increase;
             }
+            
             const newValue = modifiedStats[stat.key];
-
             const newDPS = calculateDamage(modifiedStats, stat.key === "bossDamage" ? 'boss' : 'normal').dps;
             const baseDPS = stat.key === "bossDamage" ? baseBossDPS : baseNormalDPS;
             const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
 
-            let displayedOldValue = oldValue;
-            let displayedNewValue = newValue;
-
-            // multiplicative stats are measured in terms of %x increase vs x% of the base
-            // e.g convert from 1.07 back to 7% for display
-            if (multiplicativeStats[stat.key]) {
-                displayedNewValue = (newValue * 100 - 100)
-                displayedOldValue = (oldValue * 100 - 100)
-            }
-
-            const tooltip = `+${increase}%\n Old: ${formatNumber(displayedOldValue)}, New: ${formatNumber(displayedNewValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+            const tooltip = `+${increase}%\n Old: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
 
             html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
         });
