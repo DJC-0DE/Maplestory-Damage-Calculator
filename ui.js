@@ -549,6 +549,10 @@ function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedD
                         <span class="damage-value">${stats.defPen.toFixed(2)}%</span>
                     </div>
                     <div class="damage-row">
+                        <span class="damage-label">Selected Stage:</span>
+                        <span class="damage-value">${stats.stageKey || 'None'}</span>
+                    </div>
+                    <div class="damage-row">
                         <span class="damage-label">Skill Coefficient:</span>
                         <span class="damage-value">${stats.skillCoeff.toFixed(2)}%</span>
                     </div>
@@ -583,8 +587,16 @@ function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedD
                         <span class="damage-value">${bossResults.damageAmpMultiplier.toFixed(4)}x</span>
                     </div>
                     <div class="damage-row">
-                        <span class="damage-label">Defense Pen Multiplier:</span>
-                        <span class="damage-value">${bossResults.defPenMultiplier.toFixed(4)}x</span>
+                        <span class="damage-label">Enemy Defense:</span>
+                        <span class="damage-value">${bossResults.enemyDefense.toFixed(2)}</span>
+                    </div>
+                    <div class="damage-row">
+                        <span class="damage-label">Effective Defense:</span>
+                        <span class="damage-value">${bossResults.effectiveDefense.toFixed(2)}</span>
+                    </div>
+                    <div class="damage-row">
+                        <span class="damage-label">Defense Multiplier:</span>
+                        <span class="damage-value">${bossResults.defenseMultiplier.toFixed(4)}x</span>
                     </div>
                     <div class="damage-row">
                         <span class="damage-label">Attack Speed Multiplier:</span>

@@ -9,6 +9,7 @@ function getStats(setup) {
         damageAmp: parseFloat(document.getElementById(`damage-amp-${setup}`).value),
         attackSpeed: parseFloat(document.getElementById(`attack-speed-${setup}`).value),
         defPen: parseFloat(document.getElementById(`def-pen-${setup}`).value),
+        stageKey: document.getElementById(`stage-select-${setup}`).value,
         bossDamage: parseFloat(document.getElementById(`boss-damage-${setup}`).value),
         normalDamage: parseFloat(document.getElementById(`normal-damage-${setup}`).value),
         skillCoeff: parseFloat(document.getElementById(`skill-coeff-${setup}`).value),
@@ -175,6 +176,58 @@ function calculate() {
     calculateStatWeights('base', baseStats);
 }
 
+// Populate stage select dropdown
+function populateStageSelect() {
+    const stageSelect = document.getElementById('stage-select-base');
+    if (!stageSelect) return;
+    
+    // Clear existing options except the first one
+    while (stageSelect.options.length > 1) {
+        stageSelect.remove(1);
+    }
+    
+    // Define stages with their keys and labels
+    const stages = [
+       
+    ];
+    
+    // Generate stages for chapters 2-10
+    for (let chapter = 1; chapter <= 28; chapter++) {
+        const maxStage = chapter === 1 ? 4 : 10;
+        for (let stage = 1; stage <= maxStage; stage++) {
+            const key = `${chapter}-${stage}`;
+            const isBoss = stage === maxStage;
+            const label = isBoss ? `Chapter ${chapter} - Boss` : `Chapter ${chapter} - Stage ${stage}`;
+            
+            let defense;
+            if (isBoss) {
+                // Use boss defense table
+                const bossDefenses = {
+                    '2-8': 16.6472, '3-10': 16.6472, '4-10': 22.0428,
+                    '5-10': 22.5563, '6-10': 23.0794, '7-10': 23.6124,
+                    '8-10': 21.3986, '9-10': 24.6658, '10-10': 25.2096
+                };
+                defense = bossDefenses[key] ?? 0;
+            } else {
+                // Calculate normal defense
+                const cappedChapter = Math.min(Math.max(chapter, 2), 28);
+                const cappedStage = Math.min(Math.max(stage, 1), 10);
+                defense = 0.3166094 + 3 * (cappedChapter - 2) + (cappedStage - 1) / 3;
+            }
+            
+            stages.push({ key, label, defense, isBoss });
+        }
+    }
+    
+    // Add options to select
+    stages.forEach(stage => {
+        const option = document.createElement('option');
+        option.value = stage.key;
+        option.textContent = `${stage.label} (Def: ${stage.defense.toFixed(2)})`;
+        stageSelect.appendChild(option);
+    });
+}
+
 // Initialize application
 window.onload = function () {
     // Load theme first
@@ -182,6 +235,8 @@ window.onload = function () {
     // Initialize hero power presets
     initializeHeroPowerPresets();
     initializeWeapons();
+    // Populate stage select dropdown
+    populateStageSelect();
     // Enable auto-select for all numeric inputs across the app
     enableGlobalNumberInputAutoSelect();
     // Load saved data from localStorage

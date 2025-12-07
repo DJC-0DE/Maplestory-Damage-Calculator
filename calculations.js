@@ -10,6 +10,56 @@ function calculateInventoryBonus(rarity, tier, level) {
     return rate * level;
 }
 
+// Boss defense lookup table
+const bossDefenseTable = {
+    "1-4": 16.6472,
+    "2-8": 16.6472,
+    "3-10": 16.6472,
+    "4-10": 22.0428,
+    "5-10": 22.5563,
+    "6-10": 23.0794,
+    "7-10": 23.6124,
+    "8-10": 21.3986,
+    "9-10": 24.6658,
+    "10-10": 25.2096
+};
+
+// Normal stage defense overrides
+const normalDefenseTable = {
+    "1-1": 0,
+    "1-2": 0.02,
+    "1-3": 0.1
+};
+
+// Get enemy defense based on stage key (e.g., "1-4" for Chapter 1, Stage 4)
+function getEnemyDefense(stageKey, isBoss = false) {
+    if (!stageKey) return 0;
+    
+    // Parse chapter and stage from key
+    const match = stageKey.match(/^(\d+)-(\d+)$/);
+    if (!match) return 0;
+    
+    const chapter = parseInt(match[1], 10);
+    const stage = parseInt(match[2], 10);
+    
+    if (isBoss) {
+        // Check boss defense table
+        return bossDefenseTable[stageKey] ?? 0;
+    } else {
+        // Check normal defense override
+        if (normalDefenseTable[stageKey] !== undefined) {
+            return normalDefenseTable[stageKey];
+        }
+        
+        // Fallback formula for normal stages
+        if (chapter <= 1) return 0;
+        
+        const cappedChapter = Math.min(Math.max(chapter, 2), 28);
+        const cappedStage = Math.min(Math.max(stage, 1), 10);
+        return 0.3166094 + 3 * (cappedChapter - 2) + (cappedStage - 1) / 3;
+    }
+}
+
 // Main damage calculation function
 function calculateDamage(stats, monsterType) {
     // Step 1: Calculate Base Damage
@@ -18,20 +68,24 @@ function calculateDamage(stats, monsterType) {
 
     // Step 2: Calculate Base Hit Damage
     // Damage amplification uses square root scaling with diminishing returns
-    // Formula: 1.0542 + sqrt(damageAmp) / 50
-    const damageAmpMultiplier = 1.05 + Math.sqrt(stats.damageAmp) / 50;
+    const damageAmpMultiplier = 1.0542 + 0.0198 * Math.sqrt(stats.damageAmp || 0);
 
-    // NEW: Defense Penetration multiplier
-    const defPenMultiplier = 1 + (stats.defPen / 363);
+    // Defense Penetration calculation
+    const isBoss = monsterType === 'boss';
+    const enemyDefense = getEnemyDefense(stats.stageKey, isBoss);
+    const defensePenetrationPct = Math.max(0, Math.min(stats.defPen || 0, 100));
+    const effectiveDefense = enemyDefense * (1 - defensePenetrationPct / 100);
+    const defenseMultiplier = 100 / (100 + Math.max(0, effectiveDefense));
 
-    const monsterDamage = monsterType === 'boss' ? stats.bossDamage : stats.normalDamage;
+    const monsterDamage = isBoss ? stats.bossDamage : stats.normalDamage;
 
     const baseHitDamage = baseDamage *
         (1 + stats.statDamage / 100) * 1.004 *
         (1 + stats.damage / 100) *
         (1 + monsterDamage / 100) *
         damageAmpMultiplier *
-        defPenMultiplier;
+        defenseMultiplier *
+        finalDamageMultiplier;
 
     // Step 3: Calculate Non-Crit Damage Range
     const nonCritMin = baseHitDamage * (stats.minDamage / 100);
@@ -66,8 +120,11 @@ function calculateDamage(stats, monsterType) {
         expectedDamage,
         dps,
         damageAmpMultiplier,
-        defPenMultiplier,
-        attackSpeedMultiplier
+        defenseMultiplier,
+        effectiveDefense,
+        enemyDefense,
+        attackSpeedMultiplier,
+        finalDamageMultiplier
     };
 }
 
