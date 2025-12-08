@@ -6,6 +6,7 @@ function getStats(setup) {
         critDamage: parseFloat(document.getElementById(`crit-damage-${setup}`).value),
         statDamage: parseFloat(document.getElementById(`stat-damage-${setup}`).value),
         damage: parseFloat(document.getElementById(`damage-${setup}`).value),
+        finalDamage: parseFloat(document.getElementById(`final-damage-${setup}`).value), 
         damageAmp: parseFloat(document.getElementById(`damage-amp-${setup}`).value),
         attackSpeed: parseFloat(document.getElementById(`attack-speed-${setup}`).value),
         defPen: parseFloat(document.getElementById(`def-pen-${setup}`).value),

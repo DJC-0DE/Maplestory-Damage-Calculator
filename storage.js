@@ -1,3 +1,11 @@
+// Base setup fields that need to be saved/loaded/monitored
+const BASE_SETUP_FIELDS = [
+    'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
+    'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
+    'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
+    'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat', 'final-damage'
+];
+
 // Save all data to localStorage
 function saveToLocalStorage() {
     const data = {
@@ -9,14 +17,7 @@ function saveToLocalStorage() {
     };
 
     // Save Base Setup
-    const fields = [
-        'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
-        'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
-        'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
-        'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat'
-    ];
-
-    fields.forEach(field => {
+    BASE_SETUP_FIELDS.forEach(field => {
         const element = document.getElementById(`${field}-base`);
         if (element) {
             data.baseSetup[field] = element.value;
@@ -99,15 +100,8 @@ function loadFromLocalStorage() {
         const data = JSON.parse(savedData);
 
         // Load Base Setup
-        const fields = [
-            'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
-            'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
-            'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
-            'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat'
-        ];
-
         if (data.baseSetup) {
-            fields.forEach(field => {
+            BASE_SETUP_FIELDS.forEach(field => {
                 const element = document.getElementById(`${field}-base`);
                 if (element && data.baseSetup[field] !== undefined) {
                     element.value = data.baseSetup[field];
@@ -260,14 +254,7 @@ function importData() {
 // Attach save listeners to base setup inputs
 function attachSaveListeners() {
     // Attach to base setup inputs
-    const fields = [
-        'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
-        'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
-        'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
-        'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat'
-    ];
-
-    fields.forEach(field => {
+    BASE_SETUP_FIELDS.forEach(field => {
         const element = document.getElementById(`${field}-base`);
         if (element) {
             element.addEventListener('input', () => {
