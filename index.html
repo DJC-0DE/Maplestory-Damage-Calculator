@@ -180,6 +180,7 @@
                     Comparison</button>
                 <button class="tab-button" onclick="switchTab('analysis', 'inner-ability')">Inner Ability</button>
                 <button class="tab-button" onclick="switchTab('analysis', 'artifact-potential')">Artifact Potential</button>
+                <button class="tab-button" onclick="switchTab('analysis', 'scroll-optimizer')">Scrolling</button>
             </div>
 
             <!-- Item Comparison Tab -->
@@ -275,6 +276,39 @@
                     <!-- Will be populated by JavaScript -->
                 </div>
             </div>
+
+            <!-- Scroll Optimizer Tab -->
+            <div id="analysis-scroll-optimizer" class="tab-content">
+                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                    <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                        <strong style="color: var(--accent-primary);">Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="input-group">
+                        <label>Spell Trace Budget</label>
+                        <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
+                    </div>
+                    <div class="input-group">
+                        <label>Number of Simulations</label>
+                        <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
+
+                <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
+                    <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                        <div id="scroll-progress-bar" style="height: 100%; background: var(--accent-primary); transition: width 0.3s; width: 0%;"></div>
+                    </div>
+                    <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
+                </div>
+
+                <div id="scroll-results-container" style="margin-top: 20px;">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
         </div>
 
         <!-- Stat Damage Predictions -->
@@ -290,6 +324,7 @@
     <script src="ui.js"></script>
     <script src="inner-ability.js"></script>
     <script src="artifact-potential.js"></script>
+    <script src="scroll-optimizer.js"></script>
     <script src="main.js"></script>
 </body>
 

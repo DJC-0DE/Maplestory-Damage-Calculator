@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+/* Scroll optimizer strategy tabs */
+.scroll-strategy-tab-btn:hover:not(.active-scroll-tab) {
+    background: rgba(0, 122, 255, 0.1) !important;
+}
+
 :root {
     --bg-primary: #f5f5f7;
     --bg-secondary: #ffffff;
