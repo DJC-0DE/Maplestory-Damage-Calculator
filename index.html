@@ -296,6 +296,23 @@
                     </div>
                 </div>
 
+                <div style="background: rgba(0, 122, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-primary);">Scroll Level</label>
+                    <div style="display: flex; gap: 20px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                            <input type="radio" name="scroll-level" value="65" checked onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                            <span style="color: var(--text-primary);">Level 65 Scrolls</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                            <input type="radio" name="scroll-level" value="85" onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                            <span style="color: var(--text-primary);">Level 85 Scrolls</span>
+                        </label>
+                    </div>
+                    <div id="scroll-level-info" style="margin-top: 12px; padding: 10px; background: var(--background); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;">
+                        <!-- Info will be populated by JavaScript -->
+                    </div>
+                </div>
+
                 <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
 
                 <div id="scroll-progress-container" style="display: none; margin-top: 15px;">

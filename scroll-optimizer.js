@@ -1,10 +1,16 @@
-// Scroll Optimizer - Level 65 Scrolls Only
+// Scroll Optimizer - Level 65 and Level 85 Scrolls
 // This module simulates different scrolling strategies and calculates damage gains
 
-// Scroll definitions (Level 65 only)
+// Scroll definitions
 const SCROLLS_L65 = {
     'L65_70': { name: '70% Level 65', baseSuccess: 0.70, cost: 250, attack: 100, damageAmp: 0 },
     'L65_30': { name: '30% Level 65', baseSuccess: 0.30, cost: 300, attack: 200, damageAmp: 0.1 }
+};
+
+const SCROLLS_L85 = {
+    'L85_70': { name: '70% Level 85', baseSuccess: 0.70, cost: 500, attack: 200, damageAmp: 0.2 },
+    'L85_30': { name: '30% Level 85', baseSuccess: 0.30, cost: 650, attack: 400, damageAmp: 0.4 },
+    'L85_15': { name: '15% Level 85', baseSuccess: 0.15, cost: 800, attack: 800, damageAmp: 0.8 }
 };
 
 const GLOBAL_SUCCESS_BONUS = 0.02;
@@ -12,6 +18,34 @@ const BONUS_AT_SLOT_5 = 0.10;
 const BONUS_AT_SLOT_10 = 0.20;
 const RESET_COST = 50;
 const NUM_SLOTS = 10;
+
+// Update scroll level info display
+function updateScrollLevelInfo() {
+    const level = document.querySelector('input[name="scroll-level"]:checked')?.value || '65';
+    const infoDiv = document.getElementById('scroll-level-info');
+
+    if (level === '65') {
+        infoDiv.innerHTML = `
+            <strong>Level 65 Scrolls:</strong><br>
+            • 70%: +100 ATK, 250 spell trace<br>
+            • 30%: +200 ATK, +0.1% Damage Amp, 300 spell trace
+        `;
+    } else {
+        infoDiv.innerHTML = `
+            <strong>Level 85 Scrolls:</strong><br>
+            • 70%: +200 ATK, +0.2% Damage Amp, 500 spell trace<br>
+            • 30%: +400 ATK, +0.4% Damage Amp, 650 spell trace<br>
+            • 15%: +800 ATK, +0.8% Damage Amp, 800 spell trace
+        `;
+    }
+}
+
+// Initialize scroll level info on page load
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        updateScrollLevelInfo();
+    });
+}
 
 // Calculate success rate for a scroll at a specific slot
 function getScrollSuccessRate(scroll, slotNumber) {
@@ -22,7 +56,7 @@ function getScrollSuccessRate(scroll, slotNumber) {
 }
 
 // Attempt one complete scroll run (all 10 slots)
-function attemptScrollRun(strategy, budget, traceUsed) {
+function attemptScrollRun(strategy, budget, traceUsed, scrolls) {
     let totalAttack = 0;
     let totalDamageAmp = 0;
     let successfulSlots = 0;
@@ -32,7 +66,7 @@ function attemptScrollRun(strategy, budget, traceUsed) {
 
     for (let slot = 1; slot <= NUM_SLOTS; slot++) {
         const scrollType = strategy.selectScroll(slot, successfulSlots, failedSlots, traceUsed + attemptCost, budget);
-        const scroll = SCROLLS_L65[scrollType];
+        const scroll = scrolls[scrollType];
 
         // Check if we can afford this scroll
         if (traceUsed + attemptCost + scroll.cost > budget) {
@@ -77,7 +111,7 @@ function attemptScrollRun(strategy, budget, traceUsed) {
 }
 
 // Simulate with reset strategy
-function simulateScrollWithResets(strategy, budget) {
+function simulateScrollWithResets(strategy, budget, scrolls) {
     let traceUsed = 0;
     let resetCount = 0;
     let finalResult = null;
@@ -85,7 +119,7 @@ function simulateScrollWithResets(strategy, budget) {
 
     while (traceUsed < budget) {
         attemptCount++;
-        const result = attemptScrollRun(strategy, budget, traceUsed);
+        const result = attemptScrollRun(strategy, budget, traceUsed, scrolls);
 
         // Check if we ran out of budget during attempt
         if (traceUsed + result.attemptCost > budget) {
@@ -419,6 +453,163 @@ function createL65Strategies() {
     return strategies;
 }
 
+// Create strategy variations for L85 scrolls
+function createL85Strategies() {
+    const strategies = [];
+
+    // 70% L85 strategies
+    const thresholds70 = [10, 9, 8, 7, 6];
+    for (const threshold of thresholds70) {
+        strategies.push({
+            id: `L85_70_reset_${threshold}`,
+            name: `70% L85 - Reset <${threshold}`,
+            description: `70% L85 scrolls. Reset if fewer than ${threshold} slots succeed OR if first 2 slots fail.`,
+            selectScroll: () => 'L85_70',
+            shouldReset: (result) => {
+                if (result.slotResults.length >= 2) {
+                    const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                    if (first2Failed) return true;
+                }
+                return result.successfulSlots < threshold;
+            }
+        });
+    }
+
+    // 30% L85 strategies
+    const thresholds30 = [10, 9, 8, 7, 6, 5, 4];
+    for (const threshold of thresholds30) {
+        strategies.push({
+            id: `L85_30_reset_${threshold}`,
+            name: `30% L85 - Reset <${threshold}`,
+            description: `30% L85 scrolls. Reset if fewer than ${threshold} slots succeed.`,
+            selectScroll: () => 'L85_30',
+            shouldReset: (result) => result.successfulSlots < threshold
+        });
+    }
+
+    // 15% L85 strategies
+    const thresholds15 = [10, 9, 8, 7, 6, 5];
+    for (const threshold of thresholds15) {
+        strategies.push({
+            id: `L85_15_reset_${threshold}`,
+            name: `15% L85 - Reset <${threshold}`,
+            description: `15% L85 scrolls (very risky). Reset if fewer than ${threshold} slots succeed. High budget required.`,
+            selectScroll: () => 'L85_15',
+            shouldReset: (result) => result.successfulSlots < threshold
+        });
+    }
+
+    // Mixed strategies
+    strategies.push({
+        id: 'L85_bonus_15_on_slots',
+        name: 'Bonus Slots 15%',
+        description: '15% L85 on slots 5&10 (bonus = 27% & 37% success), 70% L85 elsewhere. Reset if either bonus fails OR <7 success or first 2 fail.',
+        selectScroll: (slot) => (slot === 5 || slot === 10) ? 'L85_15' : 'L85_70',
+        shouldReset: (result) => {
+            if (result.slotResults.length >= 2) {
+                const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                if (first2Failed) return true;
+            }
+            const slot5 = result.slotResults.find(s => s.slot === 5);
+            const slot10 = result.slotResults.find(s => s.slot === 10);
+            if (slot5 && !slot5.success && !slot5.unfunded) return true;
+            if (slot10 && !slot10.success && !slot10.unfunded) return true;
+            return result.successfulSlots < 7;
+        }
+    });
+
+    strategies.push({
+        id: 'L85_first2_30_then_70',
+        name: 'First 2 30% then 70%',
+        description: '30% L85 on slots 1-2. Reset if both first 2 fail. Then 70% L85. Reset if <8 success.',
+        selectScroll: (slot) => (slot <= 2) ? 'L85_30' : 'L85_70',
+        shouldReset: (result) => {
+            if (result.slotResults.length >= 2) {
+                const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                if (first2Failed) return true;
+            }
+            return result.successfulSlots < 8;
+        }
+    });
+
+    strategies.push({
+        id: 'L85_progressive_30_to_70',
+        name: 'Progressive 30% to 70%',
+        description: '30% L85 until first failure, then switch to 70% L85. Reset if <7 success or first 2 fail.',
+        selectScroll: (slot, successfulSlots, failedSlots) => {
+            return failedSlots === 0 ? 'L85_30' : 'L85_70';
+        },
+        shouldReset: (result) => {
+            if (result.slotResults.length >= 2) {
+                const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                if (first2Failed) return true;
+            }
+            return result.successfulSlots < 7;
+        }
+    });
+
+    strategies.push({
+        id: 'L85_slot10_15_priority',
+        name: 'Slot 10 15% Priority',
+        description: '15% L85 on slot 10 (+20% bonus = 37% success), 70% L85 elsewhere. Reset if slot 10 fails OR <7 success or first 2 fail.',
+        selectScroll: (slot) => (slot === 10) ? 'L85_15' : 'L85_70',
+        shouldReset: (result) => {
+            if (result.slotResults.length >= 2) {
+                const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                if (first2Failed) return true;
+            }
+            const slot10 = result.slotResults.find(s => s.slot === 10);
+            if (slot10 && !slot10.success && !slot10.unfunded) return true;
+            return result.successfulSlots < 7;
+        }
+    });
+
+    // Damage amp strategies
+    strategies.push({
+        id: 'L85_damage_amp_1_5',
+        name: 'Damage Amp 1.5%+',
+        description: '30% L85 scrolls. Reset if damage amp < 1.5%. Good for medium budgets.',
+        selectScroll: () => 'L85_30',
+        shouldReset: (result) => result.totalDamageAmp < 1.5
+    });
+
+    strategies.push({
+        id: 'L85_damage_amp_2_0',
+        name: 'Damage Amp 2.0%+',
+        description: '30% L85 scrolls. Reset if damage amp < 2.0%. Good for high budgets.',
+        selectScroll: () => 'L85_30',
+        shouldReset: (result) => result.totalDamageAmp < 2.0
+    });
+
+    strategies.push({
+        id: 'L85_damage_amp_3_0',
+        name: 'Damage Amp 3.0%+',
+        description: '15% L85 scrolls. Reset if damage amp < 3.0%. Very aggressive, needs very high budget.',
+        selectScroll: () => 'L85_15',
+        shouldReset: (result) => result.totalDamageAmp < 3.0
+    });
+
+    strategies.push({
+        id: 'L85_bonus_30_only',
+        name: 'Only Bonus Slots 30%',
+        description: '30% L85 ONLY on slots 5&10, 70% everywhere else. Reset if either bonus slot fails OR <8 success or first 2 fail.',
+        selectScroll: (slot) => (slot === 5 || slot === 10) ? 'L85_30' : 'L85_70',
+        shouldReset: (result) => {
+            if (result.slotResults.length >= 2) {
+                const first2Failed = !result.slotResults[0].success && !result.slotResults[1].success;
+                if (first2Failed) return true;
+            }
+            const slot5 = result.slotResults.find(s => s.slot === 5);
+            const slot10 = result.slotResults.find(s => s.slot === 10);
+            if (slot5 && !slot5.success && !slot5.unfunded) return true;
+            if (slot10 && !slot10.success && !slot10.unfunded) return true;
+            return result.successfulSlots < 8;
+        }
+    });
+
+    return strategies;
+}
+
 // Calculate damage gain from scroll results
 function calculateScrollDamageGain(avgAttack, avgDamageAmp) {
     const baseStats = getStats('base');
@@ -447,6 +638,8 @@ function calculateScrollDamageGain(avgAttack, avgDamageAmp) {
 async function runScrollSimulation() {
     const budget = parseInt(document.getElementById('scroll-spell-trace-budget').value);
     const numSimulations = parseInt(document.getElementById('scroll-simulations').value);
+    const scrollLevel = document.querySelector('input[name="scroll-level"]:checked')?.value || '65';
+    const scrolls = scrollLevel === '65' ? SCROLLS_L65 : SCROLLS_L85;
 
     const button = document.getElementById('scroll-run-btn');
     const progressContainer = document.getElementById('scroll-progress-container');
@@ -456,7 +649,8 @@ async function runScrollSimulation() {
     button.disabled = true;
     progressContainer.style.display = 'block';
 
-    const strategies = createL65Strategies();
+    // Get strategies based on selected scroll level
+    const strategies = scrollLevel === '65' ? createL65Strategies() : createL85Strategies();
     const results = {};
 
     // Initialize results tracking
@@ -487,7 +681,7 @@ async function runScrollSimulation() {
         }
 
         for (const strategy of strategies) {
-            const result = simulateScrollWithResets(strategy, budget);
+            const result = simulateScrollWithResets(strategy, budget, scrolls);
 
             const data = results[strategy.id];
             data.attacks.push(result.totalAttack);
