@@ -897,3 +897,146 @@ function loadHeroPowerPresets() {
         console.error('Failed to load hero power presets:', error);
     }
 }
+
+// Equipment Slots Management
+function initializeEquipmentSlots() {
+    const slots = ['Head', 'Cape', 'Chest', 'Shoulders', 'Legs', 'Belt', 'Gloves', 'Boots', 'Ring', 'Neck'];
+    const container = document.getElementById('equipment-slots-grid');
+    if (!container) return;
+
+    let html = '';
+    slots.forEach((slotName, index) => {
+        const slotId = slotName.toLowerCase();
+        html += `
+            <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--accent-primary); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow); min-width: 0;">
+                <div style="color: var(--accent-primary); font-weight: 600; font-size: 0.95em; margin-bottom: 12px;">${slotName}</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; min-width: 0;">
+                    <div class="input-group" style="min-width: 0;">
+                        <label style="font-size: 0.75em;">Attack</label>
+                        <input type="number" step="0.1" id="slot-${slotId}-attack" value="0" onchange="saveEquipmentSlots()" style="width: 100%; min-width: 0;">
+                    </div>
+                    <div class="input-group" style="min-width: 0;">
+                        <label style="font-size: 0.75em;">Main Stat</label>
+                        <input type="number" step="1" id="slot-${slotId}-main-stat" value="0" onchange="saveEquipmentSlots()" style="width: 100%; min-width: 0;">
+                    </div>
+                    <div class="input-group" style="min-width: 0;">
+                        <label style="font-size: 0.75em;">Dmg Amp</label>
+                        <input type="number" step="0.1" id="slot-${slotId}-damage-amp" value="0" onchange="saveEquipmentSlots()" style="width: 100%; min-width: 0;">
+                    </div>
+                </div>
+                <div style="background: rgba(79, 195, 247, 0.1); border-radius: 8px; padding: 10px;">
+                    <div style="color: var(--text-secondary); font-size: 0.75em; margin-bottom: 6px; font-weight: 500;">DPS Gain % (Boss / Normal)</div>
+                    <div style="color: var(--accent-primary); font-size: 0.9em; font-weight: 600;">
+                        <span id="slot-${slotId}-boss-dps">0%</span> / <span id="slot-${slotId}-normal-dps">0%</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // Attach save listeners
+    setTimeout(() => {
+        slots.forEach(slot => {
+            const slotId = slot.toLowerCase();
+            const attackInput = document.getElementById(`slot-${slotId}-attack`);
+            const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+            const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+            if (attackInput) attackInput.addEventListener('input', saveEquipmentSlots);
+            if (mainStatInput) mainStatInput.addEventListener('input', saveEquipmentSlots);
+            if (damageAmpInput) damageAmpInput.addEventListener('input', saveEquipmentSlots);
+        });
+    }, 0);
+}
+
+function saveEquipmentSlots() {
+    const slots = {};
+    const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck'];
+
+    slotNames.forEach(slotId => {
+        const attackInput = document.getElementById(`slot-${slotId}-attack`);
+        const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+        const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+        slots[slotId] = {
+            attack: attackInput ? parseFloat(attackInput.value) || 0 : 0,
+            mainStat: mainStatInput ? parseFloat(mainStatInput.value) || 0 : 0,
+            damageAmp: damageAmpInput ? parseFloat(damageAmpInput.value) || 0 : 0
+        };
+    });
+
+    localStorage.setItem('equipmentSlots', JSON.stringify(slots));
+}
+
+function loadEquipmentSlots() {
+    const saved = localStorage.getItem('equipmentSlots');
+    if (!saved) return;
+
+    try {
+        const slots = JSON.parse(saved);
+        const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck'];
+
+        slotNames.forEach(slotId => {
+            if (slots[slotId]) {
+                const attackInput = document.getElementById(`slot-${slotId}-attack`);
+                const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+                const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+                if (attackInput) attackInput.value = slots[slotId].attack || 0;
+                if (mainStatInput) mainStatInput.value = slots[slotId].mainStat || 0;
+                if (damageAmpInput) damageAmpInput.value = slots[slotId].damageAmp || 0;
+            }
+        });
+    } catch (error) {
+        console.error('Failed to load equipment slots:', error);
+    }
+}
+
+function calculateEquipmentSlotDPS() {
+    const baseStats = getStats('base');
+    const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck'];
+
+    slotNames.forEach(slotId => {
+        const attackInput = document.getElementById(`slot-${slotId}-attack`);
+        const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+        const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+        const slotAttack = parseFloat(attackInput?.value) || 0;
+        const slotMainStat = parseFloat(mainStatInput?.value) || 0;
+        const slotDamageAmp = parseFloat(damageAmpInput?.value) || 0;
+
+        // Calculate baseline DPS (base stats WITH this slot included)
+        const baselineBossDPS = calculateDamage(baseStats, 'boss').dps;
+        const baselineNormalDPS = calculateDamage(baseStats, 'normal').dps;
+
+        // Calculate weapon attack bonus (same as scrolling tab)
+        const weaponAttackBonus = getWeaponAttackBonus();
+        const effectiveAttackIncrease = slotAttack * (1 + weaponAttackBonus / 100);
+
+        // Convert main stat to stat damage (100:1 ratio)
+        const statDamageFromMainStat = slotMainStat / 100;
+
+        // Remove this slot's stats from base to see DPS without it
+        const statsWithoutSlot = { ...baseStats };
+        statsWithoutSlot.attack -= effectiveAttackIncrease;
+        statsWithoutSlot.statDamage -= statDamageFromMainStat;
+        statsWithoutSlot.damageAmp -= slotDamageAmp;
+
+        // Calculate DPS without this slot
+        const withoutSlotBossDPS = calculateDamage(statsWithoutSlot, 'boss').dps;
+        const withoutSlotNormalDPS = calculateDamage(statsWithoutSlot, 'normal').dps;
+
+        // Calculate percentage gain (same formula as scrolling tab: (new - old) / old * 100)
+        const bossDPSGainPct = ((baselineBossDPS - withoutSlotBossDPS) / baselineBossDPS * 100);
+        const normalDPSGainPct = ((baselineNormalDPS - withoutSlotNormalDPS) / baselineNormalDPS * 100);
+
+        // Display results
+        const bossDPSDisplay = document.getElementById(`slot-${slotId}-boss-dps`);
+        const normalDPSDisplay = document.getElementById(`slot-${slotId}-normal-dps`);
+
+        if (bossDPSDisplay) bossDPSDisplay.textContent = `+${bossDPSGainPct.toFixed(2)}%`;
+        if (normalDPSDisplay) normalDPSDisplay.textContent = `+${normalDPSGainPct.toFixed(2)}%`;
+    });
+}

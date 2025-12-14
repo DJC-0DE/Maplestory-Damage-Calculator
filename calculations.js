@@ -105,6 +105,53 @@ function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     return newStats;
 }
 
+// Helper function to find equivalent percentage stat for a target DPS gain
+function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS, monsterType, multiplicativeStats, diminishingReturnStats) {
+    // Binary search for the percentage increase needed
+    let low = 0;
+    let high = 1000; // Max search limit
+    let iterations = 0;
+    const maxIterations = 50;
+    const tolerance = 0.01; // 0.01% tolerance
+
+    while (iterations < maxIterations && high - low > tolerance) {
+        const mid = (low + high) / 2;
+        const modifiedStats = { ...stats };
+        const oldValue = stats[statKey];
+
+        if (multiplicativeStats[statKey]) {
+            modifiedStats[statKey] = ((1 + oldValue / 100) * (1 + mid / 100)) * 100 - 100;
+        } else if (diminishingReturnStats[statKey]) {
+            const denominator = diminishingReturnStats[statKey].denominator;
+            const effectiveIncrease = mid * (1 - oldValue / denominator);
+            modifiedStats[statKey] = oldValue + effectiveIncrease;
+        } else {
+            modifiedStats[statKey] = oldValue + mid;
+        }
+
+        const newDPS = calculateDamage(modifiedStats, monsterType).dps;
+        const actualGain = ((newDPS - baseDPS) / baseDPS * 100);
+
+        if (Math.abs(actualGain - targetDPSGain) < tolerance) {
+            return mid;
+        } else if (actualGain < targetDPSGain) {
+            low = mid;
+        } else {
+            high = mid;
+        }
+
+        iterations++;
+    }
+
+    // Check if we found a reasonable value
+    const finalMid = (low + high) / 2;
+    if (finalMid > 500) {
+        return null; // Unrealistic value
+    }
+
+    return finalMid;
+}
+
 // Calculate stat weights - generates HTML for stat damage predictions
 function calculateStatWeights(setup, stats) {
     const baseBossDPS = calculateDamage(stats, 'boss').dps;
@@ -135,18 +182,25 @@ function calculateStatWeights(setup, stats) {
 
     const percentIncreases = [1, 5, 10, 25, 50, 75, 100];
 
+    const multiplicativeStats = {
+        'finalDamage': true
+    };
+
+    const diminishingReturnStats = {
+        'attackSpeed': { denominator: 150 }
+    };
+
     let html = '';
 
-    // Single merged table
+    // ========== TABLE 1: FLAT STAT INCREASES ==========
+    html += '<div style="margin-bottom: 30px;">';
+    html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Flat Stat Increases</h3>';
     html += '<table class="stat-weight-table">';
     html += '<thead><tr><th>Stat</th>';
     for (let i = 0; i < 7; i++) {
         html += `<th>Increase</th>`;
     }
     html += '</tr></thead><tbody>';
-
-    // Flat Increases Section Header
-    html += '<tr class="bucket-row"><td colspan="8" class="bucket-label">Flat Stat Increases</td></tr>';
 
     // Attack increments row
     html += '<tr style="background: rgba(79, 195, 247, 0.15);"><td style="color: #4fc3f7; font-weight: bold;"></td>';
@@ -185,7 +239,7 @@ function calculateStatWeights(setup, stats) {
     mainStatIncreases.forEach(increase => {
         const modifiedStats = { ...stats };
         const oldValue = stats.statDamage;
-        const statDamageIncrease = increase / 100; // 100 main stat = 1% stat damage
+        const statDamageIncrease = increase / 100;
         modifiedStats.statDamage = stats.statDamage + statDamageIncrease;
         const newValue = modifiedStats.statDamage;
 
@@ -198,8 +252,18 @@ function calculateStatWeights(setup, stats) {
     });
     html += '</tr>';
 
-    // Percentage Section Header
-    html += '<tr class="bucket-row"><td colspan="8" class="bucket-label">Percentage Stat Increases</td></tr>';
+    html += '</tbody></table>';
+    html += '</div>';
+
+    // ========== TABLE 2: PERCENTAGE STAT INCREASES ==========
+    html += '<div style="margin-bottom: 30px;">';
+    html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Percentage Stat Increases</h3>';
+    html += '<table class="stat-weight-table">';
+    html += '<thead><tr><th>Stat</th>';
+    for (let i = 0; i < 7; i++) {
+        html += `<th>Increase</th>`;
+    }
+    html += '</tr></thead><tbody>';
 
     // Percentage increments row
     html += '<tr style="background: rgba(79, 195, 247, 0.15);"><td style="color: #4fc3f7; font-weight: bold;"></td>';
@@ -208,19 +272,11 @@ function calculateStatWeights(setup, stats) {
     });
     html += '</tr>';
 
-    const multiplicativeStats = {
-        'finalDamage': true 
-    };
-
-    const diminishingReturnStats = {
-        'attackSpeed': { denominator: 150 }
-    };
-
     // Percentage stats
     percentageStats.forEach(stat => {
         let labelContent = stat.label;
         if (multiplicativeStats[stat.key]) {
-            labelContent += ` <span class="info-icasdasdon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive. This is our best guess at how ${stat.key} is calculated.">ℹ️</span>`;
+            labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive. This is our best guess at how ${stat.key} is calculated.">ℹ️</span>`;
         } else if (diminishingReturnStats[stat.key]) {
             const info = diminishingReturnStats[stat.key];
             labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are additive but have diminishing returns. Final increase = y% × (1 - x/${info.denominator}), where x is the current value and y is the increase amount.">ℹ️</span>`;
@@ -232,24 +288,21 @@ function calculateStatWeights(setup, stats) {
             const modifiedStats = { ...stats };
             const oldValue = stats[stat.key];
             if (multiplicativeStats[stat.key]) {
-                // multiplicative
-                modifiedStats[stat.key] = ((1 + oldValue / 100) *  (1 + increase / 100)) * 100 - 100;
+                modifiedStats[stat.key] = ((1 + oldValue / 100) * (1 + increase / 100)) * 100 - 100;
             } else if (diminishingReturnStats[stat.key]) {
-                // additive with diminishing returns
                 const denominator = diminishingReturnStats[stat.key].denominator;
                 const effectiveIncrease = increase * (1 - oldValue / denominator);
                 modifiedStats[stat.key] = oldValue + effectiveIncrease;
             } else {
-                // regular additive
                 modifiedStats[stat.key] = oldValue + increase;
             }
-            
+
             const newValue = modifiedStats[stat.key];
             const newDPS = calculateDamage(modifiedStats, stat.key === "bossDamage" ? 'boss' : 'normal').dps;
             const baseDPS = stat.key === "bossDamage" ? baseBossDPS : baseNormalDPS;
             const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
 
-            const tooltip = `+${increase}%\n Old: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+            const tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
 
             html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
         });
@@ -258,6 +311,61 @@ function calculateStatWeights(setup, stats) {
     });
 
     html += '</tbody></table>';
+    html += '</div>';
+
+    // ========== TABLE 3: STAT EQUIVALENCE ==========
+    html += '<div style="margin-bottom: 20px;">';
+    html += '<h3 style="color: var(--accent-success); margin-bottom: 10px; font-size: 1.1em; font-weight: 600;">Stat Equivalence to Attack</h3>';
+    html += '<p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px;">How much of each percentage stat equals the same DPS gain as gaining attack?</p>';
+    html += '<table class="stat-weight-table">';
+    html += '<thead><tr><th>Percentage Stat</th>';
+
+    // Reference attack amounts for equivalence
+    const referenceAttacks = [500, 1000, 2500];
+    const attackGains = [];
+
+    referenceAttacks.forEach(attackInc => {
+        const modifiedStats = { ...stats };
+        const effectiveIncrease = attackInc * (1 + weaponAttackBonus / 100);
+        modifiedStats.attack = stats.attack + effectiveIncrease;
+        const newDPS = calculateDamage(modifiedStats, 'boss').dps;
+        const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100);
+        attackGains.push(gain);
+        html += `<th>≈ +${formatNumber(attackInc)} Attack</th>`;
+    });
+
+    html += '</tr></thead><tbody>';
+
+    // For each percentage stat, find equivalent
+    percentageStats.forEach(stat => {
+        html += `<tr><td class="stat-name">${stat.label}</td>`;
+
+        referenceAttacks.forEach((attackInc, index) => {
+            const targetGain = attackGains[index];
+            const monsterType = stat.key === "bossDamage" ? 'boss' : (stat.key === "normalDamage" ? 'normal' : 'boss');
+            const equivalentPct = findEquivalentPercentage(
+                stats,
+                stat.key,
+                targetGain,
+                monsterType === 'boss' ? baseBossDPS : baseNormalDPS,
+                monsterType,
+                multiplicativeStats,
+                diminishingReturnStats
+            );
+
+            if (equivalentPct === null) {
+                html += `<td class="gain-cell" style="color: var(--text-secondary);">N/A</td>`;
+            } else {
+                const tooltip = `${equivalentPct.toFixed(2)}% ${stat.label}\n≈ ${targetGain.toFixed(2)}% DPS gain\n≈ +${formatNumber(attackInc)} Attack`;
+                html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${equivalentPct.toFixed(2)}%</span></td>`;
+            }
+        });
+
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    html += '</div>';
 
     document.getElementById(`stat-weights-${setup}`).innerHTML = html;
 }

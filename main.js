@@ -193,6 +193,10 @@ window.onload = function () {
     initializeInnerAbilityAnalysis();
     // Initialize Artifact Potential
     initializeArtifactPotential();
+    // Initialize Equipment Slots
+    initializeEquipmentSlots();
+    // Load equipment slots after initialization
+    loadEquipmentSlots();
     // Attach save listeners to all inputs
     attachSaveListeners();
     // Update weapon bonuses if data was loaded

@@ -86,6 +86,22 @@ function saveToLocalStorage() {
         });
     });
 
+    // Save Equipment Slots
+    const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck'];
+    data.equipmentSlots = {};
+
+    slotNames.forEach(slotId => {
+        const attackInput = document.getElementById(`slot-${slotId}-attack`);
+        const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+        const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+        data.equipmentSlots[slotId] = {
+            attack: attackInput ? parseFloat(attackInput.value) || 0 : 0,
+            mainStat: mainStatInput ? parseFloat(mainStatInput.value) || 0 : 0,
+            damageAmp: damageAmpInput ? parseFloat(damageAmpInput.value) || 0 : 0
+        };
+    });
+
     localStorage.setItem('damageCalculatorData', JSON.stringify(data));
 }
 
@@ -171,6 +187,23 @@ function loadFromLocalStorage() {
                         if (equippedInput) equippedInput.value = weaponData.equippedAttack;
                     }
                 });
+            });
+        }
+
+        // Load Equipment Slots
+        if (data.equipmentSlots) {
+            const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck'];
+
+            slotNames.forEach(slotId => {
+                if (data.equipmentSlots[slotId]) {
+                    const attackInput = document.getElementById(`slot-${slotId}-attack`);
+                    const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+                    const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+
+                    if (attackInput) attackInput.value = data.equipmentSlots[slotId].attack || 0;
+                    if (mainStatInput) mainStatInput.value = data.equipmentSlots[slotId].mainStat || 0;
+                    if (damageAmpInput) damageAmpInput.value = data.equipmentSlots[slotId].damageAmp || 0;
+                }
             });
         }
 
