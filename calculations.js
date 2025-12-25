@@ -156,12 +156,12 @@ function calculateStatWeights(setup, stats) {
     const baseBossDPS = calculateDamage(stats, 'boss').dps;
     const baseNormalDPS = calculateDamage(stats, 'normal').dps;
     const weaponAttackBonus = getWeaponAttackBonus();
- 
+
     // Flat attack increases
-    const attackIncreases = [500, 1000, 2500, 5000, 10000, 15000, 25000];
- 
+    const attackIncreases = [500, 1000, 2500, 5000, 10000, 15000];
+
     // Flat main stat increases (100 main stat = 1% stat damage)
-    const mainStatIncreases = [100, 500, 1000, 2500, 5000, 7500, 10000];
+    const mainStatIncreases = [100, 500, 1000, 2500, 5000, 7500];
  
     // Percentage-based stats
     const percentageStats = [
@@ -178,8 +178,8 @@ function calculateStatWeights(setup, stats) {
         { key: 'critDamage', label: 'Critical Damage' },
         { key: 'attackSpeed', label: 'Attack Speed' }
     ];
- 
-    const percentIncreases = [1, 5, 10, 25, 50, 75, 100];
+
+    const percentIncreases = [1, 5, 10, 25, 50, 75];
  
     const multiplicativeStats = {
         'finalDamage': 1
@@ -197,7 +197,7 @@ function calculateStatWeights(setup, stats) {
     html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Flat Stat Increases</h3>';
     html += '<table class="stat-weight-table">';
     html += '<thead><tr><th>Stat</th>';
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
         html += `<th>Increase</th>`;
     }
     html += '</tr></thead><tbody>';
@@ -260,7 +260,7 @@ function calculateStatWeights(setup, stats) {
     html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Percentage Stat Increases</h3>';
     html += '<table class="stat-weight-table">';
     html += '<thead><tr><th>Stat</th>';
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
         html += `<th>Increase</th>`;
     }
     html += '</tr></thead><tbody>';
@@ -367,4 +367,195 @@ function calculateStatWeights(setup, stats) {
     html += '</div>';
  
     document.getElementById(`stat-weights-${setup}`).innerHTML = html;
+}
+
+// Calculate stat equivalency - shows what other stats equal a given stat increase
+function calculateStatEquivalency(sourceStat) {
+    // Get base stats from inputs
+    const stats = {
+        attack: parseFloat(document.getElementById('attack-base').value),
+        critRate: parseFloat(document.getElementById('crit-rate-base').value),
+        critDamage: parseFloat(document.getElementById('crit-damage-base').value),
+        statDamage: parseFloat(document.getElementById('stat-damage-base').value),
+        damage: parseFloat(document.getElementById('damage-base').value),
+        damageAmp: parseFloat(document.getElementById('damage-amp-base').value),
+        attackSpeed: parseFloat(document.getElementById('attack-speed-base').value),
+        defPen: parseFloat(document.getElementById('def-pen-base')?.value || 0),
+        bossDamage: parseFloat(document.getElementById('boss-damage-base').value),
+        normalDamage: parseFloat(document.getElementById('normal-damage-base').value),
+        skillCoeff: parseFloat(document.getElementById('skill-coeff-base').value),
+        skillMastery: parseFloat(document.getElementById('skill-mastery-base').value),
+        skillMasteryBoss: parseFloat(document.getElementById('skill-mastery-boss-base').value),
+        minDamage: parseFloat(document.getElementById('min-damage-base').value),
+        maxDamage: parseFloat(document.getElementById('max-damage-base').value),
+        finalDamage: parseFloat(document.getElementById('final-damage-base').value)
+    };
+
+    const baseBossDPS = calculateDamage(stats, 'boss').dps;
+    const weaponAttackBonus = getWeaponAttackBonus();
+
+    // Map of stat IDs to their properties
+    const statMapping = {
+        'attack': {
+            label: 'Attack',
+            getValue: () => parseFloat(document.getElementById('equiv-attack').value) || 0,
+            applyToStats: (stats, value) => {
+                const effectiveIncrease = value * (1 + weaponAttackBonus / 100);
+                return { ...stats, attack: stats.attack + effectiveIncrease };
+            },
+            formatValue: (val) => formatNumber(val)
+        },
+        'main-stat': {
+            label: 'Main Stat',
+            getValue: () => parseFloat(document.getElementById('equiv-main-stat').value) || 0,
+            applyToStats: (stats, value) => {
+                const statDamageIncrease = value / 100;
+                return { ...stats, statDamage: stats.statDamage + statDamageIncrease };
+            },
+            formatValue: (val) => formatNumber(val)
+        },
+        'crit-rate': {
+            label: 'Critical Rate',
+            getValue: () => parseFloat(document.getElementById('equiv-crit-rate').value) || 0,
+            applyToStats: (stats, value) => ({ ...stats, critRate: stats.critRate + value }),
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%'
+        },
+        'crit-damage': {
+            label: 'Critical Damage',
+            getValue: () => parseFloat(document.getElementById('equiv-crit-damage').value) || 0,
+            applyToStats: (stats, value) => ({ ...stats, critDamage: stats.critDamage + value }),
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%'
+        },
+        'attack-speed': {
+            label: 'Attack Speed',
+            getValue: () => parseFloat(document.getElementById('equiv-attack-speed').value) || 0,
+            applyToStats: (stats, value) => {
+                const factor = 150;
+                const newValue = (1 - (1 - stats.attackSpeed / factor) * (1 - value / factor)) * factor;
+                return { ...stats, attackSpeed: newValue };
+            },
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%',
+            isDiminishing: true
+        },
+        'damage': {
+            label: 'Damage',
+            getValue: () => parseFloat(document.getElementById('equiv-damage').value) || 0,
+            applyToStats: (stats, value) => ({ ...stats, damage: stats.damage + value }),
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%'
+        },
+        'final-damage': {
+            label: 'Final Damage',
+            getValue: () => parseFloat(document.getElementById('equiv-final-damage').value) || 0,
+            applyToStats: (stats, value) => {
+                const newValue = (((1 + stats.finalDamage / 100) * (1 + value / 100)) - 1) * 100;
+                return { ...stats, finalDamage: newValue };
+            },
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%',
+            isMultiplicative: true
+        },
+        'boss-damage': {
+            label: 'Boss Damage',
+            getValue: () => parseFloat(document.getElementById('equiv-boss-damage').value) || 0,
+            applyToStats: (stats, value) => ({ ...stats, bossDamage: stats.bossDamage + value }),
+            formatValue: (val) => `${val.toFixed(2)}%`,
+            suffix: '%'
+        },
+        'damage-amp': {
+            label: 'Damage Amplification',
+            getValue: () => parseFloat(document.getElementById('equiv-damage-amp').value) || 0,
+            applyToStats: (stats, value) => ({ ...stats, damageAmp: stats.damageAmp + value }),
+            formatValue: (val) => `${val.toFixed(2)}x`,
+            suffix: 'x'
+        }
+    };
+
+    // Get the source stat value and calculate target DPS gain
+    const sourceValue = statMapping[sourceStat].getValue();
+    if (sourceValue === 0) {
+        document.getElementById('equivalency-results').innerHTML = '';
+        return;
+    }
+
+    const modifiedStats = statMapping[sourceStat].applyToStats(stats, sourceValue);
+    const newDPS = calculateDamage(modifiedStats, 'boss').dps;
+    const targetDPSGain = ((newDPS - baseBossDPS) / baseBossDPS * 100);
+
+    // Build HTML for results
+    let html = '<div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.2); border-radius: 16px; padding: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">';
+
+    html += '<div style="text-align: center; margin-bottom: 25px;">';
+    html += `<div style="font-size: 1.4em; font-weight: 700; color: var(--accent-primary); margin-bottom: 10px;">`;
+    html += `${statMapping[sourceStat].formatValue(sourceValue)} ${statMapping[sourceStat].label}`;
+    html += '</div>';
+    html += `<div style="font-size: 1.1em; color: var(--accent-success); font-weight: 600;">`;
+    html += `= ${targetDPSGain.toFixed(2)}% DPS Gain`;
+    html += '</div>';
+    html += '</div>';
+
+    html += '<table class="stat-weight-table" style="margin: 0;">';
+    html += '<thead><tr>';
+    html += '<th style="text-align: left; font-size: 1em;">Equivalent Stat</th>';
+    html += '<th style="text-align: right; font-size: 1em;">Required Amount</th>';
+    html += '<th style="text-align: right; font-size: 1em;">DPS Gain</th>';
+    html += '</tr></thead><tbody>';
+
+    // Calculate equivalents for all other stats
+    Object.entries(statMapping).forEach(([statId, statConfig]) => {
+        if (statId === sourceStat) return; // Skip the source stat
+
+        // Binary search for equivalent value
+        let low = 0;
+        let high = statId === 'attack' ? 100000 : (statId === 'main-stat' ? 50000 : 1000);
+        let iterations = 0;
+        const maxIterations = 50;
+        const tolerance = 0.01;
+
+        while (iterations < maxIterations && high - low > tolerance) {
+            const mid = (low + high) / 2;
+            const testStats = statConfig.applyToStats(stats, mid);
+            const testDPS = calculateDamage(testStats, 'boss').dps;
+            const actualGain = ((testDPS - baseBossDPS) / baseBossDPS * 100);
+
+            if (Math.abs(actualGain - targetDPSGain) < tolerance) {
+                break;
+            } else if (actualGain < targetDPSGain) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+
+            iterations++;
+        }
+
+        const equivalentValue = (low + high) / 2;
+
+        // Verify the equivalent value produces similar DPS gain
+        const verifyStats = statConfig.applyToStats(stats, equivalentValue);
+        const verifyDPS = calculateDamage(verifyStats, 'boss').dps;
+        const verifyGain = ((verifyDPS - baseBossDPS) / baseBossDPS * 100);
+
+        let icon = '';
+
+        if (statConfig.isMultiplicative) {
+            icon = ' <span style="font-size: 0.9em; opacity: 0.7;" title="Multiplicative stat">ℹ️</span>';
+        } else if (statConfig.isDiminishing) {
+            icon = ' <span style="font-size: 0.9em; opacity: 0.7;" title="Diminishing returns">ℹ️</span>';
+        }
+
+        html += '<tr>';
+        html += `<td style="font-weight: 600;">${statConfig.label}${icon}</td>`;
+        html += `<td style="text-align: right; font-size: 1.05em; color: var(--accent-primary); font-weight: 600;">${statConfig.formatValue(equivalentValue)}</td>`;
+        html += `<td style="text-align: right;"><span class="gain-positive">+${verifyGain.toFixed(2)}%</span></td>`;
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    html += '</div>';
+
+    document.getElementById('equivalency-results').innerHTML = html;
 }
