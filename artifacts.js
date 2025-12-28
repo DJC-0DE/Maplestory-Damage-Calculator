@@ -48,6 +48,17 @@ function renderEquippedArtifacts() {
     const preset = artifactPresets[currentArtifactPreset];
 
     let html = `
+        <div style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.05));
+                    border: 2px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 12px;
+                    margin-bottom: 20px; text-align: center;">
+            <div style="color: var(--text-primary); font-weight: 600; font-size: 0.9em; margin-bottom: 4px;">
+                ⚠️ Work in Progress
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.8em; line-height: 1.4;">
+                Artifact configuration is not yet used in damage calculations.<br>
+                Full integration coming in a future update.
+            </div>
+        </div>
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Artifact Preset</label>
             <select id="artifact-preset-selector" onchange="switchArtifactPreset(this.value)"
