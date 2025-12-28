@@ -87,7 +87,11 @@ function renderEquippedArtifacts() {
         if (artifactName && typeof artifactName === 'string' && artifactName.trim() !== '') {
             const artifact = artifactsData.find(a => a.name === artifactName);
             const libraryEntry = artifactLibrary[artifactName] || { stars: 0, potentials: [null, null, null] };
-            const stars = '★'.repeat(libraryEntry.stars) + '☆'.repeat(5 - libraryEntry.stars);
+
+            // Build stars with filled (gold) and empty (grey) styling
+            const filledStars = '★'.repeat(libraryEntry.stars);
+            const emptyStars = '☆'.repeat(5 - libraryEntry.stars);
+            const starsHtml = `<span style="color: #FFD700;">${filledStars}</span><span style="color: #666;">${emptyStars}</span>`;
 
             html += `
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -96,7 +100,7 @@ function renderEquippedArtifacts() {
                          style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
                     <div style="flex: 1; min-width: 0;">
                         <div style="font-weight: 600; font-size: 0.9em; color: var(--text-primary);">${artifactName}</div>
-                        <div style="color: #FFD700; font-size: 0.85em;">${stars}</div>
+                        <div style="font-size: 0.85em;">${starsHtml}</div>
                         <div style="color: var(--text-secondary); font-size: 0.75em; margin-top: 2px;">
                             ${libraryEntry.potentials.filter(p => p).length} potential(s)
                         </div>
@@ -193,7 +197,7 @@ function renderArtifactDetail() {
             <button onclick="setArtifactStars('${artifactName}', ${i})"
                     style="flex: 1; padding: 8px; border: 2px solid ${isSelected ? 'var(--accent-primary)' : 'var(--border-color)'};
                            background: ${isSelected ? 'var(--accent-primary)' : 'var(--background)'};
-                           color: ${isSelected ? 'white' : 'var(--text-primary)'};
+                           color: ${isSelected ? '#FFD700' : 'var(--text-primary)'};
                            border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
                 ${i}★
             </button>
@@ -297,18 +301,24 @@ function renderArtifactGrid() {
         <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 15px; text-align: center;">
             Select Artifact
         </div>
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 600px; overflow-y: auto; padding: 5px;">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-height: 600px; overflow-y: auto; padding: 5px;">
     `;
 
     artifactsData.forEach(artifact => {
         const isEquipped = equippedNames.includes(artifact.name);
         const isPreviewing = previewArtifactName === artifact.name;
+        const libraryEntry = artifactLibrary[artifact.name] || { stars: 0, potentials: [null, null, null] };
+
+        // Build stars with filled (gold) and empty (grey) styling
+        const filledStars = '★'.repeat(libraryEntry.stars);
+        const emptyStars = '☆'.repeat(5 - libraryEntry.stars);
+        const starsHtml = `<span style="color: #FFD700;">${filledStars}</span><span style="color: #666;">${emptyStars}</span>`;
 
         html += `
             <div onclick="previewArtifact('${artifact.name.replace(/'/g, "\\'")}')"
                  style="background: var(--background); border: 2px solid ${isPreviewing ? 'var(--accent-primary)' : (isEquipped ? 'var(--accent-success)' : 'var(--border-color)')};
-                        border-radius: 8px; padding: 6px; cursor: pointer; transition: all 0.3s;
-                        box-shadow: 0 2px 8px var(--shadow); position: relative; display: flex; justify-content: center; align-items: center;"
+                        border-radius: 8px; padding: 8px; cursor: pointer; transition: all 0.3s;
+                        box-shadow: 0 2px 8px var(--shadow); position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;"
                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px var(--shadow)'"
                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px var(--shadow)'"
                  title="${artifact.name}">
@@ -317,6 +327,7 @@ function renderArtifactGrid() {
                                             display: flex; align-items: center; justify-content: center; font-size: 0.7em; font-weight: 700;">✓</div>` : ''}
                 <img src="media/artifacts/${artifact.imageName}" alt="${artifact.name}"
                      style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+                <div style="font-size: 0.75em; font-weight: 600;">${starsHtml}</div>
             </div>
         `;
     });
@@ -409,6 +420,7 @@ function setArtifactStars(artifactName, stars) {
     // Refresh all views (this will update all presets using this artifact)
     renderArtifactDetail();
     renderEquippedArtifacts();
+    renderArtifactGrid();
     saveArtifactsToLocalStorage();
 }
 
