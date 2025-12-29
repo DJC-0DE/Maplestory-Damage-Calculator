@@ -110,26 +110,31 @@ function getItemStats(prefix) {
 }
 
 function getWeaponAttackBonus() {
+    // Calculate total attack % bonus from all weapon levels (inventory + equipped)
     let totalInventory = 0;
     let equippedBonus = 0;
 
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
-            const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-            const equippedCheckbox = document.getElementById(`equipped-${rarity}-${tier}`);
-            const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+            const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
+            if (!levelInput) return;
 
-            if (inventoryInput) {
-                const inventoryBonus = parseFloat(inventoryInput.value) || 0;
-                totalInventory += inventoryBonus;
+            const level = parseInt(levelInput.value) || 0;
+            if (level === 0) return;
 
-                if (equippedCheckbox && equippedCheckbox.checked && equippedInput) {
-                    equippedBonus = parseFloat(equippedInput.value) || 0;
-                }
+            // Get inventory and equipped attack % for this weapon
+            const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
+            totalInventory += inventoryAttack;
+
+            // Check if this weapon is equipped based on display visibility
+            if (equippedDisplay && equippedDisplay.style.display !== 'none') {
+                equippedBonus = equippedAttack;
             }
         });
     });
 
+    // Return total weapon attack % (inventory + equipped)
     return totalInventory + equippedBonus;
 }
 

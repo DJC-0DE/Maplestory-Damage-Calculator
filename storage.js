@@ -4,7 +4,7 @@ const BASE_SETUP_FIELDS = [
     'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
     'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
     'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat', 'final-damage',
-    'target-stage', 'defense'
+    'target-stage', 'defense', 'main-stat-pct'
 ];
 
 // Save all data to localStorage

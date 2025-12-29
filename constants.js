@@ -242,10 +242,10 @@ const rarityColors = {
     'Legendary': '#33ce85',
     'Unique': '#ffd26d',
     'Epic': '#9966ff',
-    'Rare': '#6699ff',
+    'Rare': '#88bbff',
     'Normal': '#ffffff',
     'Mystic': '#ff3f42',
-    'Ancient': '#3882ff'
+    'Ancient': '#2266cc'
 };
 
 // Artifacts data

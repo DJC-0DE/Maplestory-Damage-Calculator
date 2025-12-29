@@ -9,19 +9,37 @@ function mapArtifactStat(statName, value, baseStats) {
 
     switch (cleanStatName) {
         case 'Main Stat %':
-            // Calculate the additional main stat from the percentage
-            let primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
+            // Main stat % bonuses are additive with each other
+            // Primary Main Stat already includes current main stat % bonuses
+            const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
+            const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
+            let currentTotalMainStat = primaryMainStat;
+            let defenseToMainStat = 0;
 
             // Dark Knight: 12.7% of defense is converted to main stat but doesn't scale with Main Stat %
             if (selectedClass === 'dark-knight') {
                 const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
-                const defenseToMainStat = defense * 0.127;
-                primaryMainStat = primaryMainStat - defenseToMainStat;
+                defenseToMainStat = defense * 0.127;
             }
 
-            const additionalMainStat = primaryMainStat * (value / 100);
-            // Convert additional main stat to Stat Damage % at 100:1 ratio
-            const statDamageBonus = additionalMainStat / 100;
+            // Calculate the affected portion (total minus defense conversion for DK)
+            const affectedPortion = currentTotalMainStat - defenseToMainStat;
+
+            // Calculate ratio of new multiplier to current multiplier
+            const currentMultiplier = 1 + mainStatPct / 100;
+            const newMultiplier = 1 + (mainStatPct + value) / 100;
+            const ratio = newMultiplier / currentMultiplier;
+
+            // Apply ratio to affected portion, then add back defense portion
+            const newAffectedPortion = affectedPortion * ratio;
+            const newTotalMainStat = newAffectedPortion + defenseToMainStat;
+
+            // Convert to stat damage (100 main stat = 1% stat damage)
+            const currentStatDamageFromMainStat = currentTotalMainStat / 100;
+            const newStatDamageFromMainStat = newTotalMainStat / 100;
+
+            // Calculate the gain in stat damage and apply it
+            const statDamageBonus = newStatDamageFromMainStat - currentStatDamageFromMainStat;
             modifiedStats.statDamage += statDamageBonus;
             break;
         case 'Critical Rate %':

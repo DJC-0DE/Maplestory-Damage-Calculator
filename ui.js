@@ -416,10 +416,10 @@ function initializeWeapons() {
             const rarityCapitalized = rarity.charAt(0).toUpperCase() + rarity.slice(1);
             let rarityColor = rarityColors[rarityCapitalized] || '#ffffff';
 
-            // For Normal rarity, use black in light theme and white in dark theme
+            // For Normal rarity, use dark grey in light theme and white in dark theme
             if (rarityCapitalized === 'Normal') {
-                const currentTheme = document.body.getAttribute('data-theme');
-                rarityColor = currentTheme === 'light' ? '#000000' : '#ffffff';
+                const isDark = document.documentElement.classList.contains('dark');
+                rarityColor = isDark ? '#ffffff' : '#2a2a2a';
             }
 
             // Ancient T4 is enabled, T3/T2/T1 are disabled
@@ -456,6 +456,8 @@ function initializeWeapons() {
 
                 for (let i = 1; i <= 5; i++) {
                     html += `<span onclick="setWeaponStars('${rarity}', '${tier}', ${i})"
+                                   onmouseenter="previewStars('${rarity}', '${tier}', ${i})"
+                                   onmouseleave="resetStarPreview('${rarity}', '${tier}')"
                                    id="star-${rarity}-${tier}-${i}"
                                    style="cursor: pointer; font-size: 1.1em; transition: all 0.2s; opacity: ${i <= defaultStars ? 1 : 0.3};">⭐</span>`;
                 }
@@ -524,6 +526,30 @@ function setWeaponStars(rarity, tier, stars) {
     // Trigger level change to recalculate and enforce max level
     handleWeaponLevelChange(rarity, tier);
     saveToLocalStorage();
+}
+
+function previewStars(rarity, tier, stars) {
+    // Temporarily show what the stars would look like if this star is clicked
+    for (let i = 1; i <= 5; i++) {
+        const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
+        if (starElem) {
+            starElem.style.opacity = i <= stars ? '1' : '0.3';
+        }
+    }
+}
+
+function resetStarPreview(rarity, tier) {
+    // Reset stars to their actual stored value
+    const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+    if (!starsInput) return;
+
+    const currentStars = parseInt(starsInput.value) || 0;
+    for (let i = 1; i <= 5; i++) {
+        const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
+        if (starElem) {
+            starElem.style.opacity = i <= currentStars ? '1' : '0.3';
+        }
+    }
 }
 
 function handleEquippedCheckboxChange(rarity, tier) {
@@ -883,8 +909,9 @@ function updateUpgradePriorityChain() {
     groupedUpgrades.forEach((group, index) => {
         const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
         const tierUpper = group.tier.toUpperCase();
+        const rarityFirstLetter = group.rarity.charAt(0).toUpperCase();
 
-        html += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} x${group.count}</span>`;
+        html += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count}</span>`;
 
         if (index < groupedUpgrades.length - 1) {
             html += ' <span style="color: var(--text-secondary);">→</span> ';
@@ -1542,6 +1569,37 @@ const helpContent = {
 
             <h4>Note</h4>
             <p>This field is only visible when you select Dark Knight as your class.</p>
+        `
+    },
+    'main-stat-pct': {
+        title: 'Current Main Stat %',
+        content: `
+            <h4>What is Main Stat %?</h4>
+            <p>Main Stat % represents all percentage-based bonuses you currently have that increase your main stat (STR, DEX, INT, or LUK depending on your class).</p>
+
+            <h4>Why It's Required</h4>
+            <p>Main stat % bonuses are <strong>additive with each other</strong>, which means the value of gaining additional main stat % depends on your current total and existing bonuses. This field is required to correctly calculate how much DPS you would gain from additional main stat % sources.</p>
+
+            <h4>How to Use These Fields Together</h4>
+            <ol>
+                <li><strong>Primary Main Stat:</strong> Enter the TOTAL main stat shown on your character sheet (this already includes all your main stat % bonuses)</li>
+                <li><strong>Current Main Stat %:</strong> Enter the sum of all your main stat % bonuses</li>
+            </ol>
+
+            <h4>How to Calculate</h4>
+            <p>Add up all your main stat % bonuses from:</p>
+            <ul>
+                <li>Artifacts</li>
+                <li>Passive skills</li>
+                <li>Buff skills</li>
+                <li>Any other source that says "+X% Main Stat"</li>
+            </ul>
+
+            <h4>Important Note for Dark Knights</h4>
+            <p>Main stat % bonuses do NOT affect the portion of your main stat that comes from Defense conversion. This is automatically handled in the calculations.</p>
+
+            <h4>Example</h4>
+            <p>If you have +20% from equipment, +15% from artifacts, and +10% from skills, enter <strong>45</strong> in the "Current Main Stat %" field. Then enter your character sheet's total main stat value in the "Primary Main Stat" field.</p>
         `
     }
 };

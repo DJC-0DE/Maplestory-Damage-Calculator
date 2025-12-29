@@ -316,6 +316,13 @@ function calculateStatWeights(setup, stats) {
     const baseNormalDPS = calculateDamage(stats, 'normal').dps;
     const weaponAttackBonus = getWeaponAttackBonus();
 
+    // Get main stat % and related values for proper main stat % calculations
+    const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
+    const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
+    const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
+    // Use global selectedClass variable (set by selectClass() function)
+    const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
+
     // Flat attack increases
     const attackIncreases = [500, 1000, 2500, 5000, 10000, 15000];
 
@@ -330,6 +337,7 @@ function calculateStatWeights(setup, stats) {
         { key: 'finalDamage', label: 'Final Damage' },
         { key: 'bossDamage', label: 'Boss Damage' },
         { key: 'normalDamage', label: 'Monster Damage' },
+        { key: 'statDamage', label: 'Main Stat %' },
         { key: 'damageAmp', label: 'Damage Amplification' },
         { key: 'minDamage', label: 'Min Damage Multiplier' },
         { key: 'maxDamage', label: 'Max Damage Multiplier' },
@@ -447,25 +455,89 @@ function calculateStatWeights(setup, stats) {
         html += `<tr><td class="stat-name"><button onclick="toggleStatChart('${setup}', '${stat.key}', '${stat.label}', false)" style="background: none; border: none; cursor: pointer; font-size: 1.2em; margin-right: 8px; color: var(--accent-primary);" title="Toggle graph">📊</button>${labelContent}</td>`;
  
         percentIncreases.forEach(increase => {
-            const modifiedStats = { ...stats };
-            const oldValue = stats[stat.key];
-            if (multiplicativeStats[stat.key]) {
-                modifiedStats[stat.key] = (((1 + oldValue / 100) * (1 + increase / 100)) - 1) * 100;
-            } else if (diminishingReturnStats[stat.key]) {
-                const factor = diminishingReturnStats[stat.key].denominator;
-                // Use the formula to combine the current value with the new source
-                modifiedStats[stat.key] = (1 - (1 - oldValue / factor) * (1 - increase / factor)) * factor;
-            } else {
-                modifiedStats[stat.key] = oldValue + increase;
-            }
- 
-            const newValue = modifiedStats[stat.key];
-            const newDPS = calculateDamage(modifiedStats, stat.key === "bossDamage" ? 'boss' : 'normal').dps;
+            // Calculate cumulative gain by stepping through 1% at a time
+            let cumulativeGainPct = 0;
+            let currentStepStats = { ...stats };
             const baseDPS = stat.key === "bossDamage" ? baseBossDPS : baseNormalDPS;
-            const gain = ((newDPS - baseDPS) / baseDPS * 100).toFixed(2);
- 
-            const tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
- 
+            let previousDPS = baseDPS;
+
+            // Step through in 1% increments (or 0.1% for small increases)
+            const stepSize = increase <= 5 ? 0.1 : 1;
+            const numSteps = Math.round(increase / stepSize);
+
+            for (let step = 1; step <= numSteps; step++) {
+                const stepIncrease = stepSize;
+                const modifiedStats = { ...currentStepStats };
+                const oldValue = currentStepStats[stat.key];
+
+                // Special handling for Main Stat % - it's additive with existing Main Stat % bonuses
+                if (stat.key === 'statDamage') {
+                    // Primary Main Stat already includes current main stat % bonuses
+                    let currentTotalMainStat = primaryMainStat;
+                    let defenseToMainStat = 0;
+
+                    // For Dark Knight, subtract defense-converted portion (not affected by main stat %)
+                    if (currentSelectedClass === 'dark-knight') {
+                        defenseToMainStat = defense * 0.127;
+                    }
+
+                    // Calculate the affected portion (total minus defense conversion for DK)
+                    const affectedPortion = currentTotalMainStat - defenseToMainStat;
+
+                    // Calculate ratio of new multiplier to current multiplier
+                    // We need to track the actual main stat % at this step
+                    const currentMainStatPctAtStep = mainStatPct + (step - 1) * stepSize;
+                    const currentMultiplier = 1 + currentMainStatPctAtStep / 100;
+                    const newMultiplier = 1 + (currentMainStatPctAtStep + stepIncrease) / 100;
+                    const ratio = newMultiplier / currentMultiplier;
+
+                    // Apply ratio to affected portion, then add back defense portion
+                    const newAffectedPortion = affectedPortion * ratio;
+                    const newTotalMainStat = newAffectedPortion + defenseToMainStat;
+
+                    // Convert to stat damage (100 main stat = 1% stat damage)
+                    const currentStatDamageFromMainStat = currentTotalMainStat / 100;
+                    const newStatDamageFromMainStat = newTotalMainStat / 100;
+
+                    // Calculate the gain in stat damage
+                    const statDamageGain = newStatDamageFromMainStat - currentStatDamageFromMainStat;
+
+                    // Apply the gain to current stat damage
+                    modifiedStats[stat.key] = oldValue + statDamageGain;
+                } else if (multiplicativeStats[stat.key]) {
+                    modifiedStats[stat.key] = (((1 + oldValue / 100) * (1 + stepIncrease / 100)) - 1) * 100;
+                } else if (diminishingReturnStats[stat.key]) {
+                    const factor = diminishingReturnStats[stat.key].denominator;
+                    // Use the formula to combine the current value with the new source
+                    modifiedStats[stat.key] = (1 - (1 - oldValue / factor) * (1 - stepIncrease / factor)) * factor;
+                } else {
+                    modifiedStats[stat.key] = oldValue + stepIncrease;
+                }
+
+                const newDPS = calculateDamage(modifiedStats, stat.key === "bossDamage" ? 'boss' : 'normal').dps;
+                const stepGain = ((newDPS - previousDPS) / baseDPS * 100);
+                cumulativeGainPct += stepGain;
+
+                // Update for next iteration
+                currentStepStats = modifiedStats;
+                previousDPS = newDPS;
+            }
+
+            const gain = cumulativeGainPct.toFixed(2);
+            const newValue = currentStepStats[stat.key];
+
+            // Create tooltip - special handling for Main Stat %
+            const oldValue = stats[stat.key];
+            const newDPS = previousDPS;
+
+            let tooltip;
+            if (stat.key === 'statDamage') {
+                const statDamageIncrease = (newValue - oldValue).toFixed(2);
+                tooltip = `+${increase}% Main Stat\nStat Damage increase: +${statDamageIncrease}%\nOld Stat Damage: ${formatNumber(oldValue)}%, New: ${formatNumber(newValue)}%\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+            } else {
+                tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+            }
+
             html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
         });
 
@@ -523,41 +595,105 @@ function generateStatChartData(setup, statKey, statLabel, isFlat) {
     // Generate data points
     const dataPoints = [];
     const numPoints = 50;
-    const maxIncrease = isFlat ? (statKey === 'attack' ? 10000 : 5000) : 100;
+    const minIncrease = isFlat ? (statKey === 'attack' ? 500 : 100) : 1;  // Start at 500 for attack, 100 for mainStat, 1% for percentage stats
+    const maxIncrease = isFlat ? (statKey === 'attack' ? 15000 : 7500) : 75;  // Cap at 75% for percentage, 15000 for attack, 7500 for mainStat
+
+    // Calculate baseline DPS at +0% (for first marginal gain calculation)
+    const monsterTypeBase = statKey === 'bossDamage' ? 'boss' : (statKey === 'normalDamage' ? 'normal' : 'boss');
+    const baseDPS = monsterTypeBase === 'boss' ? baseBossDPS : calculateDamage(stats, 'normal').dps;
+    let previousDPS = baseDPS;
+    let cumulativeStats = { ...stats };
+    let cumulativeIncrease = 0;
 
     for (let i = 0; i <= numPoints; i++) {
-        const increase = (i / numPoints) * maxIncrease;
-        const modifiedStats = { ...stats };
+        // For attack, use fixed 500 steps; for others, divide the range
+        const stepIncrease = isFlat && statKey === 'attack'
+            ? 500
+            : (i === 0 ? minIncrease : (maxIncrease - minIncrease) / numPoints);
+        cumulativeIncrease += stepIncrease;
+
+        // Stop if we've exceeded the max for attack
+        if (isFlat && statKey === 'attack' && cumulativeIncrease > maxIncrease) {
+            break;
+        }
+
+        const modifiedStats = { ...cumulativeStats };
+
+        let effectiveStepIncrease = stepIncrease;
 
         if (isFlat) {
             if (statKey === 'attack') {
-                const effectiveIncrease = increase * (1 + weaponAttackBonus / 100);
-                modifiedStats.attack = stats.attack + effectiveIncrease;
+                effectiveStepIncrease = stepIncrease * (1 + weaponAttackBonus / 100);
+                modifiedStats.attack = cumulativeStats.attack + effectiveStepIncrease;
             } else if (statKey === 'mainStat') {
-                const statDamageIncrease = increase / 100;
-                modifiedStats.statDamage = stats.statDamage + statDamageIncrease;
+                const statDamageIncrease = stepIncrease / 100;
+                modifiedStats.statDamage = cumulativeStats.statDamage + statDamageIncrease;
             }
         } else {
-            const oldValue = stats[statKey];
-            if (multiplicativeStats[statKey]) {
-                modifiedStats[statKey] = (((1 + oldValue / 100) * (1 + increase / 100)) - 1) * 100;
+            const oldValue = cumulativeStats[statKey];
+            if (statKey === 'statDamage') {
+                // Special handling for Main Stat % using the ratio approach
+                // For the graph, we step through from the baseline
+                const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
+                const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
+                const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
+                const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
+
+                let defenseToMainStat = 0;
+                if (currentSelectedClass === 'dark-knight') {
+                    defenseToMainStat = defense * 0.127;
+                }
+
+                const affectedPortion = primaryMainStat - defenseToMainStat;
+
+                // Calculate multiplier at previous step and this step
+                const prevCumulativeIncrease = cumulativeIncrease - stepIncrease;
+                const prevMultiplier = 1 + (mainStatPct + prevCumulativeIncrease) / 100;
+                const newMultiplier = 1 + (mainStatPct + cumulativeIncrease) / 100;
+
+                // Get current total based on previous step
+                const prevTotalMainStat = affectedPortion * prevMultiplier + defenseToMainStat;
+                const newTotalMainStat = affectedPortion * newMultiplier + defenseToMainStat;
+
+                const prevStatDamage = prevTotalMainStat / 100;
+                const newStatDamage = newTotalMainStat / 100;
+                const statDamageGain = newStatDamage - prevStatDamage;
+
+                modifiedStats[statKey] = oldValue + statDamageGain;
+            } else if (multiplicativeStats[statKey]) {
+                modifiedStats[statKey] = (((1 + oldValue / 100) * (1 + stepIncrease / 100)) - 1) * 100;
             } else if (diminishingReturnStats[statKey]) {
                 const factor = diminishingReturnStats[statKey].denominator;
-                modifiedStats[statKey] = (1 - (1 - oldValue / factor) * (1 - increase / factor)) * factor;
+                modifiedStats[statKey] = (1 - (1 - oldValue / factor) * (1 - stepIncrease / factor)) * factor;
             } else {
-                modifiedStats[statKey] = oldValue + increase;
+                modifiedStats[statKey] = oldValue + stepIncrease;
             }
         }
 
+        // Save cumulative stats for next iteration
+        cumulativeStats = { ...modifiedStats };
+
         const monsterType = statKey === 'bossDamage' ? 'boss' : (statKey === 'normalDamage' ? 'normal' : 'boss');
-        const newDPS = calculateDamage(modifiedStats, monsterType).dps;
-        const baseDPS = monsterType === 'boss' ? baseBossDPS : calculateDamage(stats, 'normal').dps;
-        const gain = ((newDPS - baseDPS) / baseDPS * 100);
+        const currentDPS = calculateDamage(modifiedStats, monsterType).dps;
+
+        // Calculate marginal gain (gain from previous point to this point) relative to PREVIOUS DPS
+        // This shows: "at this power level, adding 1% more gives X% DPS increase"
+        const marginalGain = ((currentDPS - previousDPS) / previousDPS * 100);
+
+        // Use the base step increment (weapon bonus is already in DPS calculation)
+        // For attack: per 500, for mainStat: per 100, for percentage stats: per 1%
+        const actualStepSize = isFlat
+            ? (statKey === 'attack' ? stepIncrease / 500 : stepIncrease / 100)
+            : stepIncrease;
+
+        const gainPerUnit = actualStepSize > 0 ? marginalGain / actualStepSize : 0;
 
         dataPoints.push({
-            x: increase,
-            y: gain
+            x: cumulativeIncrease,
+            y: parseFloat(gainPerUnit.toFixed(2))
         });
+
+        previousDPS = currentDPS;
     }
 
     return dataPoints;
@@ -582,12 +718,15 @@ function renderStatChart(setup, statKey, statLabel, isFlat) {
     const textColor = isDark ? '#e5e7eb' : '#1f2937';
     const gridColor = isDark ? '#374151' : '#d1d5db';
 
+    // Determine the per-unit label based on stat type
+    const perUnitLabel = isFlat ? (statKey === 'attack' ? '500' : '100') : '1%';
+
     // Create new chart
     statWeightCharts[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
-                label: `${statLabel} → DPS Gain`,
+                label: `${statLabel} → DPS Gain per ${perUnitLabel}`,
                 data: data,
                 borderColor: '#007aff',
                 backgroundColor: 'rgba(0, 122, 255, 0.1)',
@@ -609,8 +748,8 @@ function renderStatChart(setup, statKey, statLabel, isFlat) {
                     callbacks: {
                         label: function(context) {
                             const increase = context.parsed.x.toFixed(2);
-                            const gain = context.parsed.y.toFixed(2);
-                            return `+${increase}${isFlat ? '' : '%'} ${statLabel} → +${gain}% DPS`;
+                            const gainPerUnit = context.parsed.y.toFixed(2);
+                            return `At +${increase}${isFlat ? '' : '%'}: ${gainPerUnit}% DPS per ${perUnitLabel} added`;
                         }
                     }
                 }
@@ -618,9 +757,10 @@ function renderStatChart(setup, statKey, statLabel, isFlat) {
             scales: {
                 x: {
                     type: 'linear',
+                    min: isFlat ? (statKey === 'attack' ? 500 : 100) : 1,
                     title: {
                         display: true,
-                        text: `Increase in ${statLabel}${isFlat ? '' : ' (%)'}`,
+                        text: `Total Increase in ${statLabel}${isFlat ? '' : ' (%)'}`,
                         color: textColor
                     },
                     ticks: {
@@ -633,7 +773,7 @@ function renderStatChart(setup, statKey, statLabel, isFlat) {
                 y: {
                     title: {
                         display: true,
-                        text: 'DPS Gain (%)',
+                        text: `DPS Gain (%) per ${perUnitLabel} Added`,
                         color: textColor
                     },
                     ticks: {
