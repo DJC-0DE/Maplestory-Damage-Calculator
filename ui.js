@@ -63,28 +63,39 @@ function toggleTheme() {
                     const weaponData = data.weapons[key];
 
                     if (weaponData) {
-                        const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-                        const equippedCheckbox = document.getElementById(`equipped-${rarity}-${tier}`);
-                        const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+                        const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+                        const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+                        const equippedCheckbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
 
-                        if (inventoryInput) inventoryInput.value = weaponData.inventoryAttack || '0';
+                        if (starsInput) {
+                            const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
+                            const stars = weaponData.stars !== undefined ? weaponData.stars : defaultStars;
+                            starsInput.value = stars;
 
-                        // Set the equipped attack value BEFORE calling handleEquippedChange
-                        // This ensures the value is set before the save is triggered
-                        if (equippedInput && weaponData.equippedAttack !== undefined) {
-                            equippedInput.value = weaponData.equippedAttack || '0';
+                            // Update star display (1-5 stars)
+                            for (let i = 1; i <= 5; i++) {
+                                const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
+                                if (starElem) {
+                                    starElem.style.opacity = i <= stars ? '1' : '0.3';
+                                }
+                            }
                         }
 
-                        if (equippedCheckbox) {
-                            equippedCheckbox.checked = weaponData.equipped;
-                            if (weaponData.equipped) {
-                                handleEquippedChange(rarity, tier);
-                            }
+                        if (levelInput) {
+                            levelInput.value = weaponData.level || '0';
+                            handleWeaponLevelChange(rarity, tier);
+                        }
+
+                        // Restore equipped state
+                        if (equippedCheckbox && weaponData.equipped) {
+                            equippedCheckbox.checked = true;
+                            handleEquippedCheckboxChange(rarity, tier);
                         }
                     }
                 });
             });
             updateWeaponBonuses();
+            updateEquippedWeaponIndicator();
         }
     }
 }
@@ -401,7 +412,7 @@ function initializeWeapons() {
 
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
-            const rate = weaponRatesPerLevel[rarity][tier];
+            const baseAtk = weaponBaseAttackEquipped[rarity]?.[tier];
             const rarityCapitalized = rarity.charAt(0).toUpperCase() + rarity.slice(1);
             let rarityColor = rarityColors[rarityCapitalized] || '#ffffff';
 
@@ -411,30 +422,61 @@ function initializeWeapons() {
                 rarityColor = currentTheme === 'light' ? '#000000' : '#ffffff';
             }
 
-            if (rate === null) {
+            // Ancient T4 is enabled, T3/T2/T1 are disabled
+            const isDisabled = rarity === 'ancient' && tier !== 't4';
+
+            if (baseAtk === null || baseAtk === undefined || isDisabled) {
                 html += `<div class="weapon-card" style="opacity: 0.4;">
                     <div class="weapon-header" style="color: ${rarityColor};">${tier.toUpperCase()} ${rarityCapitalized}</div>
                     <div style="text-align: center; color: var(--text-secondary); font-size: 0.8em; padding: 15px 0;">No data</div>
                 </div>`;
             } else {
+                // Default stars: 5 for normal/rare/epic/unique, 1 for legendary/mystic/ancient
+                const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
+
                 html += `<div class="weapon-card" id="weapon-${rarity}-${tier}">
+                    <!-- Equipped Checkbox in top right -->
+                    <div style="position: absolute; top: 8px; right: 8px;">
+                        <input type="checkbox" id="equipped-checkbox-${rarity}-${tier}"
+                               style="display: none;"
+                               onchange="handleEquippedCheckboxChange('${rarity}', '${tier}')">
+                        <label for="equipped-checkbox-${rarity}-${tier}"
+                               style="cursor: pointer; display: flex; align-items: center; justify-content: center;
+                                      width: 24px; height: 24px; border: 2px solid var(--border-color);
+                                      border-radius: 4px; background: var(--background);
+                                      font-weight: bold; font-size: 0.9em; color: var(--text-secondary);
+                                      transition: all 0.2s;"
+                               id="equipped-label-${rarity}-${tier}">E</label>
+                    </div>
+
                     <div class="weapon-header" style="color: ${rarityColor};">${tier.toUpperCase()} ${rarityCapitalized}</div>
+
+                    <!-- Star Rating -->
+                    <div style="display: flex; gap: 4px; justify-content: center; margin: 8px 0;">`;
+
+                for (let i = 1; i <= 5; i++) {
+                    html += `<span onclick="setWeaponStars('${rarity}', '${tier}', ${i})"
+                                   id="star-${rarity}-${tier}-${i}"
+                                   style="cursor: pointer; font-size: 1.1em; transition: all 0.2s; opacity: ${i <= defaultStars ? 1 : 0.3};">⭐</span>`;
+                }
+
+                html += `</div>
+                    <input type="hidden" id="stars-${rarity}-${tier}" value="${defaultStars}">
+
                     <div class="input-group" style="margin-bottom: 8px;">
-                        <label style="margin-bottom: 4px;">Inventory:</label>
-                        <input type="number" step="0.1" class="weapon-input" id="inventory-${rarity}-${tier}"
-                               placeholder="0.0%" value="0" onchange="updateWeaponBonuses()">
+                        <label style="margin-bottom: 4px;">Level:</label>
+                        <input type="number" min="0" max="200" class="weapon-input" id="level-${rarity}-${tier}"
+                               placeholder="0-200" value="0" oninput="handleWeaponLevelChange('${rarity}', '${tier}')">
                     </div>
-                    <div class="weapon-checkbox">
-                        <input type="checkbox" id="equipped-${rarity}-${tier}"
-                               onchange="handleEquippedChange('${rarity}', '${tier}')">
-                        <label>Equipped</label>
+                    <div style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 8px;">
+                        <span id="inventory-display-${rarity}-${tier}">0.0% inventory attack</span>
                     </div>
-                    <div id="equipped-input-${rarity}-${tier}" style="display: none;">
-                        <div class="input-group" style="margin-top: 8px;">
-                            <label style="margin-bottom: 4px;">Equipped (✓):</label>
-                            <input type="number" step="0.1" class="weapon-input"
-                                   id="equipped-attack-${rarity}-${tier}"
-                                   placeholder="0.0%" value="0" onchange="updateWeaponBonuses()">
+                    <div id="upgrade-gain-container-${rarity}-${tier}" style="font-size: 0.8em; margin-bottom: 8px; display: none;">
+                        <span id="upgrade-gain-${rarity}-${tier}"></span>
+                    </div>
+                    <div id="equipped-display-${rarity}-${tier}" style="display: none; margin-top: 8px;">
+                        <div style="color: var(--text-secondary); font-size: 0.85em;">
+                            Equipped: <span id="equipped-value-${rarity}-${tier}">0.0%</span>
                         </div>
                     </div>
                 </div>`;
@@ -444,56 +486,246 @@ function initializeWeapons() {
 
     weaponsGrid.innerHTML = html;
 
-    // Attach save listeners to weapon inputs (after they're created)
+    // Attach save listeners to weapon level and star inputs (after they're created)
     setTimeout(() => {
         rarities.forEach(rarity => {
             tiers.forEach(tier => {
-                const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-                const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+                const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+                const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
 
-                if (inventoryInput) {
-                    inventoryInput.addEventListener('input', saveToLocalStorage);
+                if (levelInput) {
+                    levelInput.addEventListener('input', saveToLocalStorage);
                 }
-                if (equippedInput) {
-                    equippedInput.addEventListener('input', saveToLocalStorage);
+                if (starsInput) {
+                    starsInput.addEventListener('change', saveToLocalStorage);
                 }
             });
         });
     }, 0);
 }
 
-function handleEquippedChange(rarity, tier) {
-    const checkbox = document.getElementById(`equipped-${rarity}-${tier}`);
-    const equippedInput = document.getElementById(`equipped-input-${rarity}-${tier}`);
-    const weaponCard = document.getElementById(`weapon-${rarity}-${tier}`);
+function setWeaponStars(rarity, tier, stars) {
+    const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+    if (!starsInput) return;
+
+    // Toggle behavior: if clicking the same star, set to 0, otherwise set to clicked star
+    const currentStars = parseInt(starsInput.value) || 0;
+    const newStars = (currentStars === stars) ? 0 : stars;
+    starsInput.value = newStars;
+
+    // Update star display (1-5 stars)
+    for (let i = 1; i <= 5; i++) {
+        const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
+        if (starElem) {
+            starElem.style.opacity = i <= newStars ? '1' : '0.3';
+        }
+    }
+
+    // Trigger level change to recalculate and enforce max level
+    handleWeaponLevelChange(rarity, tier);
+    saveToLocalStorage();
+}
+
+function handleEquippedCheckboxChange(rarity, tier) {
+    const checkbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
+    const label = document.getElementById(`equipped-label-${rarity}-${tier}`);
+    const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
+    const card = document.getElementById(`weapon-${rarity}-${tier}`);
 
     if (checkbox.checked) {
         // Uncheck all other equipped checkboxes
         rarities.forEach(r => {
             tiers.forEach(t => {
                 if (r !== rarity || t !== tier) {
-                    const otherCheckbox = document.getElementById(`equipped-${r}-${t}`);
-                    if (otherCheckbox) {
-                        otherCheckbox.checked = false;
-                        const otherInput = document.getElementById(`equipped-input-${r}-${t}`);
-                        const otherCard = document.getElementById(`weapon-${r}-${t}`);
-                        if (otherInput) otherInput.style.display = 'none';
-                        if (otherCard) otherCard.classList.remove('equipped');
+                    const otherCheckbox = document.getElementById(`equipped-checkbox-${r}-${t}`);
+                    const otherLabel = document.getElementById(`equipped-label-${r}-${t}`);
+                    const otherDisplay = document.getElementById(`equipped-display-${r}-${t}`);
+                    const otherCard = document.getElementById(`weapon-${r}-${t}`);
+
+                    if (otherCheckbox) otherCheckbox.checked = false;
+                    if (otherLabel) {
+                        otherLabel.style.background = 'var(--background)';
+                        otherLabel.style.borderColor = 'var(--border-color)';
+                        otherLabel.style.color = 'var(--text-secondary)';
                     }
+                    if (otherDisplay) otherDisplay.style.display = 'none';
+                    if (otherCard) otherCard.classList.remove('equipped');
                 }
             });
         });
-        equippedInput.style.display = 'block';
-        weaponCard.classList.add('equipped');
+
+        // Calculate and display equipped attack
+        const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+        const level = parseInt(levelInput.value) || 0;
+        const { equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
+
+        const equippedValue = document.getElementById(`equipped-value-${rarity}-${tier}`);
+        if (equippedValue) {
+            equippedValue.textContent = `${equippedAttack.toFixed(1)}%`;
+        }
+
+        if (equippedDisplay) equippedDisplay.style.display = 'block';
+        if (card) card.classList.add('equipped');
+
+        // Style the checkbox label
+        if (label) {
+            label.style.background = 'var(--accent-primary)';
+            label.style.borderColor = 'var(--accent-primary)';
+            label.style.color = '#ffffff';
+        }
     } else {
-        equippedInput.style.display = 'none';
-        weaponCard.classList.remove('equipped');
+        if (equippedDisplay) equippedDisplay.style.display = 'none';
+        if (card) card.classList.remove('equipped');
+
+        // Reset the checkbox label style
+        if (label) {
+            label.style.background = 'var(--background)';
+            label.style.borderColor = 'var(--border-color)';
+            label.style.color = 'var(--text-secondary)';
+        }
     }
 
-    // Save to localStorage
     saveToLocalStorage();
-
     updateWeaponBonuses();
+    updateEquippedWeaponIndicator();
+}
+
+function updateWeaponUpgradeColors() {
+    // Collect all gainPer1k values
+    const gainValues = [];
+    rarities.forEach(rarity => {
+        tiers.forEach(tier => {
+            const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
+            if (upgradeGainDisplay && upgradeGainDisplay.dataset.gainPer1k) {
+                const gainPer1k = parseFloat(upgradeGainDisplay.dataset.gainPer1k);
+                if (!isNaN(gainPer1k) && gainPer1k > 0) {
+                    gainValues.push(gainPer1k);
+                }
+            }
+        });
+    });
+
+    if (gainValues.length === 0) return;
+
+    // Find min and max
+    const minGain = Math.min(...gainValues);
+    const maxGain = Math.max(...gainValues);
+
+    // Apply colors to each upgrade display
+    rarities.forEach(rarity => {
+        tiers.forEach(tier => {
+            const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
+            if (upgradeGainDisplay && upgradeGainDisplay.dataset.gainPer1k) {
+                const gainPer1k = parseFloat(upgradeGainDisplay.dataset.gainPer1k);
+                if (!isNaN(gainPer1k) && gainPer1k > 0) {
+                    // Normalize value between 0 (min) and 1 (max)
+                    const normalized = maxGain === minGain ? 1 : (gainPer1k - minGain) / (maxGain - minGain);
+
+                    // Color from deep forest green (low) to vibrant green (high)
+                    // Deep forest green: rgb(34, 139, 34) or #228B22
+                    // Vibrant green: rgb(16, 185, 129) or #10b981
+                    const r = Math.round(34 + (16 - 34) * normalized);
+                    const g = Math.round(139 + (185 - 139) * normalized);
+                    const b = Math.round(34 + (129 - 34) * normalized);
+
+                    upgradeGainDisplay.style.color = `rgb(${r}, ${g}, ${b})`;
+                }
+            }
+        });
+    });
+}
+
+function handleWeaponLevelChange(rarity, tier) {
+    const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+    const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+    const level = parseInt(levelInput.value) || 0;
+    const stars = starsInput?.value !== undefined && starsInput?.value !== ''
+        ? parseInt(starsInput.value)
+        : 5;
+
+    // Enforce max level based on stars
+    const maxLevel = getMaxLevelForStars(stars);
+    levelInput.setAttribute('max', maxLevel);
+    if (level > maxLevel) {
+        levelInput.value = maxLevel;
+        return handleWeaponLevelChange(rarity, tier);
+    }
+
+    // Calculate inventory and equipped attack percentages
+    const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
+
+    // Update inventory display
+    const inventoryDisplay = document.getElementById(`inventory-display-${rarity}-${tier}`);
+    if (inventoryDisplay) {
+        inventoryDisplay.textContent = `${inventoryAttack.toFixed(1)}% inventory attack`;
+    }
+
+    // Show/hide upgrade gain display based on whether at max level
+    const upgradeGainContainer = document.getElementById(`upgrade-gain-container-${rarity}-${tier}`);
+    const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
+
+    if (level < maxLevel && level > 0) {
+        const upgradeGain = calculateUpgradeGain(rarity, tier, level, stars, 10000);
+        if (upgradeGainDisplay && upgradeGain.attackGain > 0) {
+            let gainPer1k;
+            if (upgradeGain.isUnaffordable) {
+                // Next level costs more than 10k, show actual cost
+                const costInK = (upgradeGain.singleLevelCost / 1000).toFixed(1);
+                gainPer1k = upgradeGain.attackGain / parseFloat(costInK);
+                upgradeGainDisplay.textContent = `+${upgradeGain.attackGain.toFixed(1)}% attack / ${costInK}k shards (+${gainPer1k.toFixed(2)}%/1k)`;
+            } else {
+                // Can afford multiple levels with 10k
+                gainPer1k = upgradeGain.attackGain / 10;
+                upgradeGainDisplay.textContent = `+${upgradeGain.attackGain.toFixed(1)}% attack / 10k shards (+${gainPer1k.toFixed(2)}%/1k)`;
+            }
+            // Store gainPer1k for color coding
+            upgradeGainDisplay.dataset.gainPer1k = gainPer1k;
+        }
+        if (upgradeGainContainer) {
+            upgradeGainContainer.style.display = 'block';
+        }
+    } else {
+        if (upgradeGainContainer) {
+            upgradeGainContainer.style.display = 'none';
+        }
+        if (upgradeGainDisplay) {
+            delete upgradeGainDisplay.dataset.gainPer1k;
+        }
+    }
+
+    // Update equipped display if this weapon is currently shown as equipped
+    const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
+    if (equippedDisplay && equippedDisplay.style.display !== 'none') {
+        const equippedValue = document.getElementById(`equipped-value-${rarity}-${tier}`);
+        if (equippedValue) {
+            equippedValue.textContent = `${equippedAttack.toFixed(1)}%`;
+        }
+    }
+
+    // Update totals and recalculate damage
+    updateWeaponBonuses();
+    updateEquippedWeaponIndicator();
+    updateWeaponUpgradeColors();
+}
+
+function updateEquippedWeaponIndicator() {
+    // Check if any weapon is equipped
+    let hasEquipped = false;
+
+    rarities.forEach(rarity => {
+        tiers.forEach(tier => {
+            const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
+            if (equippedDisplay && equippedDisplay.style.display !== 'none') {
+                hasEquipped = true;
+            }
+        });
+    });
+
+    // Show/hide the indicator
+    const indicator = document.getElementById('no-weapon-equipped-indicator');
+    if (indicator) {
+        indicator.style.display = hasEquipped ? 'none' : 'block';
+    }
 }
 
 function updateWeaponBonuses() {
@@ -502,16 +734,22 @@ function updateWeaponBonuses() {
 
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
-            const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-            const equippedCheckbox = document.getElementById(`equipped-${rarity}-${tier}`);
-            const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+            const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+            const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
 
-            if (inventoryInput) {
-                const inventoryBonus = parseFloat(inventoryInput.value) || 0;
-                totalInventory += inventoryBonus;
+            if (levelInput) {
+                const level = parseInt(levelInput.value) || 0;
+                const stars = starsInput?.value !== undefined && starsInput?.value !== ''
+                    ? parseInt(starsInput.value)
+                    : 5;
+                const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
 
-                if (equippedCheckbox && equippedCheckbox.checked && equippedInput) {
-                    equippedBonus = parseFloat(equippedInput.value) || 0;
+                totalInventory += inventoryAttack;
+
+                // Check if equipped based on display visibility
+                if (equippedDisplay && equippedDisplay.style.display !== 'none') {
+                    equippedBonus = equippedAttack;
                 }
             }
         });
@@ -526,6 +764,134 @@ function updateWeaponBonuses() {
 
     // Recalculate damage
     calculate();
+
+    // Update upgrade priority chain
+    updateUpgradePriorityChain();
+}
+
+function updateUpgradePriorityChain() {
+    const priorityChain = document.getElementById('upgrade-priority-chain');
+    if (!priorityChain) return;
+
+    // Collect current weapon states
+    const weaponStates = [];
+    rarities.forEach(rarity => {
+        tiers.forEach(tier => {
+            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+            const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+            if (levelInput) {
+                const level = parseInt(levelInput.value) || 0;
+                const stars = starsInput?.value !== undefined && starsInput?.value !== ''
+                    ? parseInt(starsInput.value)
+                    : 5;
+                const maxLevel = getMaxLevelForStars(stars);
+
+                // Only include weapons that can be upgraded (level > 0 and not at max)
+                if (level > 0 && level < maxLevel) {
+                    weaponStates.push({
+                        rarity,
+                        tier,
+                        level,
+                        stars,
+                        maxLevel
+                    });
+                }
+            }
+        });
+    });
+
+    if (weaponStates.length === 0) {
+        priorityChain.innerHTML = '<span style="color: var(--text-secondary);">No weapons available to upgrade</span>';
+        return;
+    }
+
+    // Simulate 100 upgrades
+    const upgradeSequence = [];
+    const weaponLevels = {};
+    const weaponMaxLevels = {};
+
+    // Initialize current levels and max levels
+    weaponStates.forEach(ws => {
+        const key = `${ws.rarity}-${ws.tier}`;
+        weaponLevels[key] = ws.level;
+        weaponMaxLevels[key] = ws.maxLevel;
+    });
+
+    for (let i = 0; i < 100; i++) {
+        let bestWeapon = null;
+        let bestEfficiency = 0;
+
+        // Recalculate efficiency for ALL weapons at their current levels
+        weaponStates.forEach(ws => {
+            const key = `${ws.rarity}-${ws.tier}`;
+            const currentLevel = weaponLevels[key];
+            const maxLevel = weaponMaxLevels[key];
+
+            // Skip if at max level
+            if (currentLevel >= maxLevel) return;
+
+            // Calculate gain from upgrading by 1 level at the CURRENT level
+            const currentAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel).inventoryAttack;
+            const nextAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel + 1).inventoryAttack;
+            const gain = nextAttack - currentAttack;
+
+            // Calculate cost for this upgrade
+            const cost = getUpgradeCost(ws.rarity, ws.tier, currentLevel + 1);
+
+            // Calculate efficiency: gain per 1k shards
+            const efficiency = cost > 0 ? (gain / cost) * 1000 : 0;
+
+            if (efficiency > bestEfficiency) {
+                bestEfficiency = efficiency;
+                bestWeapon = { rarity: ws.rarity, tier: ws.tier, key };
+            }
+        });
+
+        // If no weapon can be upgraded, stop
+        if (!bestWeapon) break;
+
+        // Record this upgrade and increment the level for next iteration
+        upgradeSequence.push(bestWeapon);
+        weaponLevels[bestWeapon.key]++;
+    }
+
+    // Group consecutive upgrades to the same weapon
+    const groupedUpgrades = [];
+    let currentGroup = null;
+
+    upgradeSequence.forEach(upgrade => {
+        if (!currentGroup || currentGroup.rarity !== upgrade.rarity || currentGroup.tier !== upgrade.tier) {
+            if (currentGroup) {
+                groupedUpgrades.push(currentGroup);
+            }
+            currentGroup = {
+                rarity: upgrade.rarity,
+                tier: upgrade.tier,
+                count: 1
+            };
+        } else {
+            currentGroup.count++;
+        }
+    });
+
+    if (currentGroup) {
+        groupedUpgrades.push(currentGroup);
+    }
+
+    // Build HTML for display
+    let html = '';
+    groupedUpgrades.forEach((group, index) => {
+        const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
+        const tierUpper = group.tier.toUpperCase();
+
+        html += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} x${group.count}</span>`;
+
+        if (index < groupedUpgrades.length - 1) {
+            html += ' <span style="color: var(--text-secondary);">→</span> ';
+        }
+    });
+
+    priorityChain.innerHTML = html;
 }
 
 // Display functions

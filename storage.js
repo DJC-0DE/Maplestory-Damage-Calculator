@@ -72,16 +72,16 @@ function saveToLocalStorage() {
     // Save Weapons
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
-            const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-            const equippedCheckbox = document.getElementById(`equipped-${rarity}-${tier}`);
-            const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+            const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+            const equippedCheckbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
 
-            if (inventoryInput) {
+            if (levelInput) {
                 const key = `${rarity}-${tier}`;
                 data.weapons[key] = {
-                    inventoryAttack: inventoryInput.value,
-                    equipped: equippedCheckbox ? equippedCheckbox.checked : false,
-                    equippedAttack: equippedInput ? equippedInput.value : '0'
+                    level: levelInput.value,
+                    stars: starsInput ? starsInput.value : '5',
+                    equipped: equippedCheckbox ? equippedCheckbox.checked : false
                 };
             }
         });
@@ -174,28 +174,44 @@ function loadFromLocalStorage() {
                     const weaponData = data.weapons[key];
 
                     if (weaponData) {
-                        const inventoryInput = document.getElementById(`inventory-${rarity}-${tier}`);
-                        const equippedCheckbox = document.getElementById(`equipped-${rarity}-${tier}`);
-                        const equippedInput = document.getElementById(`equipped-attack-${rarity}-${tier}`);
+                        const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+                        const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
+                        const equippedCheckbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
 
-                        if (inventoryInput) inventoryInput.value = weaponData.inventoryAttack || '0';
+                        // Set stars first
+                        if (starsInput) {
+                            const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
+                            const stars = weaponData.stars !== undefined ? weaponData.stars : defaultStars;
+                            starsInput.value = stars;
 
-                        // Set the equipped attack value BEFORE calling handleEquippedChange
-                        // This ensures the value is set before the save is triggered
-                        if (equippedInput && weaponData.equippedAttack !== undefined) {
-                            equippedInput.value = weaponData.equippedAttack || '0';
+                            // Update star display (1-5 stars)
+                            for (let i = 1; i <= 5; i++) {
+                                const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
+                                if (starElem) {
+                                    starElem.style.opacity = i <= stars ? '1' : '0.3';
+                                }
+                            }
                         }
 
-                        if (equippedCheckbox) {
-                            equippedCheckbox.checked = weaponData.equipped;
-                            if (weaponData.equipped) {
-                                handleEquippedChange(rarity, tier);
-                            }
+                        // Then set level
+                        if (levelInput) {
+                            levelInput.value = weaponData.level || '0';
+                            // Trigger the level change handler to update displays
+                            handleWeaponLevelChange(rarity, tier);
+                        }
+
+                        // Restore equipped state
+                        if (equippedCheckbox && weaponData.equipped) {
+                            equippedCheckbox.checked = true;
+                            handleEquippedCheckboxChange(rarity, tier);
                         }
                     }
                 });
             });
         }
+
+        // Update equipped weapon indicator after loading
+        updateEquippedWeaponIndicator();
 
         // Load Equipment Slots
         if (data.equipmentSlots) {

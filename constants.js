@@ -9,6 +9,17 @@ const weaponRatesPerLevel = {
     'ancient': { 't1': 6.5, 't2': 5.0, 't3': 5.5, 't4': 6.2 }
 };
 
+// Base attack % at level 1 for EQUIPPED weapons (from weapon invent attack formula.png)
+const weaponBaseAttackEquipped = {
+    'normal': { 't1': 25, 't2': 21, 't3': 18, 't4': 15 },
+    'rare': { 't1': 61.1, 't2': 48.9, 't3': 39.1, 't4': 31.3 },
+    'epic': { 't1': 149.3, 't2': 119.4, 't3': 95.5, 't4': 76.4 },
+    'unique': { 't1': 426.4, 't2': 328, 't3': 252.3, 't4': 194.1 },
+    'legendary': { 't1': 1217.8, 't2': 936.8, 't3': 720.6, 't4': 554.3 },
+    'mystic': { 't1': 3810.6, 't2': 2865.1, 't3': 2154.2, 't4': 1619.7 },
+    'ancient': { 't1': 2186.6, 't2': 2908.2, 't3': 3867.9, 't4': 5144.3 }
+};
+
 const tiers = ['t4', 't3', 't2', 't1'];
 const rarities = ['normal', 'rare', 'epic', 'unique', 'legendary', 'mystic', 'ancient'];
 
