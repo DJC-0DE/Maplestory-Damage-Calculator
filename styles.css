@@ -938,28 +938,35 @@ select option {
     }
 }
 
+/* Backdrop for mobile */
+.help-sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    display: none;
+}
+
+.help-sidebar-backdrop.active {
+    display: block;
+}
+
 /* Mobile positioning */
 @media (max-width: 767px) {
     .help-sidebar {
+        position: fixed;
         left: 5%;
         right: 5%;
         top: 20px;
         max-height: calc(100vh - 80px);
+        z-index: 1001;
+        background: white;
     }
 
-    /* Add backdrop on mobile */
-    .help-sidebar-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        display: none;
-    }
-
-    .help-sidebar-backdrop.active {
-        display: block;
+    .dark .help-sidebar {
+        background: #1f2937;
     }
 }

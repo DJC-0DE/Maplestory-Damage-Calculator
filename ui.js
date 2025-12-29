@@ -1550,6 +1550,7 @@ function openHelpSidebar(helpKey) {
     const sidebar = document.getElementById('help-sidebar');
     const title = document.getElementById('help-sidebar-title');
     const content = document.getElementById('help-sidebar-content');
+    const backdrop = document.getElementById('help-sidebar-backdrop');
 
     if (!sidebar || !title || !content) return;
 
@@ -1560,13 +1561,21 @@ function openHelpSidebar(helpKey) {
     title.textContent = helpData.title;
     content.innerHTML = helpData.content;
 
-    // Show sidebar
+    // Show sidebar and backdrop (for mobile)
     sidebar.style.display = 'flex';
+    if (backdrop) {
+        backdrop.classList.add('active');
+    }
 }
 
 function closeHelpSidebar() {
     const sidebar = document.getElementById('help-sidebar');
+    const backdrop = document.getElementById('help-sidebar-backdrop');
+
     if (sidebar) {
         sidebar.style.display = 'none';
+    }
+    if (backdrop) {
+        backdrop.classList.remove('active');
     }
 }
