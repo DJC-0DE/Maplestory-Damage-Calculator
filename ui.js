@@ -1579,3 +1579,14 @@ function closeHelpSidebar() {
         backdrop.classList.remove('active');
     }
 }
+
+// Left Navigation - Scroll to Section
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}

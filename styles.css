@@ -970,3 +970,48 @@ select option {
         background: #1f2937;
     }
 }
+
+/* Left Navigation Sidebar */
+.left-nav-sidebar {
+    display: none;
+}
+
+@media (min-width: 1650px) {
+    .left-nav-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: fixed;
+        left: 20px;
+        top: 120px;
+        z-index: 50;
+        padding: 20px;
+        max-width: 200px;
+    }
+
+    .left-nav-item {
+        color: #6b7280;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 8px 12px;
+        border-radius: 8px;
+        line-height: 1.4;
+    }
+
+    .left-nav-item:hover {
+        color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+        transform: translateX(4px);
+    }
+
+    .dark .left-nav-item {
+        color: #9ca3af;
+    }
+
+    .dark .left-nav-item:hover {
+        color: #60a5fa;
+        background: rgba(96, 165, 250, 0.1);
+    }
+}

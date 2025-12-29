@@ -51,6 +51,14 @@
         <a href="https://paypal.me/freakehms" target="_blank" rel="noopener noreferrer" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 opacity-70 hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">DONATE</a>
         <button onclick="toggleTheme()" id="theme-toggle" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full px-5 py-2.5 text-xl hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">🌙</button>
     </div>
+
+    <!-- Left Navigation Sidebar (large screens only) -->
+    <nav id="left-nav-sidebar" class="left-nav-sidebar">
+        <div class="left-nav-item" onclick="scrollToSection('character-setup-card')">Character Setup</div>
+        <div class="left-nav-item" onclick="scrollToSection('character-optimization-card')">Character Optimization</div>
+        <div class="left-nav-item" onclick="scrollToSection('stat-damage-predictions-card')">Stat Damage Predictions</div>
+    </nav>
+
     <div class="max-w-7xl mx-auto">
         <h1 class="text-center mb-8 text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Damage Calculator</h1>
         <div class="flex flex-col sm:flex-row justify-end gap-2.5 mb-4">
@@ -330,7 +338,7 @@
         </div>
 
         <!-- Second Tabbed Area: Character Optimization -->
-        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
+        <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
             <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Character Optimization</div>
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'item-comparison')">Item Comparison</button>
@@ -484,7 +492,7 @@
         </div>
 
         <!-- Stat Damage Predictions -->
-        <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
+        <div id="stat-damage-predictions-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
             <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Stat Damage Predictions</div>
 
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
