@@ -1,0 +1,12 @@
+{
+  "name": "maplestory-damage-calculator",
+  "version": "1.0.0",
+  "description": "Maplestory damage calculator with regression tests",
+  "scripts": {
+    "test": "node tests/run-all-tests.js",
+    "test:weapon-priority": "node tests/weapon-priority.test.js"
+  },
+  "keywords": ["maplestory", "damage-calculator"],
+  "author": "",
+  "license": "ISC"
+}

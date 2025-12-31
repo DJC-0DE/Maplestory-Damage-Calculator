@@ -712,24 +712,33 @@ function handleWeaponLevelChange(rarity, tier) {
     const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
 
     if (level < maxLevel && level > 0) {
-        const upgradeGain = calculateUpgradeGain(rarity, tier, level, stars, 10000);
+        // Calculate multi-level efficiency (what you actually get per 1k shards)
+        const upgradeGain = calculateUpgradeGain(rarity, tier, level, stars, 1000);
+
         if (upgradeGainDisplay && upgradeGain.attackGain > 0) {
             let gainPer1k;
+
             if (upgradeGain.isUnaffordable) {
-                // Next level costs more than 10k, show actual cost
-                const costInK = (upgradeGain.singleLevelCost / 1000).toFixed(1);
-                gainPer1k = upgradeGain.attackGain / parseFloat(costInK);
-                upgradeGainDisplay.textContent = `+${upgradeGain.attackGain.toFixed(1)}% attack / ${costInK}k shards (+${gainPer1k.toFixed(2)}%/1k)`;
+                // Next level costs more than 1k - normalize to per 1k
+                gainPer1k = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+                upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (next level costs ${upgradeGain.singleLevelCost} shards)`;
             } else {
-                // Can afford multiple levels with 10k
-                gainPer1k = upgradeGain.attackGain / 10;
-                upgradeGainDisplay.textContent = `+${upgradeGain.attackGain.toFixed(1)}% attack / 10k shards (+${gainPer1k.toFixed(2)}%/1k)`;
+                // Can afford levels with 1k shards
+                gainPer1k = upgradeGain.attackGain;
+                upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (${upgradeGain.levelsGained} levels)`;
             }
+
             // Store gainPer1k for color coding
             upgradeGainDisplay.dataset.gainPer1k = gainPer1k;
-        }
-        if (upgradeGainContainer) {
-            upgradeGainContainer.style.display = 'block';
+
+            if (upgradeGainContainer) {
+                upgradeGainContainer.style.display = 'block';
+            }
+        } else {
+            // Hide if no gain or can't calculate
+            if (upgradeGainContainer) {
+                upgradeGainContainer.style.display = 'none';
+            }
         }
     } else {
         if (upgradeGainContainer) {
@@ -877,16 +886,16 @@ function updateUpgradePriorityChain() {
             // Skip if at max level
             if (currentLevel >= maxLevel) return;
 
-            // Calculate gain from upgrading by 1 level at the CURRENT level
-            const currentAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel).inventoryAttack;
-            const nextAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel + 1).inventoryAttack;
-            const gain = nextAttack - currentAttack;
+            // Calculate multi-level efficiency (what 1k shards gets you from current level)
+            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, 1000);
 
-            // Calculate cost for this upgrade
-            const cost = getUpgradeCost(ws.rarity, ws.tier, currentLevel + 1);
-
-            // Calculate efficiency: gain per 1k shards
-            const efficiency = cost > 0 ? (gain / cost) * 1000 : 0;
+            let efficiency;
+            if (upgradeGain.isUnaffordable) {
+                // Normalize to per 1k when single level costs more than 1k
+                efficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+            } else {
+                efficiency = upgradeGain.attackGain; // Already per 1k
+            }
 
             if (efficiency > bestEfficiency) {
                 bestEfficiency = efficiency;
@@ -897,7 +906,7 @@ function updateUpgradePriorityChain() {
         // If no weapon can be upgraded, stop
         if (!bestWeapon) break;
 
-        // Record this upgrade and increment the level for next iteration
+        // Record this upgrade and increment by 1 level only (for granular priority display)
         upgradeSequence.push(bestWeapon);
         weaponLevels[bestWeapon.key]++;
     }
@@ -1016,8 +1025,9 @@ function calculateCurrencyUpgrades() {
         let bestEfficiency = 0;
         let bestCost = 0;
         let bestGain = 0;
+        let bestLevelsGained = 0;
 
-        // Find the most efficient upgrade we can afford
+        // Find the most efficient upgrade based on 1k shard potential
         weaponStates.forEach(ws => {
             const key = `${ws.rarity}-${ws.tier}`;
             const currentLevel = weaponLevels[key];
@@ -1025,31 +1035,39 @@ function calculateCurrencyUpgrades() {
 
             if (currentLevel >= maxLevel) return;
 
-            const cost = getUpgradeCost(ws.rarity, ws.tier, currentLevel + 1);
+            // Use up to 1k shards OR remaining currency, whichever is less
+            const testAmount = Math.min(1000, remainingCurrency);
+            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, testAmount);
 
-            // Skip if we can't afford this upgrade
-            if (cost > remainingCurrency) return;
+            // Skip if we can't afford any upgrade (or upgrade costs more than we have)
+            if (upgradeGain.resourcesUsed === 0 && !upgradeGain.isUnaffordable) return;
+            if (upgradeGain.isUnaffordable && upgradeGain.singleLevelCost > remainingCurrency) return;
 
-            const currentAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel).inventoryAttack;
-            const nextAttack = calculateWeaponAttacks(ws.rarity, ws.tier, currentLevel + 1).inventoryAttack;
-            const gain = nextAttack - currentAttack;
-
-            const efficiency = cost > 0 ? (gain / cost) * 1000 : 0;
+            // Normalize efficiency to per 1k
+            let efficiency;
+            if (upgradeGain.isUnaffordable) {
+                // Single level costs more than test amount - normalize
+                efficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+            } else {
+                efficiency = upgradeGain.resourcesUsed > 0 ?
+                    (upgradeGain.attackGain / upgradeGain.resourcesUsed) * 1000 : 0;
+            }
 
             if (efficiency > bestEfficiency) {
                 bestEfficiency = efficiency;
                 bestWeapon = { rarity: ws.rarity, tier: ws.tier, key };
-                bestCost = cost;
-                bestGain = gain;
+                bestCost = upgradeGain.isUnaffordable ? upgradeGain.singleLevelCost : upgradeGain.resourcesUsed;
+                bestGain = upgradeGain.attackGain;
+                bestLevelsGained = upgradeGain.isUnaffordable ? 1 : upgradeGain.levelsGained;
             }
         });
 
         // If no affordable upgrade found, stop
         if (!bestWeapon) break;
 
-        // Apply this upgrade
+        // Apply this upgrade (might be multiple levels)
         upgradeSequence.push(bestWeapon);
-        weaponLevels[bestWeapon.key]++;
+        weaponLevels[bestWeapon.key] += bestLevelsGained;
         remainingCurrency -= bestCost;
         totalAttackGain += bestGain;
     }
