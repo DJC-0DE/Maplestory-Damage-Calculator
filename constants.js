@@ -61,8 +61,8 @@ const innerAbilityStats = [
 
 // Inner abilities data with min/max values per rarity
 const innerAbilitiesData = {
-	"Mystic": {
-		"Meso Drop": { "min": 9, "max": 15 },
+    "Mystic": {
+        "Meso Drop": { "min": 9, "max": 15 },
         "EXP Gain": { "min": 9, "max": 15 },
         "Defense Penetration": { "min": 14, "max": 20 },
         "Boss Monster Damage": { "min": 28, "max": 40 },
@@ -81,7 +81,7 @@ const innerAbilitiesData = {
         "Accuracy": { "min": 20, "max": 25 },
         "Evasion": { "min": 20, "max": 25 },
         "MP Recovery Per Sec": { "min": 80, "max": 150 }
-	},
+    },
     "Legendary": {
         "Meso Drop": { "min": 5, "max": 8 },
         "EXP Gain": { "min": 5, "max": 8 },
@@ -714,7 +714,7 @@ const rarityColors = {
     'Unique': '#ffd26d',
     'Epic': '#9966ff',
     'Rare': '#88bbff',
-    'Normal': '#ffffff',
+    'Normal': '#cccccc',
     'Mystic': '#ff3f42',
     'Ancient': '#2266cc'
 };
