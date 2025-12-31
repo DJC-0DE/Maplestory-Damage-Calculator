@@ -31,7 +31,9 @@ const classMainStatMap = {
     'marksman': 'Dex',
     'night-lord': 'Luk',
     'shadower': 'Luk',
-    'arch-mage': 'Int'
+    'arch-mage': 'Int',
+    'arch-mage-il': 'Int',
+    'arch-mage-fp': 'Int'
 };
 
 // Slot-specific potential lines (only available on certain equipment slots)

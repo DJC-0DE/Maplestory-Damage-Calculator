@@ -1114,40 +1114,44 @@ function calculateCurrencyUpgrades() {
     const newDPS = calculateDamage(newStats, 'boss').dps;
     const dpsGainPct = ((newDPS - initialDPS) / initialDPS * 100);
 
-    // Group consecutive upgrades
-    const groupedUpgrades = [];
-    let currentGroup = null;
+    // Collate all upgrades by weapon type (not just consecutive)
+    const upgradeCounts = {};
 
     upgradeSequence.forEach(upgrade => {
-        if (!currentGroup || currentGroup.rarity !== upgrade.rarity || currentGroup.tier !== upgrade.tier) {
-            if (currentGroup) {
-                groupedUpgrades.push(currentGroup);
-            }
-            currentGroup = {
+        const key = `${upgrade.rarity}-${upgrade.tier}`;
+        if (!upgradeCounts[key]) {
+            upgradeCounts[key] = {
                 rarity: upgrade.rarity,
                 tier: upgrade.tier,
-                count: 1
+                count: 0
             };
-        } else {
-            currentGroup.count++;
         }
+        upgradeCounts[key].count++;
     });
 
-    if (currentGroup) {
-        groupedUpgrades.push(currentGroup);
-    }
+    // Convert to array and sort by count (descending) then by rarity/tier
+    const collatedUpgrades = Object.values(upgradeCounts).sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        // Secondary sort: by rarity index then tier
+        const rarityOrder = { normal: 0, rare: 1, epic: 2, unique: 3, legendary: 4, mystic: 5, ancient: 6 };
+        if (rarityOrder[a.rarity] !== rarityOrder[b.rarity]) {
+            return rarityOrder[a.rarity] - rarityOrder[b.rarity];
+        }
+        const tierOrder = { t4: 0, t3: 1, t2: 2, t1: 3 };
+        return tierOrder[a.tier] - tierOrder[b.tier];
+    });
 
-    // Build path HTML
+    // Build path HTML (horizontal list)
     let pathHTML = '';
-    groupedUpgrades.forEach((group, index) => {
+    collatedUpgrades.forEach((group, index) => {
         const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
         const tierUpper = group.tier.toUpperCase();
         const rarityFirstLetter = group.rarity.charAt(0).toUpperCase();
 
         pathHTML += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count}</span>`;
 
-        if (index < groupedUpgrades.length - 1) {
-            pathHTML += ' <span style="color: var(--text-secondary);">→</span> ';
+        if (index < collatedUpgrades.length - 1) {
+            pathHTML += ' <span style="color: var(--text-secondary);">,</span> ';
         }
     });
 
