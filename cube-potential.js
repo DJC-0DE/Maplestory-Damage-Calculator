@@ -45,9 +45,41 @@ const slotSpecificPotentials = {
             line3: [{ stat: "Final Damage %", value: 3, weight: 0.08, prime: true }]
         },
         unique: {
-            line1: [{ stat: "Final Damage %", value: 3, weight: 1, prime: true }],
-            line2: [{ stat: "Final Damage %", value: 3, weight: 0.24, prime: true }],
-            line3: [{ stat: "Final Damage %", value: 3, weight: 0.08, prime: true }]
+            line1: [{ stat: "Final Damage %", value: 5, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 5, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 3, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 5, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 3, weight: 0.92, prime: false }]
+        },
+        legendary: {
+            line1: [{ stat: "Final Damage %", value: 8, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 8, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 5, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 8, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 5, weight: 0.92, prime: false }]
+        },
+        mystic: {
+            line1: [{ stat: "Final Damage %", value: 12, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 12, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 8, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 12, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 8, weight: 0.92, prime: false }]
+        }
+    },
+	'gloves': {
+        epic: {
+            line1: [{ stat: "Critical Damage %", value: 10, weight: 1, prime: true }],
+            line2: [{ stat: "Critical Damage %", value: 10, weight: 0.24, prime: true }],
+            line3: [{ stat: "Critical Damage %", value: 10, weight: 0.08, prime: true }]
+        },
+        unique: {
+            line1: [{ stat: "Critical Damage %", value: 20, weight: 1, prime: true }],
+            line2: [{ stat: "Critical Damage %", value: 20, weight: 0.24, prime: true }, { stat: "Critical Damage %", value: 10, weight: 0.76, prime: false }],
+            line3: [{ stat: "Critical Damage %", value: 20, weight: 0.08, prime: true }, { stat: "Critical Damage %", value: 10, weight: 0.92, prime: false }]
+        },
+        legendary: {
+            line1: [{ stat: "Critical Damage %", value: 30, weight: 1, prime: true }],
+            line2: [{ stat: "Critical Damage %", value: 30, weight: 0.24, prime: true }, { stat: "Critical Damage %", value: 20, weight: 0.76, prime: false }],
+            line3: [{ stat: "Critical Damage %", value: 30, weight: 0.08, prime: true }, { stat: "Critical Damage %", value: 20, weight: 0.92, prime: false }]
+        },
+        mystic: {
+            line1: [{ stat: "Critical Damage %", value: 50, weight: 1, prime: true }],
+            line2: [{ stat: "Critical Damage %", value: 50, weight: 0.24, prime: true }, { stat: "Critical Damage %", value: 30, weight: 0.76, prime: false }],
+            line3: [{ stat: "Critical Damage %", value: 50, weight: 0.08, prime: true }, { stat: "Critical Damage %", value: 30, weight: 0.92, prime: false }]
         }
     }
 };
@@ -367,12 +399,12 @@ function updatePotentialLineDropdowns(setName, rarity) {
         // Get available stats for this line
         let lineData = [...(potentialData[`line${lineNum}`] || [])];
 
-        // Add slot-specific lines if available
+        // Add slot-specific lines if available (at the top)
         const slotId = currentCubeSlot;
         if (slotSpecificPotentials[slotId] && slotSpecificPotentials[slotId][rarity]) {
             const slotSpecificLines = slotSpecificPotentials[slotId][rarity][`line${lineNum}`];
             if (slotSpecificLines) {
-                lineData = [...lineData, ...slotSpecificLines];
+                lineData = [...slotSpecificLines, ...lineData];
             }
         }
 
@@ -469,6 +501,7 @@ function potentialStatToDamageStat(potentialStat, value) {
     // Map potential stat to damage calculation stat
     const statMap = {
         'Critical Rate %': { stat: 'critRate', value: value },
+        'Critical Damage %': { stat: 'critDamage', value: value },
         'Attack Speed %': { stat: 'attackSpeed', value: value },
         'Damage %': { stat: 'damage', value: value },
         'Final Damage %': { stat: 'finalDamage', value: value },
