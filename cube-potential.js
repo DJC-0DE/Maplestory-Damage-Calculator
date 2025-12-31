@@ -31,7 +31,6 @@ const classMainStatMap = {
     'marksman': 'Dex',
     'night-lord': 'Luk',
     'shadower': 'Luk',
-    'arch-mage': 'Int',
     'arch-mage-il': 'Int',
     'arch-mage-fp': 'Int'
 };
@@ -80,6 +79,45 @@ const slotSpecificPotentials = {
             line1: [{ stat: "Critical Damage %", value: 50, weight: 1, prime: true }],
             line2: [{ stat: "Critical Damage %", value: 50, weight: 0.24, prime: true }, { stat: "Critical Damage %", value: 30, weight: 0.76, prime: false }],
             line3: [{ stat: "Critical Damage %", value: 50, weight: 0.08, prime: true }, { stat: "Critical Damage %", value: 30, weight: 0.92, prime: false }]
+        }
+    },
+	'legs': {
+        epic: {
+            line1: [{ stat: "Final Damage %", value: 3, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 3, weight: 0.24, prime: true }],
+            line3: [{ stat: "Final Damage %", value: 3, weight: 0.08, prime: true }]
+        },
+        unique: {
+            line1: [{ stat: "Final Damage %", value: 5, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 5, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 3, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 5, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 3, weight: 0.92, prime: false }]
+        },
+        legendary: {
+            line1: [{ stat: "Final Damage %", value: 8, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 8, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 5, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 8, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 5, weight: 0.92, prime: false }]
+        },
+        mystic: {
+            line1: [{ stat: "Final Damage %", value: 12, weight: 1, prime: true }],
+            line2: [{ stat: "Final Damage %", value: 12, weight: 0.24, prime: true }, { stat: "Final Damage %", value: 8, weight: 0.76, prime: false }],
+            line3: [{ stat: "Final Damage %", value: 12, weight: 0.08, prime: true }, { stat: "Final Damage %", value: 8, weight: 0.92, prime: false }]
+        }
+    },
+	'shoulder': {
+        unique: {
+            line1: [{ stat: "Defense Penetration", value: 8, weight: 1, prime: true }],
+            line2: [{ stat: "Defense Penetration", value: 8, weight: 0.24, prime: true }],
+            line3: [{ stat: "Defense Penetration", value: 8, weight: 0.08, prime: true }]
+        },
+        legendary: {
+            line1: [{ stat: "Defense Penetration", value: 12, weight: 1, prime: true }],
+            line2: [{ stat: "Defense Penetration", value: 12, weight: 0.24, prime: true }, { stat: "Defense Penetration", value: 8, weight: 0.76, prime: false }],
+            line3: [{ stat: "Defense Penetration", value: 12, weight: 0.08, prime: true }, { stat: "Defense Penetration", value: 8, weight: 0.92, prime: false }]
+        },
+        mystic: {
+            line1: [{ stat: "Defense Penetration", value: 20, weight: 1, prime: true }],
+            line2: [{ stat: "Defense Penetration", value: 20, weight: 0.24, prime: true }, { stat: "Defense Penetration", value: 12, weight: 0.76, prime: false }],
+            line3: [{ stat: "Defense Penetration", value: 20, weight: 0.08, prime: true }, { stat: "Defense Penetration", value: 12, weight: 0.92, prime: false }]
         }
     }
 };
@@ -542,6 +580,7 @@ function potentialStatToDamageStat(potentialStat, value) {
         'Min Damage Multiplier %': { stat: 'minDamage', value: value },
         'Max Damage Multiplier %': { stat: 'maxDamage', value: value },
         'Defense %': { stat: 'defense', value: value },
+        'Defense Penetration': { stat: 'defPen', value: value },
         'Max HP %': { stat: 'maxHP', value: value },
         'Max MP %': { stat: 'maxMP', value: value }
     };
