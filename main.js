@@ -261,26 +261,43 @@ export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     const weaponAttackBonus = getWeaponAttackBonus();
     const weaponMultiplier = 1 + (weaponAttackBonus / 100);
 
-    // Subtract equipped item
-    newStats.attack -= equippedItem.attack * weaponMultiplier;
-    newStats.statDamage -= equippedItem.mainStat / 100;
-    newStats.statDamage -= (equippedItem.defense * 12.7) / 100;
-    newStats.critRate -= equippedItem.critRate;
-    newStats.critDamage -= equippedItem.critDamage;
-    newStats.skillCoeff -= equippedItem.skillLevel * 0.3;
-    newStats.normalDamage -= equippedItem.normalDamage;
-    newStats.bossDamage -= equippedItem.bossDamage;
-    newStats.damage -= equippedItem.damage;
+    // For Dark Knight, defense from items needs to be handled specially
+    // because it affects main stat which is then multiplied by main stat %
+    let mainStatChange = 0;
 
-    // Add comparison item
+    // Calculate main stat change from flat main stat on items
+    mainStatChange -= equippedItem.mainStat;
+    mainStatChange += comparisonItem.mainStat;
+
+    // For Dark Knight: defense converts to main stat (but is NOT affected by main stat %)
+    if (selectedClass === 'dark-knight') {
+        mainStatChange -= equippedItem.defense * 0.127;
+        mainStatChange += comparisonItem.defense * 0.127;
+    }
+
+    // Convert main stat change to stat damage (100 main stat = 1% stat damage)
+    newStats.statDamage += mainStatChange / 100;
+
+    // Apply other stats
+    newStats.attack -= equippedItem.attack * weaponMultiplier;
     newStats.attack += comparisonItem.attack * weaponMultiplier;
-    newStats.statDamage += comparisonItem.mainStat / 100;
-    newStats.statDamage += (comparisonItem.defense * 12.7) / 100;
+
+    newStats.critRate -= equippedItem.critRate;
     newStats.critRate += comparisonItem.critRate;
+
+    newStats.critDamage -= equippedItem.critDamage;
     newStats.critDamage += comparisonItem.critDamage;
+
+    newStats.skillCoeff -= equippedItem.skillLevel * 0.3;
     newStats.skillCoeff += comparisonItem.skillLevel * 0.3;
+
+    newStats.normalDamage -= equippedItem.normalDamage;
     newStats.normalDamage += comparisonItem.normalDamage;
+
+    newStats.bossDamage -= equippedItem.bossDamage;
     newStats.bossDamage += comparisonItem.bossDamage;
+
+    newStats.damage -= equippedItem.damage;
     newStats.damage += comparisonItem.damage;
 
     return newStats;
@@ -499,3 +516,4 @@ window.renderPresetComparison = renderPresetComparison;
 window.renderTheoreticalBest = renderTheoreticalBest;
 window.renderArtifactPotential = renderArtifactPotential;
 window.clearCubeRankingsCache = clearCubeRankingsCache;
+window.saveToLocalStorage = saveToLocalStorage;
