@@ -1152,8 +1152,8 @@ export function calculateCurrencyUpgrades() {
         const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
         const tierUpper = group.tier.toUpperCase();
         const rarityFirstLetter = group.rarity.charAt(0).toUpperCase();
-
-        pathHTML += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count}</span>`;
+        const weaponKey = `${group.rarity}-${group.tier}`;
+        pathHTML += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count} (${weaponLevels[weaponKey]})</span>`;
 
         if (index < collatedUpgrades.length - 1) {
             pathHTML += ' <span style="color: var(--text-secondary);">,</span> ';

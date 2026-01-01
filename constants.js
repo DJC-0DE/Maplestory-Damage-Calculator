@@ -41,7 +41,7 @@ export const rarityColors = {
     'Unique': '#ffd26d',
     'Epic': '#9966ff',
     'Rare': '#88bbff',
-    'Normal': '#ffffff',
+    'Normal': '#cccccc',
     'Mystic': '#ff3f42',
     'Ancient': '#2266cc'
 };
