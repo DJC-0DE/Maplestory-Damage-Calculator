@@ -1,10 +1,43 @@
+import { weaponRatesPerLevel, weaponBaseAttackEquipped, rarities, tiers } from './constants.js';
+import { getSelectedStageDefense } from './main.js';
+
 // Number formatting utility
-function formatNumber(num) {
+export function formatNumber(num) {
     return Math.round(num).toLocaleString();
 }
 
+// Calculate stat damage gain from main stat % increase
+// This is the canonical implementation used by both the predicted damage table and cube potential
+export function calculateMainStatPercentGain(mainStatPctIncrease, currentMainStatPct, primaryMainStat, defense, selectedClass) {
+    let defenseToMainStat = 0;
+    if (selectedClass === 'dark-knight') {
+        defenseToMainStat = defense * 0.127;
+    }
+
+    // Primary main stat is AFTER applying current main stat %
+    // We need to work backwards to find the base main stat (before main stat % multiplier)
+    // For Dark Knight: defense contribution is NOT affected by main stat %
+    // So: primaryMainStat = (baseMainStat × currentMultiplier) + defenseToMainStat
+    // Therefore: baseMainStat = (primaryMainStat - defenseToMainStat) / currentMultiplier
+
+    const currentMultiplier = 1 + currentMainStatPct / 100;
+    const baseMainStat = (primaryMainStat - defenseToMainStat) / currentMultiplier;
+
+    // Now calculate the new total with the increased main stat %
+    const newMultiplier = 1 + (currentMainStatPct + mainStatPctIncrease) / 100;
+    const newTotalMainStat = (baseMainStat * newMultiplier) + defenseToMainStat;
+
+    // Calculate the gain in main stat
+    const mainStatGain = newTotalMainStat - primaryMainStat;
+
+    // Convert to stat damage (100 main stat = 1% stat damage)
+    const statDamageGain = mainStatGain / 100;
+
+    return statDamageGain;
+}
+
 // Get weapon level multiplier based on level (from weapon-damage-stats.txt)
-function getWeaponLevelMultiplier(level) {
+export function getWeaponLevelMultiplier(level) {
     if (!level || level <= 1) return 1.0;
     if (level <= 100) return 1 + (0.3 * (level - 1)) / 100;
     if (level <= 130) return 1 + (30.3 + 0.7 * (level - 101)) / 100;
@@ -15,12 +48,12 @@ function getWeaponLevelMultiplier(level) {
 }
 
 // Get inventory divisor based on rarity
-function getInventoryDivisor(rarity) {
+export function getInventoryDivisor(rarity) {
     return ['legendary', 'mystic', 'ancient'].includes(rarity) ? 4 : 3.5;
 }
 
 // Calculate weapon attack percentages from level
-function calculateWeaponAttacks(rarity, tier, level) {
+export function calculateWeaponAttacks(rarity, tier, level) {
     const baseEquipped = weaponBaseAttackEquipped[rarity]?.[tier];
     if (baseEquipped === null || baseEquipped === undefined || !level || level <= 0) {
         return { inventoryAttack: 0, equippedAttack: 0 };
@@ -41,13 +74,13 @@ function calculateWeaponAttacks(rarity, tier, level) {
 }
 
 // Get max level based on star rating
-function getMaxLevelForStars(stars) {
+export function getMaxLevelForStars(stars) {
     const maxLevels = { 0: 100, 1: 120, 2: 140, 3: 160, 4: 180, 5: 200 };
     return maxLevels[stars] || 100;
 }
 
 // Calculate upgrade cost for a weapon at a specific level
-function getUpgradeCost(rarity, tier, level) {
+export function getUpgradeCost(rarity, tier, level) {
     if (level <= 0) return 0;
 
     const tierNum = parseInt(tier.replace('t', ''));
@@ -94,7 +127,7 @@ function getUpgradeCost(rarity, tier, level) {
 }
 
 // Calculate inventory attack gain from spending resources
-function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources) {
+export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources) {
     if (currentLevel <= 0) {
         return { levelsGained: 0, newLevel: currentLevel, attackGain: 0, resourcesUsed: 0, efficiency: 0, singleLevelCost: 0 };
     }
@@ -155,14 +188,14 @@ function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources) {
 }
 
 // Calculate inventory bonus for a weapon
-function calculateInventoryBonus(rarity, tier, level) {
+export function calculateInventoryBonus(rarity, tier, level) {
     const rate = weaponRatesPerLevel[rarity][tier];
     if (rate === null || level === 0) return 0;
     return rate * level;
 }
  
 // Main damage calculation function
-function calculateDamage(stats, monsterType) {
+export function calculateDamage(stats, monsterType) {
     // Step 1: Calculate Base Damage
     const totalSkillMastery = stats.skillMastery + (monsterType === 'boss' ? stats.skillMasteryBoss : 0);
     const baseDamage = stats.attack * (stats.skillCoeff / 100) * (1 + totalSkillMastery / 100);
@@ -235,7 +268,7 @@ function calculateDamage(stats, monsterType) {
 }
  
 // Apply item stats to base stats
-function applyItemToStats(baseStats, equippedItem, comparisonItem) {
+export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     // Start with base stats
     const newStats = { ...baseStats };
  
@@ -275,7 +308,7 @@ function applyItemToStats(baseStats, equippedItem, comparisonItem) {
 }
  
 // Helper function to find equivalent percentage stat for a target DPS gain
-function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS, monsterType, multiplicativeStats, diminishingReturnStats) {
+export function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS, monsterType, multiplicativeStats, diminishingReturnStats) {
     // Binary search for the percentage increase needed
     let low = 0;
     let high = 1000; // Max search limit
@@ -321,7 +354,7 @@ function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS, monste
 }
  
 // Calculate stat weights - generates HTML for stat damage predictions
-function calculateStatWeights(setup, stats) {
+export function calculateStatWeights(setup, stats) {
     const baseBossDPS = calculateDamage(stats, 'boss').dps;
     const baseNormalDPS = calculateDamage(stats, 'normal').dps;
     const weaponAttackBonus = getWeaponAttackBonus();
@@ -482,35 +515,15 @@ function calculateStatWeights(setup, stats) {
 
                 // Special handling for Main Stat % - it's additive with existing Main Stat % bonuses
                 if (stat.key === 'statDamage') {
-                    // Primary Main Stat already includes current main stat % bonuses
-                    let currentTotalMainStat = primaryMainStat;
-                    let defenseToMainStat = 0;
-
-                    // For Dark Knight, subtract defense-converted portion (not affected by main stat %)
-                    if (currentSelectedClass === 'dark-knight') {
-                        defenseToMainStat = defense * 0.127;
-                    }
-
-                    // Calculate the affected portion (total minus defense conversion for DK)
-                    const affectedPortion = currentTotalMainStat - defenseToMainStat;
-
-                    // Calculate ratio of new multiplier to current multiplier
-                    // We need to track the actual main stat % at this step
+                    // Use the shared calculation function
                     const currentMainStatPctAtStep = mainStatPct + (step - 1) * stepSize;
-                    const currentMultiplier = 1 + currentMainStatPctAtStep / 100;
-                    const newMultiplier = 1 + (currentMainStatPctAtStep + stepIncrease) / 100;
-                    const ratio = newMultiplier / currentMultiplier;
-
-                    // Apply ratio to affected portion, then add back defense portion
-                    const newAffectedPortion = affectedPortion * ratio;
-                    const newTotalMainStat = newAffectedPortion + defenseToMainStat;
-
-                    // Convert to stat damage (100 main stat = 1% stat damage)
-                    const currentStatDamageFromMainStat = currentTotalMainStat / 100;
-                    const newStatDamageFromMainStat = newTotalMainStat / 100;
-
-                    // Calculate the gain in stat damage
-                    const statDamageGain = newStatDamageFromMainStat - currentStatDamageFromMainStat;
+                    const statDamageGain = calculateMainStatPercentGain(
+                        stepIncrease,
+                        currentMainStatPctAtStep,
+                        primaryMainStat,
+                        defense,
+                        currentSelectedClass
+                    );
 
                     // Apply the gain to current stat damage
                     modifiedStats[stat.key] = oldValue + statDamageGain;
@@ -566,7 +579,7 @@ function calculateStatWeights(setup, stats) {
 const statWeightCharts = {};
 
 // Toggle stat weight chart visibility
-function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
+export function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
     const chartId = `chart-${setup}-${statKey}`;
     const rowId = `chart-row-${setup}-${statKey}`;
     const chartRow = document.getElementById(rowId);
@@ -587,7 +600,7 @@ function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
 }
 
 // Generate chart data for a stat
-function generateStatChartData(setup, statKey, statLabel, isFlat) {
+export function generateStatChartData(setup, statKey, statLabel, isFlat) {
     const stats = getStats(setup);
     const baseBossDPS = calculateDamage(stats, 'boss').dps;
     const weaponAttackBonus = getWeaponAttackBonus();
@@ -642,32 +655,20 @@ function generateStatChartData(setup, statKey, statLabel, isFlat) {
         } else {
             const oldValue = cumulativeStats[statKey];
             if (statKey === 'statDamage') {
-                // Special handling for Main Stat % using the ratio approach
-                // For the graph, we step through from the baseline
+                // Use the shared calculation function
                 const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
                 const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
                 const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
                 const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
 
-                let defenseToMainStat = 0;
-                if (currentSelectedClass === 'dark-knight') {
-                    defenseToMainStat = defense * 0.127;
-                }
-
-                const affectedPortion = primaryMainStat - defenseToMainStat;
-
-                // Calculate multiplier at previous step and this step
                 const prevCumulativeIncrease = cumulativeIncrease - stepIncrease;
-                const prevMultiplier = 1 + (mainStatPct + prevCumulativeIncrease) / 100;
-                const newMultiplier = 1 + (mainStatPct + cumulativeIncrease) / 100;
-
-                // Get current total based on previous step
-                const prevTotalMainStat = affectedPortion * prevMultiplier + defenseToMainStat;
-                const newTotalMainStat = affectedPortion * newMultiplier + defenseToMainStat;
-
-                const prevStatDamage = prevTotalMainStat / 100;
-                const newStatDamage = newTotalMainStat / 100;
-                const statDamageGain = newStatDamage - prevStatDamage;
+                const statDamageGain = calculateMainStatPercentGain(
+                    stepIncrease,
+                    mainStatPct + prevCumulativeIncrease,
+                    primaryMainStat,
+                    defense,
+                    currentSelectedClass
+                );
 
                 modifiedStats[statKey] = oldValue + statDamageGain;
             } else if (multiplicativeStats[statKey]) {
@@ -710,7 +711,7 @@ function generateStatChartData(setup, statKey, statLabel, isFlat) {
 }
 
 // Render stat weight chart
-function renderStatChart(setup, statKey, statLabel, isFlat) {
+export function renderStatChart(setup, statKey, statLabel, isFlat) {
     const chartId = `chart-${setup}-${statKey}`;
     const canvas = document.getElementById(chartId);
     if (!canvas) return;
@@ -799,7 +800,7 @@ function renderStatChart(setup, statKey, statLabel, isFlat) {
 }
 
 // Calculate stat equivalency - shows what other stats equal a given stat increase
-function calculateStatEquivalency(sourceStat) {
+export function calculateStatEquivalency(sourceStat) {
     // Get base stats from inputs
     const stats = {
         attack: parseFloat(document.getElementById('attack-base').value),

@@ -1,12 +1,72 @@
+// Main Entry Point - ES6 Module
+// This is the single entry point that orchestrates the entire application
+
+import { rarities, tiers, stageDefenses, availableStats, comparisonItemCount, setComparisonItemCount } from './constants.js';
+import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart } from './calculations.js';
+import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData } from './storage.js';
+import {
+    loadTheme,
+    initializeHeroPowerPresets,
+    initializeWeapons,
+    updateWeaponBonuses,
+    loadHeroPowerPresets,
+    initializeEquipmentSlots,
+    loadEquipmentSlots,
+    saveEquipmentSlots,
+    calculateEquipmentSlotDPS,
+    displayResults,
+    switchTab,
+    toggleTheme,
+    unequipItem,
+    equipItem,
+    addEquippedStat,
+    removeEquippedStat,
+    addComparisonItem,
+    removeComparisonItem,
+    addComparisonItemStat,
+    removeComparisonItemStat,
+    setWeaponStars,
+    previewStars,
+    resetStarPreview,
+    handleEquippedCheckboxChange,
+    handleWeaponLevelChange,
+    updateUpgradePriorityChain,
+    calculateCurrencyUpgrades,
+    toggleSubDetails,
+    toggleDetails,
+    switchPreset,
+    handlePresetEquipped,
+    openHelpSidebar,
+    closeHelpSidebar,
+    scrollToSection
+} from './ui.js';
+import { initializeInnerAbilityAnalysis, switchInnerAbilityTab, toggleLineBreakdown, sortPresetTable, sortTheoreticalTable, renderPresetComparison, renderTheoreticalBest } from './inner-ability.js';
+import { initializeArtifactPotential, renderArtifactPotential, sortArtifactTable } from './artifact-potential.js';
+import { runScrollSimulation, switchScrollStrategyTab, updateScrollLevelInfo } from './scroll-optimizer.js';
+import { initializeArtifacts, switchArtifactPreset, selectArtifactSlot, previewArtifact, equipPreviewedArtifact, cancelPreview, setArtifactStars, setArtifactPotential, clearArtifactSlot } from './artifacts.js';
+import {
+    initializeCubePotential,
+    switchPotentialType,
+    selectCubeSlot,
+    calculateComparison,
+    displayOrCalculateRankings,
+    displayAllSlotsSummary,
+    saveCubePotentialData,
+    loadCubePotentialData,
+    clearCubeRankingsCache,
+    updateClassWarning,
+    runCubeSimulation
+} from './cube-potential.js';
+
 // Data extraction functions
-function getStats(setup) {
+export function getStats(setup) {
     return {
         attack: parseFloat(document.getElementById(`attack-${setup}`).value),
         critRate: parseFloat(document.getElementById(`crit-rate-${setup}`).value),
         critDamage: parseFloat(document.getElementById(`crit-damage-${setup}`).value),
         statDamage: parseFloat(document.getElementById(`stat-damage-${setup}`).value),
         damage: parseFloat(document.getElementById(`damage-${setup}`).value),
-        finalDamage: parseFloat(document.getElementById(`final-damage-${setup}`).value), 
+        finalDamage: parseFloat(document.getElementById(`final-damage-${setup}`).value),
         damageAmp: parseFloat(document.getElementById(`damage-amp-${setup}`).value),
         attackSpeed: parseFloat(document.getElementById(`attack-speed-${setup}`).value),
         defPen: parseFloat(document.getElementById(`def-pen-${setup}`).value),
@@ -20,7 +80,7 @@ function getStats(setup) {
     };
 }
 
-function getItemStats(prefix) {
+export function getItemStats(prefix) {
     const stats = {
         name: document.getElementById(`${prefix}-name`)?.value || '',
         attack: parseFloat(document.getElementById(`${prefix}-attack`)?.value) || 0,
@@ -37,7 +97,7 @@ function getItemStats(prefix) {
     // Get stats from dropdown selections
     if (prefix === 'equipped') {
         // Get equipped item stats
-        for (let i = 1; i <= 10; i++) {  // Check up to 10 (more than max)
+        for (let i = 1; i <= 10; i++) {
             const typeElem = document.getElementById(`equipped-stat-${i}-type`);
             const valueElem = document.getElementById(`equipped-stat-${i}-value`);
 
@@ -46,38 +106,20 @@ function getItemStats(prefix) {
                 const value = parseFloat(valueElem.value) || 0;
 
                 switch (statType) {
-                    case 'attack':
-                        stats.attack += value;
-                        break;
-                    case 'main-stat':
-                        stats.mainStat += value;
-                        break;
-                    case 'defense':
-                        stats.defense += value;
-                        break;
-                    case 'crit-rate':
-                        stats.critRate += value;
-                        break;
-                    case 'crit-damage':
-                        stats.critDamage += value;
-                        break;
-                    case 'skill-level':
-                        stats.skillLevel += value;
-                        break;
-                    case 'normal-damage':
-                        stats.normalDamage += value;
-                        break;
-                    case 'boss-damage':
-                        stats.bossDamage += value;
-                        break;
-                    case 'damage':
-                        stats.damage += value;
-                        break;
+                    case 'attack': stats.attack += value; break;
+                    case 'main-stat': stats.mainStat += value; break;
+                    case 'defense': stats.defense += value; break;
+                    case 'crit-rate': stats.critRate += value; break;
+                    case 'crit-damage': stats.critDamage += value; break;
+                    case 'skill-level': stats.skillLevel += value; break;
+                    case 'normal-damage': stats.normalDamage += value; break;
+                    case 'boss-damage': stats.bossDamage += value; break;
+                    case 'damage': stats.damage += value; break;
                 }
             }
         }
     } else {
-        // Get comparison item stats (prefix is like "item-1")
+        // Get comparison item stats
         const itemId = prefix.split('-')[1];
         for (let i = 1; i <= 10; i++) {
             const typeElem = document.getElementById(`item-${itemId}-stat-${i}-type`);
@@ -88,33 +130,15 @@ function getItemStats(prefix) {
                 const value = parseFloat(valueElem.value) || 0;
 
                 switch (statType) {
-                    case 'attack':
-                        stats.attack += value;
-                        break;
-                    case 'main-stat':
-                        stats.mainStat += value;
-                        break;
-                    case 'defense':
-                        stats.defense += value;
-                        break;
-                    case 'crit-rate':
-                        stats.critRate += value;
-                        break;
-                    case 'crit-damage':
-                        stats.critDamage += value;
-                        break;
-                    case 'skill-level':
-                        stats.skillLevel += value;
-                        break;
-                    case 'normal-damage':
-                        stats.normalDamage += value;
-                        break;
-                    case 'boss-damage':
-                        stats.bossDamage += value;
-                        break;
-                    case 'damage':
-                        stats.damage += value;
-                        break;
+                    case 'attack': stats.attack += value; break;
+                    case 'main-stat': stats.mainStat += value; break;
+                    case 'defense': stats.defense += value; break;
+                    case 'crit-rate': stats.critRate += value; break;
+                    case 'crit-damage': stats.critDamage += value; break;
+                    case 'skill-level': stats.skillLevel += value; break;
+                    case 'normal-damage': stats.normalDamage += value; break;
+                    case 'boss-damage': stats.bossDamage += value; break;
+                    case 'damage': stats.damage += value; break;
                 }
             }
         }
@@ -123,8 +147,7 @@ function getItemStats(prefix) {
     return stats;
 }
 
-function getWeaponAttackBonus() {
-    // Calculate total attack % bonus from all weapon levels (inventory + equipped)
+export function getWeaponAttackBonus() {
     let totalInventory = 0;
     let equippedBonus = 0;
 
@@ -137,36 +160,30 @@ function getWeaponAttackBonus() {
             const level = parseInt(levelInput.value) || 0;
             if (level === 0) return;
 
-            // Get inventory and equipped attack % for this weapon
             const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
             totalInventory += inventoryAttack;
 
-            // Check if this weapon is equipped based on display visibility
             if (equippedDisplay && equippedDisplay.style.display !== 'none') {
                 equippedBonus = equippedAttack;
             }
         });
     });
 
-    // Return total weapon attack % (inventory + equipped)
     return totalInventory + equippedBonus;
 }
 
 // Stage defense functions
-function populateStageDropdown() {
+export function populateStageDropdown() {
     const select = document.getElementById('target-stage-base');
     if (!select) return;
 
-    // Clear existing options
     select.innerHTML = '';
 
-    // Default option
     const noneOpt = document.createElement('option');
     noneOpt.value = 'none';
     noneOpt.textContent = 'None / Training Dummy (Def: 0%, DR: 0%)';
     select.appendChild(noneOpt);
 
-    // Stage Hunts group
     const stageHuntsGroup = document.createElement('optgroup');
     stageHuntsGroup.label = 'Stage Hunts';
     stageDefenses.stageHunts.forEach(entry => {
@@ -177,7 +194,6 @@ function populateStageDropdown() {
     });
     select.appendChild(stageHuntsGroup);
 
-    // Chapter Bosses group
     const chapterGroup = document.createElement('optgroup');
     chapterGroup.label = 'Chapter Bosses';
     stageDefenses.chapterBosses.forEach(entry => {
@@ -188,7 +204,6 @@ function populateStageDropdown() {
     });
     select.appendChild(chapterGroup);
 
-    // World Bosses group
     const worldBossGroup = document.createElement('optgroup');
     worldBossGroup.label = 'World Bosses';
     stageDefenses.worldBosses.forEach(entry => {
@@ -199,7 +214,6 @@ function populateStageDropdown() {
     });
     select.appendChild(worldBossGroup);
 
-    // Boss Raids group
     const bossRaidGroup = document.createElement('optgroup');
     bossRaidGroup.label = 'Boss Raids';
     stageDefenses.bossRaids.forEach(entry => {
@@ -211,7 +225,7 @@ function populateStageDropdown() {
     select.appendChild(bossRaidGroup);
 }
 
-function getSelectedStageDefense() {
+export function getSelectedStageDefense() {
     const select = document.getElementById('target-stage-base');
     if (!select) return { defense: 0, damageReduction: 0 };
 
@@ -224,7 +238,6 @@ function getSelectedStageDefense() {
     const [category, identifier] = value.split('-');
 
     if (category === 'stageHunt') {
-        // identifier will be like "1" and we need to reconstruct "1-1"
         const stage = value.replace('stageHunt-', '');
         const entry = stageDefenses.stageHunts.find(e => e.stage === stage);
         return entry ? { defense: entry.defense, damageReduction: entry.damageReduction } : { defense: 0, damageReduction: 0 };
@@ -242,14 +255,44 @@ function getSelectedStageDefense() {
     return { defense: 0, damageReduction: 0 };
 }
 
+// Apply item stats to base stats
+export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
+    const newStats = { ...baseStats };
+    const weaponAttackBonus = getWeaponAttackBonus();
+    const weaponMultiplier = 1 + (weaponAttackBonus / 100);
+
+    // Subtract equipped item
+    newStats.attack -= equippedItem.attack * weaponMultiplier;
+    newStats.statDamage -= equippedItem.mainStat / 100;
+    newStats.statDamage -= (equippedItem.defense * 12.7) / 100;
+    newStats.critRate -= equippedItem.critRate;
+    newStats.critDamage -= equippedItem.critDamage;
+    newStats.skillCoeff -= equippedItem.skillLevel * 0.3;
+    newStats.normalDamage -= equippedItem.normalDamage;
+    newStats.bossDamage -= equippedItem.bossDamage;
+    newStats.damage -= equippedItem.damage;
+
+    // Add comparison item
+    newStats.attack += comparisonItem.attack * weaponMultiplier;
+    newStats.statDamage += comparisonItem.mainStat / 100;
+    newStats.statDamage += (comparisonItem.defense * 12.7) / 100;
+    newStats.critRate += comparisonItem.critRate;
+    newStats.critDamage += comparisonItem.critDamage;
+    newStats.skillCoeff += comparisonItem.skillLevel * 0.3;
+    newStats.normalDamage += comparisonItem.normalDamage;
+    newStats.bossDamage += comparisonItem.bossDamage;
+    newStats.damage += comparisonItem.damage;
+
+    return newStats;
+}
+
 // Main calculation orchestration
-function calculate() {
+export function calculate() {
     const baseStats = getStats('base');
     const equippedItem = getItemStats('equipped');
 
     let resultsHTML = '';
 
-    // Calculate equipped item's reference values for comparison
     const equippedBossResults = calculateDamage(baseStats, 'boss');
     const equippedNormalResults = calculateDamage(baseStats, 'normal');
     const equippedDamageValues = {
@@ -259,10 +302,8 @@ function calculate() {
         dpsNormal: equippedNormalResults.dps
     };
 
-    // Display equipped item results
     resultsHTML += displayResults(equippedItem.name || 'Currently Equipped', baseStats, 'equipped', true, null);
 
-    // Get all comparison items
     const comparisonItems = [];
     for (let i = 1; i <= comparisonItemCount; i++) {
         const element = document.getElementById(`comparison-item-${i}`);
@@ -273,7 +314,6 @@ function calculate() {
         }
     }
 
-    // Display each comparison item
     comparisonItems.forEach(item => {
         const itemStats = applyItemToStats(baseStats, equippedItem, item);
         resultsHTML += displayResults(item.name || `Item ${item.id}`, itemStats, `item-${item.id}`, false, equippedDamageValues);
@@ -281,48 +321,8 @@ function calculate() {
 
     document.getElementById('results-container').innerHTML = resultsHTML || '<p style="text-align: center; color: #b3d9ff;">Add comparison items to see results</p>';
 
-    // Calculate stat weights for base setup
     calculateStatWeights('base', baseStats);
 }
-
-// Initialize application
-window.onload = function () {
-    // Load theme first
-    loadTheme();
-    // Initialize hero power presets
-    initializeHeroPowerPresets();
-    initializeWeapons();
-    // Populate stage dropdown
-    populateStageDropdown();
-    // Enable auto-select for all numeric inputs across the app
-    enableGlobalNumberInputAutoSelect();
-    // Load saved data from localStorage
-    const loaded = loadFromLocalStorage();
-    // Load hero power presets from localStorage
-    loadHeroPowerPresets();
-    // Initialize Inner Ability Analysis
-    initializeInnerAbilityAnalysis();
-    // Initialize Artifact Potential
-    initializeArtifactPotential();
-    // Initialize Equipment Slots
-    initializeEquipmentSlots();
-    // Load equipment slots after initialization
-    loadEquipmentSlots();
-    // Initialize Artifacts
-    initializeArtifacts();
-    // Initialize Cube Potential
-    initializeCubePotential();
-    // Attach save listeners to all inputs
-    attachSaveListeners();
-    // Update weapon bonuses if data was loaded
-    if (loaded) {
-        updateWeaponBonuses();
-    } else {
-        calculate();
-    }
-    // Show donation notification if needed
-    showDonateNotificationIfNeeded();
-};
 
 // Donation notification functions
 function showDonateNotificationIfNeeded() {
@@ -330,18 +330,15 @@ function showDonateNotificationIfNeeded() {
         const today = new Date().toDateString();
         const lastShown = localStorage.getItem('donateNotificationLastShown');
 
-        // Only show if not shown today
         if (lastShown !== today) {
             const notification = document.getElementById('donate-notification');
             if (notification) {
                 notification.style.display = 'block';
 
-                // Auto-dismiss after 15 seconds
                 setTimeout(() => {
                     dismissDonateNotification();
                 }, 15000);
 
-                // Mark as shown today
                 localStorage.setItem('donateNotificationLastShown', today);
             }
         }
@@ -350,7 +347,7 @@ function showDonateNotificationIfNeeded() {
     }
 }
 
-function dismissDonateNotification() {
+export function dismissDonateNotification() {
     const notification = document.getElementById('donate-notification');
     if (notification) {
         notification.style.animation = 'slideOut 0.3s ease-out';
@@ -373,19 +370,20 @@ function enableGlobalNumberInputAutoSelect() {
 // Class Selection
 let selectedClass = null;
 
-function selectClass(className) {
-    // Remove selected state from all class selectors
+export function getSelectedClass() {
+    return selectedClass;
+}
+
+export function selectClass(className) {
     document.querySelectorAll('.class-selector').forEach(el => {
         el.classList.remove('selected');
     });
 
-    // Add selected state to clicked class
     const classElement = document.getElementById(`class-${className}`);
     if (classElement) {
         classElement.classList.add('selected');
         selectedClass = className;
 
-        // Show/hide defense input for Dark Knight
         const defenseInputGroup = document.getElementById('defense-input-group');
         if (defenseInputGroup) {
             if (className === 'dark-knight') {
@@ -395,12 +393,14 @@ function selectClass(className) {
             }
         }
 
-        // Save to localStorage
         try {
             localStorage.setItem('selectedClass', className);
         } catch (error) {
             console.error('Error saving selected class:', error);
         }
+
+        // Update class warning in cube potential tab
+        updateClassWarning();
     }
 }
 
@@ -415,7 +415,87 @@ function loadSelectedClass() {
     }
 }
 
-// Load selected class on initialization
-document.addEventListener('DOMContentLoaded', () => {
+// exportData and importData are now imported above
+
+// Initialize application
+window.onload = function () {
+    loadTheme();
+    initializeHeroPowerPresets();
+    initializeWeapons();
+    populateStageDropdown();
+    enableGlobalNumberInputAutoSelect();
+    const loaded = loadFromLocalStorage();
+    loadHeroPowerPresets();
+    initializeInnerAbilityAnalysis();
+    initializeArtifactPotential();
+    initializeEquipmentSlots();
+    loadEquipmentSlots();
+    initializeArtifacts();
+    initializeCubePotential();
+    attachSaveListeners();
+    if (loaded) {
+        updateWeaponBonuses();
+    } else {
+        calculate();
+    }
+    showDonateNotificationIfNeeded();
     loadSelectedClass();
-});
+};
+
+// Expose functions to window for HTML onclick handlers
+window.switchTab = switchTab;
+window.toggleTheme = toggleTheme;
+window.unequipItem = unequipItem;
+window.equipItem = equipItem;
+window.addEquippedStat = addEquippedStat;
+window.removeEquippedStat = removeEquippedStat;
+window.saveEquipmentSlots = saveEquipmentSlots;
+window.calculateEquipmentSlotDPS = calculateEquipmentSlotDPS;
+window.addComparisonItem = addComparisonItem;
+window.removeComparisonItem = removeComparisonItem;
+window.addComparisonItemStat = addComparisonItemStat;
+window.removeComparisonItemStat = removeComparisonItemStat;
+window.calculate = calculate;
+window.setWeaponStars = setWeaponStars;
+window.previewStars = previewStars;
+window.resetStarPreview = resetStarPreview;
+window.handleEquippedCheckboxChange = handleEquippedCheckboxChange;
+window.handleWeaponLevelChange = handleWeaponLevelChange;
+window.calculateCurrencyUpgrades = calculateCurrencyUpgrades;
+window.toggleSubDetails = toggleSubDetails;
+window.toggleDetails = toggleDetails;
+window.switchPreset = switchPreset;
+window.handlePresetEquipped = handlePresetEquipped;
+window.openHelpSidebar = openHelpSidebar;
+window.closeHelpSidebar = closeHelpSidebar;
+window.scrollToSection = scrollToSection;
+window.toggleStatChart = toggleStatChart;
+window.switchInnerAbilityTab = switchInnerAbilityTab;
+window.toggleLineBreakdown = toggleLineBreakdown;
+window.sortPresetTable = sortPresetTable;
+window.sortTheoreticalTable = sortTheoreticalTable;
+window.sortArtifactTable = sortArtifactTable;
+window.runScrollSimulation = runScrollSimulation;
+window.switchScrollStrategyTab = switchScrollStrategyTab;
+window.updateScrollLevelInfo = updateScrollLevelInfo;
+window.switchArtifactPreset = switchArtifactPreset;
+window.selectArtifactSlot = selectArtifactSlot;
+window.previewArtifact = previewArtifact;
+window.equipPreviewedArtifact = equipPreviewedArtifact;
+window.cancelPreview = cancelPreview;
+window.setArtifactStars = setArtifactStars;
+window.setArtifactPotential = setArtifactPotential;
+window.clearArtifactSlot = clearArtifactSlot;
+window.switchPotentialType = switchPotentialType;
+window.selectCubeSlot = selectCubeSlot;
+window.runCubeSimulation = runCubeSimulation;
+window.selectClass = selectClass;
+window.dismissDonateNotification = dismissDonateNotification;
+window.exportData = exportData;
+window.importData = importData;
+window.getStats = getStats;
+window.getWeaponAttackBonus = getWeaponAttackBonus;
+window.renderPresetComparison = renderPresetComparison;
+window.renderTheoreticalBest = renderTheoreticalBest;
+window.renderArtifactPotential = renderArtifactPotential;
+window.clearCubeRankingsCache = clearCubeRankingsCache;

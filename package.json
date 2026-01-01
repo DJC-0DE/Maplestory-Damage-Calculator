@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "Maplestory damage calculator with regression tests",
   "scripts": {
+    "start": "python -m http.server 8000 || python3 -m http.server 8000 || npx http-server -p 8000",
     "test": "node tests/run-all-tests.js",
-    "test:weapon-priority": "node tests/weapon-priority.test.js"
+    "test:weapon-priority": "node tests/weapon-priority.test.js",
+    "lint": "eslint *.js",
+    "lint:fix": "eslint *.js --fix"
   },
   "keywords": ["maplestory", "damage-calculator"],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
 }

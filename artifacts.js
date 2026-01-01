@@ -1,6 +1,9 @@
 // Artifacts System
 // Manage artifact data, presets, and UI
-// Note: artifactsData is loaded from constants.js
+
+import { artifactsData } from './artifacts-data.js';
+import { artifactPotentialData } from './artifact-potential-data.js';
+import { calculateDamage, formatNumber } from './calculations.js';
 
 // Global state
 let currentArtifactPreset = 1;
@@ -10,7 +13,7 @@ let artifactPresets = {};
 let artifactLibrary = {}; // Stores star ratings and potentials for each artifact by name
 
 // Initialize artifact library (one entry per artifact with its stats)
-function initializeArtifactLibrary() {
+export function initializeArtifactLibrary() {
     // Initialize library entries for all artifacts with default values
     artifactsData.forEach(artifact => {
         if (!artifactLibrary[artifact.name]) {
@@ -23,7 +26,7 @@ function initializeArtifactLibrary() {
 }
 
 // Initialize artifact presets (10 presets, each with 3 slots storing artifact name references)
-function initializeArtifactPresets() {
+export function initializeArtifactPresets() {
     for (let i = 1; i <= 10; i++) {
         artifactPresets[i] = {
             slot1: null, // Just stores artifact name (string) or null
@@ -34,14 +37,14 @@ function initializeArtifactPresets() {
 }
 
 // Render the entire artifacts tab
-function renderArtifactsTab() {
+export function renderArtifactsTab() {
     renderEquippedArtifacts();
     renderArtifactDetail();
     renderArtifactGrid();
 }
 
 // Render left panel: preset selector + 3 equipped slots
-function renderEquippedArtifacts() {
+export function renderEquippedArtifacts() {
     const container = document.getElementById('artifacts-equipped-panel');
     if (!container) return;
 
@@ -134,7 +137,7 @@ function renderEquippedArtifacts() {
 }
 
 // Render center panel: detail editor
-function renderArtifactDetail() {
+export function renderArtifactDetail() {
     const container = document.getElementById('artifacts-detail-panel');
     if (!container) return;
 
@@ -238,7 +241,7 @@ function renderArtifactDetail() {
                 <label style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">
                     Potential ${i + 1}
                 </label>
-                <select id="artifact-potential-${i}" onchange="setArtifactPotential('${artifactName}', ${i}, this.value)"
+                <select id="artifact-potential-${i}" onchange="setArtifactPotential('${artifactName.replace(/'/g, "\\'")}', ${i}, this.value)"
                         class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg">
                     <option value="">-- None --</option>
         `;
@@ -300,7 +303,7 @@ function renderArtifactDetail() {
 }
 
 // Render right panel: artifact grid
-function renderArtifactGrid() {
+export function renderArtifactGrid() {
     const container = document.getElementById('artifacts-grid-panel');
     if (!container) return;
 
@@ -349,7 +352,7 @@ function renderArtifactGrid() {
 
 // Event Handlers
 
-function switchArtifactPreset(presetNum) {
+export function switchArtifactPreset(presetNum) {
     currentArtifactPreset = parseInt(presetNum);
     selectedArtifactSlot = null;
     // Keep previewArtifactName so user can equip the same artifact across multiple presets
@@ -357,7 +360,7 @@ function switchArtifactPreset(presetNum) {
     saveArtifactsToLocalStorage();
 }
 
-function selectArtifactSlot(slotNum) {
+export function selectArtifactSlot(slotNum) {
     selectedArtifactSlot = slotNum;
 
     // Only clear preview if the slot already has an artifact (so user can edit it)
@@ -375,13 +378,13 @@ function selectArtifactSlot(slotNum) {
     renderArtifactsTab();
 }
 
-function previewArtifact(artifactName) {
+export function previewArtifact(artifactName) {
     previewArtifactName = artifactName;
     renderArtifactDetail();
     renderArtifactGrid();
 }
 
-function equipPreviewedArtifact() {
+export function equipPreviewedArtifact() {
     if (!selectedArtifactSlot || !previewArtifactName) return;
 
     const preset = artifactPresets[currentArtifactPreset];
@@ -411,13 +414,13 @@ function equipPreviewedArtifact() {
     saveArtifactsToLocalStorage();
 }
 
-function cancelPreview() {
+export function cancelPreview() {
     previewArtifactName = null;
     renderArtifactDetail();
     renderArtifactGrid();
 }
 
-function setArtifactStars(artifactName, stars) {
+export function setArtifactStars(artifactName, stars) {
     // Edit the artifact in the library (not the preset slot)
     if (!artifactLibrary[artifactName]) {
         artifactLibrary[artifactName] = {
@@ -435,7 +438,7 @@ function setArtifactStars(artifactName, stars) {
     saveArtifactsToLocalStorage();
 }
 
-function setArtifactPotential(artifactName, potentialIndex, value) {
+export function setArtifactPotential(artifactName, potentialIndex, value) {
     // Edit the artifact in the library (not the preset slot)
     if (!artifactLibrary[artifactName]) {
         artifactLibrary[artifactName] = {
@@ -451,7 +454,7 @@ function setArtifactPotential(artifactName, potentialIndex, value) {
     saveArtifactsToLocalStorage();
 }
 
-function clearArtifactSlot() {
+export function clearArtifactSlot() {
     if (!selectedArtifactSlot) return;
 
     const preset = artifactPresets[currentArtifactPreset];
@@ -465,7 +468,7 @@ function clearArtifactSlot() {
 
 // LocalStorage
 
-function saveArtifactsToLocalStorage() {
+export function saveArtifactsToLocalStorage() {
     try {
         localStorage.setItem('artifactLibrary', JSON.stringify(artifactLibrary));
         localStorage.setItem('artifactPresets', JSON.stringify(artifactPresets));
@@ -475,7 +478,7 @@ function saveArtifactsToLocalStorage() {
     }
 }
 
-function loadArtifactsFromLocalStorage() {
+export function loadArtifactsFromLocalStorage() {
     try {
         // Load library
         const savedLibrary = localStorage.getItem('artifactLibrary');
@@ -556,7 +559,7 @@ function loadArtifactsFromLocalStorage() {
 }
 
 // Initialize on load
-function initializeArtifacts() {
+export function initializeArtifacts() {
     initializeArtifactLibrary();
     initializeArtifactPresets();
     loadArtifactsFromLocalStorage();

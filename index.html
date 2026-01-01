@@ -577,6 +577,39 @@
                     </div>
                 </div>
 
+                <!-- Main Tab Navigation -->
+                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <button id="cube-main-tab-summary" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Summary</button>
+                    <button id="cube-main-tab-selected" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Selected Slot</button>
+                    <button id="cube-main-tab-simulation" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Simulation</button>
+                </div>
+
+                <!-- Summary Main Tab Content -->
+                <div id="cube-main-summary-content" style="display: none;">
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
+                            All Slots Potential Summary
+                        </h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9em;">
+                            Overview of Set A DPS gains for all equipment slots (Regular and Bonus Potential)
+                        </p>
+                    </div>
+
+                    <!-- Loading Progress -->
+                    <div id="cube-summary-progress" style="display: none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px;">
+                        <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 8px; text-align: center;">
+                            <span id="cube-summary-progress-text">Loading rankings...</span>
+                        </div>
+                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div id="cube-summary-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div id="cube-summary-results"></div>
+                </div>
+
+                <!-- Selected Slot Main Tab Content -->
+                <div id="cube-main-selected-content" style="display: block;">
                 <!-- Potential Type Toggle -->
                 <div style="margin-bottom: 20px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px; padding: 15px;">
                     <label style="font-weight: 600; font-size: 0.95em; color: var(--text-primary); display: block; margin-bottom: 10px;">Potential Type</label>
@@ -596,11 +629,10 @@
                     <select id="cube-rarity-selector" class="cube-rarity-select"></select>
                 </div>
 
-                <!-- Tab Navigation -->
+                <!-- Selected Slot Sub-Tab Navigation -->
                 <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button id="cube-tab-comparison" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Comparison</button>
-                    <button id="cube-tab-rankings" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Theoretical Best</button>
-                    <button id="cube-tab-summary" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Summary</button>
+                    <button id="cube-tab-rankings" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Slot Theoretical Best</button>
                 </div>
 
                 <!-- Comparison Tab Content -->
@@ -664,29 +696,44 @@
                     <!-- Rankings Results -->
                     <div id="cube-rankings-results"></div>
                 </div>
+                </div>
 
-                <!-- Summary Tab Content -->
-                <div id="cube-summary-content" style="display: none;">
+                <!-- Simulation Main Tab Content -->
+                <div id="cube-main-simulation-content" style="display: none;">
                     <div style="margin-bottom: 20px;">
                         <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
-                            All Slots Potential Summary
+                            Cube Potential Optimization Simulator
                         </h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9em;">
-                            Overview of Set A DPS gains for all equipment slots (Regular and Bonus Potential)
+                        <p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
+                            Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses the current slots configured in the Cube Potential section.
                         </p>
                     </div>
 
-                    <!-- Loading Progress -->
-                    <div id="cube-summary-progress" style="display: none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px;">
-                        <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 8px; text-align: center;">
-                            <span id="cube-summary-progress-text">Loading rankings...</span>
+                    <!-- Simulation Controls -->
+                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div class="input-group">
+                                <label style="font-weight: 600; color: var(--text-primary);">Cube Budget</label>
+                                <input type="number" id="simulation-cube-budget" value="1000" min="100" max="50000" step="100" style="padding: 10px; border-radius: 8px;">
+                            </div>
+                            <div class="input-group">
+                                <label style="font-weight: 600; color: var(--text-primary);">Number of Simulations</label>
+                                <input type="number" id="simulation-count" value="1000" min="100" max="10000" step="100" style="padding: 10px; border-radius: 8px;">
+                            </div>
                         </div>
-                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="cube-summary-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
-                        </div>
+                        <button class="calculate-btn" onclick="runCubeSimulation()" id="cube-simulation-run-btn">Run Simulation</button>
                     </div>
 
-                    <div id="cube-summary-results"></div>
+                    <!-- Progress Bar -->
+                    <div id="cube-simulation-progress" style="display: none; margin-bottom: 20px;">
+                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+                            <div id="cube-simulation-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                        <p id="cube-simulation-progress-text" style="text-align: center; color: var(--text-secondary); font-weight: 600;"></p>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="cube-simulation-results"></div>
                 </div>
             </div>
         </div>
@@ -766,16 +813,7 @@
         </div>
     </div>
 
-    <script src="constants.js"></script>
-    <script src="calculations.js"></script>
-    <script src="storage.js"></script>
-    <script src="ui.js"></script>
-    <script src="inner-ability.js"></script>
-    <script src="artifact-potential.js"></script>
-    <script src="scroll-optimizer.js"></script>
-    <script src="artifacts.js"></script>
-    <script src="cube-potential.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 
 </html>

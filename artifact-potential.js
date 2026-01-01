@@ -1,7 +1,11 @@
 // Artifact Potential stat mapping and calculations
 
+import { artifactPotentialData } from './artifact-potential-data.js';
+import { calculateDamage, formatNumber } from './calculations.js';
+import { getSelectedClass } from './main.js';
+
 // Map artifact potential stat to base stat properties
-function mapArtifactStat(statName, value, baseStats) {
+export function mapArtifactStat(statName, value, baseStats) {
     const modifiedStats = { ...baseStats };
 
     // Remove "(prime)" suffix if present for mapping
@@ -17,7 +21,7 @@ function mapArtifactStat(statName, value, baseStats) {
             let defenseToMainStat = 0;
 
             // Dark Knight: 12.7% of defense is converted to main stat but doesn't scale with Main Stat %
-            if (selectedClass === 'dark-knight') {
+            if (getSelectedClass() === 'dark-knight') {
                 const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
                 defenseToMainStat = defense * 0.127;
             }
@@ -73,7 +77,7 @@ function mapArtifactStat(statName, value, baseStats) {
 }
 
 // Calculate all possible artifact potential rolls and rank them
-function calculateArtifactPotentialRankings() {
+export function calculateArtifactPotentialRankings() {
     const baseStats = getStats('base');
     const baselineBossDamage = calculateDamage(baseStats, 'boss');
     const baselineNormalDamage = calculateDamage(baseStats, 'normal');
@@ -145,7 +149,7 @@ function calculateArtifactPotentialRankings() {
 let artifactSortColumn = 5;
 let artifactSortAsc = false;
 
-function sortArtifactTable(column) {
+export function sortArtifactTable(column) {
     if (artifactSortColumn === column) {
         artifactSortAsc = !artifactSortAsc;
     } else {
@@ -156,7 +160,7 @@ function sortArtifactTable(column) {
 }
 
 // Render the Artifact Potential rankings table
-function renderArtifactPotential() {
+export function renderArtifactPotential() {
     const container = document.getElementById('artifact-potential-container');
     if (!container) return;
 
@@ -223,7 +227,7 @@ function renderArtifactPotential() {
 }
 
 // Initialize Artifact Potential Analysis
-function initializeArtifactPotential() {
+export function initializeArtifactPotential() {
     // Render only if the tab is active
     const tab = document.getElementById('analysis-artifact-potential');
     if (tab && tab.classList.contains('active')) {

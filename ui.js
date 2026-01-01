@@ -1,5 +1,10 @@
+import { rarities, tiers, comparisonItemCount, equippedStatCount, setComparisonItemCount, setEquippedStatCount, weaponBaseAttackEquipped, rarityColors, availableStats } from './constants.js';
+import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain, calculateInventoryBonus, formatNumber, calculateDamage, calculateStatWeights } from './calculations.js';
+import { saveToLocalStorage } from './storage.js';
+import { innerAbilityStats } from './inner-ability-data.js';
+
 // Tab switching function
-function switchTab(group, tabName) {
+export function switchTab(group, tabName) {
     // Get all tab contents and buttons within the group
     const tabContents = document.querySelectorAll(`#${group}-${tabName}`).length > 0
         ? document.querySelectorAll(`[id^="${group}-"]`)
@@ -34,7 +39,7 @@ function switchTab(group, tabName) {
 }
 
 // Theme toggle functions
-function toggleTheme() {
+export function toggleTheme() {
     const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
     const isDark = html.classList.contains('dark');
@@ -100,7 +105,7 @@ function toggleTheme() {
     }
 }
 
-function loadTheme() {
+export function loadTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
@@ -115,7 +120,7 @@ function loadTheme() {
 }
 
 // Equip/Unequip functionality
-function unequipItem() {
+export function unequipItem() {
     // Get equipped item data
     const equippedItem = getItemStats('equipped');
 
@@ -195,13 +200,13 @@ function unequipItem() {
         const statElem = document.getElementById(`equipped-stat-${i}`);
         if (statElem) statElem.remove();
     }
-    equippedStatCount = 0;
+    setEquippedStatCount(0);
 
     saveToLocalStorage();
     calculate();
 }
 
-function equipItem(itemId) {
+export function equipItem(itemId) {
     // Check if there's already an equipped item
     const currentEquipped = getItemStats('equipped');
     if (currentEquipped.attack !== 0 || currentEquipped.mainStat !== 0 ||
@@ -281,7 +286,7 @@ function equipItem(itemId) {
 }
 
 // Equipped item stat management
-function addEquippedStat() {
+export function addEquippedStat() {
     const container = document.getElementById('equipped-stats-container');
     const currentStats = container.children.length;
 
@@ -295,7 +300,7 @@ function addEquippedStat() {
     while (document.getElementById(`equipped-stat-${statId}`)) {
         statId++;
     }
-    equippedStatCount = statId;
+    setEquippedStatCount(statId);
 
     const statDiv = document.createElement('div');
     statDiv.id = `equipped-stat-${equippedStatCount}`;
@@ -324,7 +329,7 @@ function addEquippedStat() {
     saveToLocalStorage();
 }
 
-function removeEquippedStat(id) {
+export function removeEquippedStat(id) {
     const stat = document.getElementById(`equipped-stat-${id}`);
     if (stat) {
         stat.remove();
@@ -333,8 +338,8 @@ function removeEquippedStat(id) {
 }
 
 // Comparison item management
-function addComparisonItem() {
-    comparisonItemCount++;
+export function addComparisonItem() {
+    setComparisonItemCount(comparisonItemCount + 1);
     const container = document.getElementById('comparison-items-container');
 
     const itemDiv = document.createElement('div');
@@ -368,7 +373,7 @@ function addComparisonItem() {
     saveToLocalStorage();
 }
 
-function removeComparisonItem(id) {
+export function removeComparisonItem(id) {
     const item = document.getElementById(`comparison-item-${id}`);
     if (item) {
         item.remove();
@@ -377,7 +382,7 @@ function removeComparisonItem(id) {
     }
 }
 
-function addComparisonItemStat(itemId) {
+export function addComparisonItemStat(itemId) {
     const container = document.getElementById(`item-${itemId}-stats-container`);
     const currentStats = container.children.length;
 
@@ -418,7 +423,7 @@ function addComparisonItemStat(itemId) {
     saveToLocalStorage();
 }
 
-function removeComparisonItemStat(itemId, statId) {
+export function removeComparisonItemStat(itemId, statId) {
     const stat = document.getElementById(`item-${itemId}-stat-${statId}`);
     if (stat) {
         stat.remove();
@@ -427,7 +432,7 @@ function removeComparisonItemStat(itemId, statId) {
 }
 
 // Weapon initialization and management
-function initializeWeapons() {
+export function initializeWeapons() {
     const weaponsGrid = document.getElementById('weapons-grid');
     let html = '';
 
@@ -527,7 +532,7 @@ function initializeWeapons() {
     }, 0);
 }
 
-function setWeaponStars(rarity, tier, stars) {
+export function setWeaponStars(rarity, tier, stars) {
     const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
     if (!starsInput) return;
 
@@ -549,7 +554,7 @@ function setWeaponStars(rarity, tier, stars) {
     saveToLocalStorage();
 }
 
-function previewStars(rarity, tier, stars) {
+export function previewStars(rarity, tier, stars) {
     // Temporarily show what the stars would look like if this star is clicked
     for (let i = 1; i <= 5; i++) {
         const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
@@ -559,7 +564,7 @@ function previewStars(rarity, tier, stars) {
     }
 }
 
-function resetStarPreview(rarity, tier) {
+export function resetStarPreview(rarity, tier) {
     // Reset stars to their actual stored value
     const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
     if (!starsInput) return;
@@ -573,7 +578,7 @@ function resetStarPreview(rarity, tier) {
     }
 }
 
-function handleEquippedCheckboxChange(rarity, tier) {
+export function handleEquippedCheckboxChange(rarity, tier) {
     const checkbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
     const label = document.getElementById(`equipped-label-${rarity}-${tier}`);
     const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
@@ -637,7 +642,7 @@ function handleEquippedCheckboxChange(rarity, tier) {
     updateEquippedWeaponIndicator();
 }
 
-function updateWeaponUpgradeColors() {
+export function updateWeaponUpgradeColors() {
     // Collect all gainPer1k values
     const gainValues = [];
     rarities.forEach(rarity => {
@@ -682,7 +687,7 @@ function updateWeaponUpgradeColors() {
     });
 }
 
-function handleWeaponLevelChange(rarity, tier) {
+export function handleWeaponLevelChange(rarity, tier) {
     const levelInput = document.getElementById(`level-${rarity}-${tier}`);
     const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
     const level = parseInt(levelInput.value) || 0;
@@ -764,7 +769,7 @@ function handleWeaponLevelChange(rarity, tier) {
     updateWeaponUpgradeColors();
 }
 
-function updateEquippedWeaponIndicator() {
+export function updateEquippedWeaponIndicator() {
     // Check if any weapon is equipped
     let hasEquipped = false;
 
@@ -784,7 +789,7 @@ function updateEquippedWeaponIndicator() {
     }
 }
 
-function updateWeaponBonuses() {
+export function updateWeaponBonuses() {
     let totalInventory = 0;
     let equippedBonus = 0;
 
@@ -825,7 +830,7 @@ function updateWeaponBonuses() {
     updateUpgradePriorityChain();
 }
 
-function updateUpgradePriorityChain() {
+export function updateUpgradePriorityChain() {
     const priorityChain = document.getElementById('upgrade-priority-chain');
     if (!priorityChain) return;
 
@@ -951,7 +956,7 @@ function updateUpgradePriorityChain() {
     priorityChain.innerHTML = html;
 }
 
-function calculateCurrencyUpgrades() {
+export function calculateCurrencyUpgrades() {
     const currencyInput = document.getElementById('upgrade-currency-input');
     const resultsDiv = document.getElementById('currency-upgrade-results');
     const attackGainDisplay = document.getElementById('currency-attack-gain');
@@ -1163,7 +1168,7 @@ function calculateCurrencyUpgrades() {
 }
 
 // Display functions
-function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedDamageValues = null) {
+export function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedDamageValues = null) {
     const bossResults = calculateDamage(stats, 'boss');
     const normalResults = calculateDamage(stats, 'normal');
 
@@ -1369,7 +1374,7 @@ function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedD
     return html;
 }
 
-function toggleSubDetails(id) {
+export function toggleSubDetails(id) {
     const section = document.getElementById(id);
     const icon = document.getElementById(`${id}-icon`);
 
@@ -1382,7 +1387,7 @@ function toggleSubDetails(id) {
     }
 }
 
-function toggleDetails(id) {
+export function toggleDetails(id) {
     const detailsSection = document.getElementById(`details-${id}`);
     const toggleButton = event.target;
 
@@ -1398,7 +1403,7 @@ function toggleDetails(id) {
 }
 
 // Hero Power Ability preset management
-function initializeHeroPowerPresets() {
+export function initializeHeroPowerPresets() {
     const container = document.getElementById('hero-power-presets-container');
     if (!container) return;
 
@@ -1419,7 +1424,7 @@ function initializeHeroPowerPresets() {
     container.innerHTML = tabsHTML + contentsHTML;
 }
 
-function createPresetContentHTML(presetId, isActive = false) {
+export function createPresetContentHTML(presetId, isActive = false) {
     let optionsHTML = '<option value="">-- Select Stat --</option>';
 
     innerAbilityStats.forEach(stat => {
@@ -1454,7 +1459,7 @@ function createPresetContentHTML(presetId, isActive = false) {
     `;
 }
 
-function switchPreset(presetId) {
+export function switchPreset(presetId) {
     // Hide all preset contents
     for (let i = 1; i <= 10; i++) {
         const content = document.getElementById(`preset-${i}-content`);
@@ -1472,7 +1477,7 @@ function switchPreset(presetId) {
     if (selectedTab) selectedTab.classList.add('active');
 }
 
-function handlePresetEquipped(presetId) {
+export function handlePresetEquipped(presetId) {
     const checkbox = document.getElementById(`preset-${presetId}-equipped`);
 
     if (checkbox.checked) {
@@ -1499,7 +1504,7 @@ function handlePresetEquipped(presetId) {
     saveHeroPowerPresets();
 }
 
-function saveHeroPowerPresets() {
+export function saveHeroPowerPresets() {
     const presets = {};
 
     for (let i = 1; i <= 10; i++) {
@@ -1525,7 +1530,7 @@ function saveHeroPowerPresets() {
     renderTheoreticalBest();
 }
 
-function loadHeroPowerPresets() {
+export function loadHeroPowerPresets() {
     const saved = localStorage.getItem('heroPowerPresets');
     if (!saved) return;
 
@@ -1563,7 +1568,7 @@ function loadHeroPowerPresets() {
 }
 
 // Equipment Slots Management
-function initializeEquipmentSlots() {
+export function initializeEquipmentSlots() {
     const slots = ['Head', 'Cape', 'Chest', 'Shoulders', 'Legs', 'Belt', 'Gloves', 'Boots', 'Ring', 'Neck', 'Eye Accessory'];
     const container = document.getElementById('equipment-slots-grid');
     if (!container) return;
@@ -1615,7 +1620,7 @@ function initializeEquipmentSlots() {
     }, 0);
 }
 
-function saveEquipmentSlots() {
+export function saveEquipmentSlots() {
     const slots = {};
     const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
 
@@ -1634,7 +1639,7 @@ function saveEquipmentSlots() {
     localStorage.setItem('equipmentSlots', JSON.stringify(slots));
 }
 
-function loadEquipmentSlots() {
+export function loadEquipmentSlots() {
     const saved = localStorage.getItem('equipmentSlots');
     if (!saved) return;
 
@@ -1658,7 +1663,7 @@ function loadEquipmentSlots() {
     }
 }
 
-function calculateEquipmentSlotDPS() {
+export function calculateEquipmentSlotDPS() {
     const baseStats = getStats('base');
     const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
     const weaponAttackBonus = getWeaponAttackBonus();
@@ -1862,7 +1867,7 @@ const helpContent = {
     }
 };
 
-function openHelpSidebar(helpKey) {
+export function openHelpSidebar(helpKey) {
     const sidebar = document.getElementById('help-sidebar');
     const title = document.getElementById('help-sidebar-title');
     const content = document.getElementById('help-sidebar-content');
@@ -1886,7 +1891,7 @@ function openHelpSidebar(helpKey) {
     }
 }
 
-function closeHelpSidebar() {
+export function closeHelpSidebar() {
     const sidebar = document.getElementById('help-sidebar');
     const backdrop = document.getElementById('help-sidebar-backdrop');
 
@@ -1899,7 +1904,7 @@ function closeHelpSidebar() {
 }
 
 // Left Navigation - Scroll to Section
-function scrollToSection(sectionId) {
+export function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
         section.scrollIntoView({

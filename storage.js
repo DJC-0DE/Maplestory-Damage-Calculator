@@ -1,3 +1,6 @@
+import { comparisonItemCount, equippedStatCount, setComparisonItemCount, setEquippedStatCount, rarities, tiers } from './constants.js';
+import { addEquippedStat, addComparisonItem, addComparisonItemStat, handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from './ui.js';
+
 // Base setup fields that need to be saved/loaded/monitored
 const BASE_SETUP_FIELDS = [
     'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
@@ -8,7 +11,7 @@ const BASE_SETUP_FIELDS = [
 ];
 
 // Save all data to localStorage
-function saveToLocalStorage() {
+export function saveToLocalStorage() {
     const data = {
         baseSetup: {},
         equippedItem: {},
@@ -107,7 +110,7 @@ function saveToLocalStorage() {
 }
 
 // Load data from localStorage
-function loadFromLocalStorage() {
+export function loadFromLocalStorage() {
     const savedData = localStorage.getItem('damageCalculatorData');
     if (!savedData) {
         return false;
@@ -238,7 +241,7 @@ function loadFromLocalStorage() {
 }
 
 // Update analysis tabs when base stats change
-function updateAnalysisTabs() {
+export function updateAnalysisTabs() {
     // Update Inner Ability Analysis
     renderPresetComparison();
     renderTheoreticalBest();
@@ -256,7 +259,7 @@ function updateAnalysisTabs() {
 }
 
 // Export all local storage data to clipboard
-function exportData() {
+export function exportData() {
     const allData = {
         damageCalculatorData: localStorage.getItem('damageCalculatorData'),
         heroPowerPresets: localStorage.getItem('heroPowerPresets'),
@@ -287,7 +290,7 @@ function exportData() {
 }
 
 // Import data from clipboard to local storage
-function importData() {
+export function importData() {
     navigator.clipboard.readText().then(text => {
         try {
             const data = JSON.parse(text);
@@ -341,7 +344,7 @@ function importData() {
 }
 
 // Attach save listeners to base setup inputs
-function attachSaveListeners() {
+export function attachSaveListeners() {
     // Attach to base setup inputs
     BASE_SETUP_FIELDS.forEach(field => {
         const element = document.getElementById(`${field}-base`);

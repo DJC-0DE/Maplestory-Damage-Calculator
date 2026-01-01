@@ -1,6 +1,8 @@
 // Scroll Optimizer - Level 65 and Level 85 Scrolls
 // This module simulates different scrolling strategies and calculates damage gains
 
+import { calculateDamage, formatNumber } from './calculations.js';
+
 // Scroll definitions
 const SCROLLS_L65 = {
     'L65_70': { name: '70% Level 65', baseSuccess: 0.70, cost: 250, attack: 100, damageAmp: 0 },
@@ -20,7 +22,7 @@ const RESET_COST = 50;
 const NUM_SLOTS = 10;
 
 // Update scroll level info display
-function updateScrollLevelInfo() {
+export function updateScrollLevelInfo() {
     const level = document.querySelector('input[name="scroll-level"]:checked')?.value || '65';
     const infoDiv = document.getElementById('scroll-level-info');
 
@@ -48,7 +50,7 @@ if (typeof document !== 'undefined') {
 }
 
 // Calculate success rate for a scroll at a specific slot
-function getScrollSuccessRate(scroll, slotNumber) {
+export function getScrollSuccessRate(scroll, slotNumber) {
     let rate = scroll.baseSuccess + GLOBAL_SUCCESS_BONUS;
     if (slotNumber === 5) rate += BONUS_AT_SLOT_5;
     if (slotNumber === 10) rate += BONUS_AT_SLOT_10;
@@ -56,7 +58,7 @@ function getScrollSuccessRate(scroll, slotNumber) {
 }
 
 // Attempt one complete scroll run (all 10 slots)
-function attemptScrollRun(strategy, budget, traceUsed, scrolls) {
+export function attemptScrollRun(strategy, budget, traceUsed, scrolls) {
     let totalAttack = 0;
     let totalDamageAmp = 0;
     let successfulSlots = 0;
@@ -126,7 +128,7 @@ function attemptScrollRun(strategy, budget, traceUsed, scrolls) {
 }
 
 // Simulate with reset strategy
-function simulateScrollWithResets(strategy, budget, scrolls) {
+export function simulateScrollWithResets(strategy, budget, scrolls) {
     let traceUsed = 0;
     let resetCount = 0;
     let finalResult = null;
@@ -183,7 +185,7 @@ function simulateScrollWithResets(strategy, budget, scrolls) {
 }
 
 // Create strategy variations for L65 scrolls - Lock-in optimized strategies
-function createL65Strategies() {
+export function createL65Strategies() {
     const strategies = [];
 
     // Secure Slot 1 with 30% (Base strategy)
@@ -467,7 +469,7 @@ function createL65Strategies() {
 }
 
 // Create strategy variations for L85 scrolls
-function createL85Strategies() {
+export function createL85Strategies() {
     const strategies = [];
 
     // Base strategy: Slot 1 15% Lock-In
@@ -736,7 +738,7 @@ function createL85Strategies() {
 }
 
 // Calculate damage gain from scroll results
-function calculateScrollDamageGain(avgAttack, avgDamageAmp) {
+export function calculateScrollDamageGain(avgAttack, avgDamageAmp) {
     const baseStats = getStats('base');
     const baseDPS = calculateDamage(baseStats, 'boss').dps;
 
@@ -760,7 +762,7 @@ function calculateScrollDamageGain(avgAttack, avgDamageAmp) {
 }
 
 // Main simulation runner
-async function runScrollSimulation() {
+export async function runScrollSimulation() {
     const budget = parseInt(document.getElementById('scroll-spell-trace-budget').value);
     const numSimulations = parseInt(document.getElementById('scroll-simulations').value);
     const scrollLevel = document.querySelector('input[name="scroll-level"]:checked')?.value || '65';
@@ -846,7 +848,7 @@ async function runScrollSimulation() {
 }
 
 // Display simulation results
-function displayScrollResults(results, budget, numSimulations) {
+export function displayScrollResults(results, budget, numSimulations) {
     const container = document.getElementById('scroll-results-container');
     container.innerHTML = '';
 
@@ -1079,7 +1081,7 @@ function displayScrollResults(results, budget, numSimulations) {
 }
 
 // Switch between strategy detail tabs
-function switchScrollStrategyTab(strategyId) {
+export function switchScrollStrategyTab(strategyId) {
     // Hide all tab contents
     const allContents = document.querySelectorAll('.scroll-strategy-tab-content');
     allContents.forEach(content => {

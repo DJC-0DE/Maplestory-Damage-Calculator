@@ -1,7 +1,10 @@
 // Inner Ability stat mapping and calculations
 
+import { innerAbilityStats, innerAbilitiesData } from './inner-ability-data.js';
+import { calculateDamage, formatNumber } from './calculations.js';
+
 // Map inner ability stats to base stat properties
-function mapInnerAbilityStat(statName, value, baseStats) {
+export function mapInnerAbilityStat(statName, value, baseStats) {
     const modifiedStats = { ...baseStats };
 
     switch (statName) {
@@ -46,7 +49,7 @@ function mapInnerAbilityStat(statName, value, baseStats) {
 }
 
 // Apply multiple inner ability lines to base stats
-function applyInnerAbilityLines(baseStats, lines) {
+export function applyInnerAbilityLines(baseStats, lines) {
     let modifiedStats = { ...baseStats };
 
     lines.forEach(line => {
@@ -59,7 +62,7 @@ function applyInnerAbilityLines(baseStats, lines) {
 }
 
 // Compute baseline stats (base minus equipped inner ability lines)
-function getBaselineStats() {
+export function getBaselineStats() {
     const baseStats = getStats('base');
     const presets = getAllPresets();
     const equippedPreset = presets.find(p => p.isEquipped);
@@ -75,7 +78,7 @@ function getBaselineStats() {
 }
 
 // Get all configured presets
-function getAllPresets() {
+export function getAllPresets() {
     const presets = [];
 
     for (let i = 1; i <= 10; i++) {
@@ -100,7 +103,7 @@ function getAllPresets() {
 }
 
 // Calculate preset comparison data
-function calculatePresetComparisons() {
+export function calculatePresetComparisons() {
     const baseStats = getStats('base');
     const presets = getAllPresets();
 
@@ -169,7 +172,7 @@ function calculatePresetComparisons() {
 }
 
 // Calculate all theoretical stat possibilities
-function calculateTheoreticalBest() {
+export function calculateTheoreticalBest() {
     const baseStats = getStats('base');
     const results = [];
 
@@ -217,7 +220,7 @@ function calculateTheoreticalBest() {
 }
 
 // Calculate best possible combinations
-function calculateBestCombinations() {
+export function calculateBestCombinations() {
     const baseline = getBaselineStats();
 
     const baselineBossDamage = calculateDamage(baseline, 'boss');
@@ -295,7 +298,7 @@ function calculateBestCombinations() {
 }
 
 // Switch inner ability sub-tabs
-function switchInnerAbilityTab(tabName) {
+export function switchInnerAbilityTab(tabName) {
     // Hide all subtabs
     document.querySelectorAll('.inner-ability-subtab').forEach(tab => {
         tab.classList.remove('active');
@@ -322,7 +325,7 @@ function switchInnerAbilityTab(tabName) {
 }
 
 // Render Preset Comparison table
-function renderPresetComparison() {
+export function renderPresetComparison() {
     const container = document.getElementById('preset-comparison-container');
     if (!container) return;
 
@@ -416,7 +419,7 @@ function renderPresetComparison() {
 }
 
 // Render Theoretical Best table
-function renderTheoreticalBest() {
+export function renderTheoreticalBest() {
     const container = document.getElementById('theoretical-best-container');
     if (!container) return;
 
@@ -525,7 +528,7 @@ function renderTheoreticalBest() {
 }
 
 // Toggle line breakdown visibility
-function toggleLineBreakdown(presetId) {
+export function toggleLineBreakdown(presetId) {
     const row = document.getElementById(`breakdown-${presetId}`);
     if (row) {
         row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
@@ -536,7 +539,7 @@ function toggleLineBreakdown(presetId) {
 let presetSortColumn = 2;
 let presetSortAsc = false;
 
-function sortPresetTable(column) {
+export function sortPresetTable(column) {
     if (presetSortColumn === column) {
         presetSortAsc = !presetSortAsc;
     } else {
@@ -550,7 +553,7 @@ function sortPresetTable(column) {
 let theoreticalSortColumn = 2;
 let theoreticalSortAsc = false;
 
-function sortTheoreticalTable(column) {
+export function sortTheoreticalTable(column) {
     if (theoreticalSortColumn === column) {
         theoreticalSortAsc = !theoreticalSortAsc;
     } else {
@@ -561,7 +564,7 @@ function sortTheoreticalTable(column) {
 }
 
 // Initialize Inner Ability Analysis
-function initializeInnerAbilityAnalysis() {
+export function initializeInnerAbilityAnalysis() {
     renderPresetComparison();
     renderTheoreticalBest();
 }
