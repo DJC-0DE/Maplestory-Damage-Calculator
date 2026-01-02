@@ -2,7 +2,7 @@
 // This is the single entry point that orchestrates the entire application
 
 import { rarities, tiers, stageDefenses, availableStats, comparisonItemCount, setComparisonItemCount } from './constants.js';
-import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart } from './calculations.js';
+import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart, calculateStatEquivalency } from './calculations.js';
 import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData } from './storage.js';
 import {
     loadTheme,
@@ -517,3 +517,4 @@ window.renderTheoreticalBest = renderTheoreticalBest;
 window.renderArtifactPotential = renderArtifactPotential;
 window.clearCubeRankingsCache = clearCubeRankingsCache;
 window.saveToLocalStorage = saveToLocalStorage;
+window.calculateStatEquivalency = calculateStatEquivalency;
