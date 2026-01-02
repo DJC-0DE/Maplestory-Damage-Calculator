@@ -2,6 +2,7 @@ import { rarities, tiers, comparisonItemCount, equippedStatCount, setComparisonI
 import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain, calculateInventoryBonus, formatNumber, calculateDamage, calculateStatWeights } from './calculations.js';
 import { saveToLocalStorage } from './storage.js';
 import { innerAbilityStats } from './inner-ability-data.js';
+import { getSelectedClass } from './main.js';
 
 // Tab switching function
 export function switchTab(group, tabName) {
@@ -141,7 +142,8 @@ export function unequipItem() {
     const statDamageBase = document.getElementById('stat-damage-base');
     let statDamageChange = equippedItem.mainStat / 100;
     // For Dark Knight: defense converts to main stat
-    if (selectedClass === 'dark-knight') {
+    const currentClass = getSelectedClass();
+    if (currentClass === 'dark-knight') {
         statDamageChange += (equippedItem.defense * 0.127) / 100;
     }
     statDamageBase.value = (parseFloat(statDamageBase.value) - statDamageChange).toFixed(1);
@@ -231,7 +233,8 @@ export function equipItem(itemId) {
     const statDamageBase = document.getElementById('stat-damage-base');
     let statDamageChange = comparisonItem.mainStat / 100;
     // For Dark Knight: defense converts to main stat
-    if (selectedClass === 'dark-knight') {
+    const currentClass = getSelectedClass();
+    if (currentClass === 'dark-knight') {
         statDamageChange += (comparisonItem.defense * 0.127) / 100;
     }
     statDamageBase.value = (parseFloat(statDamageBase.value) + statDamageChange).toFixed(1);

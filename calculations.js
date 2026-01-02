@@ -206,8 +206,12 @@ export function calculateDamage(stats, monsterType) {
     // Get selected stage's defense values
     const stageDefense = getSelectedStageDefense();
 
-    // Defense Penetration multiplier: 1 - (defense% * (1 - defPen%))
-    const defPenMultiplier = 1 - (stageDefense.defense / 100) * (1 - stats.defPen / 100);
+    // Defense Penetration: Reduce enemy's effective defense
+    const effectiveDefense = stageDefense.defense * (1 - stats.defPen / 100);
+
+    // Defense uses diminishing returns formula: damage dealt = 100 / (100 + defense)
+    // This ensures defense never reduces damage to zero, even at very high values
+    const defPenMultiplier = 100 / (100 + effectiveDefense);
 
     // Damage Reduction: 1 - damageReduction%
     const damageReduction = 1 - (stageDefense.damageReduction / 100);
@@ -266,47 +270,6 @@ export function calculateDamage(stats, monsterType) {
         finalDamageMultiplier
     };
 }
- 
-// Apply item stats to base stats
-export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
-    // Start with base stats
-    const newStats = { ...baseStats };
- 
-    // Get weapon attack bonus
-    const weaponAttackBonus = getWeaponAttackBonus();
-    const weaponMultiplier = 1 + (weaponAttackBonus / 100);
- 
-    // Subtract equipped item stats (apply weapon bonus to attack)
-    newStats.attack -= equippedItem.attack * weaponMultiplier;
-    newStats.statDamage -= equippedItem.mainStat / 100; // 100 main stat = 1% stat damage
-    // For Dark Knight: defense converts to main stat (12.7% of defense → main stat → stat damage)
-    if (selectedClass === 'dark-knight') {
-        newStats.statDamage -= (equippedItem.defense * 0.127) / 100;
-    }
-    newStats.critRate -= equippedItem.critRate;
-    newStats.critDamage -= equippedItem.critDamage;
-    newStats.skillCoeff -= equippedItem.skillLevel * 0.3; // 1 level = 0.3% skill coefficient
-    newStats.normalDamage -= equippedItem.normalDamage;
-    newStats.bossDamage -= equippedItem.bossDamage;
-    newStats.damage -= equippedItem.damage;
-
-    // Add comparison item stats (apply weapon bonus to attack)
-    newStats.attack += comparisonItem.attack * weaponMultiplier;
-    newStats.statDamage += comparisonItem.mainStat / 100; // 100 main stat = 1% stat damage
-    // For Dark Knight: defense converts to main stat (12.7% of defense → main stat → stat damage)
-    if (selectedClass === 'dark-knight') {
-        newStats.statDamage += (comparisonItem.defense * 0.127) / 100;
-    }
-    newStats.critRate += comparisonItem.critRate;
-    newStats.critDamage += comparisonItem.critDamage;
-    newStats.skillCoeff += comparisonItem.skillLevel * 0.3; // 1 level = 0.3% skill coefficient
-    newStats.normalDamage += comparisonItem.normalDamage;
-    newStats.bossDamage += comparisonItem.bossDamage;
-    newStats.damage += comparisonItem.damage;
- 
-    return newStats;
-}
- 
 // Helper function to find equivalent percentage stat for a target DPS gain
 export function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS, monsterType, multiplicativeStats, diminishingReturnStats) {
     // Binary search for the percentage increase needed

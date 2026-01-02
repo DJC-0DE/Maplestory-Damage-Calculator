@@ -1,6 +1,9 @@
 import { comparisonItemCount, equippedStatCount, setComparisonItemCount, setEquippedStatCount, rarities, tiers } from './constants.js';
 import { addEquippedStat, addComparisonItem, addComparisonItemStat, handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from './ui.js';
 
+// Flag to prevent saving during load
+let isLoading = false;
+
 // Base setup fields that need to be saved/loaded/monitored
 const BASE_SETUP_FIELDS = [
     'attack', 'crit-rate', 'crit-damage', 'stat-damage', 'damage',
@@ -12,12 +15,21 @@ const BASE_SETUP_FIELDS = [
 
 // Save all data to localStorage
 export function saveToLocalStorage() {
+    // Don't save if we're currently loading data
+    if (isLoading) {
+        console.log('[SAVE] Skipping save - currently loading');
+        return;
+    }
+
     const data = {
         baseSetup: {},
         equippedItem: {},
         comparisonItems: [],
         comparisonItemCount: comparisonItemCount,
-        weapons: {}
+        weapons: {},
+        contentType: null,
+        subcategory: null,
+        selectedStage: null
     };
 
     // Save Base Setup
@@ -27,6 +39,28 @@ export function saveToLocalStorage() {
             data.baseSetup[field] = element.value;
         }
     });
+
+    // Save content type and subcategory
+    const contentTypeElements = document.querySelectorAll('.content-type-selector.selected');
+    if (contentTypeElements.length > 0) {
+        const selectedId = contentTypeElements[0].id;
+        data.contentType = selectedId.replace('content-', '');
+        console.log('[SAVE] Saving content type:', data.contentType);
+    } else {
+        console.log('[SAVE] No content type selected element found!');
+    }
+
+    const subcategorySelect = document.getElementById('target-subcategory');
+    if (subcategorySelect && subcategorySelect.style.display !== 'none') {
+        data.subcategory = subcategorySelect.value;
+    }
+
+    // Save the selected stage from the stage dropdown
+    const stageSelect = document.getElementById('target-stage-base');
+    if (stageSelect && stageSelect.style.display !== 'none' && stageSelect.value) {
+        data.selectedStage = stageSelect.value;
+        console.log('[SAVE] Saving selected stage:', data.selectedStage);
+    }
 
     // Save Equipped Item
     data.equippedItem.name = document.getElementById('equipped-name')?.value || '';
@@ -109,12 +143,35 @@ export function saveToLocalStorage() {
     localStorage.setItem('damageCalculatorData', JSON.stringify(data));
 }
 
+// Get saved content type data (used by main.js to restore content type after initialization)
+export function getSavedContentTypeData() {
+    const savedData = localStorage.getItem('damageCalculatorData');
+    if (!savedData) {
+        return null;
+    }
+
+    try {
+        const data = JSON.parse(savedData);
+        return {
+            contentType: data.contentType || null,
+            subcategory: data.subcategory || null,
+            selectedStage: data.selectedStage || null
+        };
+    } catch (e) {
+        console.error('Error reading content type from localStorage:', e);
+        return null;
+    }
+}
+
 // Load data from localStorage
 export function loadFromLocalStorage() {
     const savedData = localStorage.getItem('damageCalculatorData');
     if (!savedData) {
         return false;
     }
+
+    // Set flag to prevent saving during load
+    isLoading = true;
 
     try {
         const data = JSON.parse(savedData);
@@ -237,6 +294,9 @@ export function loadFromLocalStorage() {
     } catch (e) {
         console.error('Error loading from localStorage:', e);
         return false;
+    } finally {
+        // Always clear the flag when done loading
+        isLoading = false;
     }
 }
 

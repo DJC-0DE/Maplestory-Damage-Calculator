@@ -2,8 +2,8 @@
 // This is the single entry point that orchestrates the entire application
 
 import { rarities, tiers, stageDefenses, availableStats, comparisonItemCount, setComparisonItemCount } from './constants.js';
-import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart } from './calculations.js';
-import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData } from './storage.js';
+import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart, calculateStatEquivalency } from './calculations.js';
+import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData, updateAnalysisTabs, getSavedContentTypeData } from './storage.js';
 import {
     loadTheme,
     initializeHeroPowerPresets,
@@ -172,60 +172,190 @@ export function getWeaponAttackBonus() {
     return totalInventory + equippedBonus;
 }
 
+// Current content type selection
+let currentContentType = 'none';
+
 // Stage defense functions
-export function populateStageDropdown() {
+export function selectContentType(contentType, skipSave = false) {
+    // Update selected state
+    currentContentType = contentType;
+
+    // Update UI - remove selected class from all
+    document.querySelectorAll('.content-type-selector').forEach(el => {
+        el.classList.remove('selected');
+    });
+
+    // Add selected class to clicked one
+    const selectedEl = document.getElementById(`content-${contentType}`);
+    if (selectedEl) {
+        selectedEl.classList.add('selected');
+    }
+
+    const subcategorySelect = document.getElementById('target-subcategory');
+    const stageSelect = document.getElementById('target-stage-base');
+    if (!stageSelect) return;
+
+    // Hide everything first
+    if (subcategorySelect) subcategorySelect.style.display = 'none';
+    stageSelect.style.display = 'none';
+
+    if (contentType === 'none') {
+        stageSelect.value = 'none';
+        if (!skipSave) {
+            saveToLocalStorage();
+            updateAnalysisTabs();
+        }
+        return;
+    }
+
+    // For stageHunt and growthDungeon, show subcategory selector
+    if (contentType === 'stageHunt' || contentType === 'growthDungeon') {
+        populateSubcategoryDropdown(contentType);
+        if (subcategorySelect) subcategorySelect.style.display = 'block';
+    } else {
+        // For chapterBoss and worldBoss, directly show stage dropdown
+        stageSelect.style.display = 'block';
+        populateStageDropdown(contentType);
+    }
+
+    if (!skipSave) {
+        saveToLocalStorage();
+        updateAnalysisTabs();
+    }
+}
+
+// Make functions available globally
+window.selectContentType = selectContentType;
+
+export function populateSubcategoryDropdown(contentType) {
+    const select = document.getElementById('target-subcategory');
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    if (contentType === 'stageHunt') {
+        // Group by chapter
+        for (let ch = 1; ch <= 28; ch++) {
+            const opt = document.createElement('option');
+            opt.value = `chapter-${ch}`;
+            opt.textContent = `Chapter ${ch}`;
+            select.appendChild(opt);
+        }
+    } else if (contentType === 'growthDungeon') {
+        // Group by dungeon type
+        const types = ['Weapon', 'EXP', 'Equipment', 'Enhancement', 'Hero Training Ground'];
+        types.forEach(type => {
+            const opt = document.createElement('option');
+            opt.value = type;
+            opt.textContent = `${type} Stages`;
+            select.appendChild(opt);
+        });
+    }
+
+    // Trigger initial population of stage dropdown
+    updateStageDropdown();
+}
+
+export function updateStageDropdown(skipSave = false) {
+    const subcategorySelect = document.getElementById('target-subcategory');
+    const stageSelect = document.getElementById('target-stage-base');
+    if (!subcategorySelect || !stageSelect) return;
+
+    const subcategory = subcategorySelect.value;
+
+    if (currentContentType === 'stageHunt') {
+        const chapter = subcategory.replace('chapter-', '');
+        populateStageDropdownFiltered('stageHunt', chapter);
+    } else if (currentContentType === 'growthDungeon') {
+        populateStageDropdownFiltered('growthDungeon', subcategory);
+    }
+
+    stageSelect.style.display = 'block';
+
+    // Save the subcategory selection (unless we're loading from storage)
+    if (!skipSave) {
+        saveToLocalStorage();
+        updateAnalysisTabs();
+    }
+}
+
+// Make updateStageDropdown available globally
+window.updateStageDropdown = updateStageDropdown;
+
+export function populateStageDropdownFiltered(contentType, filter) {
     const select = document.getElementById('target-stage-base');
     if (!select) return;
 
     select.innerHTML = '';
 
-    const noneOpt = document.createElement('option');
-    noneOpt.value = 'none';
-    noneOpt.textContent = 'None / Training Dummy (Def: 0%, DR: 0%)';
-    select.appendChild(noneOpt);
+    let entries = [];
+    let prefix = '';
 
-    const stageHuntsGroup = document.createElement('optgroup');
-    stageHuntsGroup.label = 'Stage Hunts';
-    stageDefenses.stageHunts.forEach(entry => {
-        const opt = document.createElement('option');
-        opt.value = `stageHunt-${entry.stage}`;
-        opt.textContent = `${entry.stage} (Def: ${entry.defense}%, DR: ${entry.damageReduction}%)`;
-        stageHuntsGroup.appendChild(opt);
-    });
-    select.appendChild(stageHuntsGroup);
+    if (contentType === 'stageHunt') {
+        // Filter by chapter
+        entries = stageDefenses.stageHunts.filter(e => e.stage.startsWith(`${filter}-`));
+        prefix = 'stageHunt';
+    } else if (contentType === 'growthDungeon') {
+        // Filter by dungeon type
+        entries = stageDefenses.growthDungeons.filter(e => e.stage.startsWith(filter));
+        prefix = 'growthDungeon';
+    }
 
-    const chapterGroup = document.createElement('optgroup');
-    chapterGroup.label = 'Chapter Bosses';
-    stageDefenses.chapterBosses.forEach(entry => {
+    entries.forEach(entry => {
         const opt = document.createElement('option');
-        opt.value = `chapterBoss-${entry.chapter}`;
-        opt.textContent = `Chapter ${entry.chapter} (Def: ${entry.defense}%, DR: ${entry.damageReduction}%)`;
-        chapterGroup.appendChild(opt);
+        const identifier = entry.stage;
+        opt.value = `${prefix}-${identifier}`;
+        const accuracy = entry.accuracy ? `, Acc: ${entry.accuracy}` : '';
+        opt.textContent = `${identifier} (Def: ${entry.defense}%${accuracy})`;
+        select.appendChild(opt);
     });
-    select.appendChild(chapterGroup);
+}
 
-    const worldBossGroup = document.createElement('optgroup');
-    worldBossGroup.label = 'World Bosses';
-    stageDefenses.worldBosses.forEach(entry => {
-        const opt = document.createElement('option');
-        opt.value = `worldBoss-${entry.stage}`;
-        opt.textContent = `Stage ${entry.stage} (Def: ${entry.defense}%, DR: ${entry.damageReduction}%)`;
-        worldBossGroup.appendChild(opt);
-    });
-    select.appendChild(worldBossGroup);
+export function populateStageDropdown(contentType = null) {
+    const select = document.getElementById('target-stage-base');
+    if (!select) return;
 
-    const bossRaidGroup = document.createElement('optgroup');
-    bossRaidGroup.label = 'Boss Raids';
-    stageDefenses.bossRaids.forEach(entry => {
+    select.innerHTML = '';
+
+    // If no content type specified, it's the old initialization - select None by default
+    if (!contentType) {
+        selectContentType('none', true); // Skip save during initialization
+        return;
+    }
+
+    let entries = [];
+    let prefix = '';
+
+    switch(contentType) {
+        case 'chapterBoss':
+            entries = stageDefenses.chapterBosses;
+            prefix = 'chapterBoss';
+            break;
+        case 'worldBoss':
+            entries = stageDefenses.worldBosses;
+            prefix = 'worldBoss';
+            break;
+        default:
+            return;
+    }
+
+    entries.forEach(entry => {
         const opt = document.createElement('option');
-        opt.value = `bossRaid-${entry.boss}`;
-        opt.textContent = `${entry.boss} (Def: ${entry.defense}%, DR: ${entry.damageReduction}%)`;
-        bossRaidGroup.appendChild(opt);
+        const identifier = entry.stage || entry.chapter || entry.boss;
+        opt.value = `${prefix}-${identifier}`;
+        const label = contentType === 'chapterBoss' ? `Chapter ${identifier}` : identifier;
+        const accuracy = entry.accuracy ? `, Acc: ${entry.accuracy}` : '';
+        opt.textContent = `${label} (Def: ${entry.defense}%${accuracy})`;
+        select.appendChild(opt);
     });
-    select.appendChild(bossRaidGroup);
 }
 
 export function getSelectedStageDefense() {
+    // If none is selected, return early
+    if (currentContentType === 'none') {
+        return { defense: 0, damageReduction: 0 };
+    }
+
     const select = document.getElementById('target-stage-base');
     if (!select) return { defense: 0, damageReduction: 0 };
 
@@ -235,21 +365,21 @@ export function getSelectedStageDefense() {
         return { defense: 0, damageReduction: 0 };
     }
 
-    const [category, identifier] = value.split('-');
+    const [category, ...rest] = value.split('-');
+    const identifier = rest.join('-'); // Handle identifiers with dashes like "1000-1"
 
     if (category === 'stageHunt') {
-        const stage = value.replace('stageHunt-', '');
-        const entry = stageDefenses.stageHunts.find(e => e.stage === stage);
-        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction } : { defense: 0, damageReduction: 0 };
+        const entry = stageDefenses.stageHunts.find(e => e.stage === identifier);
+        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction || 0 } : { defense: 0, damageReduction: 0 };
     } else if (category === 'chapterBoss') {
         const entry = stageDefenses.chapterBosses.find(e => e.chapter === identifier);
-        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction } : { defense: 0, damageReduction: 0 };
+        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction || 0 } : { defense: 0, damageReduction: 0 };
     } else if (category === 'worldBoss') {
         const entry = stageDefenses.worldBosses.find(e => e.stage === identifier);
-        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction } : { defense: 0, damageReduction: 0 };
-    } else if (category === 'bossRaid') {
-        const entry = stageDefenses.bossRaids.find(e => e.boss === identifier);
-        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction } : { defense: 0, damageReduction: 0 };
+        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction || 0 } : { defense: 0, damageReduction: 0 };
+    } else if (category === 'growthDungeon') {
+        const entry = stageDefenses.growthDungeons.find(e => e.stage === identifier);
+        return entry ? { defense: entry.defense, damageReduction: entry.damageReduction || 0 } : { defense: 0, damageReduction: 0 };
     }
 
     return { defense: 0, damageReduction: 0 };
@@ -270,7 +400,8 @@ export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     mainStatChange += comparisonItem.mainStat;
 
     // For Dark Knight: defense converts to main stat (but is NOT affected by main stat %)
-    if (selectedClass === 'dark-knight') {
+    const currentClass = getSelectedClass();
+    if (currentClass === 'dark-knight') {
         mainStatChange -= equippedItem.defense * 0.127;
         mainStatChange += comparisonItem.defense * 0.127;
     }
@@ -439,9 +570,40 @@ window.onload = function () {
     loadTheme();
     initializeHeroPowerPresets();
     initializeWeapons();
-    populateStageDropdown();
+    populateStageDropdown(); // This sets contentType to 'none' without saving
     enableGlobalNumberInputAutoSelect();
     const loaded = loadFromLocalStorage();
+
+    // Restore content type AFTER loading data (to avoid overwriting during load)
+    if (loaded) {
+        const contentTypeData = getSavedContentTypeData();
+        console.log('[LOAD] Retrieved content type data:', contentTypeData);
+        if (contentTypeData && contentTypeData.contentType) {
+            console.log('[LOAD] Restoring content type:', contentTypeData.contentType);
+            selectContentType(contentTypeData.contentType, true); // Skip save, just restore UI
+
+            // Restore subcategory if applicable
+            if (contentTypeData.subcategory && (contentTypeData.contentType === 'stageHunt' || contentTypeData.contentType === 'growthDungeon')) {
+                const subcategorySelect = document.getElementById('target-subcategory');
+                if (subcategorySelect) {
+                    subcategorySelect.value = contentTypeData.subcategory;
+                    updateStageDropdown(true); // Skip save during load
+                }
+            }
+
+            // Restore the selected stage from the dropdown
+            if (contentTypeData.selectedStage) {
+                const stageSelect = document.getElementById('target-stage-base');
+                if (stageSelect) {
+                    stageSelect.value = contentTypeData.selectedStage;
+                    console.log('[LOAD] Restored selected stage:', contentTypeData.selectedStage);
+                }
+            }
+        } else {
+            console.log('[LOAD] No content type to restore');
+        }
+    }
+
     loadHeroPowerPresets();
     initializeInnerAbilityAnalysis();
     initializeArtifactPotential();
@@ -511,9 +673,12 @@ window.dismissDonateNotification = dismissDonateNotification;
 window.exportData = exportData;
 window.importData = importData;
 window.getStats = getStats;
+window.getItemStats = getItemStats;
 window.getWeaponAttackBonus = getWeaponAttackBonus;
 window.renderPresetComparison = renderPresetComparison;
 window.renderTheoreticalBest = renderTheoreticalBest;
 window.renderArtifactPotential = renderArtifactPotential;
 window.clearCubeRankingsCache = clearCubeRankingsCache;
 window.saveToLocalStorage = saveToLocalStorage;
+window.updateAnalysisTabs = updateAnalysisTabs;
+window.calculateStatEquivalency = calculateStatEquivalency;

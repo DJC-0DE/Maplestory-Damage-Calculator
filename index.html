@@ -237,10 +237,37 @@
                         <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
                         </div>
                         <div class="input-group" style="grid-column: 1 / -1;">
-                            <label>Target Stage/Boss <span class="info-icon" role="img" aria-label="Info"
+                            <label>Target Content Type <span class="info-icon" role="img" aria-label="Info"
                                     onclick="openHelpSidebar('target-stage')">?</span></label>
-                            <select id="target-stage-base" onchange="saveToLocalStorage(); updateAnalysisTabs();">
-                                <!-- Populated by JavaScript -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px;">
+                                <div onclick="selectContentType('none')" id="content-none" class="content-type-selector" title="Training Dummy">
+                                    <span style="font-size: 24px;">🎯</span>
+                                    <span>None</span>
+                                </div>
+                                <div onclick="selectContentType('stageHunt')" id="content-stageHunt" class="content-type-selector" title="Stage Hunt">
+                                    <span style="font-size: 24px;">🗺️</span>
+                                    <span>Stage Hunt</span>
+                                </div>
+                                <div onclick="selectContentType('chapterBoss')" id="content-chapterBoss" class="content-type-selector" title="Chapter Boss">
+                                    <span style="font-size: 24px;">👑</span>
+                                    <span>Chapter Boss</span>
+                                </div>
+                                <div onclick="selectContentType('worldBoss')" id="content-worldBoss" class="content-type-selector" title="World Boss">
+                                    <span style="font-size: 24px;">🌍</span>
+                                    <span>World Boss</span>
+                                </div>
+                                <div onclick="selectContentType('growthDungeon')" id="content-growthDungeon" class="content-type-selector" title="Growth Dungeon">
+                                    <span style="font-size: 24px;">📈</span>
+                                    <span>Growth Dungeon</span>
+                                </div>
+                            </div>
+                            <!-- Sub-category selector for Stage Hunts and Growth Dungeons -->
+                            <select id="target-subcategory" onchange="updateStageDropdown()" style="display: none; margin-bottom: 12px;">
+                                <!-- Populated by JavaScript based on content type -->
+                            </select>
+                            <!-- Final stage selection -->
+                            <select id="target-stage-base" onchange="saveToLocalStorage(); updateAnalysisTabs();" style="display: none;">
+                                <!-- Populated by JavaScript based on content type/subcategory selection -->
                             </select>
                         </div>
                     </div>
