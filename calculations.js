@@ -354,9 +354,9 @@ export function calculateStatWeights(setup, stats) {
     ];
 
     const percentIncreases = [1, 5, 10, 25, 50, 75];
- 
+
     const multiplicativeStats = {
-        'finalDamage': 1
+        'finalDamage': true
     };
  
     const diminishingReturnStats = {
@@ -569,7 +569,6 @@ export function generateStatChartData(setup, statKey, statLabel, isFlat) {
     const weaponAttackBonus = getWeaponAttackBonus();
 
     const multiplicativeStats = {
-        'critDamage': true,
         'finalDamage': true
     };
 
