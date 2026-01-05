@@ -291,12 +291,6 @@ export function equipItem(itemId) {
 // Equipped item stat management
 export function addEquippedStat() {
     const container = document.getElementById('equipped-stats-container');
-    const currentStats = container.children.length;
-
-    if (currentStats >= 3) {
-        alert('Maximum 3 optional stats allowed');
-        return;
-    }
 
     // Find the next available stat ID (handles gaps from removed stats)
     let statId = 1;
