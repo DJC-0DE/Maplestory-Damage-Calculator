@@ -2,7 +2,7 @@
 
 import { artifactPotentialData } from './artifact-potential-data.js';
 import { calculateDamage, formatNumber } from './calculations.js';
-import { getSelectedClass } from './main.js';
+import { getSelectedClass, getStats } from './main.js';
 
 // Map artifact potential stat to base stat properties
 export function mapArtifactStat(statName, value, baseStats) {
@@ -13,6 +13,7 @@ export function mapArtifactStat(statName, value, baseStats) {
 
     switch (cleanStatName) {
         case 'Main Stat %':
+        {
             // Main stat % bonuses are additive with each other
             // Primary Main Stat already includes current main stat % bonuses
             const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
@@ -46,6 +47,7 @@ export function mapArtifactStat(statName, value, baseStats) {
             const statDamageBonus = newStatDamageFromMainStat - currentStatDamageFromMainStat;
             modifiedStats.statDamage += statDamageBonus;
             break;
+        }
         case 'Critical Rate %':
             modifiedStats.critRate += value;
             break;

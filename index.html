@@ -98,9 +98,7 @@
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'base-stats')">Base Stats</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'weapon-levels')">Weapon Levels</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'hero-power')">Hero Power Ability</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'equipment-slots')">Slot Scrolling</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'artifacts')">Artifacts</button>
+                <!-- <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'artifacts')">Artifacts</button> -->
             </div>
 
             <!-- Base Stats Tab -->
@@ -144,6 +142,40 @@
                         </div>
                     </div>
 
+                    <!-- Character Level and Job Tier -->
+                    <div style="margin-bottom: 16px; padding: 12px 0; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: end;">
+                            <div class="input-group">
+                                <label>Character Level</label>
+                                <input type="number" id="character-level" value="0" min="0" max="200" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+                            <div class="input-group">
+                                <label>Job Tier</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <button id="job-tier-3rd" class="job-tier-btn active" onclick="selectJobTier('3rd')">
+                                        3rd Job
+                                    </button>
+                                    <button id="job-tier-4th" class="job-tier-btn" onclick="selectJobTier('4th')">
+                                        4th Job
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="input-group" style="display: none;">
+                                <label>Skill Coefficient (%)</label>
+                                <input type="text" id="skill-coefficient" value="0.00" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sub-tabs for Stats and Skill Mastery -->
+                    <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                        <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('character-stats')">Stats</button>
+                        <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-mastery')">Skill Mastery</button>
+                        <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-details')">Skill Details</button>
+                    </div>
+
+                    <!-- Character Stats Sub-tab -->
+                    <div id="base-stats-character-stats" class="base-stats-subtab active">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                         <div class="input-group">
                             <label>Attack</label>
@@ -214,25 +246,32 @@
                         <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
                         </div>
                         <div class="input-group">
+                            <label>1st Job Skill Level</label>
+                            <input type="number" id="skill-level-1st-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>2nd Job Skill Level</label>
+                            <input type="number" id="skill-level-2nd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>3rd Job Skill Level</label>
+                            <input type="number" id="skill-level-3rd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>4th Job Skill Level</label>
+                            <input type="number" id="skill-level-4th-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
+                        </div>
+                        <div class="input-group" style="display: none;">
                             <label>Skill Coefficient (%) <span class="info-icon" role="img" aria-label="Info"
                                     onclick="openHelpSidebar('skill-coeff')">?</span></label>
-                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
+                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
                         </div>
                         <div class="input-group">
                             <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
                                     onclick="openHelpSidebar('def-pen')">?</span></label>
                             <input type="number" step="0.1" id="def-pen-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus (%) <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('skill-mastery')">?</span></label>
-                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus - Boss Only (%) <span class="info-icon" role="img"
-                                    aria-label="Info"
-                                    onclick="openHelpSidebar('skill-mastery-boss')">?</span></label>
-                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
                         </div>
                         <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
                         </div>
@@ -271,6 +310,243 @@
                             </select>
                         </div>
                     </div>
+                    </div>
+                    <!-- End Character Stats Sub-tab -->
+
+                    <!-- Skill Mastery Sub-tab -->
+                    <div id="base-stats-skill-mastery" class="base-stats-subtab" style="display: none;">
+                        <div class="input-group" style="grid-column: 1 / -1;">
+                            <label>Skill Mastery Bonus <span class="info-icon" role="img" aria-label="Info"
+                                    onclick="openHelpSidebar('skill-mastery')">?</span></label>
+
+                            <!-- 3rd Job Mastery Table -->
+                            <div id="mastery-table-3rd" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>64</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-64" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-64">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>68</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-68" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-68">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>72</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-72" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-72">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>76</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-76" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-76">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>80</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-80" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-80">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>84</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-84" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-84">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>88</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-88" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-88">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>92</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-92" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-92">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-3rd-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-3rd-boss-total">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4th Job Mastery Table -->
+                            <div id="mastery-table-4th" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px; display: none;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>102</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-102" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-102">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>106</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-106" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-106">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>111</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-111" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-111">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>116</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-116" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-116">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>120</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-120" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-120">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>124</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-124" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-124">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>128</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-128" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-128">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>132</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-132" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-132">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-4th-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-4th-boss-total">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="skill-mastery-base" value="0">
+                            <input type="hidden" id="skill-mastery-boss-base" value="0">
+                        </div>
+                    </div>
+                    <!-- End Skill Mastery Sub-tab -->
+
+                    <!-- Skill Details Sub-tab -->
+                    <div id="base-stats-skill-details" class="base-stats-subtab" style="display: none;">
+                        <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                            <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                                <strong style="color: var(--accent-primary);">Instructions:</strong> Click on a skill to view its description with calculated values based on your character level.
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 20px;">
+                            <!-- Left Panel: Compact Skill Icons -->
+                            <div style="background: var(--background); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
+                                <!-- Skills -->
+                                <div style="margin-bottom: 15px;">
+                                    <div style="color: var(--accent-primary); font-size: 0.85em; font-weight: 600; margin-bottom: 8px; text-align: center;">Skills</div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; max-width: 300px;">
+                                            <div id="skill-grid-skills-2nd" style="display: contents;"></div>
+                                            <div id="skill-grid-skills-3rd" style="display: contents;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Passives -->
+                                <div>
+                                    <div style="color: var(--accent-primary); font-size: 0.85em; font-weight: 600; margin-bottom: 8px; text-align: center;">Passives</div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; max-width: 300px;">
+                                            <div id="skill-grid-passives-2nd" style="display: contents;"></div>
+                                            <div id="skill-grid-passives-3rd" style="display: contents;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Panel: Skill Description -->
+                            <div id="skill-description-panel" style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+                                <div style="text-align: center; color: var(--text-secondary); padding: 40px 20px;">
+                                    Select a skill to view its details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Skill Details Sub-tab -->
+
                 </div>
             </div>
 
@@ -369,34 +645,6 @@
                                 style="font-size: 1.6em; font-weight: 700; color: var(--text-primary);">0%</div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Hero Power Ability Tab -->
-            <div id="setup-hero-power" class="tab-content">
-                <div id="hero-power-presets-container">
-                    <!-- Presets will be generated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Equipment Slots Tab -->
-            <div id="setup-equipment-slots" class="tab-content">
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
-                    <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
-                        <strong style="color: var(--accent-primary);">Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot.
-                    </div>
-                </div>
-                <div id="equipment-slots-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Slot cards generated by JavaScript -->
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(88, 86, 214, 0.1)); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 16px var(--shadow);">
-                        <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 8px; font-weight: 500;">Total DPS Gain from All Slots</div>
-                        <div style="color: var(--accent-primary); font-size: 2em; font-weight: 700;">
-                            <span id="total-slots-dps">0%</span>
-                        </div>
-                    </div>
-                    <button class="calculate-btn" onclick="calculateEquipmentSlotDPS()" style="max-width: 400px; margin: 0 auto;">Calculate Slot DPS</button>
                 </div>
             </div>
 
@@ -511,21 +759,29 @@
             <!-- Inner Ability Analysis Tab -->
             <div id="analysis-inner-ability" class="tab-content">
                 <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
-                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
+                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('my-ability-pages')">My Ability Pages</button>
+                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
                         Comparison</button>
                     <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical
                         Best</button>
                 </div>
 
+                <!-- My Ability Pages Sub-Tab -->
+                <div id="inner-ability-my-ability-pages" class="inner-ability-subtab active">
+                    <div id="hero-power-presets-container">
+                        <!-- Presets will be generated by JavaScript -->
+                    </div>
+                </div>
+
                 <!-- Preset Comparison Sub-Tab -->
-                <div id="inner-ability-preset-comparison" class="inner-ability-subtab active">
+                <div id="inner-ability-preset-comparison" class="inner-ability-subtab" style="display: none;">
                     <div id="preset-comparison-container">
                         <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
 
                 <!-- Theoretical Best Sub-Tab -->
-                <div id="inner-ability-theoretical-best" class="inner-ability-subtab">
+                <div id="inner-ability-theoretical-best" class="inner-ability-subtab" style="display: none;">
                     <div id="theoretical-best-container">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -541,51 +797,81 @@
 
             <!-- Scroll Optimizer Tab -->
             <div id="analysis-scroll-optimizer" class="tab-content">
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
-                    <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
-                        <strong style="color: var(--accent-primary);">Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
+                <!-- Sub-tabs for Scrolling -->
+                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('my-slot-performance')">My Slot Performance</button>
+                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('simulation')">Simulation</button>
+                </div>
+
+                <!-- My Slot Performance Sub-Tab -->
+                <div id="scrolling-my-slot-performance" class="scrolling-subtab active">
+                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                        <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                            <strong style="color: var(--accent-primary);">Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot.
+                        </div>
+                    </div>
+                    <div id="equipment-slots-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Slot cards generated by JavaScript -->
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(88, 86, 214, 0.1)); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 16px var(--shadow);">
+                            <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 8px; font-weight: 500;">Total DPS Gain from All Slots</div>
+                            <div style="color: var(--accent-primary); font-size: 2em; font-weight: 700;">
+                                <span id="total-slots-dps">0%</span>
+                            </div>
+                        </div>
+                        <button class="calculate-btn" onclick="calculateEquipmentSlotDPS()" style="max-width: 400px; margin: 0 auto;">Calculate Slot DPS</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div class="input-group">
-                        <label>Spell Trace Budget</label>
-                        <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
+                <!-- Simulation Sub-Tab -->
+                <div id="scrolling-simulation" class="scrolling-subtab" style="display: none;">
+                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                        <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                            <strong style="color: var(--accent-primary);">Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Number of Simulations</label>
-                        <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
-                    </div>
-                </div>
 
-                <div style="background: rgba(0, 122, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                    <label style="font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-primary);">Scroll Level</label>
-                    <div style="display: flex; gap: 20px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
-                            <input type="radio" name="scroll-level" value="65" checked onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
-                            <span style="color: var(--text-primary);">Level 65 Scrolls</span>
-                        </label>
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
-                            <input type="radio" name="scroll-level" value="85" onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
-                            <span style="color: var(--text-primary);">Level 85 Scrolls</span>
-                        </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div class="input-group">
+                            <label>Spell Trace Budget</label>
+                            <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Simulations</label>
+                            <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
+                        </div>
                     </div>
-                    <div id="scroll-level-info" style="margin-top: 12px; padding: 10px; background: var(--background); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;">
-                        <!-- Info will be populated by JavaScript -->
+
+                    <div style="background: rgba(0, 122, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <label style="font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-primary);">Scroll Level</label>
+                        <div style="display: flex; gap: 20px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                                <input type="radio" name="scroll-level" value="65" checked onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                                <span style="color: var(--text-primary);">Level 65 Scrolls</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                                <input type="radio" name="scroll-level" value="85" onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                                <span style="color: var(--text-primary);">Level 85 Scrolls</span>
+                            </label>
+                        </div>
+                        <div id="scroll-level-info" style="margin-top: 12px; padding: 10px; background: var(--background); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;">
+                            <!-- Info will be populated by JavaScript -->
+                        </div>
                     </div>
-                </div>
 
-                <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
+                    <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
 
-                <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
-                    <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
-                        <div id="scroll-progress-bar" style="height: 100%; background: var(--accent-primary); transition: width 0.3s; width: 0%;"></div>
+                    <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
+                        <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                            <div id="scroll-progress-bar" style="height: 100%; background: var(--accent-primary); transition: width 0.3s; width: 0%;"></div>
+                        </div>
+                        <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
                     </div>
-                    <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
-                </div>
 
-                <div id="scroll-results-container" style="margin-top: 20px;">
-                    <!-- Results will be populated by JavaScript -->
+                    <div id="scroll-results-container" style="margin-top: 20px;">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
 

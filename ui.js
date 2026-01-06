@@ -1,8 +1,10 @@
 import { rarities, tiers, comparisonItemCount, equippedStatCount, setComparisonItemCount, setEquippedStatCount, weaponBaseAttackEquipped, rarityColors, availableStats } from './constants.js';
-import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain, calculateInventoryBonus, formatNumber, calculateDamage, calculateStatWeights } from './calculations.js';
+import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain, formatNumber, calculateDamage } from './calculations.js';
 import { saveToLocalStorage } from './storage.js';
 import { innerAbilityStats } from './inner-ability-data.js';
-import { getSelectedClass } from './main.js';
+import { getSelectedClass, getStats, calculate, getWeaponAttackBonus, getItemStats } from './main.js';
+import { renderTheoreticalBest, renderPresetComparison } from './inner-ability.js';
+import { renderArtifactPotential } from './artifact-potential.js';
 
 // Tab switching function
 export function switchTab(group, tabName) {
@@ -37,6 +39,32 @@ export function switchTab(group, tabName) {
     if (group === 'analysis' && tabName === 'artifact-potential') {
         renderArtifactPotential();
     }
+}
+
+// Scrolling sub-tab switching function
+export function switchScrollingSubTab(tabName) {
+    // Hide all scrolling sub-tabs
+    const subtabs = document.querySelectorAll('.scrolling-subtab');
+    subtabs.forEach(subtab => {
+        subtab.style.display = 'none';
+        subtab.classList.remove('active');
+    });
+
+    // Remove active class from all scrolling sub-tab buttons
+    const buttons = event.currentTarget.parentElement.querySelectorAll('.tab-button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show the selected sub-tab
+    const selectedSubtab = document.getElementById(`scrolling-${tabName}`);
+    if (selectedSubtab) {
+        selectedSubtab.style.display = 'block';
+        selectedSubtab.classList.add('active');
+    }
+
+    // Add active class to clicked button
+    event.currentTarget.classList.add('active');
 }
 
 // Theme toggle functions
@@ -793,14 +821,10 @@ export function updateWeaponBonuses() {
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
             const levelInput = document.getElementById(`level-${rarity}-${tier}`);
-            const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
             const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
 
             if (levelInput) {
                 const level = parseInt(levelInput.value) || 0;
-                const stars = starsInput?.value !== undefined && starsInput?.value !== ''
-                    ? parseInt(starsInput.value)
-                    : 5;
                 const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
 
                 totalInventory += inventoryAttack;
@@ -1106,7 +1130,6 @@ export function calculateCurrencyUpgrades() {
     // Calculate new DPS with new weapon attack bonus
     const newStats = { ...baseStats };
     const currentWeaponBonus = getWeaponAttackBonus();
-    const weaponBonusDiff = newWeaponAttackBonus - currentWeaponBonus;
 
     // Apply the weapon attack bonus difference to attack
     // Weapon attack bonus is a % that multiplies base attack
@@ -1188,7 +1211,6 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
     const normalResults = calculateDamage(stats, 'normal');
 
     const borderColor = isEquipped ? '#10b981' : '#2563eb';
-    const darkBorderColor = isEquipped ? '#34d399' : '#60a5fa';
     const bgGradient = isEquipped
         ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(37, 99, 235, 0.05))'
         : 'linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(88, 86, 214, 0.05))';
@@ -1589,7 +1611,7 @@ export function initializeEquipmentSlots() {
     if (!container) return;
 
     let html = '';
-    slots.forEach((slotName, index) => {
+    slots.forEach((slotName) => {
         const slotId = slotName.toLowerCase().replace(/\s+/g, '-');
         html += `
             <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--accent-primary); border-radius: 12px; padding: 15px; box-shadow: 0 4px 16px var(--shadow); min-width: 0;">
@@ -1780,19 +1802,15 @@ const helpContent = {
     'skill-mastery': {
         title: 'Skill Mastery Bonus',
         content: `
-            <h4>What is Skill Mastery Bonus?</h4>
-            <p>Skill Mastery Bonus represents the total damage increase from passive skills that enhance your Basic Attack.</p>
+            <h4>Skill Mastery - All Monsters</h4>
+            <p>Check the boxes for mastery bonuses that apply to all monsters you've unlocked.</p>
 
-            <h4>How to Calculate</h4>
-            <p>You must manually add up all Mastery skill bonuses that affect your Basic Attack damage:</p>
-            <ul>
-                <li>Check your passive skill tree</li>
-                <li>Add up all percentages that say "increases Basic Attack damage"</li>
-                <li>Enter the total sum here</li>
-            </ul>
+            <img src="media/tutorial/mastery.png" alt="Skill Mastery - All Monsters Example" style="width: 100%; max-width: 300px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
 
-            <h4>Example</h4>
-            <p>If you have three passives: +8%, +7%, and +6% to Basic Attack, your Skill Mastery Bonus would be 21%.</p>
+            <h4>Skill Mastery - Boss Only</h4>
+            <p>Check the boxes for mastery bonuses that only apply when fighting bosses.</p>
+
+            <img src="media/tutorial/mastery-boss.png" alt="Skill Mastery - Boss Only Example" style="width: 100%; max-width: 300px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
         `
     },
     'skill-mastery-boss': {

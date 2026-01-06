@@ -3,7 +3,6 @@
 
 import { artifactsData } from './artifacts-data.js';
 import { artifactPotentialData } from './artifact-potential-data.js';
-import { calculateDamage, formatNumber } from './calculations.js';
 
 // Global state
 let currentArtifactPreset = 1;
@@ -528,7 +527,6 @@ export function loadArtifactsFromLocalStorage() {
                         }
                     }
                 }
-                console.log('Migrated artifact data from old format to new library format');
             }
 
             // Final cleanup: ensure all slots are either valid strings or null

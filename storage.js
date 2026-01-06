@@ -1,5 +1,9 @@
-import { comparisonItemCount, equippedStatCount, setComparisonItemCount, setEquippedStatCount, rarities, tiers } from './constants.js';
+import { comparisonItemCount, equippedStatCount, rarities, tiers } from './constants.js';
 import { addEquippedStat, addComparisonItem, addComparisonItemStat, handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from './ui.js';
+import { calculate } from './main.js';
+import { renderTheoreticalBest, renderPresetComparison } from './inner-ability.js';
+import { renderArtifactPotential } from './artifact-potential.js';
+import { clearCubeRankingsCache } from './cube-potential.js';
 
 // Flag to prevent saving during load
 let isLoading = false;
@@ -10,14 +14,14 @@ const BASE_SETUP_FIELDS = [
     'damage-amp', 'attack-speed', 'def-pen', 'boss-damage',
     'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
     'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat', 'final-damage',
-    'target-stage', 'defense', 'main-stat-pct'
+    'target-stage', 'defense', 'main-stat-pct',
+    'skill-level-1st', 'skill-level-2nd', 'skill-level-3rd', 'skill-level-4th'
 ];
 
 // Save all data to localStorage
 export function saveToLocalStorage() {
     // Don't save if we're currently loading data
     if (isLoading) {
-        console.log('[SAVE] Skipping save - currently loading');
         return;
     }
 
@@ -40,14 +44,17 @@ export function saveToLocalStorage() {
         }
     });
 
+    // Save Character Level (does not have -base suffix)
+    const characterLevelElement = document.getElementById('character-level');
+    if (characterLevelElement) {
+        data.baseSetup['character-level'] = characterLevelElement.value;
+    }
+
     // Save content type and subcategory
     const contentTypeElements = document.querySelectorAll('.content-type-selector.selected');
     if (contentTypeElements.length > 0) {
         const selectedId = contentTypeElements[0].id;
         data.contentType = selectedId.replace('content-', '');
-        console.log('[SAVE] Saving content type:', data.contentType);
-    } else {
-        console.log('[SAVE] No content type selected element found!');
     }
 
     const subcategorySelect = document.getElementById('target-subcategory');
@@ -59,7 +66,6 @@ export function saveToLocalStorage() {
     const stageSelect = document.getElementById('target-stage-base');
     if (stageSelect && stageSelect.style.display !== 'none' && stageSelect.value) {
         data.selectedStage = stageSelect.value;
-        console.log('[SAVE] Saving selected stage:', data.selectedStage);
     }
 
     // Save Equipped Item
@@ -140,6 +146,50 @@ export function saveToLocalStorage() {
         };
     });
 
+    // Save Mastery Bonus Checkboxes for both 3rd and 4th job
+    data.masteryBonuses = {
+        '3rd': {
+            all: {},
+            boss: {}
+        },
+        '4th': {
+            all: {},
+            boss: {}
+        }
+    };
+
+    // Save 3rd Job "All Monsters" checkboxes
+    [64, 68, 76, 80, 88, 92].forEach(level => {
+        const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
+        if (checkbox) {
+            data.masteryBonuses['3rd'].all[level] = checkbox.checked;
+        }
+    });
+
+    // Save 3rd Job "Boss Only" checkboxes
+    [72, 84].forEach(level => {
+        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
+        if (checkbox) {
+            data.masteryBonuses['3rd'].boss[level] = checkbox.checked;
+        }
+    });
+
+    // Save 4th Job "All Monsters" checkboxes
+    [102, 106, 116, 120, 128, 132].forEach(level => {
+        const checkbox = document.getElementById(`mastery-4th-all-${level}`);
+        if (checkbox) {
+            data.masteryBonuses['4th'].all[level] = checkbox.checked;
+        }
+    });
+
+    // Save 4th Job "Boss Only" checkboxes
+    [111, 124].forEach(level => {
+        const checkbox = document.getElementById(`mastery-4th-boss-${level}`);
+        if (checkbox) {
+            data.masteryBonuses['4th'].boss[level] = checkbox.checked;
+        }
+    });
+
     localStorage.setItem('damageCalculatorData', JSON.stringify(data));
 }
 
@@ -184,6 +234,12 @@ export function loadFromLocalStorage() {
                     element.value = data.baseSetup[field];
                 }
             });
+
+            // Load Character Level (does not have -base suffix)
+            const characterLevelElement = document.getElementById('character-level');
+            if (characterLevelElement && data.baseSetup['character-level'] !== undefined) {
+                characterLevelElement.value = data.baseSetup['character-level'];
+            }
         }
 
         // Load Equipped Item
@@ -288,6 +344,76 @@ export function loadFromLocalStorage() {
                     if (damageAmpInput) damageAmpInput.value = data.equipmentSlots[slotId].damageAmp || 0;
                 }
             });
+        }
+
+        // Load Mastery Bonus Checkboxes
+        if (data.masteryBonuses) {
+            // Check if data is in new format (with 3rd/4th tier separation)
+            if (data.masteryBonuses['3rd'] && data.masteryBonuses['4th']) {
+                // Load 3rd Job "All Monsters" checkboxes
+                if (data.masteryBonuses['3rd'].all) {
+                    [64, 68, 76, 80, 88, 92].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
+                        if (checkbox && data.masteryBonuses['3rd'].all[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses['3rd'].all[level];
+                        }
+                    });
+                }
+
+                // Load 3rd Job "Boss Only" checkboxes
+                if (data.masteryBonuses['3rd'].boss) {
+                    [72, 84].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
+                        if (checkbox && data.masteryBonuses['3rd'].boss[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses['3rd'].boss[level];
+                        }
+                    });
+                }
+
+                // Load 4th Job "All Monsters" checkboxes
+                if (data.masteryBonuses['4th'].all) {
+                    [102, 106, 116, 120, 128, 132].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-4th-all-${level}`);
+                        if (checkbox && data.masteryBonuses['4th'].all[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses['4th'].all[level];
+                        }
+                    });
+                }
+
+                // Load 4th Job "Boss Only" checkboxes
+                if (data.masteryBonuses['4th'].boss) {
+                    [111, 124].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-4th-boss-${level}`);
+                        if (checkbox && data.masteryBonuses['4th'].boss[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses['4th'].boss[level];
+                        }
+                    });
+                }
+            } else {
+                // Legacy format - migrate old data to 3rd job tier
+                if (data.masteryBonuses.all) {
+                    [64, 68, 76, 80, 88, 92].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
+                        if (checkbox && data.masteryBonuses.all[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses.all[level];
+                        }
+                    });
+                }
+
+                if (data.masteryBonuses.boss) {
+                    [72, 84].forEach(level => {
+                        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
+                        if (checkbox && data.masteryBonuses.boss[level] !== undefined) {
+                            checkbox.checked = data.masteryBonuses.boss[level];
+                        }
+                    });
+                }
+            }
+
+            // Update the mastery bonus totals and hidden inputs
+            if (typeof window.updateMasteryBonuses === 'function') {
+                window.updateMasteryBonuses();
+            }
         }
 
         return true;
@@ -415,6 +541,15 @@ export function attachSaveListeners() {
             });
         }
     });
+
+    // Attach to character level (does not have -base suffix)
+    const characterLevelElement = document.getElementById('character-level');
+    if (characterLevelElement) {
+        characterLevelElement.addEventListener('input', () => {
+            saveToLocalStorage();
+            updateAnalysisTabs();
+        });
+    }
 
     // Attach to equipped item name and attack
     const equippedName = document.getElementById('equipped-name');

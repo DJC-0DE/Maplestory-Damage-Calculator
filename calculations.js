@@ -1,5 +1,5 @@
-import { weaponRatesPerLevel, weaponBaseAttackEquipped, rarities, tiers } from './constants.js';
-import { getSelectedStageDefense } from './main.js';
+import { weaponRatesPerLevel, weaponBaseAttackEquipped } from './constants.js';
+import { getSelectedStageDefense, getStats, getWeaponAttackBonus, getSelectedClass } from './main.js';
 
 // Number formatting utility
 export function formatNumber(num) {
@@ -327,7 +327,7 @@ export function calculateStatWeights(setup, stats) {
     const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
     const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
     // Use global selectedClass variable (set by selectClass() function)
-    const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
+    const currentSelectedClass = typeof selectedClass !== 'undefined' ? getSelectedClass() : null;
 
     // Flat attack increases
     const attackIncreases = [500, 1000, 2500, 5000, 10000, 15000];
@@ -454,7 +454,6 @@ export function calculateStatWeights(setup, stats) {
         if (multiplicativeStats[stat.key]) {
             labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive.">ℹ️</span>`;
         } else if (diminishingReturnStats[stat.key]) {
-            const info = diminishingReturnStats[stat.key];
             labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative, but have diminishing returns.">ℹ️</span>`;
         }
  
@@ -621,7 +620,7 @@ export function generateStatChartData(setup, statKey, statLabel, isFlat) {
                 const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
                 const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
                 const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
-                const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
+                const currentSelectedClass = typeof selectedClass !== 'undefined' ? getSelectedClass() : null;
 
                 const prevCumulativeIncrease = cumulativeIncrease - stepIncrease;
                 const statDamageGain = calculateMainStatPercentGain(

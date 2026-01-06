@@ -29,7 +29,7 @@ export const availableStats = [
     { value: 'defense', label: 'Defense (DK: 12.7% → Main Stat)' },
     { value: 'crit-rate', label: 'Critical Rate (%)' },
     { value: 'crit-damage', label: 'Critical Damage (%)' },
-    { value: 'skill-level', label: '3rd Job Skill Level (1 lvl = 0.3% Skill Coeff)' },
+    { value: 'skill-level', label: '3rd Job Skill Level' },
     { value: 'normal-damage', label: 'Normal Monster Damage (%)' },
     { value: 'boss-damage', label: 'Boss Monster Damage (%)' },
     { value: 'damage', label: 'Damage (%)' }

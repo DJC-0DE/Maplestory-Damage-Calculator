@@ -1,9 +1,15 @@
 // Main Entry Point - ES6 Module
 // This is the single entry point that orchestrates the entire application
 
-import { rarities, tiers, stageDefenses, availableStats, comparisonItemCount, setComparisonItemCount } from './constants.js';
-import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, formatNumber, toggleStatChart, calculateStatEquivalency } from './calculations.js';
+import { rarities, tiers, stageDefenses, comparisonItemCount } from './constants.js';
+import { calculateDamage, calculateWeaponAttacks, calculateStatWeights, toggleStatChart, calculateStatEquivalency } from './calculations.js';
 import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData, updateAnalysisTabs, getSavedContentTypeData } from './storage.js';
+import {
+    calculate3rdJobSkillCoefficient,
+    calculate4thJobSkillCoefficient,
+    getAllDarkKnightSkills,
+    DARK_KNIGHT_SKILLS
+} from './skill-coefficient.js';
 import {
     loadTheme,
     initializeHeroPowerPresets,
@@ -16,6 +22,7 @@ import {
     calculateEquipmentSlotDPS,
     displayResults,
     switchTab,
+    switchScrollingSubTab,
     toggleTheme,
     unequipItem,
     equipItem,
@@ -30,7 +37,6 @@ import {
     resetStarPreview,
     handleEquippedCheckboxChange,
     handleWeaponLevelChange,
-    updateUpgradePriorityChain,
     calculateCurrencyUpgrades,
     toggleSubDetails,
     toggleDetails,
@@ -40,20 +46,14 @@ import {
     closeHelpSidebar,
     scrollToSection
 } from './ui.js';
-import { initializeInnerAbilityAnalysis, switchInnerAbilityTab, toggleLineBreakdown, sortPresetTable, sortTheoreticalTable, renderPresetComparison, renderTheoreticalBest } from './inner-ability.js';
-import { initializeArtifactPotential, renderArtifactPotential, sortArtifactTable } from './artifact-potential.js';
+import { initializeInnerAbilityAnalysis, switchInnerAbilityTab, toggleLineBreakdown, sortPresetTable, sortTheoreticalTable } from './inner-ability.js';
+import { initializeArtifactPotential, sortArtifactTable } from './artifact-potential.js';
 import { runScrollSimulation, switchScrollStrategyTab, updateScrollLevelInfo } from './scroll-optimizer.js';
 import { initializeArtifacts, switchArtifactPreset, selectArtifactSlot, previewArtifact, equipPreviewedArtifact, cancelPreview, setArtifactStars, setArtifactPotential, clearArtifactSlot } from './artifacts.js';
 import {
     initializeCubePotential,
     switchPotentialType,
     selectCubeSlot,
-    calculateComparison,
-    displayOrCalculateRankings,
-    displayAllSlotsSummary,
-    saveCubePotentialData,
-    loadCubePotentialData,
-    clearCubeRankingsCache,
     updateClassWarning,
     runCubeSimulation
 } from './cube-potential.js';
@@ -419,8 +419,10 @@ export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     newStats.critDamage -= equippedItem.critDamage;
     newStats.critDamage += comparisonItem.critDamage;
 
-    newStats.skillCoeff -= equippedItem.skillLevel * 0.3;
-    newStats.skillCoeff += comparisonItem.skillLevel * 0.3;
+    // Skill coefficient is already handled by equip/unequip buttons modifying skill-coeff-base
+    // So we don't need to apply it here in the comparison
+    // newStats.skillCoeff -= equippedItem.skillLevel * 0.3;
+    // newStats.skillCoeff += comparisonItem.skillLevel * 0.3;
 
     newStats.normalDamage -= equippedItem.normalDamage;
     newStats.normalDamage += comparisonItem.normalDamage;
@@ -552,6 +554,373 @@ export function selectClass(className) {
     }
 }
 
+// Job Tier Selection
+let selectedJobTier = '3rd';
+
+export function getSelectedJobTier() {
+    return selectedJobTier;
+}
+
+export function selectJobTier(tier) {
+    document.querySelectorAll('.job-tier-btn').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    const tierElement = document.getElementById(`job-tier-${tier}`);
+    if (tierElement) {
+        tierElement.classList.add('active');
+        selectedJobTier = tier;
+
+        // Show/hide appropriate mastery table
+        const mastery3rdTable = document.getElementById('mastery-table-3rd');
+        const mastery4thTable = document.getElementById('mastery-table-4th');
+
+        if (mastery3rdTable && mastery4thTable) {
+            if (tier === '3rd') {
+                mastery3rdTable.style.display = 'block';
+                mastery4thTable.style.display = 'none';
+            } else if (tier === '4th') {
+                mastery3rdTable.style.display = 'none';
+                mastery4thTable.style.display = 'block';
+            }
+        }
+
+        // Update skill coefficient for the new tier
+        updateSkillCoefficient();
+
+        // Update mastery bonuses for the new tier
+        updateMasteryBonuses();
+
+        try {
+            localStorage.setItem('selectedJobTier', tier);
+        } catch (error) {
+            console.error('Error saving selected job tier:', error);
+        }
+
+        saveToLocalStorage();
+        updateAnalysisTabs();
+    }
+}
+
+export function updateSkillCoefficient() {
+    const levelInput = document.getElementById('character-level');
+    const coefficientInput = document.getElementById('skill-coeff-base');
+
+    if (!levelInput || !coefficientInput) return;
+
+    const characterLevel = parseInt(levelInput.value) || 0;
+    const jobTier = getSelectedJobTier();
+
+    // Get the skill level for the selected job tier
+    let skillLevel = 0;
+    if (jobTier === '4th') {
+        const skillLevelInput = document.getElementById('skill-level-4th-base');
+        skillLevel = parseInt(skillLevelInput?.value) || 0;
+    } else {
+        const skillLevelInput = document.getElementById('skill-level-3rd-base');
+        skillLevel = parseInt(skillLevelInput?.value) || 0;
+    }
+
+    let coefficient;
+    if (jobTier === '4th') {
+        coefficient = calculate4thJobSkillCoefficient(characterLevel, skillLevel);
+    } else {
+        coefficient = calculate3rdJobSkillCoefficient(characterLevel, skillLevel);
+    }
+
+    coefficientInput.value = coefficient.toFixed(2);
+}
+
+export function updateMasteryBonuses() {
+    // Get current job tier
+    const currentTier = getSelectedJobTier();
+
+    // Define mastery bonuses for each tier and level
+    const masteryBonuses = {
+        '3rd': {
+            all: {
+                64: 10,
+                68: 11,
+                76: 12,
+                80: 13,
+                88: 14,
+                92: 15
+            },
+            boss: {
+                72: 10,
+                84: 10
+            }
+        },
+        '4th': {
+            all: {
+                102: 10,
+                106: 11,
+                116: 12,
+                120: 13,
+                128: 14,
+                132: 15
+            },
+            boss: {
+                111: 10,
+                124: 10
+            }
+        }
+    };
+
+    // Calculate totals for the current tier
+    let allTotal = 0;
+    let bossTotal = 0;
+
+    const tierData = masteryBonuses[currentTier];
+
+    // Sum up "All Monsters" bonuses
+    for (const [level, bonus] of Object.entries(tierData.all)) {
+        const checkbox = document.getElementById(`mastery-${currentTier}-all-${level}`);
+        if (checkbox && checkbox.checked) {
+            allTotal += bonus;
+        }
+    }
+
+    // Sum up "Boss Only" bonuses
+    for (const [level, bonus] of Object.entries(tierData.boss)) {
+        const checkbox = document.getElementById(`mastery-${currentTier}-boss-${level}`);
+        if (checkbox && checkbox.checked) {
+            bossTotal += bonus;
+        }
+    }
+
+    // Update display totals for the current tier
+    const allTotalDisplay = document.getElementById(`mastery-${currentTier}-all-total`);
+    const bossTotalDisplay = document.getElementById(`mastery-${currentTier}-boss-total`);
+
+    if (allTotalDisplay) {
+        allTotalDisplay.textContent = `${allTotal}%`;
+    }
+    if (bossTotalDisplay) {
+        bossTotalDisplay.textContent = `${bossTotal}%`;
+    }
+
+    // Update hidden inputs that are used by the calculation engine
+    const skillMasteryInput = document.getElementById('skill-mastery-base');
+    const skillMasteryBossInput = document.getElementById('skill-mastery-boss-base');
+
+    if (skillMasteryInput) {
+        skillMasteryInput.value = allTotal;
+    }
+    if (skillMasteryBossInput) {
+        skillMasteryBossInput.value = bossTotal;
+    }
+
+    // Save to localStorage and recalculate
+    saveToLocalStorage();
+    updateAnalysisTabs();
+}
+
+export function switchBaseStatsSubTab(subTabName) {
+    // Hide all sub-tabs
+    const subTabs = document.querySelectorAll('.base-stats-subtab');
+    subTabs.forEach(tab => {
+        tab.style.display = 'none';
+    });
+
+    // Show the selected sub-tab
+    const selectedTab = document.getElementById(`base-stats-${subTabName}`);
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
+
+    // Update button states - get the parent container's buttons
+    const buttons = document.querySelectorAll('#setup-base-stats .tab-button');
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Find and activate the clicked button
+    event.target.classList.add('active');
+
+    // If switching to skill details, populate the skills
+    if (subTabName === 'skill-details') {
+        populateSkillDetails();
+    }
+}
+
+// Generate SKILL_DATA from DARK_KNIGHT_SKILLS (consolidated in skill-coefficient.js)
+const SKILL_DATA = (() => {
+    const allSkills = Object.values(DARK_KNIGHT_SKILLS);
+
+    return {
+        skills: {
+            secondJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'secondJob'),
+            thirdJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'thirdJob')
+        },
+        passives: {
+            secondJob: allSkills.filter(s => s.isPassive && s.jobTier === 'secondJob'),
+            thirdJob: allSkills.filter(s => s.isPassive && s.jobTier === 'thirdJob')
+        }
+    };
+})();
+
+function populateSkillDetails() {
+    const characterLevel = parseInt(document.getElementById('character-level').value) || 0;
+
+    // Get skill levels for each job tier
+    const skillLevel2nd = parseInt(document.getElementById('skill-level-2nd-base')?.value) || 0;
+    const skillLevel3rd = parseInt(document.getElementById('skill-level-3rd-base')?.value) || 0;
+
+    // Calculate effective levels for each tier using the same logic as coefficient calculation
+    // 2nd Job: min(characterLevel * 3, 90) + skillLevel
+    const baseInputLevel2nd = Math.min(characterLevel * 3, 90);
+    const effectiveLevel2nd = baseInputLevel2nd + skillLevel2nd;
+
+    // 3rd Job: min((characterLevel - 60) * 3, 120) + skillLevel
+    const baseInputLevel3rd = Math.max(0, Math.min((characterLevel - 60) * 3, 120));
+    const effectiveLevel3rd = baseInputLevel3rd + skillLevel3rd;
+
+    // Get skills for both tiers (2nd uses its effective level, 3rd uses its effective level)
+    const skills2nd = getAllDarkKnightSkills(effectiveLevel2nd);
+    const skills3rd = getAllDarkKnightSkills(effectiveLevel3rd);
+
+    // Store both for use in showSkillDescription
+    window.currentSkillData = {
+        skills2nd,
+        skills3rd,
+        effectiveLevel2nd,
+        effectiveLevel3rd,
+        baseInputLevel2nd,
+        baseInputLevel3rd,
+        characterLevel,
+        skillLevel2nd,
+        skillLevel3rd
+    };
+
+    // Helper function to render skill cards (compact icon-only version)
+    const renderSkillCard = (skill, category, jobTier) => {
+        return `
+            <div class="skill-card" onclick="showSkillDescription('${skill.key}', '${category}', '${jobTier}')"
+                 title="${skill.name}"
+                 style="width: 48px; height: 48px; padding: 4px; cursor: pointer; border-radius: 8px; border: 2px solid var(--border-color); background: var(--background); transition: all 0.2s; display: flex; align-items: center; justify-content: center;"
+                 onmouseover="this.style.borderColor='var(--accent-primary)'; this.style.transform='scale(1.1)'"
+                 onmouseout="this.style.borderColor='var(--border-color)'; this.style.transform='scale(1)'">
+                <img src="${skill.icon}" alt="${skill.name}" style="width: 40px; height: 40px; object-fit: contain;">
+            </div>
+        `;
+    };
+
+    // Populate Skills - 2nd Job
+    const skillsGrid2nd = document.getElementById('skill-grid-skills-2nd');
+    if (skillsGrid2nd) {
+        skillsGrid2nd.innerHTML = SKILL_DATA.skills.secondJob.map(skill =>
+            renderSkillCard(skill, 'skills', 'secondJob')
+        ).join('');
+    }
+
+    // Populate Skills - 3rd Job
+    const skillsGrid3rd = document.getElementById('skill-grid-skills-3rd');
+    if (skillsGrid3rd) {
+        skillsGrid3rd.innerHTML = SKILL_DATA.skills.thirdJob.map(skill =>
+            renderSkillCard(skill, 'skills', 'thirdJob')
+        ).join('');
+    }
+
+    // Populate Passives - 2nd Job
+    const passivesGrid2nd = document.getElementById('skill-grid-passives-2nd');
+    if (passivesGrid2nd) {
+        passivesGrid2nd.innerHTML = SKILL_DATA.passives.secondJob.map(skill =>
+            renderSkillCard(skill, 'passives', 'secondJob')
+        ).join('');
+    }
+
+    // Populate Passives - 3rd Job
+    const passivesGrid3rd = document.getElementById('skill-grid-passives-3rd');
+    if (passivesGrid3rd) {
+        passivesGrid3rd.innerHTML = SKILL_DATA.passives.thirdJob.map(skill =>
+            renderSkillCard(skill, 'passives', 'thirdJob')
+        ).join('');
+    }
+}
+
+export function showSkillDescription(skillKey, category, jobTier) {
+    // Use the stored skill data if available, otherwise recalculate
+    if (!window.currentSkillData) {
+        populateSkillDetails();
+    }
+
+    const { skills2nd, skills3rd, effectiveLevel2nd, effectiveLevel3rd, baseInputLevel2nd, baseInputLevel3rd, characterLevel, skillLevel2nd, skillLevel3rd } = window.currentSkillData;
+
+    // Get the skill data from the appropriate category and job tier
+    const skillDataList = SKILL_DATA[category][jobTier];
+    const skillData = skillDataList.find(s => s.key === skillKey);
+
+    if (!skillData) return;
+
+    // Use the appropriate skill set based on job tier
+    const allSkills = jobTier === 'secondJob' ? skills2nd : skills3rd;
+    const effectiveLevel = jobTier === 'secondJob' ? effectiveLevel2nd : effectiveLevel3rd;
+    const baseInputLevel = jobTier === 'secondJob' ? baseInputLevel2nd : baseInputLevel3rd;
+    const skillLevel = jobTier === 'secondJob' ? skillLevel2nd : skillLevel3rd;
+
+    const skillValues = jobTier === 'secondJob'
+        ? allSkills.secondJobSkills[skillKey]
+        : allSkills.thirdJobSkills[skillKey];
+
+    if (!skillValues) return;
+
+    // Map skill values to effect placeholders
+    const effectsHTML = skillData.effects.map(effect => {
+        let filledEffect = effect;
+
+        // Replace placeholders with actual values
+        Object.keys(skillValues).forEach(key => {
+            if (key !== 'name') {
+                const placeholder = `{${key}}`;
+                if (filledEffect.includes(placeholder)) {
+                    filledEffect = filledEffect.replace(placeholder, skillValues[key]);
+                }
+            }
+        });
+
+        return `<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95em;">
+            ${filledEffect}
+        </div>`;
+    }).join('');
+
+    // Determine the skill type label
+    const categoryLabel = category === 'skills' ? 'Skill' : 'Passive';
+    const jobLabel = jobTier === 'secondJob' ? '2nd Job' : '3rd Job';
+
+    const panel = document.getElementById('skill-description-panel');
+    if (panel) {
+        panel.innerHTML = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="${skillData.icon}" alt="${skillData.name}" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px;">
+                <h3 style="color: var(--accent-primary); font-size: 1.3em; font-weight: 700; margin-bottom: 5px;">
+                    ${skillData.name}
+                </h3>
+                <div style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 5px;">
+                    ${jobLabel} ${categoryLabel}
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.85em;">
+                    ${jobTier === 'secondJob'
+                        ? `Character Level: ${characterLevel} → Input Level: ${baseInputLevel}${skillLevel > 0 ? ` + ${skillLevel} Skill = ${effectiveLevel}` : ''}`
+                        : `Character Level: ${characterLevel} → Input Level: ${baseInputLevel}${skillLevel > 0 ? ` + ${skillLevel} Skill = ${effectiveLevel}` : ''}`
+                    }
+                </div>
+            </div>
+            <div style="background: rgba(0, 122, 255, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                <div style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
+                    ${skillData.description}
+                </div>
+            </div>
+            <div style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                <div style="font-weight: 600; color: var(--accent-primary); margin-bottom: 10px; font-size: 0.95em;">
+                    Effects:
+                </div>
+                ${effectsHTML}
+            </div>
+        `;
+    }
+}
+
 function loadSelectedClass() {
     try {
         const savedClass = localStorage.getItem('selectedClass');
@@ -560,6 +929,17 @@ function loadSelectedClass() {
         }
     } catch (error) {
         console.error('Error loading selected class:', error);
+    }
+}
+
+function loadSelectedJobTier() {
+    try {
+        const savedTier = localStorage.getItem('selectedJobTier');
+        if (savedTier) {
+            selectJobTier(savedTier);
+        }
+    } catch (error) {
+        console.error('Error loading selected job tier:', error);
     }
 }
 
@@ -577,9 +957,7 @@ window.onload = function () {
     // Restore content type AFTER loading data (to avoid overwriting during load)
     if (loaded) {
         const contentTypeData = getSavedContentTypeData();
-        console.log('[LOAD] Retrieved content type data:', contentTypeData);
         if (contentTypeData && contentTypeData.contentType) {
-            console.log('[LOAD] Restoring content type:', contentTypeData.contentType);
             selectContentType(contentTypeData.contentType, true); // Skip save, just restore UI
 
             // Restore subcategory if applicable
@@ -596,11 +974,8 @@ window.onload = function () {
                 const stageSelect = document.getElementById('target-stage-base');
                 if (stageSelect) {
                     stageSelect.value = contentTypeData.selectedStage;
-                    console.log('[LOAD] Restored selected stage:', contentTypeData.selectedStage);
                 }
             }
-        } else {
-            console.log('[LOAD] No content type to restore');
         }
     }
 
@@ -619,10 +994,13 @@ window.onload = function () {
     }
     showDonateNotificationIfNeeded();
     loadSelectedClass();
+    loadSelectedJobTier();
+    updateSkillCoefficient();
 };
 
 // Expose functions to window for HTML onclick handlers
 window.switchTab = switchTab;
+window.switchScrollingSubTab = switchScrollingSubTab;
 window.toggleTheme = toggleTheme;
 window.unequipItem = unequipItem;
 window.equipItem = equipItem;
@@ -634,7 +1012,6 @@ window.addComparisonItem = addComparisonItem;
 window.removeComparisonItem = removeComparisonItem;
 window.addComparisonItemStat = addComparisonItemStat;
 window.removeComparisonItemStat = removeComparisonItemStat;
-window.calculate = calculate;
 window.setWeaponStars = setWeaponStars;
 window.previewStars = previewStars;
 window.resetStarPreview = resetStarPreview;
@@ -669,16 +1046,14 @@ window.switchPotentialType = switchPotentialType;
 window.selectCubeSlot = selectCubeSlot;
 window.runCubeSimulation = runCubeSimulation;
 window.selectClass = selectClass;
+window.selectJobTier = selectJobTier;
+window.updateMasteryBonuses = updateMasteryBonuses;
+window.updateSkillCoefficient = updateSkillCoefficient;
+window.switchBaseStatsSubTab = switchBaseStatsSubTab;
 window.dismissDonateNotification = dismissDonateNotification;
 window.exportData = exportData;
 window.importData = importData;
-window.getStats = getStats;
-window.getItemStats = getItemStats;
-window.getWeaponAttackBonus = getWeaponAttackBonus;
-window.renderPresetComparison = renderPresetComparison;
-window.renderTheoreticalBest = renderTheoreticalBest;
-window.renderArtifactPotential = renderArtifactPotential;
-window.clearCubeRankingsCache = clearCubeRankingsCache;
+window.showSkillDescription = showSkillDescription;
 window.saveToLocalStorage = saveToLocalStorage;
 window.updateAnalysisTabs = updateAnalysisTabs;
 window.calculateStatEquivalency = calculateStatEquivalency;

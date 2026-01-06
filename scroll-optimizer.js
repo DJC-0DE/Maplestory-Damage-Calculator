@@ -2,6 +2,7 @@
 // This module simulates different scrolling strategies and calculates damage gains
 
 import { calculateDamage, formatNumber } from './calculations.js';
+import { getStats, getWeaponAttackBonus } from './main.js';
 
 // Scroll definitions
 const SCROLLS_L65 = {
@@ -198,7 +199,7 @@ export function createL65Strategies() {
             if (slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -207,7 +208,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // 70% Base with 30% on Bonus Slots Only
@@ -219,7 +220,7 @@ export function createL65Strategies() {
             if (slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Slot 10 with 30% (Best bonus slot)
@@ -232,7 +233,7 @@ export function createL65Strategies() {
             if (slot === 1 || slot === 5) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 10 && slotResults.length >= 10) {
                 const slot10 = slotResults[9];
                 if (!slot10.success && !slot10.unfunded) {
@@ -241,7 +242,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Slot 5 with 30%
@@ -254,7 +255,7 @@ export function createL65Strategies() {
             if (slot === 1 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 5 && slotResults.length >= 5) {
                 const slot5 = slotResults[4];
                 if (!slot5.success && !slot5.unfunded) {
@@ -263,7 +264,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Two Slots: 1 + 10
@@ -276,7 +277,7 @@ export function createL65Strategies() {
             if (slot === 5) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -294,7 +295,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Two Slots: 1 + 5
@@ -307,7 +308,7 @@ export function createL65Strategies() {
             if (slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -325,7 +326,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure All Three Key Slots
@@ -337,7 +338,7 @@ export function createL65Strategies() {
             if (slot === 1 || slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -364,7 +365,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Slot 1, then All 30%
@@ -372,8 +373,8 @@ export function createL65Strategies() {
         id: 'L65_slot1_lock_all_30',
         name: 'Secure Slot 1 (30%) + All 30%',
         description: 'Reset until slot 1 succeeds with 30%, then use 30% L65 for ALL remaining slots. High damage amp potential, high budget required.',
-        selectScroll: (slot) => 'L65_30',
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        selectScroll: () => 'L65_30',
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -382,7 +383,7 @@ export function createL65Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Secure Slot 1 + Require Damage Amp
@@ -395,7 +396,7 @@ export function createL65Strategies() {
             if (slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -419,7 +420,7 @@ export function createL65Strategies() {
             if (slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -451,7 +452,7 @@ export function createL65Strategies() {
             if (slot === 5 || slot === 10) return 'L65_30';
             return 'L65_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -482,7 +483,7 @@ export function createL85Strategies() {
             if (slot === 5 || slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -491,7 +492,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Slot 10 Lock-In (highest bonus slot)
@@ -504,7 +505,7 @@ export function createL85Strategies() {
             if (slot === 1 || slot === 5) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 10 && slotResults.length >= 10) {
                 const slot10 = slotResults[9];
                 if (!slot10.success && !slot10.unfunded) {
@@ -513,7 +514,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Slot 5 Lock-In (medium bonus slot)
@@ -526,7 +527,7 @@ export function createL85Strategies() {
             if (slot === 1 || slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 5 && slotResults.length >= 5) {
                 const slot5 = slotResults[4];
                 if (!slot5.success && !slot5.unfunded) {
@@ -535,7 +536,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Double Lock: Slot 1 + Slot 10
@@ -548,7 +549,7 @@ export function createL85Strategies() {
             if (slot === 5) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -566,7 +567,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Slot 1 Lock + All 30%
@@ -578,7 +579,7 @@ export function createL85Strategies() {
             if (slot === 1) return 'L85_15';
             return 'L85_30';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -587,7 +588,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Slot 1 Lock + Bonus Retry
@@ -600,7 +601,7 @@ export function createL85Strategies() {
             if (slot === 5 || slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -632,7 +633,7 @@ export function createL85Strategies() {
             if (slot === 5 || slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -656,7 +657,7 @@ export function createL85Strategies() {
             if (slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -674,7 +675,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Triple Lock: All bonus slots
@@ -686,7 +687,7 @@ export function createL85Strategies() {
             if (slot === 1 || slot === 5 || slot === 10) return 'L85_15';
             return 'L85_70';
         },
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        shouldResetEarly: (slotResults, currentSlot) => {
             // Reset if slot 1 fails
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
@@ -713,7 +714,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     // Slot 1 Lock + All 15% (Ultra Aggressive)
@@ -721,8 +722,8 @@ export function createL85Strategies() {
         id: 'L85_slot1_lock_all_15',
         name: 'Slot 1 Lock + All 15%',
         description: 'Lock slot 1, then use 15% L85 for ALL remaining slots. Ultra-aggressive, extreme budget required.',
-        selectScroll: (slot) => 'L85_15',
-        shouldResetEarly: (slotResults, currentSlot, successfulSlots, failedSlots) => {
+        selectScroll: () => 'L85_15',
+        shouldResetEarly: (slotResults, currentSlot) => {
             if (currentSlot === 1 && slotResults.length >= 1) {
                 const slot1 = slotResults[0];
                 if (!slot1.success && !slot1.unfunded) {
@@ -731,7 +732,7 @@ export function createL85Strategies() {
             }
             return false;
         },
-        shouldReset: (result) => false
+        shouldReset: () => false
     });
 
     return strategies;

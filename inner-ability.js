@@ -1,7 +1,8 @@
 // Inner Ability stat mapping and calculations
 
-import { innerAbilityStats, innerAbilitiesData } from './inner-ability-data.js';
+import { innerAbilitiesData } from './inner-ability-data.js';
 import { calculateDamage, formatNumber } from './calculations.js';
+import { getStats } from './main.js';
 
 // Map inner ability stats to base stat properties
 export function mapInnerAbilityStat(statName, value, baseStats) {
@@ -33,10 +34,12 @@ export function mapInnerAbilityStat(statName, value, baseStats) {
             modifiedStats.normalDamage += value;
             break;
         case 'Main Stat':
+        {
             // Convert Main Stat to Stat Damage % at 100:1 ratio
             const statDamageBonus = value / 100;
             modifiedStats.statDamage += statDamageBonus;
             break;
+        }
         // Ignored stats: Max HP, Max MP, Accuracy, Evasion, MP Recovery Per Sec,
         // Meso Drop, EXP Gain, Debuff Tolerance, Critical Resistance,
         // Damage Tolerance, Damage Taken Decrease
@@ -104,15 +107,11 @@ export function getAllPresets() {
 
 // Calculate preset comparison data
 export function calculatePresetComparisons() {
-    const baseStats = getStats('base');
     const presets = getAllPresets();
 
     if (presets.length === 0) {
         return [];
     }
-
-    // Find equipped preset
-    const equippedPreset = presets.find(p => p.isEquipped);
 
     // Calculate baseline (base stats without equipped IA)
     let baseline = getBaselineStats();
@@ -173,7 +172,6 @@ export function calculatePresetComparisons() {
 
 // Calculate all theoretical stat possibilities
 export function calculateTheoreticalBest() {
-    const baseStats = getStats('base');
     const results = [];
 
     // Get equipped preset to subtract from base
@@ -302,6 +300,7 @@ export function switchInnerAbilityTab(tabName) {
     // Hide all subtabs
     document.querySelectorAll('.inner-ability-subtab').forEach(tab => {
         tab.classList.remove('active');
+        tab.style.display = 'none';
     });
 
     // Remove active from all buttons
@@ -311,7 +310,10 @@ export function switchInnerAbilityTab(tabName) {
 
     // Show selected subtab
     const selectedTab = document.getElementById(`inner-ability-${tabName}`);
-    if (selectedTab) selectedTab.classList.add('active');
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+        selectedTab.style.display = 'block';
+    }
 
     // Activate button
     event.target.classList.add('active');
@@ -332,7 +334,7 @@ export function renderPresetComparison() {
     const comparisons = calculatePresetComparisons();
 
     if (comparisons.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No configured presets found. Add lines to your presets in the Hero Power Ability tab.</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No configured presets found. Add lines to your presets in the My Ability Pages tab.</p>';
         return;
     }
 

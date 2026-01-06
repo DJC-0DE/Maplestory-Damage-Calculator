@@ -3,8 +3,8 @@
 
 import { slotNames, classMainStatMap, slotSpecificPotentials, rankingsPerPage, RARITY_UPGRADE_RATES, equipmentPotentialData } from './cube-potential-data.js';
 import { rarities } from './constants.js';
-import { calculateDamage, formatNumber, calculateMainStatPercentGain } from './calculations.js';
-import { getSelectedClass } from './main.js';
+import { calculateDamage, calculateMainStatPercentGain } from './calculations.js';
+import { getSelectedClass, getStats } from './main.js';
 
 // Global state
 let currentCubeSlot = 'helm';
@@ -508,7 +508,7 @@ export function potentialStatToDamageStat(potentialStat, value, accumulatedMainS
         const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
         const baseMainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
         const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
-        const currentSelectedClass = typeof selectedClass !== 'undefined' ? selectedClass : null;
+        const currentSelectedClass = typeof selectedClass !== 'undefined' ? getSelectedClass() : null;
 
         // Calculate the current main stat % (base + accumulated from previous lines)
         const currentMainStatPct = baseMainStatPct + accumulatedMainStatPct;
@@ -616,9 +616,6 @@ export function calculateComparison() {
 export function displayComparisonResults(setAGain, setBGain, deltaGain, setAStats, setBStats) {
     const resultsDiv = document.getElementById('cube-comparison-results');
     if (!resultsDiv) return;
-
-    const deltaColor = deltaGain >= 0 ? '#4ade80' : '#f87171';
-    const deltaSign = deltaGain >= 0 ? '+' : '';
 
     // Get ranking comparison for Set A and Set B
     const slotId = currentCubeSlot;
@@ -742,7 +739,7 @@ export function getLoadingPlaceholder() {
 }
 
 // Load rankings in background and update comparison when done
-export async function loadRankingsInBackground(slotId, rarity, setAGain, setBGain) {
+export async function loadRankingsInBackground(slotId, rarity) {
     // Calculate rankings
     await calculateRankingsForRarity(rarity, slotId);
 
@@ -1000,6 +997,7 @@ export async function calculateRankings() {
 // Calculate rankings for a specific rarity and slot
 export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlot) {
     const key = `${slotId}-${rarity}`;
+    const isCurrentSlot = slotId === currentCubeSlot;
 
     try {
         // Initialize slot cache if needed
@@ -1033,7 +1031,7 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
         const resultsDiv = document.getElementById('cube-rankings-results');
 
         // Only show progress bar if calculating for the currently visible slot
-        const isCurrentSlot = slotId === currentCubeSlot;
+        
         if (isCurrentSlot) {
             if (progressBar) progressBar.style.display = 'block';
             if (progressFill) progressFill.style.width = '0%';
@@ -1425,9 +1423,6 @@ export function displayAllSlotsSummary() {
     `;
 
     summaryData.forEach((data) => {
-        const rarityColor = getRarityColor(data.regularRarity);
-        const bonusRarityColor = getRarityColor(data.bonusRarity);
-
         // Get percentile for regular and bonus
         const regularPercentile = getPercentileForGain(data.slotId, data.regularRarity, data.regularGain);
         const bonusPercentile = getPercentileForGain(data.slotId, data.bonusRarity, data.bonusGain);
@@ -1910,7 +1905,6 @@ export async function runRarityByRarityStrategy(cubeBudget) {
 
             // First, get slot to the target rarity
             while (cubesUsed < cubeBudget && slot.rarity !== targetRarity) {
-                const currentRarity = slot.rarity;
                 simulateCubeOnSlot(slot, slot.id);
                 cubesUsed++;
 
@@ -1986,7 +1980,7 @@ export function runBestFirstStrategy(cubeBudget) {
 }
 
 // Strategy 4: Balanced Threshold - keep all slots within a certain range of each other
-export function runBalancedThresholdStrategy(cubeBudget, threshold = 10) {
+export function runBalancedThresholdStrategy(cubeBudget) {
     // Initialize all slots to normal with no lines
     const slots = slotNames.map(slotDef => ({
         id: slotDef.id,
@@ -2032,7 +2026,6 @@ export function runRarityWeightedWorstFirstStrategy(cubeBudget) {
         cubesAtCurrentRarity: 0
     }));
 
-    const rarityOrder = ['normal', 'rare', 'epic', 'unique', 'legendary', 'mystic'];
     const expectedCubesForUpgrade = {
         'normal': 1 / 0.06,      // ~16.7 cubes
         'rare': 1 / 0.03333,     // ~30 cubes
@@ -2135,7 +2128,6 @@ export async function runHybridFastRarityStrategy(cubeBudget) {
     // Phase 1: Rush all slots to target rarity
     for (const slot of slots) {
         while (cubesUsed < cubeBudget && slot.rarity !== targetRarity) {
-            const currentRarity = slot.rarity;
             simulateCubeOnSlot(slot, slot.id);
             cubesUsed++;
 
@@ -2437,7 +2429,7 @@ export async function runCubeSimulation() {
 
 // Format slot details for display
 export function formatSlotDetails(slots) {
-    return slots.map((slot, idx) => {
+    return slots.map((slot) => {
         const linesHTML = slot.lines && slot.lines.length > 0
             ? slot.lines.map((line, i) => {
                 if (!line) return '';
