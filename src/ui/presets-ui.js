@@ -1,6 +1,7 @@
 // Hero Power Presets UI functionality
 
 import { innerAbilityStats } from '../data/inner-ability-data.js';
+import { renderTheoreticalBest, renderPresetComparison } from '../core/inner-ability.js';
 
 export function initializeHeroPowerPresets() {
     const container = document.getElementById('hero-power-presets-container');

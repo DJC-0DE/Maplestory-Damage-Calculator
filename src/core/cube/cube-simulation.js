@@ -1,12 +1,12 @@
 // Cache for simulation performance
-import { getStats } from './state.js';
-import { slotNames, equipmentPotentialData, slotSpecificPotentials, RARITY_UPGRADE_RATES } from './../data/cube-potential-data.js';
-import { calculateDamage } from './damage-calculations.js';
+import { rarities } from '../constants.js';
+import { cubeSlotData, currentCubeSlot, currentPotentialType, rankingsCache, rankingsInProgress } from './cube-potential.js';
+import { getSelectedClass } from '../main.js';
+import { displayRankings, displaySimulationResults, updateClassWarning } from './cube-ui.js';
+import { equipmentPotentialData, RARITY_UPGRADE_RATES, slotNames, slotSpecificPotentials } from './cube-potential-data.js';
 import { potentialStatToDamageStat } from './cube-logic.js';
-import { rarities } from '../../constants.js';
-import { getSelectedClass } from '../../main.js';
-import { updateClassWarning, displayRankings, displaySimulationResults } from '../ui/cube-ui.js';
-import { currentCubeSlot, currentPotentialType, cubeSlotData, rankingsCache, rankingsInProgress } from '../../cube-potential.js';
+import { calculateDamage } from '../calculations/damage-calculations.js';
+import { getStats } from '../state.js';
 let simCache = {
     baseStats: null,
     baseDPS: null,
@@ -145,10 +145,6 @@ export function calculateTotalDPSGain(slots) {
 export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlot) {
     const key = `${slotId}-${rarity}`;
 
-    // Declare these variables outside try block so they're accessible in catch
-    let progressBar;
-    let isCurrentSlot;
-
     try {
         // Initialize slot cache if needed
         if (!rankingsCache[slotId]) {
@@ -175,13 +171,13 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
             return;
         }
 
-        progressBar = document.getElementById('cube-rankings-progress');
+        const progressBar = document.getElementById('cube-rankings-progress');
         const progressFill = document.getElementById('cube-rankings-progress-fill');
         const progressText = document.getElementById('cube-rankings-progress-text');
         const resultsDiv = document.getElementById('cube-rankings-results');
 
         // Only show progress bar if calculating for the currently visible slot
-        isCurrentSlot = slotId === currentCubeSlot;
+        const isCurrentSlot = slotId === currentCubeSlot;
         if (isCurrentSlot) {
             if (progressBar) progressBar.style.display = 'block';
             if (progressFill) progressFill.style.width = '0%';

@@ -1,9 +1,9 @@
-import { slotNames, rankingsPerPage, slotSpecificPotentials, equipmentPotentialData } from '../data/cube-potential-data.js';
-import { calculateDamage } from '../core/damage-calculations.js';
-import { getSelectedClass, getStats } from '../../main.js';
-import { lineExistsInRarity, potentialStatToDamageStat, getRarityColor, getPercentileForGain, saveCubePotentialData } from '../core/cube-logic.js';
-import { calculateRankingsForRarity, calculateRankings } from '../core/cube-simulation.js';
-import { cubeSlotData, currentCubeSlot, currentPotentialType, rankingsCache, rankingsInProgress, calculateComparisonOrchestrator, selectCubeSlot } from '../../cube-potential.js';
+import { slotNames, rankingsPerPage, slotSpecificPotentials, equipmentPotentialData } from './cube-potential-data.js';
+import { calculateDamage } from '../calculations/damage-calculations.js';
+import { getSelectedClass, getStats } from '../main.js';
+import { lineExistsInRarity, potentialStatToDamageStat, getRarityColor, getPercentileForGain, saveCubePotentialData } from './cube-logic.js';
+import { calculateRankingsForRarity, calculateRankings } from './cube-simulation.js';
+import { cubeSlotData, currentCubeSlot, currentPotentialType, rankingsCache, rankingsInProgress, calculateComparisonOrchestrator, selectCubeSlot } from './cube-potential.js';
 
 // Global state for summary sorting
 let summarySortColumn = 'regular'; // 'regular' or 'bonus'
@@ -1175,6 +1175,7 @@ export function sortSummaryBy(column) {
     }
     displayAllSlotsSummary();
 }
+window.sortSummaryBy = sortSummaryBy;
 
 // Display summary of all slots
 export function displayAllSlotsSummary() {

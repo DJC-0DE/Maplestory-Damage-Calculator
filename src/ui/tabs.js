@@ -1,6 +1,6 @@
 // Tab switching functionality
 
-import { renderArtifactPotential } from '../../artifact-potential.js';
+import { renderArtifactPotential } from '../core/artifact-potential.js';
 
 // Tab switching function
 export function switchTab(group, tabName) {

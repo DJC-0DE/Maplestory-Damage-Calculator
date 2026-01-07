@@ -3,7 +3,7 @@
 
 // Import the complete factor table extracted from SkillLevelFactorTable.json
 // This table maps character level (1-300) to skill scaling factors
-import { SKILL_LEVEL_FACTOR_TABLE } from './src/data/factor-table-data.js';
+import { SKILL_LEVEL_FACTOR_TABLE } from '../data/factor-table-data.js';
 
 // 3rd Job Skills Configuration
 // All main 3rd job attacking skills share these parameters:

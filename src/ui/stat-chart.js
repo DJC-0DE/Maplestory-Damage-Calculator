@@ -1,7 +1,7 @@
-import { calculateDamage } from '../core/damage-calculations.js';
-import { calculateMainStatPercentGain } from '../core/stat-calculations.js';
+import { calculateDamage } from '../core/calculations/damage-calculations.js';
+import { calculateMainStatPercentGain } from '../core/calculations/stat-calculations.js';
 import { getStats, getSelectedClass } from '../core/state.js';
-import { getWeaponAttackBonus } from '../../main.js';
+import { getWeaponAttackBonus } from '../core/main.js';
 
 // Store chart instances
 const statWeightCharts = {};

@@ -1,7 +1,7 @@
 // Main Entry Point - ES6 Module
 // This is the single entry point that orchestrates the entire application
 
-import { stageDefenses } from './src/core/state.js';
+import { stageDefenses } from './state.js';
 import {
     getStats,
     getItemStats,
@@ -10,14 +10,14 @@ import {
     setSelectedClass,
     getCurrentContentType,
     setCurrentContentType
-} from './src/core/state.js';
-import { calculateDamage } from './src/core/damage-calculations.js';
-import { calculateWeaponAttacks } from './src/core/weapon-calculations.js';
-import { calculateStatWeights, calculateStatEquivalency } from './src/core/damage-calculations.js';
-import { toggleStatChart } from './src/ui/stat-chart.js';
+} from './state.js';
+import { calculateDamage } from './calculations/damage-calculations.js';
+import { calculateWeaponAttacks } from './calculations/weapon-calculations.js';
+import { calculateStatWeights, calculateStatEquivalency } from './calculations/damage-calculations.js';
+import { toggleStatChart } from '../ui/stat-chart.js';
 import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData, updateAnalysisTabs, getSavedContentTypeData } from './storage.js';
 import { rarities, tiers, comparisonItemCount } from './constants.js';
-import { updateClassWarning } from './src/ui/cube-ui.js';
+import { updateClassWarning } from './cube/cube-ui.js';
 import {
     calculate3rdJobSkillCoefficient,
     calculate4thJobSkillCoefficient,
@@ -32,19 +32,19 @@ import {
     initializeCubePotential,
     switchPotentialType,
     selectCubeSlot    
-} from './cube-potential.js';
-import { runCubeSimulation } from './src/core/cube-simulation.js';
+} from './cube/cube-potential.js';
+import { runCubeSimulation } from './cube/cube-simulation.js';
 
-import { loadTheme, toggleTheme } from './src/ui/theme.js';
-import { initializeHeroPowerPresets, loadHeroPowerPresets, switchPreset, handlePresetEquipped } from './src/ui/presets-ui.js';
-import { calculateCurrencyUpgrades } from './src/ui/weapons-ui.js';
-import { toggleSubDetails, toggleDetails } from './src/ui/results-display.js';
-import { initializeWeapons, updateWeaponBonuses, setWeaponStars, previewStars, resetStarPreview, handleEquippedCheckboxChange, handleWeaponLevelChange } from './src/ui/weapons-ui.js';
-import { initializeEquipmentSlots, loadEquipmentSlots, unequipItem, equipItem, addEquippedStat, removeEquippedStat, saveEquipmentSlots } from './src/ui/equipment-ui.js';
-import { calculateEquipmentSlotDPS } from './src/ui/results-display.js';
-import { switchTab, switchScrollingSubTab } from './src/ui/tabs.js';
-import { openHelpSidebar, closeHelpSidebar, scrollToSection } from './src/ui/help-sidebar.js';
-import { displayResults } from './src/ui/results-display.js';
+import { loadTheme, toggleTheme } from '../ui/theme.js';
+import { initializeHeroPowerPresets, loadHeroPowerPresets, switchPreset, handlePresetEquipped } from '../ui/presets-ui.js';
+import { calculateCurrencyUpgrades } from '../ui/weapons-ui.js';
+import { toggleSubDetails, toggleDetails } from '../ui/results-display.js';
+import { initializeWeapons, updateWeaponBonuses, setWeaponStars, previewStars, resetStarPreview, handleEquippedCheckboxChange, handleWeaponLevelChange } from '../ui/weapons-ui.js';
+import { initializeEquipmentSlots, loadEquipmentSlots, unequipItem, equipItem, addEquippedStat, removeEquippedStat, saveEquipmentSlots } from '../ui/equipment-ui.js';
+import { calculateEquipmentSlotDPS } from '../ui/results-display.js';
+import { switchTab, switchScrollingSubTab } from '../ui/tabs.js';
+import { openHelpSidebar, closeHelpSidebar, scrollToSection } from '../ui/help-sidebar.js';
+import { displayResults } from '../ui/results-display.js';
 
 // Data extraction functions
 // getStats and getItemStats moved to state.js

@@ -1,6 +1,6 @@
-import { getSelectedStageDefense } from './state.js';
-import { formatNumber } from '../utils/formatters.js';
-import { getWeaponAttackBonus } from '../../main.js';
+import { getSelectedStageDefense } from '../state.js';
+import { formatNumber } from '../../utils/formatters.js';
+import { getWeaponAttackBonus } from '../main.js';
 import { calculateMainStatPercentGain } from './stat-calculations.js'
 
 // Main damage calculation function

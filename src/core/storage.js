@@ -1,10 +1,10 @@
 import { calculate } from './main.js';
 import { renderTheoreticalBest, renderPresetComparison } from './inner-ability.js';
 import { renderArtifactPotential } from './artifact-potential.js';
-import { clearCubeRankingsCache } from './cube-potential.js';
-import { addComparisonItemStat, addComparisonItem } from './src/ui/comparison-ui.js';
-import { addEquippedStat } from './src/ui/equipment-ui.js';
-import { handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from './src/ui/weapons-ui.js';
+import { clearCubeRankingsCache } from './cube/cube-potential.js';
+import { addComparisonItemStat, addComparisonItem } from '../ui/comparison-ui.js';
+import { addEquippedStat } from '../ui/equipment-ui.js';
+import { handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from '../ui/weapons-ui.js';
 import { rarities, tiers, comparisonItemCount, equippedStatCount } from './constants.js';
 
 // Flag to prevent saving during load
@@ -453,6 +453,7 @@ export function exportData() {
         heroPowerPresets: localStorage.getItem('heroPowerPresets'),
         cubePotentialData: localStorage.getItem('cubePotentialData'),
         selectedClass: localStorage.getItem('selectedClass'),
+        selectedJobTier: localStorage.getItem('selectedJobTier'),
         theme: localStorage.getItem('theme')
     };
 
@@ -514,6 +515,9 @@ export function importData() {
             }
             if (data.selectedClass) {
                 localStorage.setItem('selectedClass', data.selectedClass);
+            }
+            if (data.selectedJobTier) {
+                localStorage.setItem('selectedJobTier', data.selectedJobTier);
             }
             if (data.theme) {
                 localStorage.setItem('theme', data.theme);

@@ -1,7 +1,7 @@
 // Comparison items UI functionality
-import { saveToLocalStorage } from '../../storage.js';
-import { comparisonItemCount, setComparisonItemCount, availableStats } from '../../constants.js';
-import { calculate } from '../../main.js';
+import { saveToLocalStorage } from '../core/storage.js';
+import { comparisonItemCount, setComparisonItemCount, availableStats } from '../core/constants.js';
+import { calculate } from '../core/main.js';
 
 export function addComparisonItem() {
     setComparisonItemCount(comparisonItemCount + 1);
@@ -47,6 +47,7 @@ export function removeComparisonItem(id) {
         calculate();
     }
 }
+window.removeComparisonItem = removeComparisonItem;
 
 export function addComparisonItemStat(itemId) {
     const container = document.getElementById(`item-${itemId}-stats-container`);
@@ -88,7 +89,7 @@ export function addComparisonItemStat(itemId) {
     container.appendChild(statDiv);
     saveToLocalStorage();
 }
-
+window.addComparisonItemStat = addComparisonItemStat;
 
 export function removeComparisonItemStat(itemId, statId) {
     const stat = document.getElementById(`item-${itemId}-stat-${statId}`);
@@ -97,5 +98,4 @@ export function removeComparisonItemStat(itemId, statId) {
         saveToLocalStorage();
     }
 }
-
-// Weapon initialization and management
+window.removeComparisonItemStat = removeComparisonItemStat;

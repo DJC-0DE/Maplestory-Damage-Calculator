@@ -1,10 +1,10 @@
 // Cube Potential Calculator - Orchestrator
 // Coordinates between UI and business logic components
 
-import { slotNames } from './src/data/cube-potential-data.js';
-import { getSelectedClass } from './main.js';
-import { loadCubePotentialData, calculateComparison, getRarityColor } from './src/core/cube-logic.js';
-import { setupCubeSlotSelector, updateSlotButtonColors, setupCubeTabs, updateCubePotentialUI, displayComparisonResults, displayOrCalculateRankings, updateClassWarning, displayAllSlotsSummary, loadRankingsInBackground } from './src/ui/cube-ui.js';
+import { slotNames } from './cube-potential-data.js';
+import { getSelectedClass } from '../main.js';
+import { loadCubePotentialData, calculateComparison, getRarityColor } from './cube-logic.js';
+import { setupCubeSlotSelector, updateSlotButtonColors, setupCubeTabs, updateCubePotentialUI, displayComparisonResults, displayOrCalculateRankings, updateClassWarning, displayAllSlotsSummary, loadRankingsInBackground } from './cube-ui.js';
 
 // Global state - shared with UI and logic modules
 export let currentCubeSlot = 'helm';
