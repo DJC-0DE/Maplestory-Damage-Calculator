@@ -8,7 +8,7 @@ export function initializeHeroPowerPresets() {
     if (!container) return;
 
     // Create tabs
-    let tabsHTML = '<div class="preset-tabs">';
+    let tabsHTML = '<div class="preset-tabs" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px;">';
     for (let i = 1; i <= 10; i++) {
         const activeClass = i === 1 ? 'active' : '';
         tabsHTML += `<button class="preset-tab ${activeClass}" id="preset-tab-${i}" onclick="switchPreset(${i})">${i}</button>`;

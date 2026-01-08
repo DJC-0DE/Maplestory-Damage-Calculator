@@ -14,7 +14,7 @@ export let rankingsCache = {}; // Cache rankings by slot and rarity: rankingsCac
 export let rankingsInProgress = {}; // Track which slot+rarity combinations are currently calculating
 
 // Initialize cube potential system
-export function initializeCubePotential() {
+export async function initializeCubePotential() {
     // Initialize all slots with default data (both regular and bonus potential)
     slotNames.forEach(slot => {
         cubeSlotData[slot.id] = {
@@ -54,7 +54,7 @@ export function initializeCubePotential() {
     setupCubeSlotSelector();
 
     // Set up tab switching
-    setupCubeTabs();
+    await setupCubeTabs();
 
     // Populate dropdowns for current slot
     updateCubePotentialUI();
@@ -84,7 +84,7 @@ export function clearCubeRankingsCache() {
     }
 
     // If summary tab is visible, update summary
-    const summaryContent = document.getElementById('cube-summary-content');
+    const summaryContent = document.getElementById('cube-main-summary-content');
     if (summaryContent && summaryContent.style.display !== 'none') {
         displayAllSlotsSummary();
     }
@@ -189,7 +189,7 @@ export function calculateComparisonOrchestrator() {
     }
 
     // If summary tab is visible, update it
-    const summaryContent = document.getElementById('cube-summary-content');
+    const summaryContent = document.getElementById('cube-main-summary-content');
     if (summaryContent && summaryContent.style.display !== 'none') {
         displayAllSlotsSummary();
     }

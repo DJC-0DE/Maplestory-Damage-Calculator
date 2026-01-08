@@ -1,15 +1,4 @@
-// Weapon rates per level calculated from provided data
-export const weaponRatesPerLevel = {
-    'normal': { 't1': 0.0755, 't2': 0.064, 't3': 0.054, 't4': 0.0455 },
-    'rare': { 't1': 0.1952, 't2': 0.1535, 't3': 0.1221, 't4': 0.0959 },
-    'epic': { 't1': 0.5144, 't2': 0.6015, 't3': 0.4308, 't4': 0.3033 },
-    'unique': { 't1': 1.5573, 't2': 2.7395, 't3': 0.8850, 't4': 0.6686 },
-    'legendary': { 't1': 3.9490, 't2': 2.7297, 't3': 3.1824, 't4': 2.5734 },
-    'mystic': { 't1': 5.5, 't2': 4.2, 't3': 4.8, 't4': 4.9322 },
-    'ancient': { 't1': 6.5, 't2': 5.0, 't3': 5.5, 't4': 6.2 }
-};
-
-// Base attack % at level 1 for EQUIPPED weapons (from weapon invent attack formula.png)
+// Base attack % at level 1 for EQUIPPED weapons
 export const weaponBaseAttackEquipped = {
     'normal': { 't1': 25, 't2': 21, 't3': 18, 't4': 15 },
     'rare': { 't1': 61.1, 't2': 48.9, 't3': 39.1, 't4': 31.3 },
@@ -17,7 +6,7 @@ export const weaponBaseAttackEquipped = {
     'unique': { 't1': 426.4, 't2': 328, 't3': 252.3, 't4': 194.1 },
     'legendary': { 't1': 1217.8, 't2': 936.8, 't3': 720.6, 't4': 554.3 },
     'mystic': { 't1': 3810.6, 't2': 2865.1, 't3': 2154.2, 't4': 1619.7 },
-    'ancient': { 't1': 2186.6, 't2': 2908.2, 't3': 3867.9, 't4': 5144.3 }
+    'ancient': { 't1': 0, 't2': 9375.5, 't3': 6944.8, 't4': 5144.3 }
 };
 
 export const tiers = ['t4', 't3', 't2', 't1'];

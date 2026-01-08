@@ -24,7 +24,7 @@ export function initializeWeapons() {
             }
 
             // Ancient T4 is enabled, T3/T2/T1 are disabled
-            const isDisabled = rarity === 'ancient' && tier !== 't4';
+            const isDisabled = rarity === 'ancient' && tier === 't1';
 
             if (baseAtk === null || baseAtk === undefined || isDisabled) {
                 html += `<div class="weapon-card" style="opacity: 0.4;">

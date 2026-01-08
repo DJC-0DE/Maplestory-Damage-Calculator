@@ -175,7 +175,7 @@ export function setupRaritySelector() {
 }
 
 // Setup tab switching
-export function setupCubeTabs() {
+export async function setupCubeTabs() {
     // Main tabs
     const mainSummaryTab = document.getElementById('cube-main-tab-summary');
     const mainSelectedTab = document.getElementById('cube-main-tab-selected');
@@ -192,7 +192,7 @@ export function setupCubeTabs() {
 
     // Setup main tab switching
     if (mainSummaryTab && mainSelectedTab && mainSimulationTab && mainSummaryContent && mainSelectedContent && mainSimulationContent) {
-        mainSummaryTab.addEventListener('click', () => {
+        mainSummaryTab.addEventListener('click', async () => {
             mainSummaryTab.classList.add('active');
             mainSelectedTab.classList.remove('active');
             mainSimulationTab.classList.remove('active');
@@ -202,7 +202,7 @@ export function setupCubeTabs() {
 
             // Display summary and start loading any missing rankings
             displayAllSlotsSummary();
-            loadAllRankingsForSummary();
+            await loadAllRankingsForSummary();
         });
 
         mainSelectedTab.addEventListener('click', () => {
@@ -764,7 +764,8 @@ export function updateClassWarning() {
 }
 
 // Load all rankings needed for summary
-export function loadAllRankingsForSummary() {
+export async function loadAllRankingsForSummary() {
+    console.log("=== loadAllRankingsForSummary called ===");
     if (!getSelectedClass()) return;
 
     // Collect all unique slot+rarity combinations that need ranking
@@ -774,6 +775,7 @@ export function loadAllRankingsForSummary() {
         // Regular potential
         const regularRarity = cubeSlotData[slot.id].regular.rarity;
         const regularKey = `${slot.id}-${regularRarity}`;
+        console.log(`Checking ${slot.name} Regular: cache=${!!rankingsCache[slot.id]?.[regularRarity]}, inProgress=${!!rankingsInProgress[regularKey]}`);
         if (!rankingsCache[slot.id]?.[regularRarity] && !rankingsInProgress[regularKey]) {
             rankingsToLoad.push({ slotId: slot.id, rarity: regularRarity, slotName: slot.name, type: 'Regular' });
         }
@@ -781,13 +783,19 @@ export function loadAllRankingsForSummary() {
         // Bonus potential
         const bonusRarity = cubeSlotData[slot.id].bonus.rarity;
         const bonusKey = `${slot.id}-${bonusRarity}`;
+        console.log(`Checking ${slot.name} Bonus: cache=${!!rankingsCache[slot.id]?.[bonusRarity]}, inProgress=${!!rankingsInProgress[bonusKey]}`);
         if (!rankingsCache[slot.id]?.[bonusRarity] && !rankingsInProgress[bonusKey]) {
             rankingsToLoad.push({ slotId: slot.id, rarity: bonusRarity, slotName: slot.name, type: 'Bonus' });
         }
     });
 
+    console.log(`Rankings to load: ${rankingsToLoad.length}`, rankingsToLoad.map(r => `${r.slotName}(${r.type})`));
+
     // If nothing to load, we're done
-    if (rankingsToLoad.length === 0) return;
+    if (rankingsToLoad.length === 0) {
+        console.log("=== loadAllRankingsForSummary finished (nothing to load) ===");
+        return;
+    }
 
     const progressBar = document.getElementById('cube-summary-progress');
     const progressFill = document.getElementById('cube-summary-progress-fill');
@@ -798,26 +806,71 @@ export function loadAllRankingsForSummary() {
 
     const total = rankingsToLoad.length;
 
-    // Calculate each ranking in sequence (to avoid overwhelming the browser)
-    for (let i = 0; i < rankingsToLoad.length; i++) {
-        const { slotId, rarity, slotName, type } = rankingsToLoad[i];
+    // Create all promises to run in parallel
+    const promises = rankingsToLoad.map((item, index) =>
+        (async () => {
+            try {
+                const { slotId, rarity, slotName, type } = item;
+                console.log(`Promise ${index} running for ${slotName} (${type})`);
 
-        // Update progress text
-        if (progressText) {
-            progressText.textContent = `Loading rankings for ${slotName} (${type} - ${rarity})... ${i + 1}/${total}`;
-        }
-        if (progressFill) {
-            progressFill.style.width = `${((i / total) * 100)}%`;
-        }
+                // Update progress text
+                if (progressText) {
+                    progressText.textContent = `Loading rankings for ${slotName} (${type} - ${rarity})... ${index + 1}/${total}`;
+                }
+                if (progressFill) {
+                    progressFill.style.width = `${((index / total) * 100)}%`;
+                }
 
-        calculateRankingsForRarity(rarity, slotId);
+                await calculateRankingsForRarity(rarity, slotId);
+                console.log(`Promise ${index} ended for ${slotName} (${type})`);
+            } catch (error) {
+                console.error(`Promise ${index} error for ${item.slotName} (${item.type}):`, error);
+            }
+        })()
+    );
 
-        // Update summary display after each ranking is calculated
-        const summaryContent = document.getElementById('cube-summary-content');
-        if (summaryContent && summaryContent.style.display !== 'none') {
-            displayAllSlotsSummary();
-        }
+    console.log("Before Promise.all", promises.length, "promises");
+    try {
+        await Promise.all(promises);
+        console.log("After Promise.all - SUCCESS");
+    } catch (error) {
+        console.error("Promise.all failed:", error);
     }
+
+    // Update summary display after all rankings are calculated
+    const summaryContent = document.getElementById('cube-main-summary-content');
+    console.log("Checking if should refresh summary:", {
+        summaryContentExists: !!summaryContent,
+        isVisible: summaryContent?.style.display !== 'none',
+        display: summaryContent?.style.display
+    });
+    if (summaryContent && summaryContent.style.display !== 'none') {
+        console.log("Refreshing summary display after all rankings loaded");
+        displayAllSlotsSummary();
+    }
+
+    console.log("=== loadAllRankingsForSummary finished ===");       
+
+    // Calculate each ranking in sequence (to avoid overwhelming the browser)
+    //for (let i = 0; i < rankingsToLoad.length; i++) {
+    //    const { slotId, rarity, slotName, type } = rankingsToLoad[i];
+//
+    //    // Update progress text
+    //    if (progressText) {
+    //        progressText.textContent = `Loading rankings for ${slotName} (${type} - ${rarity})... ${i + 1}/${total}`;
+    //    }
+    //    if (progressFill) {
+    //        progressFill.style.width = `${((i / total) * 100)}%`;
+    //    }
+//
+    //    calculateRankingsForRarity(rarity, slotId);
+//
+    //    // Update summary display after each ranking is calculated
+    //    const summaryContent = document.getElementById('cube-main-summary-content');
+    //    if (summaryContent && summaryContent.style.display !== 'none') {
+    //        displayAllSlotsSummary();
+    //    }
+    //}
 
     // Hide progress bar
     if (progressFill) progressFill.style.width = '100%';
@@ -1179,6 +1232,10 @@ window.sortSummaryBy = sortSummaryBy;
 
 // Display summary of all slots
 export function displayAllSlotsSummary() {
+    console.log("displayAllSlotsSummary called, current rankingsCache:", Object.keys(rankingsCache).map(slotId => {
+        return `${slotId}: ${Object.keys(rankingsCache[slotId] || {}).join(', ')}`;
+    }));
+
     const resultsDiv = document.getElementById('cube-summary-results');
     if (!resultsDiv) return;
 

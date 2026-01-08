@@ -1,4 +1,4 @@
-import { weaponRatesPerLevel, weaponBaseAttackEquipped } from '../constants.js';
+import { weaponBaseAttackEquipped } from '../constants.js';
 
 // Get weapon level multiplier based on level (from weapon-damage-stats.txt)
 export function getWeaponLevelMultiplier(level) {
@@ -65,7 +65,18 @@ export function getUpgradeCost(rarity, tier, level) {
     if (!baseCost) return 0;
 
     // Apply tier multiplier (1.2x for each tier above T4)
-    const tierAdjustedCost = baseCost * Math.pow(1.2, tierSteps);
+    let tierAdjustedCost = baseCost * Math.pow(1.2, tierSteps);
+
+    if(rarity === "ancient" && tier === "t3")
+    {
+        if(tier === "t3")
+        {
+            tierAdjustedCost = 70000;
+        } else if (tier === "t2")
+        {
+            tierAdjustedCost = 120000;
+        }        
+    }
 
     // Apply level-based multiplier
     let levelMultiplier = 1;
@@ -149,11 +160,4 @@ export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resource
         singleLevelCost: 0,
         isUnaffordable: false
     };
-}
-
-// Calculate inventory bonus for a weapon
-export function calculateInventoryBonus(rarity, tier, level) {
-    const rate = weaponRatesPerLevel[rarity][tier];
-    if (rate === null || level === 0) return 0;
-    return rate * level;
 }
