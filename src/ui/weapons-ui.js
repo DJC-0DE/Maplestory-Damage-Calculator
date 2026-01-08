@@ -292,24 +292,42 @@ export function handleWeaponLevelChange(rarity, tier) {
     const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
 
     if (level < maxLevel && level > 0) {
+        // Check if this weapon is equipped
+        const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
+        const isEquipped = equippedDisplay && equippedDisplay.style.display !== 'none';
+
         // Calculate multi-level efficiency (what you actually get per 1k shards)
-        const upgradeGain = calculateUpgradeGain(rarity, tier, level, stars, 1000);
+        const upgradeGain = calculateUpgradeGain(rarity, tier, level, stars, 1000, isEquipped);
 
         if (upgradeGainDisplay && upgradeGain.attackGain > 0) {
             let gainPer1k;
+            let totalGainPer1k;
 
             if (upgradeGain.isUnaffordable) {
                 // Next level costs more than 1k - normalize to per 1k
                 gainPer1k = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
-                upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (next level costs ${upgradeGain.singleLevelCost} shards)`;
+                const equippedGainPer1k = (upgradeGain.equippedAttackGain / upgradeGain.singleLevelCost) * 1000;
+                totalGainPer1k = gainPer1k + equippedGainPer1k;
+
+                if (isEquipped) {
+                    upgradeGainDisplay.textContent = `+${totalGainPer1k.toFixed(2)}% per 1k shards (${gainPer1k.toFixed(2)}% inv + ${equippedGainPer1k.toFixed(2)}% eq, next level costs ${upgradeGain.singleLevelCost} shards)`;
+                } else {
+                    upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (next level costs ${upgradeGain.singleLevelCost} shards)`;
+                }
             } else {
                 // Can afford levels with 1k shards
                 gainPer1k = upgradeGain.attackGain;
-                upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (${upgradeGain.levelsGained} levels)`;
+                totalGainPer1k = gainPer1k + upgradeGain.equippedAttackGain;
+
+                if (isEquipped) {
+                    upgradeGainDisplay.textContent = `+${totalGainPer1k.toFixed(2)}% per 1k shards (${gainPer1k.toFixed(2)}% inv + ${upgradeGain.equippedAttackGain.toFixed(2)}% eq, ${upgradeGain.levelsGained} levels)`;
+                } else {
+                    upgradeGainDisplay.textContent = `+${gainPer1k.toFixed(2)}% per 1k shards (${upgradeGain.levelsGained} levels)`;
+                }
             }
 
-            // Store gainPer1k for color coding
-            upgradeGainDisplay.dataset.gainPer1k = gainPer1k;
+            // Store totalGainPer1k for color coding (use total when equipped, otherwise just inventory)
+            upgradeGainDisplay.dataset.gainPer1k = isEquipped ? totalGainPer1k : gainPer1k;
 
             if (upgradeGainContainer) {
                 upgradeGainContainer.style.display = 'block';
@@ -441,12 +459,17 @@ export function updateUpgradePriorityChain() {
     const upgradeSequence = [];
     const weaponLevels = {};
     const weaponMaxLevels = {};
+    const weaponEquippedStates = {};
 
-    // Initialize current levels and max levels
+    // Initialize current levels, max levels, and equipped states
     weaponStates.forEach(ws => {
         const key = `${ws.rarity}-${ws.tier}`;
         weaponLevels[key] = ws.level;
         weaponMaxLevels[key] = ws.maxLevel;
+
+        // Check if this weapon is equipped
+        const equippedDisplay = document.getElementById(`equipped-display-${ws.rarity}-${ws.tier}`);
+        weaponEquippedStates[key] = equippedDisplay && equippedDisplay.style.display !== 'none';
     });
 
     for (let i = 0; i < 100; i++) {
@@ -458,19 +481,22 @@ export function updateUpgradePriorityChain() {
             const key = `${ws.rarity}-${ws.tier}`;
             const currentLevel = weaponLevels[key];
             const maxLevel = weaponMaxLevels[key];
+            const isEquipped = weaponEquippedStates[key];
 
             // Skip if at max level
             if (currentLevel >= maxLevel) return;
 
             // Calculate multi-level efficiency (what 1k shards gets you from current level)
-            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, 1000);
+            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, 1000, isEquipped);
 
             let efficiency;
             if (upgradeGain.isUnaffordable) {
                 // Normalize to per 1k when single level costs more than 1k
-                efficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+                const inventoryEfficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+                const equippedEfficiency = (upgradeGain.equippedAttackGain / upgradeGain.singleLevelCost) * 1000;
+                efficiency = inventoryEfficiency + equippedEfficiency;
             } else {
-                efficiency = upgradeGain.attackGain; // Already per 1k
+                efficiency = upgradeGain.attackGain + upgradeGain.equippedAttackGain; // Already per 1k
             }
 
             if (efficiency > bestEfficiency) {
@@ -585,14 +611,19 @@ export function calculateCurrencyUpgrades() {
     const upgradeSequence = [];
     const weaponLevels = {};
     const weaponMaxLevels = {};
+    const weaponEquippedStates = {};
     let remainingCurrency = currency;
     let totalAttackGain = 0;
 
-    // Initialize current levels and max levels
+    // Initialize current levels, max levels, and equipped states
     weaponStates.forEach(ws => {
         const key = `${ws.rarity}-${ws.tier}`;
         weaponLevels[key] = ws.level;
         weaponMaxLevels[key] = ws.maxLevel;
+
+        // Check if this weapon is equipped
+        const equippedDisplay = document.getElementById(`equipped-display-${ws.rarity}-${ws.tier}`);
+        weaponEquippedStates[key] = equippedDisplay && equippedDisplay.style.display !== 'none';
     });
 
     // Keep upgrading until we run out of currency (same logic as priority chain)
@@ -605,18 +636,21 @@ export function calculateCurrencyUpgrades() {
             const key = `${ws.rarity}-${ws.tier}`;
             const currentLevel = weaponLevels[key];
             const maxLevel = weaponMaxLevels[key];
+            const isEquipped = weaponEquippedStates[key];
 
             if (currentLevel >= maxLevel) return;
 
             // Calculate multi-level efficiency (what 1k shards gets you from current level)
-            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, 1000);
+            const upgradeGain = calculateUpgradeGain(ws.rarity, ws.tier, currentLevel, ws.stars, 1000, isEquipped);
 
             let efficiency;
             if (upgradeGain.isUnaffordable) {
                 // Normalize to per 1k when single level costs more than 1k
-                efficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+                const inventoryEfficiency = (upgradeGain.attackGain / upgradeGain.singleLevelCost) * 1000;
+                const equippedEfficiency = (upgradeGain.equippedAttackGain / upgradeGain.singleLevelCost) * 1000;
+                efficiency = inventoryEfficiency + equippedEfficiency;
             } else {
-                efficiency = upgradeGain.attackGain; // Already per 1k
+                efficiency = upgradeGain.attackGain + upgradeGain.equippedAttackGain; // Already per 1k
             }
 
             if (efficiency > bestEfficiency) {

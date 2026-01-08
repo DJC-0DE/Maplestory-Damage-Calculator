@@ -314,14 +314,17 @@ export function loadFromLocalStorage() {
                         // Then set level
                         if (levelInput) {
                             levelInput.value = weaponData.level || '0';
-                            // Trigger the level change handler to update displays
-                            handleWeaponLevelChange(rarity, tier);
                         }
 
                         // Restore equipped state
                         if (equippedCheckbox && weaponData.equipped) {
                             equippedCheckbox.checked = true;
                             handleEquippedCheckboxChange(rarity, tier);
+                        }
+
+                        // Trigger the level change handler AFTER equipped state is set
+                        if (levelInput) {
+                            handleWeaponLevelChange(rarity, tier);
                         }
                     }
                 });

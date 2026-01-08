@@ -102,9 +102,9 @@ export function getUpgradeCost(rarity, tier, level) {
 }
 
 // Calculate inventory attack gain from spending resources
-export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources) {
+export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources, isEquipped = false) {
     if (currentLevel <= 0) {
-        return { levelsGained: 0, newLevel: currentLevel, attackGain: 0, resourcesUsed: 0, efficiency: 0, singleLevelCost: 0 };
+        return { levelsGained: 0, newLevel: currentLevel, attackGain: 0, equippedAttackGain: 0, resourcesUsed: 0, efficiency: 0, singleLevelCost: 0 };
     }
 
     const maxLevel = getMaxLevelForStars(stars);
@@ -118,10 +118,16 @@ export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resource
         const nextLevelAttack = calculateWeaponAttacks(rarity, tier, currentLevel + 1).inventoryAttack;
         const attackGain = nextLevelAttack - currentAttack;
 
+        // Calculate equipped attack gain if equipped
+        const currentEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel).equippedAttack;
+        const nextEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel + 1).equippedAttack;
+        const equippedAttackGain = isEquipped ? (nextEquippedAttack - currentEquippedAttack) : 0;
+
         return {
             levelsGained: 0,
             newLevel: currentLevel,
             attackGain: attackGain,
+            equippedAttackGain: equippedAttackGain,
             resourcesUsed: 0,
             efficiency: 0,
             singleLevelCost: nextLevelCost,
@@ -151,10 +157,16 @@ export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resource
     const newAttack = calculateWeaponAttacks(rarity, tier, level).inventoryAttack;
     const attackGain = newAttack - currentAttack;
 
+    // Calculate equipped attack gain if equipped
+    const currentEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel).equippedAttack;
+    const newEquippedAttack = calculateWeaponAttacks(rarity, tier, level).equippedAttack;
+    const equippedAttackGain = isEquipped ? (newEquippedAttack - currentEquippedAttack) : 0;
+
     return {
         levelsGained: level - currentLevel,
         newLevel: level,
         attackGain: attackGain,
+        equippedAttackGain: equippedAttackGain,
         resourcesUsed: totalCost,
         efficiency: totalCost > 0 ? attackGain / (totalCost / 1000) : 0,
         singleLevelCost: 0,
