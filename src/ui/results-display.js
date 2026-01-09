@@ -153,6 +153,10 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
                         <span class="damage-value">${stats.normalDamage.toFixed(2)}%</span>
                     </div>
                     <div class="damage-row">
+                        <span class="damage-label">Final Damage:</span>
+                        <span class="damage-value">${stats.finalDamage.toFixed(2)}%</span>
+                    </div>
+                    <div class="damage-row">
                         <span class="damage-label">Damage Amplification:</span>
                         <span class="damage-value">${stats.damageAmp.toFixed(2)}</span>
                     </div>

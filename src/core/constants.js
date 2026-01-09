@@ -26,6 +26,7 @@ export const availableStats = [
     { value: 'normal-damage', label: 'Normal Monster Damage (%)' },
     { value: 'boss-damage', label: 'Boss Monster Damage (%)' },
     { value: 'damage', label: 'Damage (%)' },
+    { value: 'final-damage', label: 'Final Damage (%)' },
     { value: 'min-damage', label: 'Min Damage Multiplier (%)' },
     { value: 'max-damage', label: 'Max Damage Multiplier (%)' }
 ];
@@ -45,6 +46,7 @@ export const itemStatProperties = {
     'normal-damage': 'normalDamage',
     'boss-damage': 'bossDamage',
     'damage': 'damage',
+    'final-damage': 'finalDamage',
     'min-damage': 'minDamage',
     'max-damage': 'maxDamage'
 };
@@ -53,7 +55,7 @@ export const itemStatProperties = {
 export const allItemStatProperties = [
     'attack', 'mainStat', 'defense', 'critRate', 'critDamage',
     'skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th', 'skillLevelAll',
-    'normalDamage', 'bossDamage', 'damage',
+    'normalDamage', 'bossDamage', 'damage', 'finalDamage',
     'minDamage', 'maxDamage'
 ];
 

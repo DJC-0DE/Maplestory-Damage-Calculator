@@ -381,11 +381,23 @@ export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
         };
     }
 
-    // Apply all other stats dynamically
+    // Apply final damage multiplicatively (not additively)
+    // Final damage formula: (1 + base%) * (1 + equipped%) * (1 + comparison%)
+    // We need to remove equipped and add comparison multiplicatively
+    const baseFinalDamageMultiplier = 1 + (newStats.finalDamage / 100);
+    const equippedFinalDamageMultiplier = 1 + ((equippedItem.finalDamage || 0) / 100);
+    const comparisonFinalDamageMultiplier = 1 + ((comparisonItem.finalDamage || 0) / 100);
+
+    // Remove equipped item's multiplicative contribution and add comparison item's
+    const newFinalDamageMultiplier = (baseFinalDamageMultiplier / equippedFinalDamageMultiplier) * comparisonFinalDamageMultiplier;
+    newStats.finalDamage = (newFinalDamageMultiplier - 1) * 100;
+
+    // Apply all other stats dynamically (excluding finalDamage which we just handled)
     const statsToApply = allItemStatProperties.filter(prop =>
         prop !== 'attack' && prop !== 'mainStat' && prop !== 'defense' &&
         prop !== 'skillLevel1st' && prop !== 'skillLevel2nd' &&
-        prop !== 'skillLevel3rd' && prop !== 'skillLevel4th' && prop !== 'skillLevelAll'
+        prop !== 'skillLevel3rd' && prop !== 'skillLevel4th' && prop !== 'skillLevelAll' &&
+        prop !== 'finalDamage'
     );
 
     statsToApply.forEach(prop => {
