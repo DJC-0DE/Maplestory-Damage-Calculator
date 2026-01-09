@@ -5,6 +5,30 @@
 // This table maps character level (1-300) to skill scaling factors
 import { SKILL_LEVEL_FACTOR_TABLE } from '../data/factor-table-data.js';
 
+// Import all class skill data
+import {
+    HERO_SKILLS,
+    DARK_KNIGHT_SKILLS as DK_GENERATED_SKILLS,
+    ARCH_MAGE_IL_SKILLS,
+    ARCH_MAGE_FP_SKILLS,
+    BOWMASTER_SKILLS,
+    MARKSMAN_SKILLS,
+    NIGHT_LORD_SKILLS,
+    SHADOWER_SKILLS
+} from './all-class-skills.js';
+
+// Map class names to their skill data
+const CLASS_TO_SKILLS_MAP = {
+    'hero': HERO_SKILLS,
+    'dark-knight': DK_GENERATED_SKILLS,
+    'arch-mage-il': ARCH_MAGE_IL_SKILLS,
+    'arch-mage-fp': ARCH_MAGE_FP_SKILLS,
+    'bowmaster': BOWMASTER_SKILLS,
+    'marksman': MARKSMAN_SKILLS,
+    'night-lord': NIGHT_LORD_SKILLS,
+    'shadower': SHADOWER_SKILLS
+};
+
 // 3rd Job Skills Configuration
 // All main 3rd job attacking skills share these parameters:
 // - Base damage: 800 (represents 80%)
@@ -68,6 +92,42 @@ function getFactorForLevel(level, factorIndex) {
 }
 
 /**
+ * Calculate the input level for skills based on character level and job tier
+ * This is used to look up the appropriate factor in the skill level factor table
+ * @param {number} characterLevel - Current character level
+ * @param {number} jobTier - Job tier (1, 2, 3, or 4)
+ * @param {number} skillLevelBonus - Bonus to skill level from items (default 0)
+ * @returns {number} - Input level for factor table lookup
+ */
+function calculateSkillInputLevel(characterLevel, jobTier, skillLevelBonus = 0) {
+    let baseInputLevel = 0;
+
+    switch (jobTier) {
+        case 1:
+            // 1st job skills scale directly with character level (assumption - needs verification)
+            baseInputLevel = characterLevel;
+            break;
+        case 2:
+            // 2nd job skills: Similar pattern, starts at level 30
+            // Using same formula pattern until exact formula is confirmed
+            baseInputLevel = Math.max(0, Math.min((characterLevel - 30) * 3, 120));
+            break;
+        case 3:
+            // 3rd job skills: (characterLevel - 60) * 3, capped at 120
+            baseInputLevel = Math.max(0, Math.min((characterLevel - 60) * 3, 120));
+            break;
+        case 4:
+            // 4th job skills: (characterLevel - 100) * 3, no cap
+            baseInputLevel = Math.max(0, (characterLevel - 100) * 3);
+            break;
+        default:
+            baseInputLevel = characterLevel;
+    }
+
+    return baseInputLevel + skillLevelBonus;
+}
+
+/**
  * Calculates the skill coefficient (damage %) for 3rd job skills
  * All main 3rd job attacking skills use the same scaling:
  * - Intrepid Slash (Hero)
@@ -89,9 +149,8 @@ function getFactorForLevel(level, factorIndex) {
 export function calculate3rdJobSkillCoefficient(characterLevel, skillLevel = 0) {
     const baseDamagePercent = THIRD_JOB_SKILLS.baseDamage / 10;
 
-    // Calculate input level for factor table: (level - 60) * 3, capped at 120, then add skill level
-    const baseInputLevel = Math.max(0, Math.min((characterLevel - 60) * 3, 120));
-    const inputLevel = baseInputLevel + skillLevel;
+    // Calculate input level for factor table using shared helper
+    const inputLevel = calculateSkillInputLevel(characterLevel, 3, skillLevel);
 
     // Get factor from table using the input level
     const factor = getFactorForLevel(inputLevel, THIRD_JOB_SKILLS.factorIndex);
@@ -115,9 +174,8 @@ export function calculate3rdJobSkillCoefficient(characterLevel, skillLevel = 0) 
 export function calculate4thJobSkillCoefficient(characterLevel, skillLevel = 0) {
     const baseDamagePercent = FOURTH_JOB_SKILLS.baseDamage / 10;
 
-    // Calculate input level for factor table: (level - 100) * 3, no cap, then add skill level
-    const baseInputLevel = Math.max(0, (characterLevel - 100) * 3);
-    const inputLevel = baseInputLevel + skillLevel;
+    // Calculate input level for factor table using shared helper
+    const inputLevel = calculateSkillInputLevel(characterLevel, 4, skillLevel);
 
     // Get factor from table using the input level
     const factor = getFactorForLevel(inputLevel, FOURTH_JOB_SKILLS.factorIndex);
@@ -664,5 +722,295 @@ export function getAllDarkKnightSkills(level) {
                 debuffTolerance: calculateEndure(level).toFixed(0)
             }
         }
+    };
+}
+
+// ============================================================================
+// JOB SKILL PASSIVE GAINS FOR DPS CALCULATION
+// ============================================================================
+
+/**
+ * Mapping of skill effect property names to calculator stat names
+ * This maps the property names in DARK_KNIGHT_SKILLS to the stat names expected by calculateDamage()
+ */
+const SKILL_EFFECT_TO_CALCULATOR_STAT = {
+    // Attack speed
+    'attackSpeed': 'attackSpeed',
+
+    // Min/Max damage
+    'minDamageRatio': 'minDamage',
+    'maxDamageRatio': 'maxDamage',
+
+    // Critical stats
+    'criticalRate': 'critRate',
+    'criticalDamage': 'critDamage',
+
+    // Main stat (STR conversion)
+    'strFromDefense': 'mainStat',  // Special: needs defense value for calculation
+
+    // Damage types - not directly mappable, need special handling
+    'attackBonus': null,  // Buff skill, not passive
+    'defenseBonus': null,  // Not DPS relevant
+    'damageTakenIncrease': null,  // Not DPS relevant
+    'toughnessBonus': null,  // Not DPS relevant
+    'hpRecovery': null,  // Not DPS relevant
+    'debuffTolerance': null  // Not DPS relevant
+};
+
+/**
+ * Get DPS-relevant passives from generated class skills by job tier
+ * Works with the new format from all-class-skills.js
+ * @param {object} classSkills - The skill data object for a class (e.g., HERO_SKILLS)
+ * @param {number} jobTier - Numeric job tier (1, 2, 3, or 4)
+ * @returns {Array} - Array of passive skill objects with DPS-relevant effects
+ */
+function getPassivesByTier(classSkills, jobTier) {
+    const passives = [];
+
+    for (const [skillKey, skillData] of Object.entries(classSkills)) {
+        // Only include skills from the specified job tier that are DPS relevant
+        if (skillData.jobStep === jobTier && !skillData.isComplex) {
+            passives.push({
+                skillKey,
+                name: skillData.name,
+                skillData
+            });
+        }
+    }
+
+    return passives;
+}
+
+/**
+ * Get DPS-relevant complex passives from generated class skills by job tier
+ * @param {object} classSkills - The skill data object for a class (e.g., HERO_SKILLS)
+ * @param {number} jobTier - Numeric job tier (1, 2, 3, or 4)
+ * @returns {Array} - Array of complex passive skill objects
+ */
+function getComplexPassivesByTier(classSkills, jobTier) {
+    const passives = [];
+
+    for (const [skillKey, skillData] of Object.entries(classSkills)) {
+        // Only include complex skills from the specified job tier
+        if (skillData.jobStep === jobTier && skillData.isComplex) {
+            passives.push({
+                skillKey,
+                name: skillData.name,
+                skillData
+            });
+        }
+    }
+
+    return passives;
+}
+
+/**
+ * Get DPS-relevant passives from DARK_KNIGHT_SKILLS by job tier
+ * @param {string} jobTier - 'firstJob', 'secondJob', 'thirdJob', or 'fourthJob'
+ * @returns {Array} - Array of passive skill objects with DPS-relevant effects
+ */
+function getDarkKnightPassivesByTier(jobTier) {
+    const passives = [];
+
+    for (const [skillKey, skillData] of Object.entries(DARK_KNIGHT_SKILLS)) {
+        // Only include passives from the specified job tier
+        if (skillData.isPassive && skillData.jobTier === jobTier) {
+            passives.push({
+                skillKey,
+                name: skillData.name,
+                skillData
+            });
+        }
+    }
+
+    return passives;
+}
+
+/**
+ * Convert string job tier name to numeric tier
+ * @param {string} jobTierStr - 'firstJob', 'secondJob', 'thirdJob', or 'fourthJob'
+ * @returns {number} - Numeric job tier (1, 2, 3, or 4)
+ */
+function jobTierStringToNumber(jobTierStr) {
+    const mapping = {
+        'firstJob': 1,
+        'secondJob': 2,
+        'thirdJob': 3,
+        'fourthJob': 4
+    };
+    return mapping[jobTierStr] || 1;
+}
+
+/**
+ * Calculate passive stat gains from job skill level bonuses
+ * @param {string} className - Class name (e.g., 'dark-knight')
+ * @param {number} characterLevel - Current character level
+ * @param {object} skillLevelBonuses - Object with jobTier keys and skill level bonus values
+ *   Example: { firstJob: 0, secondJob: 1, thirdJob: 2, fourthJob: 0, allSkills: 1 }
+ * @param {object} currentStats - Current character stats (needed for Iron Wall defense → STR conversion)
+ * @returns {object} - Object with stat changes and breakdown
+ *   Example: {
+ *     statChanges: { attackSpeed: 6.5, minDamage: 19.5, critRate: 10.4, critDamage: 39 },
+ *     breakdown: [{ passive: "Weapon Acceleration", stat: "attackSpeed", gain: 6.5 }],
+ *     complexPassives: [{ passive: "Final Attack", note: "25% chance to proc 45.5% damage" }]
+ *   }
+ */
+export function calculateJobSkillPassiveGains(className, characterLevel, skillLevelBonuses, currentStats = {}) {
+    // Get the class skills data
+    const classSkills = CLASS_TO_SKILLS_MAP[className];
+
+    if (!classSkills) {
+        return { statChanges: {}, breakdown: [], complexPassives: [] };
+    }
+
+    const statChanges = {};
+    const breakdown = [];
+    const complexPassives = [];
+
+    const jobTiers = [1, 2, 3, 4];
+    const jobTierNames = ['firstJob', 'secondJob', 'thirdJob', 'fourthJob'];
+    const allSkillsBonus = skillLevelBonuses.allSkills || 0;
+
+    for (let i = 0; i < jobTiers.length; i++) {
+        const tierNumber = jobTiers[i];
+        const tierName = jobTierNames[i];
+        const tierBonus = (skillLevelBonuses[tierName] || 0) + allSkillsBonus;
+
+        if (tierBonus === 0) continue;  // Skip if no bonus for this tier
+
+        // Get regular passives for this tier
+        const passives = getPassivesByTier(classSkills, tierNumber);
+
+        for (const { name, skillData } of passives) {
+            // Calculate input levels for factor table lookup using shared helper
+            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, 0);
+            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, tierBonus);
+
+            // Process each effect in the skill's effects array
+            for (const effect of skillData.effects) {
+                // The 'type' field is "flat" or "percent"
+                const isFlat = effect.type === 'flat';
+
+                // Calculate the stat value at base input level
+                const baseValue = calculateSkillValue(
+                    effect.baseValue,
+                    effect.factorIndex,
+                    baseInputLevel,
+                    true,  // scalesWithLevel - always true for passives
+                    isFlat
+                );
+
+                // Calculate the stat value at bonus input level
+                const bonusValue = calculateSkillValue(
+                    effect.baseValue,
+                    effect.factorIndex,
+                    bonusInputLevel,
+                    true,  // scalesWithLevel - always true for passives
+                    isFlat
+                );
+
+                const statGain = bonusValue - baseValue;
+                const calculatorStat = effect.stat;
+
+                // Special handling for defense stat (converts to mainStat for certain classes)
+                if (calculatorStat === 'defense' && currentStats.defense) {
+                    const baseStrGain = (currentStats.defense * baseValue) / 100;
+                    const bonusStrGain = (currentStats.defense * bonusValue) / 100;
+                    const strGain = bonusStrGain - baseStrGain;
+
+                    // Convert STR to stat damage (100 STR = 1% stat damage)
+                    const baseStatDamage = baseStrGain / 100;
+                    const bonusStatDamage = bonusStrGain / 100;
+                    const statDamageGain = bonusStatDamage - baseStatDamage;
+
+                    if (!statChanges['statDamage']) statChanges['statDamage'] = 0;
+                    statChanges['statDamage'] += statDamageGain;
+
+                    breakdown.push({
+                        passive: name,
+                        stat: 'statDamage',
+                        statDisplay: 'Stat Damage',
+                        baseValue: baseStatDamage,
+                        bonusValue: bonusStatDamage,
+                        gain: statDamageGain,
+                        isPercent: true,
+                        note: `${baseValue.toFixed(2)}% → ${bonusValue.toFixed(2)}% DEF conversion = ${baseStrGain.toFixed(0)} → ${bonusStrGain.toFixed(0)} STR`
+                    });
+                } else {
+                    // Standard stat gain
+                    if (!statChanges[calculatorStat]) statChanges[calculatorStat] = 0;
+                    statChanges[calculatorStat] += statGain;
+
+                    // Determine if this stat should display with % sign
+                    const isPercent = ['attackSpeed', 'minDamage', 'maxDamage', 'critRate', 'critDamage', 'statDamage', 'finalDamage', 'damage', 'bossDamage', 'normalDamage', 'skillDamage', 'damageAmp', 'basicAttackDamage'].includes(calculatorStat);
+
+                    breakdown.push({
+                        passive: name,
+                        stat: calculatorStat,
+                        baseValue: baseValue,
+                        bonusValue: bonusValue,
+                        gain: statGain,
+                        isPercent: isPercent
+                    });
+                }
+            }
+        }
+
+        // Get complex passives for this tier (these have notes/conditions and are shown separately)
+        const complexPassivesForTier = getComplexPassivesByTier(classSkills, tierNumber);
+
+        for (const { name, skillData } of complexPassivesForTier) {
+            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, 0);
+            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, tierBonus);
+
+            // Complex passives are just shown with their note
+            // If they have effects, we calculate the difference to show the gain
+            if (skillData.effects && skillData.effects.length > 0) {
+                for (const effect of skillData.effects) {
+                    const isFlat = effect.type === 'flat';
+
+                    const baseValue = calculateSkillValue(
+                        effect.baseValue,
+                        effect.factorIndex,
+                        baseInputLevel,
+                        true,
+                        isFlat
+                    );
+
+                    const bonusValue = calculateSkillValue(
+                        effect.baseValue,
+                        effect.factorIndex,
+                        bonusInputLevel,
+                        true,
+                        isFlat
+                    );
+
+                    const gain = bonusValue - baseValue;
+                    const calculatorStat = effect.stat;
+
+                    complexPassives.push({
+                        passive: name,
+                        stat: calculatorStat,
+                        baseValue: baseValue,
+                        bonusValue: bonusValue,
+                        gain: gain,
+                        isPercent: !isFlat,
+                        note: skillData.note || ''
+                    });
+                }
+            } else {
+                // Just show the note for complex passives with no effects
+                complexPassives.push({
+                    passive: name,
+                    note: skillData.note || 'Complex passive'
+                });
+            }
+        }
+    }
+
+    return {
+        statChanges,
+        breakdown,
+        complexPassives
     };
 }

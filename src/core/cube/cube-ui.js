@@ -157,7 +157,7 @@ export function setupRaritySelector() {
         cubeSlotData[currentCubeSlot][currentPotentialType].rarity = e.target.value;
         updateSlotButtonColors(); // Update slot button border colors
         updateCubePotentialUI(); // This will clear invalid lines
-        saveCubePotentialData(); // Save after clearing invalid lines
+        saveCubePotentialData(cubeSlotData); // Save after clearing invalid lines
 
         // If rankings tab is visible, update rankings display
         const rankingsContent = document.getElementById('cube-rankings-content');
@@ -274,8 +274,13 @@ export function updatePotentialLineDropdowns(setName, rarity) {
 
         if (!statSelect) continue;
 
+        // Remove old event listeners by cloning the element
+        const newStatSelect = statSelect.cloneNode(false);
+        statSelect.parentNode.replaceChild(newStatSelect, statSelect);
+        const cleanStatSelect = document.getElementById(`cube-${setName}-line${lineNum}-stat`);
+
         // Clear existing options
-        statSelect.innerHTML = '<option value="">-- Select Stat --</option>';
+        cleanStatSelect.innerHTML = '<option value="">-- Select Stat --</option>';
 
         // Get available stats for this line
         let lineData = [...(potentialData[`line${lineNum}`] || [])];
@@ -319,11 +324,11 @@ export function updatePotentialLineDropdowns(setName, rarity) {
             option.dataset.stat = opt.stat;
             option.dataset.value = opt.value;
             option.dataset.prime = opt.prime;
-            statSelect.appendChild(option);
+            cleanStatSelect.appendChild(option);
         });
 
         // Add change listener
-        statSelect.addEventListener('change', (e) => {
+        cleanStatSelect.addEventListener('change', (e) => {
             const selectedOption = e.target.selectedOptions[0];
             if (selectedOption && selectedOption.dataset.value) {
                 // Save to slot data
@@ -334,7 +339,7 @@ export function updatePotentialLineDropdowns(setName, rarity) {
                     prime: prime === 'true'
                 };
 
-                saveCubePotentialData();
+                saveCubePotentialData(cubeSlotData);
                 calculateComparisonOrchestrator();
             } else {
                 cubeSlotData[currentCubeSlot][currentPotentialType][setName][`line${lineNum}`] = {
@@ -342,7 +347,7 @@ export function updatePotentialLineDropdowns(setName, rarity) {
                     value: 0,
                     prime: false
                 };
-                saveCubePotentialData();
+                saveCubePotentialData(cubeSlotData);
                 calculateComparisonOrchestrator();
             }
         });

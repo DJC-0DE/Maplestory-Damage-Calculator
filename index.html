@@ -171,7 +171,7 @@
                     <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                         <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('character-stats')">Stats</button>
                         <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-mastery')">Skill Mastery</button>
-                        <button style="display: none;" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-details')">Skill Details</button>
+                        <button  class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-details')">Skill Details</button>
                     </div>
 
                     <!-- Character Stats Sub-tab -->
@@ -737,10 +737,12 @@
                     <div>
                         <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
                             Comparison Items</h3>
-                        <div id="comparison-items-container"
-                            style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
-                        <button class="calculate-btn" onclick="addComparisonItem()">+
-                            Add Item</button>
+                        <!-- Tab Navigation -->
+                        <div id="comparison-tabs-container" class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                            <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="addComparisonItem()">+ Add Item</button>
+                        </div>
+                        <!-- Comparison Items Content -->
+                        <div id="comparison-items-container" style="margin-bottom: 10px;"></div>
                     </div>
                 </div>
                 <button class="calculate-btn" onclick="calculate()" style="margin-bottom: 20px;">Calculate All</button>

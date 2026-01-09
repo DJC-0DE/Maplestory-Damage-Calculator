@@ -27,31 +27,96 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
     const expectedNormalDamagePercentChange = equippedDamageValues ? getPercentChangeDisplay(normalResults.expectedDamage, equippedDamageValues.expectedDamageNormal) : '';
     const normalDpsPercentChjange = equippedDamageValues ? getPercentChangeDisplay(normalResults.dps, equippedDamageValues.dpsNormal) : '';
 
+    // Generate passive gains breakdown HTML
+    let passiveGainsHTML = '';
+    if (stats.passiveGainsBreakdown && stats.passiveGainsBreakdown.comparison) {
+        const gains = stats.passiveGainsBreakdown.comparison;
+
+        // Mapping for friendly stat names
+        const statDisplayNames = {
+            'attackSpeed': 'Attack Speed',
+            'minDamage': 'Min Damage',
+            'maxDamage': 'Max Damage',
+            'critRate': 'Critical Rate',
+            'critDamage': 'Critical Damage',
+            'statDamage': 'Stat Damage',
+            'skillDamage': 'Skill Damage',
+            'damage': 'Damage',
+            'bossDamage': 'Boss Damage',
+            'normalDamage': 'Normal Damage',
+            'attack': 'Attack',
+            'mainStat': 'Main Stat',
+            'basicAttackDamage': 'Basic Attack Damage',
+            'damageAmp': 'Damage Amplification',
+            'finalDamage': 'Final Damage'
+        };
+
+        if (gains.breakdown && gains.breakdown.length > 0) {
+            passiveGainsHTML = `
+                <div class="damage-box">
+                    <h3 onclick="toggleSubDetails('passive-gains-${uniqueId}')" style="cursor: pointer; user-select: none;">Passive Skill Gains <span id="passive-gains-${uniqueId}-icon">▼</span></h3>
+                    <div id="passive-gains-${uniqueId}" class="collapsible-section">
+                        ${gains.breakdown.map(item => {
+                            const statLabel = item.statDisplay || statDisplayNames[item.stat] || item.stat;
+                            const percentSign = item.isPercent ? '%' : '';
+                            const gainSign = item.gain >= 0 ? '+' : '';
+                            const fromTo = `${item.baseValue.toFixed(2)}${percentSign} → ${item.bonusValue.toFixed(2)}${percentSign}`;
+                            const note = item.note ? ` <span style="color: #9ca3af; font-size: 0.85em;">(${item.note})</span>` : '';
+                            return `<div class="damage-row">
+                                <span class="damage-label">${item.passive}:</span>
+                                <span class="damage-value">${gainSign}${item.gain.toFixed(2)}${percentSign} ${statLabel} (${fromTo})${note}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (gains.complexPassives && gains.complexPassives.length > 0) {
+            passiveGainsHTML += `
+                <div class="damage-box">
+                    <h3 onclick="toggleSubDetails('complex-passives-${uniqueId}')" style="cursor: pointer; user-select: none;">Complex Passives (Not in DPS) <span id="complex-passives-${uniqueId}-icon">▼</span></h3>
+                    <div id="complex-passives-${uniqueId}" class="collapsible-section">
+                        ${gains.complexPassives.map(item => {
+                            // If we have gain data, format it with the stat changes
+                            if (item.stat && item.gain !== undefined && item.baseValue !== undefined && item.bonusValue !== undefined) {
+                                const statName = statDisplayNames[item.stat] || item.stat;
+                                const percentSign = item.isPercent ? '%' : '';
+                                const sign = item.gain >= 0 ? '+' : '';
+                                const fromTo = `${item.baseValue.toFixed(2)}${percentSign} → ${item.bonusValue.toFixed(2)}${percentSign}`;
+                                return `<div class="damage-row">
+                                    <span class="damage-label">${item.passive}:</span>
+                                    <span class="damage-value" style="color: #fbbf24;">${sign}${item.gain.toFixed(2)}${percentSign} ${statName} (${fromTo})</span>
+                                </div>`;
+                            } else {
+                                // Otherwise just show the note
+                                return `<div class="damage-row">
+                                    <span class="damage-label">${item.passive}:</span>
+                                    <span class="damage-value" style="color: #fbbf24;">${item.note || ''}</span>
+                                </div>`;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
     const html = `
-        <div class="result-panel" style="background: ${bgGradient}; border: 2px solid ${borderColor}; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">
-            <h3 style="color: ${borderColor}; margin-bottom: 15px; text-align: center; font-size: 1.2em; font-weight: 600;">${itemName}</h3>
+        <div class="result-panel" style="background: ${bgGradient}; border: 2px solid ${borderColor}; border-radius: 16px; padding: 16px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">
+            <h3 style="color: ${borderColor}; margin-bottom: 12px; text-align: center; font-size: 1.1em; font-weight: 600;">${itemName}</h3>
 
-        <div class="expected-damage">
-            <div class="label">Expected Damage (Boss)</div>
-            <div class="value">${formatNumber(bossResults.expectedDamage)}${expectedBossDamagePercentChange}</div>
-        </div>
-
-        <div class="expected-damage" style="margin-top: 10px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(37, 99, 235, 0.2));">
+        <div class="expected-damage" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(37, 99, 235, 0.2));">
             <div class="label">DPS (Boss)</div>
             <div class="value">${formatNumber(bossResults.dps)}${bossDpsPercentChange}</div>
         </div>
 
-        <div class="expected-damage" style="margin-top: 10px;">
-            <div class="label">Expected Damage (Normal)</div>
-            <div class="value">${formatNumber(normalResults.expectedDamage)}${expectedNormalDamagePercentChange}</div>
-        </div>
-
-        <div class="expected-damage" style="margin-top: 10px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(37, 99, 235, 0.2));">
+        <div class="expected-damage" style="margin-top: 8px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(37, 99, 235, 0.2));">
             <div class="label">DPS (Normal)</div>
             <div class="value">${formatNumber(normalResults.dps)}${normalDpsPercentChjange}</div>
         </div>
 
-        <div class="toggle-details" onclick="toggleDetails('${uniqueId}')">
+        <div class="toggle-details" onclick="toggleDetails('${uniqueId}')" style="margin-top: 12px;">
             Show Detailed Breakdown
         </div>
 
@@ -122,6 +187,8 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
                 </div>
             </div>
 
+            ${passiveGainsHTML}
+
             <div class="damage-box">
                 <h3 onclick="toggleSubDetails('multipliers-${uniqueId}')" style="cursor: pointer; user-select: none;">Multipliers Applied <span id="multipliers-${uniqueId}-icon">▼</span></h3>
                 <div id="multipliers-${uniqueId}" class="collapsible-section">
@@ -139,6 +206,10 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
             <div class="damage-box">
                 <h3 onclick="toggleSubDetails('boss-${uniqueId}')" style="cursor: pointer; user-select: none;">VS Boss Monsters <span id="boss-${uniqueId}-icon">▼</span></h3>
                 <div id="boss-${uniqueId}" class="collapsible-section">
+                <div class="damage-row">
+                    <span class="damage-label">Expected Damage:</span>
+                    <span class="damage-value">${formatNumber(bossResults.expectedDamage)}</span>
+                </div>
                 <div class="damage-row">
                     <span class="damage-label">Base Damage:</span>
                     <span class="damage-value">${formatNumber(bossResults.baseDamage)}</span>
@@ -173,6 +244,10 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
             <div class="damage-box">
                 <h3 onclick="toggleSubDetails('normal-${uniqueId}')" style="cursor: pointer; user-select: none;">VS Normal Monsters <span id="normal-${uniqueId}-icon">▼</span></h3>
                 <div id="normal-${uniqueId}" class="collapsible-section">
+                <div class="damage-row">
+                    <span class="damage-label">Expected Damage:</span>
+                    <span class="damage-value">${formatNumber(normalResults.expectedDamage)}</span>
+                </div>
                 <div class="damage-row">
                     <span class="damage-label">Base Damage:</span>
                     <span class="damage-value">${formatNumber(normalResults.baseDamage)}</span>

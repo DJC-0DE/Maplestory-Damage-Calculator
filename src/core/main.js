@@ -22,7 +22,8 @@ import {
     calculate3rdJobSkillCoefficient,
     calculate4thJobSkillCoefficient,
     getAllDarkKnightSkills,
-    DARK_KNIGHT_SKILLS
+    DARK_KNIGHT_SKILLS,
+    calculateJobSkillPassiveGains
 } from './skill-coefficient.js';
 import { initializeInnerAbilityAnalysis, switchInnerAbilityTab, toggleLineBreakdown, sortPresetTable, sortTheoreticalTable } from './inner-ability.js';
 import { initializeArtifactPotential, sortArtifactTable } from './artifact-potential.js';
@@ -287,27 +288,104 @@ export function applyItemToStats(baseStats, equippedItem, comparisonItem) {
     const characterLevel = parseInt(document.getElementById('character-level')?.value) || 0;
     const jobTier = getSelectedJobTier();
 
-    // Get base skill level (without items)
+    // Get all job tier base levels (needed for both coefficient calc and passive gains)
+    const baseSkillLevel1st = parseInt(document.getElementById('skill-level-1st-base')?.value) || 0;
+    const baseSkillLevel2nd = parseInt(document.getElementById('skill-level-2nd-base')?.value) || 0;
     const baseSkillLevel3rd = parseInt(document.getElementById('skill-level-3rd-base')?.value) || 0;
     const baseSkillLevel4th = parseInt(document.getElementById('skill-level-4th-base')?.value) || 0;
+    const defense = parseInt(document.getElementById('defense-base')?.value) || 0;
+
+    // Calculate total skill level for 3rd and 4th job (for coefficient calculation)
+    const equipped3rdJobTotal = baseSkillLevel3rd + (equippedItem.skillLevel3rd || 0) + (equippedItem.skillLevelAll || 0);
+    const equipped4thJobTotal = baseSkillLevel4th + (equippedItem.skillLevel4th || 0) + (equippedItem.skillLevelAll || 0);
+    const comparison3rdJobTotal = baseSkillLevel3rd + (comparisonItem.skillLevel3rd || 0) + (comparisonItem.skillLevelAll || 0);
+    const comparison4thJobTotal = baseSkillLevel4th + (comparisonItem.skillLevel4th || 0) + (comparisonItem.skillLevelAll || 0);
 
     // Calculate coefficient with equipped item's skill level
-    const equippedSkillLevel = jobTier === '4th' ? baseSkillLevel4th : baseSkillLevel3rd;
     const coeffWithEquipped = jobTier === '4th'
-        ? calculate4thJobSkillCoefficient(characterLevel, equippedSkillLevel + (equippedItem.skillLevel || 0))
-        : calculate3rdJobSkillCoefficient(characterLevel, equippedSkillLevel + (equippedItem.skillLevel || 0));
+        ? calculate4thJobSkillCoefficient(characterLevel, equipped4thJobTotal)
+        : calculate3rdJobSkillCoefficient(characterLevel, equipped3rdJobTotal);
 
     // Calculate coefficient with comparison item's skill level
     const coeffWithComparison = jobTier === '4th'
-        ? calculate4thJobSkillCoefficient(characterLevel, equippedSkillLevel + (comparisonItem.skillLevel || 0))
-        : calculate3rdJobSkillCoefficient(characterLevel, equippedSkillLevel + (comparisonItem.skillLevel || 0));
+        ? calculate4thJobSkillCoefficient(characterLevel, comparison4thJobTotal)
+        : calculate3rdJobSkillCoefficient(characterLevel, comparison3rdJobTotal);
 
     // Apply the difference
     newStats.skillCoeff += (coeffWithComparison - coeffWithEquipped);
 
+    // Apply passive skill gains from skill level bonuses
+    // Calculate the DIFFERENCE in skill levels between equipped and comparison items for each tier
+    const skillLevelDiff1st = (comparisonItem.skillLevel1st || 0) - (equippedItem.skillLevel1st || 0);
+    const skillLevelDiff2nd = (comparisonItem.skillLevel2nd || 0) - (equippedItem.skillLevel2nd || 0);
+    const skillLevelDiff3rd = (comparisonItem.skillLevel3rd || 0) - (equippedItem.skillLevel3rd || 0);
+    const skillLevelDiff4th = (comparisonItem.skillLevel4th || 0) - (equippedItem.skillLevel4th || 0);
+    const skillLevelDiffAll = (comparisonItem.skillLevelAll || 0) - (equippedItem.skillLevelAll || 0);
+
+    // Only calculate passive gains if there's a difference in any skill level
+    const hasSkillLevelDiff = skillLevelDiff1st !== 0 || skillLevelDiff2nd !== 0 || skillLevelDiff3rd !== 0 ||
+                              skillLevelDiff4th !== 0 || skillLevelDiffAll !== 0;
+
+    let passiveGainsDiff = { statChanges: {}, breakdown: [], complexPassives: [] };
+
+    if (hasSkillLevelDiff) {
+        // Calculate gains at base skill level (with equipped item)
+        const basePassiveGains = calculateJobSkillPassiveGains(
+            currentClass,
+            characterLevel,
+            {
+                firstJob: 0,
+                secondJob: 0,
+                thirdJob: 0,
+                fourthJob: 0,
+                allSkills: 0
+            },
+            { defense }
+        );
+
+        // Calculate gains at base + difference
+        const bonusPassiveGains = calculateJobSkillPassiveGains(
+            currentClass,
+            characterLevel,
+            {
+                firstJob: skillLevelDiff1st,
+                secondJob: skillLevelDiff2nd,
+                thirdJob: skillLevelDiff3rd,
+                fourthJob: skillLevelDiff4th,
+                allSkills: skillLevelDiffAll
+            },
+            { defense }
+        );
+
+        // Calculate the difference in passive gains
+        passiveGainsDiff.breakdown = bonusPassiveGains.breakdown;
+        passiveGainsDiff.complexPassives = bonusPassiveGains.complexPassives;
+
+        Object.keys(bonusPassiveGains.statChanges).forEach(stat => {
+            const baseGain = basePassiveGains.statChanges[stat] || 0;
+            const bonusGain = bonusPassiveGains.statChanges[stat] || 0;
+            const gainDiff = bonusGain - baseGain;
+
+            passiveGainsDiff.statChanges[stat] = gainDiff;
+
+            if (newStats[stat] !== undefined && gainDiff !== 0) {
+                newStats[stat] += gainDiff;
+            }
+        });
+    }
+
+    // Store passive gain breakdown for UI display (only show if there's a difference)
+    if (hasSkillLevelDiff) {
+        newStats.passiveGainsBreakdown = {
+            comparison: passiveGainsDiff
+        };
+    }
+
     // Apply all other stats dynamically
     const statsToApply = allItemStatProperties.filter(prop =>
-        prop !== 'attack' && prop !== 'mainStat' && prop !== 'defense' && prop !== 'skillLevel'
+        prop !== 'attack' && prop !== 'mainStat' && prop !== 'defense' &&
+        prop !== 'skillLevel1st' && prop !== 'skillLevel2nd' &&
+        prop !== 'skillLevel3rd' && prop !== 'skillLevel4th' && prop !== 'skillLevelAll'
     );
 
     statsToApply.forEach(prop => {

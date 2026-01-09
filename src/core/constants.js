@@ -18,7 +18,11 @@ export const availableStats = [
     { value: 'defense', label: 'Defense (DK: 12.7% → Main Stat)' },
     { value: 'crit-rate', label: 'Critical Rate (%)' },
     { value: 'crit-damage', label: 'Critical Damage (%)' },
-    { value: 'skill-level', label: '3rd Job Skill Level' },
+    { value: 'skill-level-1st', label: '1st Job Skill Level' },
+    { value: 'skill-level-2nd', label: '2nd Job Skill Level' },
+    { value: 'skill-level-3rd', label: '3rd Job Skill Level' },
+    { value: 'skill-level-4th', label: '4th Job Skill Level' },
+    { value: 'skill-level-all', label: 'All Skill Levels' },
     { value: 'normal-damage', label: 'Normal Monster Damage (%)' },
     { value: 'boss-damage', label: 'Boss Monster Damage (%)' },
     { value: 'damage', label: 'Damage (%)' },
@@ -33,7 +37,11 @@ export const itemStatProperties = {
     'defense': 'defense',
     'crit-rate': 'critRate',
     'crit-damage': 'critDamage',
-    'skill-level': 'skillLevel',
+    'skill-level-1st': 'skillLevel1st',
+    'skill-level-2nd': 'skillLevel2nd',
+    'skill-level-3rd': 'skillLevel3rd',
+    'skill-level-4th': 'skillLevel4th',
+    'skill-level-all': 'skillLevelAll',
     'normal-damage': 'normalDamage',
     'boss-damage': 'bossDamage',
     'damage': 'damage',
@@ -44,7 +52,8 @@ export const itemStatProperties = {
 // List of all stat properties that can exist on an item (for iteration)
 export const allItemStatProperties = [
     'attack', 'mainStat', 'defense', 'critRate', 'critDamage',
-    'skillLevel', 'normalDamage', 'bossDamage', 'damage',
+    'skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th', 'skillLevelAll',
+    'normalDamage', 'bossDamage', 'damage',
     'minDamage', 'maxDamage'
 ];
 

@@ -17,12 +17,7 @@ export function unequipItem() {
         return;
     }
 
-    // Subtract equipped item stats from base stats
-    const weaponMultiplier = 1 + (getWeaponAttackBonus() / 100);
-
-    const attackBase = document.getElementById('attack-base');
-    attackBase.value = Math.floor(parseFloat(attackBase.value) - (equippedItem.attack * weaponMultiplier));
-
+    // Subtract equipped item stats from base stats (only from stat lines, not base attack)
     const statDamageBase = document.getElementById('stat-damage-base');
     let statDamageChange = equippedItem.mainStat / 100;
     // For Dark Knight: defense converts to main stat
@@ -38,13 +33,15 @@ export function unequipItem() {
     const critDamageBase = document.getElementById('crit-damage-base');
     critDamageBase.value = (parseFloat(critDamageBase.value) - equippedItem.critDamage).toFixed(1);
 
-    // Remove skill level from the appropriate job tier input and recalculate coefficient
-    const jobTier = getSelectedJobTier();
-    const skillLevelInput = document.getElementById(jobTier === '4th' ? 'skill-level-4th-base' : 'skill-level-3rd-base');
-    if (skillLevelInput) {
-        skillLevelInput.value = Math.max(0, parseInt(skillLevelInput.value || 0) - equippedItem.skillLevel);
-        updateSkillCoefficient();
-    }
+    // Remove skill levels from all job tier inputs
+    ['1st', '2nd', '3rd', '4th'].forEach((tier, index) => {
+        const skillKey = ['skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th'][index];
+        const skillLevelInput = document.getElementById(`skill-level-${tier}-base`);
+        if (skillLevelInput && equippedItem[skillKey]) {
+            skillLevelInput.value = Math.max(0, parseInt(skillLevelInput.value || 0) - equippedItem[skillKey]);
+        }
+    });
+    updateSkillCoefficient();
 
     const normalDamageBase = document.getElementById('normal-damage-base');
     normalDamageBase.value = (parseFloat(normalDamageBase.value) - equippedItem.normalDamage).toFixed(1);
@@ -64,31 +61,24 @@ export function unequipItem() {
     // Move to comparison items
     addComparisonItem();
     document.getElementById(`item-${comparisonItemCount}-name`).value = equippedItem.name || 'Unequipped Item';
-    document.getElementById(`item-${comparisonItemCount}-attack`).value = equippedItem.attack;
 
-    // Add stats to comparison item
-    const statMapping = [
-        { type: 'main-stat', value: equippedItem.mainStat },
-        { type: 'defense', value: equippedItem.defense },
-        { type: 'crit-rate', value: equippedItem.critRate },
-        { type: 'crit-damage', value: equippedItem.critDamage },
-        { type: 'skill-level', value: equippedItem.skillLevel },
-        { type: 'normal-damage', value: equippedItem.normalDamage },
-        { type: 'boss-damage', value: equippedItem.bossDamage },
-        { type: 'damage', value: equippedItem.damage },
-        { type: 'min-damage', value: equippedItem.minDamage },
-        { type: 'max-damage', value: equippedItem.maxDamage }
-    ];
+    // Get base attack from the attack field (not from stat lines)
+    const baseAttack = parseFloat(document.getElementById('equipped-attack')?.value) || 0;
+    document.getElementById(`item-${comparisonItemCount}-attack`).value = baseAttack;
 
-    statMapping.forEach(stat => {
-        if (stat.value !== 0) {
+    // Copy stat lines from equipped to comparison item (preserving the exact structure)
+    for (let i = 1; i <= 10; i++) {
+        const typeElem = document.getElementById(`equipped-stat-${i}-type`);
+        const valueElem = document.getElementById(`equipped-stat-${i}-value`);
+
+        if (typeElem && valueElem && typeElem.value && valueElem.value) {
             addComparisonItemStat(comparisonItemCount);
             const container = document.getElementById(`item-${comparisonItemCount}-stats-container`);
             const statCount = container.children.length;
-            document.getElementById(`item-${comparisonItemCount}-stat-${statCount}-type`).value = stat.type;
-            document.getElementById(`item-${comparisonItemCount}-stat-${statCount}-value`).value = stat.value;
+            document.getElementById(`item-${comparisonItemCount}-stat-${statCount}-type`).value = typeElem.value;
+            document.getElementById(`item-${comparisonItemCount}-stat-${statCount}-value`).value = valueElem.value;
         }
-    });
+    }
 
     // Clear equipped item
     document.getElementById('equipped-name').value = 'Current Item';
@@ -121,12 +111,7 @@ export function equipItem(itemId) {
     // Get comparison item data
     const comparisonItem = getItemStats(`item-${itemId}`);
 
-    // Add comparison item stats to base stats
-    const weaponMultiplier = 1 + (getWeaponAttackBonus() / 100);
-
-    const attackBase = document.getElementById('attack-base');
-    attackBase.value = Math.floor(parseFloat(attackBase.value) + (comparisonItem.attack * weaponMultiplier));
-
+    // Add comparison item stats to base stats (only from stat lines, not base attack)
     const statDamageBase = document.getElementById('stat-damage-base');
     let statDamageChange = comparisonItem.mainStat / 100;
     // For Dark Knight: defense converts to main stat
@@ -142,13 +127,15 @@ export function equipItem(itemId) {
     const critDamageBase = document.getElementById('crit-damage-base');
     critDamageBase.value = (parseFloat(critDamageBase.value) + comparisonItem.critDamage).toFixed(1);
 
-    // Add skill level to the appropriate job tier input and recalculate coefficient
-    const jobTier = getSelectedJobTier();
-    const skillLevelInput = document.getElementById(jobTier === '4th' ? 'skill-level-4th-base' : 'skill-level-3rd-base');
-    if (skillLevelInput) {
-        skillLevelInput.value = parseInt(skillLevelInput.value || 0) + comparisonItem.skillLevel;
-        updateSkillCoefficient();
-    }
+    // Add skill levels to all job tier inputs
+    ['1st', '2nd', '3rd', '4th'].forEach((tier, index) => {
+        const skillKey = ['skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th'][index];
+        const skillLevelInput = document.getElementById(`skill-level-${tier}-base`);
+        if (skillLevelInput && comparisonItem[skillKey]) {
+            skillLevelInput.value = parseInt(skillLevelInput.value || 0) + comparisonItem[skillKey];
+        }
+    });
+    updateSkillCoefficient();
 
     const normalDamageBase = document.getElementById('normal-damage-base');
     normalDamageBase.value = (parseFloat(normalDamageBase.value) + comparisonItem.normalDamage).toFixed(1);
@@ -167,29 +154,22 @@ export function equipItem(itemId) {
 
     // Move to equipped item
     document.getElementById('equipped-name').value = comparisonItem.name || 'Equipped Item';
-    document.getElementById('equipped-attack').value = comparisonItem.attack;
 
-    // Add stats to equipped item
-    const statMapping = [
-        { type: 'main-stat', value: comparisonItem.mainStat },
-        { type: 'defense', value: comparisonItem.defense },
-        { type: 'crit-rate', value: comparisonItem.critRate },
-        { type: 'crit-damage', value: comparisonItem.critDamage },
-        { type: 'skill-level', value: comparisonItem.skillLevel },
-        { type: 'normal-damage', value: comparisonItem.normalDamage },
-        { type: 'boss-damage', value: comparisonItem.bossDamage },
-        { type: 'damage', value: comparisonItem.damage },
-        { type: 'min-damage', value: comparisonItem.minDamage },
-        { type: 'max-damage', value: comparisonItem.maxDamage }
-    ];
+    // Get base attack from the attack field (not from stat lines)
+    const baseAttack = parseFloat(document.getElementById(`item-${itemId}-attack`)?.value) || 0;
+    document.getElementById('equipped-attack').value = baseAttack;
 
-    statMapping.forEach(stat => {
-        if (stat.value !== 0) {
+    // Copy stat lines from comparison item to equipped (preserving the exact structure)
+    for (let i = 1; i <= 10; i++) {
+        const typeElem = document.getElementById(`item-${itemId}-stat-${i}-type`);
+        const valueElem = document.getElementById(`item-${itemId}-stat-${i}-value`);
+
+        if (typeElem && valueElem && typeElem.value && valueElem.value) {
             addEquippedStat();
-            document.getElementById(`equipped-stat-${equippedStatCount}-type`).value = stat.type;
-            document.getElementById(`equipped-stat-${equippedStatCount}-value`).value = stat.value;
+            document.getElementById(`equipped-stat-${equippedStatCount}-type`).value = typeElem.value;
+            document.getElementById(`equipped-stat-${equippedStatCount}-value`).value = valueElem.value;
         }
-    });
+    }
 
     // Remove comparison item
     removeComparisonItem(itemId);
