@@ -400,6 +400,14 @@ select option {
     border-bottom-color: #374151;
 }
 
+/* Highlight the upgrade currency input to make it more obvious and accessible */
+#upgrade-currency-input {
+    border: 2px solid transparent;
+    border-radius: 6px;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.06);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
 .stat-weight-table tr:last-child td {
     border-bottom: none;
 }

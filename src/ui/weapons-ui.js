@@ -683,7 +683,15 @@ export function calculateCurrencyUpgrades() {
     }
 
     if (upgradeSequence.length === 0) {
-        resultsDiv.style.display = 'none';
+        // If no upgrades could be bought with the entered currency, show a friendly message
+        // instead of hiding the results block so the user knows to save up.
+        resultsDiv.style.display = 'block';
+        if (attackGainDisplay) attackGainDisplay.textContent = `+0.00%`;
+        if (dpsGainDisplay) dpsGainDisplay.textContent = `+0.00%`;
+        if (pathDisplay) pathDisplay.innerHTML = `<span style="color: var(--text-secondary);">Most impactful upgrade can't be afforded — save up!</span>`;
+        // Hide the apply button since there is no path to apply
+        const applyUpgradesBtn = document.getElementById('apply-upgrade-path-btn');
+        if (applyUpgradesBtn) applyUpgradesBtn.style.display = 'none';
         return;
     }
 
@@ -771,20 +779,25 @@ export function calculateCurrencyUpgrades() {
     resultsDiv.style.display = 'block';
     const applyUpgradesBtn = document.getElementById('apply-upgrade-path-btn');
 
-    // update weapon levels after user has leveled weps accordingly
-    applyUpgradesBtn.onclick = () => {
-        for (const key in weaponLevels) {
-            const levelInput = document.getElementById(`level-${key}`);
-            levelInput.value = weaponLevels[key];
+    // Ensure the apply button is visible when there is a valid path
+    if (applyUpgradesBtn) {
+        applyUpgradesBtn.style.display = '';
+
+        // update weapon levels after user has leveled weps accordingly
+        applyUpgradesBtn.onclick = () => {
+            for (const key in weaponLevels) {
+                const levelInput = document.getElementById(`level-${key}`);
+                levelInput.value = weaponLevels[key];
+            }
+
+            // reset currency input
+            const currencyInput = document.getElementById('upgrade-currency-input');
+            currencyInput.value = '0';
+
+            // update/save stats
+            calculateCurrencyUpgrades();
+            saveToLocalStorage();
+            updateWeaponBonuses();
         }
-
-        // reset currency input
-        const currencyInput = document.getElementById('upgrade-currency-input');
-        currencyInput.value = '0';
-
-        // update/save stats
-        calculateCurrencyUpgrades();
-        saveToLocalStorage();
-        updateWeaponBonuses();
     }
 }
