@@ -1185,6 +1185,7 @@ export function switchSimDetailTab(strategy, tab) {
         content.style.display = content.dataset.tab === tab ? 'block' : 'none';
     });
 }
+window.switchSimDetailTab = switchSimDetailTab;
 
 // Sort summary table by column
 export function sortSummaryBy(column) {

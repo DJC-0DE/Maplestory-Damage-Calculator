@@ -144,7 +144,6 @@ export function calculateTotalDPSGain(slots) {
 // Calculate rankings for a specific rarity and slot
 export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlot) {
     const key = `${slotId}-${rarity}`;
-    console.log(`[${key}] Starting calculateRankingsForRarity`);
 
     try {
         // Initialize slot cache if needed
@@ -154,18 +153,15 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
 
         // Check if already calculated for this slot and rarity
         if (rankingsCache[slotId][rarity]) {
-            console.log(`[${key}] Already calculated, returning`);
             return;
         }
 
         // Check if already calculating this combination
         if (rankingsInProgress[key]) {
-            console.log(`[${key}] Already being calculated, returning`);
             return; // Already calculating, skip
         }
 
         // Mark as in progress
-        console.log(`[${key}] Marking as in progress`);
         rankingsInProgress[key] = true;
 
         // Check if class is selected
@@ -285,11 +281,9 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
             }
         }
 
-        console.log(`[${key}] Sorting ${rankings.length} rankings`);
         // Sort by DPS gain descending
         rankings.sort((a, b) => b.dpsGain - a.dpsGain);
 
-        console.log(`[${key}] Deduplicating rankings`);
         // Deduplicate: keep only unique combinations of lines (order doesn't matter)
         const seen = new Set();
         const deduplicatedRankings = [];
@@ -307,11 +301,9 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
             }
         }
 
-        console.log(`[${key}] Filtering rankings (${deduplicatedRankings.length} unique)`);
         // Filter out combinations with 0% or negligible DPS gain
         const filteredRankings = deduplicatedRankings.filter(combo => combo.dpsGain > 0.01);
 
-        console.log(`[${key}] Caching ${filteredRankings.length} filtered rankings`);
         // Cache the filtered results for this slot and rarity
         rankingsCache[slotId][rarity] = filteredRankings;
 
@@ -327,7 +319,6 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
                 progressBar.style.display = 'none';
             }
         }
-        console.log(`[${key}] calculateRankingsForRarity completed successfully`);
     } catch (error) {
         console.error(`[${key}] Error calculating rankings:`, error);
         const progressBar = document.getElementById('cube-rankings-progress');
@@ -336,7 +327,6 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
         }
     } finally {
         // Always mark as complete and remove from in-progress tracker
-        console.log(`[${key}] Cleaning up - removing from rankingsInProgress`);
         delete rankingsInProgress[key];
     }
 }
