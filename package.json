@@ -9,7 +9,10 @@
     "lint": "eslint *.js",
     "lint:fix": "eslint *.js --fix"
   },
-  "keywords": ["maplestory", "damage-calculator"],
+  "keywords": [
+    "maplestory",
+    "damage-calculator"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
