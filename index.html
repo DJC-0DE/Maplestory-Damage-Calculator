@@ -58,7 +58,7 @@
     </script>
 </head>
 
-<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen p-5 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
     <!-- Donation Message Notification -->
     <div id="donate-notification" class="donate-notification-theme" style="display: none; position: fixed; top: 80px; right: 20px; z-index: 1000; max-width: 400px; border-radius: 12px; padding: 16px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); animation: slideIn 0.4s ease-out;">
         <div style="display: flex; align-items: start; gap: 12px;">
@@ -72,36 +72,87 @@
         </div>
     </div>
 
-    <div class="fixed top-5 right-5 z-50 flex gap-2 items-center">
-        <a href="https://paypal.me/freakehms" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);" class="backdrop-blur-sm rounded-full px-6 py-2.5 text-sm hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 hover:shadow-xl">
-            💝 DONATE
-        </a>
-        <button onclick="toggleTheme()" id="theme-toggle" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full px-5 py-2.5 text-xl hover:-translate-y-0.5 transition-all duration-300 shadow-lg hover:shadow-xl">🌙</button>
-    </div>
+    <!-- Sidebar Backdrop (for mobile) -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
 
-    <!-- Left Navigation Sidebar (large screens only) -->
-    <nav id="left-nav-sidebar" class="left-nav-sidebar">
-        <div class="left-nav-item" onclick="scrollToSection('character-setup-card')">Character Setup</div>
-        <div class="left-nav-item" onclick="scrollToSection('character-optimization-card')">Character Optimization</div>
-        <div class="left-nav-item" onclick="scrollToSection('stat-damage-predictions-card')">Stat Damage Predictions</div>
-    </nav>
+    <!-- Main Sidebar Navigation -->
+    <aside id="app-sidebar" class="app-sidebar">
+        <nav class="sidebar-nav">
+            <!-- Loadout Section -->
+            <button class="sidebar-nav-item" data-page="setup" onclick="toggleSubMenu('setup')">
+                <span class="sidebar-icon">🎮</span>
+                <span>Loadout</span>
+                <span class="submenu-arrow">▼</span>
+            </button>
+            <div class="sidebar-submenu" id="submenu-setup">
+                <button class="sidebar-submenu-item" onclick="navigateToTab('setup', 'base-stats')">Base Stats</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('setup', 'weapon-levels')">Weapon Levels</button>
+            </div>
 
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-center mb-8 text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">Damage Calculator</h1>
-        <div class="flex flex-col sm:flex-row justify-end gap-2.5 mb-4">
-            <button onclick="exportData()" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all">📋 Copy Data</button>
-            <button onclick="importData()" class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all">📥 Paste Data</button>
+            <!-- Gear Lab Section -->
+            <button class="sidebar-nav-item" data-page="optimization" onclick="toggleSubMenu('optimization')">
+                <span class="sidebar-icon">🧪</span>
+                <span>Gear Lab</span>
+                <span class="submenu-arrow">▼</span>
+            </button>
+            <div class="sidebar-submenu" id="submenu-optimization">
+                <button class="sidebar-submenu-item" onclick="navigateToTab('optimization', 'item-comparison')">Item Comparison</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('optimization', 'inner-ability')">Inner Ability</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('optimization', 'artifact-potential')">Artifact Potential</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('optimization', 'scroll-optimizer')">Scrolling</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('optimization', 'cube-potential')">Cube Potential</button>
+            </div>
+
+            <!-- StatHub Section -->
+            <button class="sidebar-nav-item" data-page="predictions" onclick="toggleSubMenu('predictions')">
+                <span class="sidebar-icon">📊</span>
+                <span class="stat-hub-logo">Stat<span class="stat-hub-highlight">Hub</span></span>
+                <span class="submenu-arrow">▼</span>
+            </button>
+            <div class="sidebar-submenu" id="submenu-predictions">
+                <button class="sidebar-submenu-item" onclick="navigateToTab('predictions', 'stat-tables')">Stat Predictions</button>
+                <button class="sidebar-submenu-item" onclick="navigateToTab('predictions', 'equivalency')">Stat Equivalency</button>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button onclick="toggleTheme()" id="theme-toggle-sidebar" class="sidebar-footer-btn">
+                <span id="theme-icon-sidebar">🌙</span>
+                <span>Toggle Theme</span>
+            </button>
+            <a href="https://paypal.me/freakehms" target="_blank" rel="noopener noreferrer" class="sidebar-footer-btn donate-btn">
+                <span>💝</span>
+                <span>Donate</span>
+            </a>
+            <button onclick="exportData()" class="sidebar-footer-btn">
+                <span>📋</span>
+                <span>Copy Data</span>
+            </button>
+            <button onclick="importData()" class="sidebar-footer-btn">
+                <span>📥</span>
+                <span>Paste Data</span>
+            </button>
         </div>
+    </aside>
 
-        <!-- First Tabbed Area: Character Setup -->
+    <!-- Mobile Hamburger Button -->
+    <button id="mobile-menu-btn" class="mobile-menu-btn" onclick="openMobileMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Page: Loadout -->
+        <div id="page-setup" class="page-container">
+        <!-- Loadout Content -->
         <div id="character-setup-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5" style="position: relative;">
-            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Character Setup</div>
+            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Loadout</div>
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'base-stats')">Base Stats</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'weapon-levels')">Weapon Levels</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'hero-power')">Hero Power Ability</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'equipment-slots')">Slot Scrolling</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'artifacts')">Artifacts</button>
+                <!-- <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'artifacts')">Artifacts</button> -->
             </div>
 
             <!-- Base Stats Tab -->
@@ -148,6 +199,41 @@
                     <section class="paste-image-section" id="paste-image-section">
                         <div class="paste-icon">📋</div>
                     </section>
+
+                    <!-- Character Level and Job Tier -->
+                    <div style="margin-bottom: 16px; padding: 12px 0; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: end;">
+                            <div class="input-group">
+                                <label>Character Level</label>
+                                <input type="number" id="character-level" value="0" min="0" max="200" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+                            <div class="input-group">
+                                <label>Job Tier</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <button id="job-tier-3rd" class="job-tier-btn active" onclick="selectJobTier('3rd')">
+                                        3rd Job
+                                    </button>
+                                    <button id="job-tier-4th" class="job-tier-btn" onclick="selectJobTier('4th')">
+                                        4th Job
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="input-group" style="display: none;">
+                                <label>Skill Coefficient (%)</label>
+                                <input type="text" id="skill-coefficient" value="0.00" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sub-tabs for Stats and Skill Mastery -->
+                    <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                        <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('character-stats')">Stats</button>
+                        <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-mastery')">Skill Mastery</button>
+                        <button style="display: none;" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-details')">Skill Details</button>
+                    </div>
+
+                    <!-- Character Stats Sub-tab -->
+                    <div id="base-stats-character-stats" class="base-stats-subtab active">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                         <div class="input-group">
                             <label>Attack</label>
@@ -210,12 +296,30 @@
                             <label>Final Damage (%)</label>
                             <input type="number" step="0.1" id="final-damage-base" value="0">
                         </div>
-                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
+                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 0px 0;">
                         </div>
                         <div class="input-group">
+                            <label>1st Job Skill Level</label>
+                            <input type="number" id="skill-level-1st-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>2nd Job Skill Level</label>
+                            <input type="number" id="skill-level-2nd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>3rd Job Skill Level</label>
+                            <input type="number" id="skill-level-3rd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div class="input-group">
+                            <label>4th Job Skill Level</label>
+                            <input type="number" id="skill-level-4th-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                        </div>
+                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
+                        </div>
+                        <div class="input-group" style="display: none;">
                             <label>Skill Coefficient (%) <span class="info-icon" role="img" aria-label="Info"
                                     onclick="openHelpSidebar('skill-coeff')">?</span></label>
-                            <input type="number" step="0.1" id="skill-coeff-base" value="89.9">
+                            <input type="number" step="0.1" id="skill-coeff-base" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
                         </div>
                         <div class="input-group">
                             <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
@@ -276,6 +380,243 @@
                             </select>
                         </div>
                     </div>
+                    </div>
+                    <!-- End Character Stats Sub-tab -->
+
+                    <!-- Skill Mastery Sub-tab -->
+                    <div id="base-stats-skill-mastery" class="base-stats-subtab" style="display: none;">
+                        <div class="input-group" style="grid-column: 1 / -1;">
+                            <label>Skill Mastery Bonus <span class="info-icon" role="img" aria-label="Info"
+                                    onclick="openHelpSidebar('skill-mastery')">?</span></label>
+
+                            <!-- 3rd Job Mastery Table -->
+                            <div id="mastery-table-3rd" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>64</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-64" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-64">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>68</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-68" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-68">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>72</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-72" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-72">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>76</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-76" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-76">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>80</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-80" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-80">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>84</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-84" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-84">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>88</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-88" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-88">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>92</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-92" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-92">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-3rd-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-3rd-boss-total">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4th Job Mastery Table -->
+                            <div id="mastery-table-4th" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px; display: none;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>102</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-102" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-102">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>106</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-106" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-106">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>111</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-111" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-111">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>116</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-116" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-116">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>120</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-120" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-120">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>124</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-124" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-124">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>128</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-128" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-128">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>132</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-132" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-132">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-4th-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-4th-boss-total">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="skill-mastery-base" value="0">
+                            <input type="hidden" id="skill-mastery-boss-base" value="0">
+                        </div>
+                    </div>
+                    <!-- End Skill Mastery Sub-tab -->
+
+                    <!-- Skill Details Sub-tab -->
+                    <div id="base-stats-skill-details" class="base-stats-subtab" style="display: none;">
+                        <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                            <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                                <strong style="color: var(--accent-primary);">Instructions:</strong> Click on a skill to view its description with calculated values based on your character level.
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 20px;">
+                            <!-- Left Panel: Compact Skill Icons -->
+                            <div style="background: var(--background); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px;">
+                                <!-- Skills -->
+                                <div style="margin-bottom: 15px;">
+                                    <div style="color: var(--accent-primary); font-size: 0.85em; font-weight: 600; margin-bottom: 8px; text-align: center;">Skills</div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; max-width: 300px;">
+                                            <div id="skill-grid-skills-2nd" style="display: contents;"></div>
+                                            <div id="skill-grid-skills-3rd" style="display: contents;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Passives -->
+                                <div>
+                                    <div style="color: var(--accent-primary); font-size: 0.85em; font-weight: 600; margin-bottom: 8px; text-align: center;">Passives</div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; max-width: 300px;">
+                                            <div id="skill-grid-passives-2nd" style="display: contents;"></div>
+                                            <div id="skill-grid-passives-3rd" style="display: contents;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Panel: Skill Description -->
+                            <div id="skill-description-panel" style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid var(--border-color); border-radius: 12px; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+                                <div style="text-align: center; color: var(--text-secondary); padding: 40px 20px;">
+                                    Select a skill to view its details
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Skill Details Sub-tab -->
+
                 </div>
             </div>
 
@@ -312,6 +653,10 @@
 
                     <!-- Currency Calculator -->
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <div
+                            style="color: var(--text-secondary); font-size: 0.9em; text-align: center; margin-bottom: 12px; font-weight: 600;">
+                            Enter your current upgrade currency to see your optimal target weapon levels
+                        </div>
                         <div style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
                             <label style="color: var(--text-secondary); font-weight: 600;">Upgrade Currency:</label>
                             <input type="number" id="upgrade-currency-input" placeholder="Enter amount"
@@ -377,34 +722,6 @@
                 </div>
             </div>
 
-            <!-- Hero Power Ability Tab -->
-            <div id="setup-hero-power" class="tab-content">
-                <div id="hero-power-presets-container">
-                    <!-- Presets will be generated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Equipment Slots Tab -->
-            <div id="setup-equipment-slots" class="tab-content">
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
-                    <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
-                        <strong style="color: var(--accent-primary);">Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot.
-                    </div>
-                </div>
-                <div id="equipment-slots-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Slot cards generated by JavaScript -->
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(88, 86, 214, 0.1)); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 16px var(--shadow);">
-                        <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 8px; font-weight: 500;">Total DPS Gain from All Slots</div>
-                        <div style="color: var(--accent-primary); font-size: 2em; font-weight: 700;">
-                            <span id="total-slots-dps">0%</span>
-                        </div>
-                    </div>
-                    <button class="calculate-btn" onclick="calculateEquipmentSlotDPS()" style="max-width: 400px; margin: 0 auto;">Calculate Slot DPS</button>
-                </div>
-            </div>
-
             <!-- Artifacts Tab -->
             <div id="setup-artifacts" class="tab-content">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; min-height: 600px;">
@@ -439,10 +756,14 @@
                 </div>
             </div>
         </div>
+        </div>
+        <!-- End Page: Character Setup -->
 
-        <!-- Second Tabbed Area: Character Optimization -->
+        <!-- Page: Gear Lab -->
+        <div id="page-optimization" class="page-container" style="display: none;">
+        <!-- Gear Lab Content -->
         <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
-            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Character Optimization</div>
+            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Gear Lab 🧪</div>
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'item-comparison')">Item Comparison</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'inner-ability')">Inner Ability</button>
@@ -494,10 +815,12 @@
                     <div>
                         <h3 style="color: var(--accent-primary); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
                             Comparison Items</h3>
-                        <div id="comparison-items-container"
-                            style="max-height: 400px; overflow-y: auto; margin-bottom: 10px;"></div>
-                        <button class="calculate-btn" onclick="addComparisonItem()">+
-                            Add Item</button>
+                        <!-- Tab Navigation -->
+                        <div id="comparison-tabs-container" class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                            <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="addComparisonItem()">+ Add Item</button>
+                        </div>
+                        <!-- Comparison Items Content -->
+                        <div id="comparison-items-container" style="margin-bottom: 10px;"></div>
                     </div>
                 </div>
                 <button class="calculate-btn" onclick="calculate()" style="margin-bottom: 20px;">Calculate All</button>
@@ -516,21 +839,29 @@
             <!-- Inner Ability Analysis Tab -->
             <div id="analysis-inner-ability" class="tab-content">
                 <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
-                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
+                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('my-ability-pages')">My Ability Pages</button>
+                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
                         Comparison</button>
                     <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical
                         Best</button>
                 </div>
 
+                <!-- My Ability Pages Sub-Tab -->
+                <div id="inner-ability-my-ability-pages" class="inner-ability-subtab active">
+                    <div id="hero-power-presets-container">
+                        <!-- Presets will be generated by JavaScript -->
+                    </div>
+                </div>
+
                 <!-- Preset Comparison Sub-Tab -->
-                <div id="inner-ability-preset-comparison" class="inner-ability-subtab active">
+                <div id="inner-ability-preset-comparison" class="inner-ability-subtab" style="display: none;">
                     <div id="preset-comparison-container">
                         <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
 
                 <!-- Theoretical Best Sub-Tab -->
-                <div id="inner-ability-theoretical-best" class="inner-ability-subtab">
+                <div id="inner-ability-theoretical-best" class="inner-ability-subtab" style="display: none;">
                     <div id="theoretical-best-container">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -546,41 +877,70 @@
 
             <!-- Scroll Optimizer Tab -->
             <div id="analysis-scroll-optimizer" class="tab-content">
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
-                    <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
-                        <strong style="color: var(--accent-primary);">Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
+                <!-- Sub-tabs for Scrolling -->
+                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('my-slot-performance')">My Slot Performance</button>
+                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('simulation')">Simulation</button>
+                </div>
+
+                <!-- My Slot Performance Sub-Tab -->
+                <div id="scrolling-my-slot-performance" class="scrolling-subtab active">
+                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                        <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                            <strong style="color: var(--accent-primary);">Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot.
+                        </div>
+                    </div>
+                    <div id="equipment-slots-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Slot cards generated by JavaScript -->
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(88, 86, 214, 0.1)); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 16px var(--shadow);">
+                            <div style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 8px; font-weight: 500;">Total DPS Gain from All Slots</div>
+                            <div style="color: var(--accent-primary); font-size: 2em; font-weight: 700;">
+                                <span id="total-slots-dps">0%</span>
+                            </div>
+                        </div>
+                        <button class="calculate-btn" onclick="calculateEquipmentSlotDPS()" style="max-width: 400px; margin: 0 auto;">Calculate Slot DPS</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div class="input-group">
-                        <label>Spell Trace Budget</label>
-                        <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
+                <!-- Simulation Sub-Tab -->
+                <div id="scrolling-simulation" class="scrolling-subtab" style="display: none;">
+                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                        <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
+                            <strong style="color: var(--accent-primary);">Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Number of Simulations</label>
-                        <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
-                    </div>
-                </div>
 
-                <div style="background: rgba(0, 122, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                    <label style="font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-primary);">Scroll Level</label>
-                    <div style="display: flex; gap: 20px;">
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
-                            <input type="radio" name="scroll-level" value="65" checked onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
-                            <span style="color: var(--text-primary);">Level 65 Scrolls</span>
-                        </label>
-                        <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
-                            <input type="radio" name="scroll-level" value="85" onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
-                            <span style="color: var(--text-primary);">Level 85 Scrolls</span>
-                        </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div class="input-group">
+                            <label>Spell Trace Budget</label>
+                            <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Simulations</label>
+                            <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
+                        </div>
                     </div>
-                    <div id="scroll-level-info" style="margin-top: 12px; padding: 10px; background: var(--background); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;">
-                        <!-- Info will be populated by JavaScript -->
-                    </div>
-                </div>
 
-                <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
+                    <div style="background: rgba(0, 122, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <label style="font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-primary);">Scroll Level</label>
+                        <div style="display: flex; gap: 20px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                                <input type="radio" name="scroll-level" value="65" checked onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                                <span style="color: var(--text-primary);">Level 65 Scrolls</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 0.95em;">
+                                <input type="radio" name="scroll-level" value="85" onchange="updateScrollLevelInfo()" style="margin-right: 8px; cursor: pointer;">
+                                <span style="color: var(--text-primary);">Level 85 Scrolls</span>
+                            </label>
+                        </div>
+                        <div id="scroll-level-info" style="margin-top: 12px; padding: 10px; background: var(--background); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;">
+                            <!-- Info will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
 
                 <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
                     <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
@@ -589,8 +949,9 @@
                     <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
                 </div>
 
-                <div id="scroll-results-container" style="margin-top: 20px;">
-                    <!-- Results will be populated by JavaScript -->
+                    <div id="scroll-results-container" style="margin-top: 20px;">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
 
@@ -616,9 +977,9 @@
                 </div>
 
                 <!-- Main Tab Navigation -->
-                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
-                    <button id="cube-main-tab-summary" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Summary</button>
+                <div id="tab-container-main" class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button id="cube-main-tab-selected" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Selected Slot</button>
+                    <button id="cube-main-tab-summary" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Summary</button>
                     <button id="cube-main-tab-simulation" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Simulation</button>
                 </div>
 
@@ -743,7 +1104,7 @@
                             Cube Potential Optimization Simulator
                         </h3>
                         <p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
-                            Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses the current slots configured in the Cube Potential section.
+                            Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses fictious slots that are all set to normal with 0 tries attempted. This does not account for your current slots or their rarities!.
                         </p>
                     </div>
 
@@ -775,10 +1136,16 @@
                 </div>
             </div>
         </div>
+        </div>
+        <!-- End Page: Character Optimization -->
 
-        <!-- Stat Damage Predictions -->
+        <!-- Page: Stat Hub -->
+        <div id="page-predictions" class="page-container" style="display: none;">
+        <!-- Stat Hub Content -->
         <div id="stat-damage-predictions-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
-            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Stat Damage Predictions</div>
+            <div class="text-2xl mb-5 text-center font-semibold">
+                <span class="stat-hub-logo-large">Stat<span class="stat-hub-highlight-large">Hub</span></span>
+            </div>
 
             <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('predictions', 'stat-tables')">Stat Predictions</button>
@@ -841,6 +1208,14 @@
                             <label style="font-weight: 600; color: var(--accent-primary);">Damage Amplification (x)</label>
                             <input type="number" id="equiv-damage-amp" value="1" min="0" step="0.1" oninput="calculateStatEquivalency('damage-amp')">
                         </div>
+                        <div class="input-group">
+                            <label style="font-weight: 600; color: var(--accent-primary);">Min Damage Multiplier (%)</label>
+                            <input type="number" id="equiv-min-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('min-damage')">
+                        </div>
+                        <div class="input-group">
+                            <label style="font-weight: 600; color: var(--accent-primary);">Max Damage Multiplier (%)</label>
+                            <input type="number" id="equiv-max-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('max-damage')">
+                        </div>
                     </div>
                 </div>
 
@@ -849,9 +1224,12 @@
                 </div>
             </div>
         </div>
+        </div>
+        <!-- End Page: Stat Damage Predictions -->
     </div>
+    <!-- End Main Content -->
 
-    <script type="module" src="main.js"></script>
+    <script type="module" src="./src/core/main.js"></script>
 </body>
 
 </html>

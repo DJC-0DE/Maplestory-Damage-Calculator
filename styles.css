@@ -1,5 +1,397 @@
 /* Minimal custom CSS for Tailwind CDN (cannot use @apply) */
 
+/* ========================================
+   SIDEBAR NAVIGATION & LAYOUT
+   ======================================== */
+
+/* Main Layout */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar Backdrop for Mobile */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.active {
+    display: block;
+}
+
+/* Main Sidebar */
+.app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.dark .app-sidebar {
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    display: none;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    flex: 1;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+    position: relative;
+}
+
+.sidebar-nav-item:hover {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.3);
+    color: #60a5fa;
+    transform: translateX(4px);
+}
+
+.sidebar-nav-item.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.15));
+    border-color: #3b82f6;
+    color: #60a5fa;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: scale(1.02);
+}
+
+.sidebar-icon {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+}
+
+.submenu-arrow {
+    margin-left: auto;
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+    display: none; /* Hidden on desktop since submenus are always visible */
+}
+
+.sidebar-nav-item.expanded .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+/* Show arrows on mobile where submenus are collapsible */
+@media (max-width: 1023px) {
+    .submenu-arrow {
+        display: inline;
+    }
+}
+
+/* Submenu Styles */
+.sidebar-submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 44px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    overflow: visible;
+    max-height: none;
+    opacity: 1;
+}
+
+/* On mobile, use collapsible behavior */
+@media (max-width: 1023px) {
+    .sidebar-submenu {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    }
+
+    .sidebar-submenu.expanded {
+        max-height: 500px;
+        opacity: 1;
+    }
+}
+
+.sidebar-submenu-item {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.sidebar-submenu-item:hover {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.2);
+    color: #cbd5e1;
+    transform: translateX(4px);
+}
+
+.sidebar-submenu-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    font-weight: 600;
+    /* No transition on color and font-weight to prevent flash */
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.sidebar-footer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.sidebar-footer-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e2e8f0;
+    transform: scale(1.02);
+}
+
+.sidebar-footer-btn span:first-child {
+    font-size: 1.1rem;
+}
+
+/* Hide text labels on small screens to make buttons more compact */
+@media (max-width: 1023px) {
+    .sidebar-footer {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 10px;
+    }
+
+    .sidebar-footer-btn span:last-child {
+        display: none;
+    }
+
+    .sidebar-footer-btn {
+        padding: 12px;
+        gap: 0;
+    }
+
+    .sidebar-footer-btn span:first-child {
+        font-size: 1.3rem;
+    }
+}
+
+/* Mobile Hamburger Menu */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    flex-direction: column;
+    gap: 5px;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
+.mobile-menu-btn span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+/* Hide hamburger when menu is open */
+.mobile-menu-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 260px;
+    padding: 40px;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+/* Page Container */
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Hide all pages initially to prevent flash */
+.page-container {
+    visibility: hidden;
+}
+
+.page-fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1023px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .app-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 80px 20px 20px 20px;
+    }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .main-content {
+        padding: 80px 30px 30px 30px;
+    }
+}
+
+/* Large Screen */
+@media (min-width: 1024px) {
+    .sidebar-backdrop {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   END SIDEBAR NAVIGATION & LAYOUT
+   ======================================== */
+
+/* ========================================
+   STAT HUB LOGO STYLING
+   ======================================== */
+
+/* Sidebar StatHub Logo */
+.stat-hub-logo {
+    font-weight: 700;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.stat-hub-highlight {
+    background: #ff9900;
+    color: black;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin-left: 2px;
+    font-weight: 700;
+}
+
+/* Large StatHub Logo for page title */
+.stat-hub-logo-large {
+    font-weight: 700;
+    font-size: 2rem;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stat-hub-highlight-large {
+    background: #ff9900;
+    color: black;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 4px;
+    font-weight: 700;
+}
+
+/* Light theme adjustments */
+.stat-hub-logo-large {
+    color: #1f2937;
+}
+
+.dark .stat-hub-logo-large {
+    color: white;
+}
+
+/* ========================================
+   END STAT HUB LOGO STYLING
+   ======================================== */
+
 /* Input groups - using traditional CSS */
 .input-group {
     display: flex;
@@ -132,17 +524,17 @@ select option {
 }
 
 .tab-button.active {
-    color: #2563eb;
-    border-bottom-color: #2563eb;
-    background: rgba(37, 99, 235, 0.1);
-    font-weight: 700;
+    color: #2563eb !important;
+    border-bottom-color: #2563eb !important;
+    background: rgba(37, 99, 235, 0.1) !important;
+    font-weight: 700 !important;
 }
 
 .dark .tab-button.active {
-    color: #60a5fa;
-    border-bottom-color: #60a5fa;
-    background: rgba(96, 165, 250, 0.1);
-    font-weight: 700;
+    color: #60a5fa !important;
+    border-bottom-color: #60a5fa !important;
+    background: rgba(96, 165, 250, 0.1) !important;
+    font-weight: 700 !important;
 }
 
 /* Preset tabs */
@@ -401,6 +793,14 @@ select option {
 
 .dark .stat-weight-table td {
     border-bottom-color: #374151;
+}
+
+/* Highlight the upgrade currency input to make it more obvious and accessible */
+#upgrade-currency-input {
+    border: 2px solid transparent;
+    border-radius: 6px;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.06);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .stat-weight-table tr:last-child td {
@@ -1276,4 +1676,281 @@ select option {
 
 .paste-icon {
     font-size: 15px;
+}
+/* Skill Mastery Table Styles */
+.mastery-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dark .mastery-table {
+    background: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mastery-table thead tr {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(88, 86, 214, 0.08));
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.dark .mastery-table thead tr {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(147, 137, 230, 0.1));
+    border-bottom: 2px solid #374151;
+}
+
+.mastery-table th {
+    padding: 12px 8px;
+    text-align: center;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.dark .mastery-table th {
+    color: #60a5fa;
+}
+
+.mastery-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.dark .mastery-table tbody tr {
+    border-bottom: 1px solid #374151;
+}
+
+.mastery-table tbody tr:nth-child(odd) {
+    background: rgba(37, 99, 235, 0.03);
+}
+
+.dark .mastery-table tbody tr:nth-child(odd) {
+    background: rgba(96, 165, 250, 0.05);
+}
+
+.mastery-table tbody tr:nth-child(even) {
+    background: white;
+}
+
+.dark .mastery-table tbody tr:nth-child(even) {
+    background: #1f2937;
+}
+
+.mastery-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.08);
+    transform: scale(1.01);
+}
+
+.dark .mastery-table tbody tr:hover {
+    background: rgba(96, 165, 250, 0.1);
+}
+
+.mastery-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.mastery-table td {
+    padding: 10px 8px;
+    text-align: center;
+    color: #111827;
+    font-size: 0.9em;
+    vertical-align: middle;
+}
+
+.dark .mastery-table td {
+    color: #f3f4f6;
+}
+
+.mastery-table td:first-child {
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.dark .mastery-table td:first-child {
+    color: #60a5fa;
+}
+
+.mastery-table input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: #2563eb;
+    vertical-align: middle;
+    margin: 0;
+}
+
+.dark .mastery-table input[type="checkbox"] {
+    accent-color: #60a5fa;
+}
+
+.mastery-table label {
+    margin-left: 8px;
+    cursor: pointer;
+    color: #6b7280;
+    font-weight: 500;
+    vertical-align: middle;
+    display: inline;
+    line-height: 18px;
+}
+
+.dark .mastery-table label {
+    color: #9ca3af;
+}
+
+.mastery-totals-container {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid #e5e7eb;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dark .mastery-totals-container {
+    border-top-color: #374151;
+}
+
+.mastery-total-box {
+    text-align: center;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(37, 99, 235, 0.05));
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.dark .mastery-total-box {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(37, 99, 235, 0.08));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.mastery-total-box.boss-total {
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.08), rgba(255, 193, 7, 0.05));
+    border-color: rgba(255, 149, 0, 0.2);
+}
+
+.dark .mastery-total-box.boss-total {
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.12), rgba(255, 193, 7, 0.08));
+    border-color: rgba(255, 149, 0, 0.3);
+}
+
+.mastery-total-label {
+    color: #6b7280;
+    font-size: 0.85em;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.dark .mastery-total-label {
+    color: #9ca3af;
+}
+
+.mastery-total-value {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.mastery-total-value.all-monsters {
+    color: #10b981;
+}
+
+.dark .mastery-total-value.all-monsters {
+    color: #34d399;
+}
+
+.mastery-total-value.boss-only {
+    color: #ff9500;
+}
+
+.dark .mastery-total-value.boss-only {
+    color: #ffa726;
+}
+
+/* Job Tier Button Styles */
+.job-tier-btn {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+    border: 2px solid #d1d5db;
+    color: #6b7280;
+}
+
+.job-tier-btn:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: #3b82f6;
+    color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.job-tier-btn.active {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(88, 86, 214, 0.1));
+    border-color: #2563eb;
+    color: #2563eb;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.dark .job-tier-btn {
+    background: #374151;
+    border-color: #4b5563;
+    color: #9ca3af;
+}
+
+.dark .job-tier-btn:hover {
+    background: rgba(96, 165, 250, 0.12);
+    border-color: #60a5fa;
+    color: #60a5fa;
+}
+
+.dark .job-tier-btn.active {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(147, 137, 230, 0.15));
+    border-color: #60a5fa;
+    color: #60a5fa;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+}
+
+/* Skill Card Styles */
+.skill-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dark .skill-card {
+    background: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.skill-card:hover {
+    border-color: #2563eb;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(88, 86, 214, 0.05));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+}
+
+.dark .skill-card:hover {
+    border-color: #60a5fa;
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(147, 137, 230, 0.08));
+    box-shadow: 0 6px 16px rgba(96, 165, 250, 0.3);
+}
+
+.skill-card:active {
+    transform: translateY(-1px);
 }
