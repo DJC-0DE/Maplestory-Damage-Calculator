@@ -133,6 +133,30 @@ const helpContent = {
             <p>If you have +20% from equipment, +15% from artifacts, and +10% from skills, enter <strong>45</strong> in the "Current Main Stat %" field. Then enter your character sheet's total main stat value in the "Primary Main Stat" field.</p>
         `
     }
+    ,
+    'stats-autofill': {
+        title: 'Stats Auto-Fill',
+        content: `
+            <p>Use optical character recognition to auto-fill stats from the Character page.</p>
+
+            <h4>How to prepare the screenshot</h4>
+            <ul>
+                <li>Copy the image such that only the stat lines are visible. Tip: Use Win-Shift-S on Windows, or Cmd-Shift-4 on Mac</li>
+                <li>Paste the image from your clipboard while mouse is hovering over the paste area</li>
+                <li>If Auto-Fill misses fields, you can edit them manually</li>
+            </ul>
+            
+            <h4>Notes</h4>
+              <ul>
+                <li>"Min Damage Multiplier" may not get autofilled correctly</li>
+                <li>Ensure that all primary stats (STR, DEX, INT, LUK) are visible in the <strong>same</strong> screenshot for accurate calculation of primary/secondary stats</li>
+            </ul>
+            
+            <h4> Example Acceptable Screenshots</h4>
+            <img src="media/autofill/stats-autofill-ex1.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
+            <img src="media/autofill/stats-autofill-ex2.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
+        `
+    }
 };
 
 export function openHelpSidebar(helpKey) {
