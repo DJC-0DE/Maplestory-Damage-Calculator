@@ -14,6 +14,7 @@ import {
 } from './state.js';
 import { calculateDamage } from './calculations/damage-calculations.js';
 import { calculateWeaponAttacks } from './calculations/weapon-calculations.js';
+import { showToast } from '../utils/notifications.js';
 import { calculateStatWeights, calculateStatEquivalency } from './calculations/damage-calculations.js';
 import { toggleStatChart } from '../ui/stat-chart.js';
 import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, exportData, importData, updateAnalysisTabs, getSavedContentTypeData } from './storage.js';
@@ -36,7 +37,7 @@ import {
     selectCubeSlot    
 } from './cube/cube-potential.js';
 import { runCubeSimulation } from './cube/cube-simulation.js';
-
+import { extractText, parseBaseStatText } from '../utils/ocr.js';
 import { loadTheme, toggleTheme } from '../ui/theme.js';
 import { initializeHeroPowerPresets, loadHeroPowerPresets, switchPreset, handlePresetEquipped } from '../ui/presets-ui.js';
 import { calculateCurrencyUpgrades } from '../ui/weapons-ui.js';
@@ -1020,6 +1021,48 @@ function initializeDefaultTabStates() {
         });
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const pasteArea = document.getElementById('base-stats-paste-image-section');
+
+    pasteArea.addEventListener('paste', async (event) => {
+        const items = Array.from(event.clipboardData.items);
+        const pastedImage = items.filter(x => x.type.startsWith("image/"))[0];
+        if (!pastedImage) return;
+
+        const file = pastedImage.getAsFile();
+        const imageURL = URL.createObjectURL(file);
+        const extractedText = await extractText(imageURL, false);
+        try {
+            const parsedStats = parseBaseStatText(extractedText);
+            console.log('Parsed Stats:', parsedStats);
+            for (const parsedStat of parsedStats) {
+                console.log(`Setting ${parsedStat[0]} to ${parsedStat[1]}`);
+                const inputElement = document.getElementById(parsedStat[0]);
+                if (inputElement) {
+                    inputElement.value = parsedStat[1];
+                    // Add a permanent outline until the input is changed again
+                    inputElement.style.outline = '2px solid #95b993'; // Outline color
+                    inputElement.addEventListener('input', () => {
+                        inputElement.style.outline = ''; // Reset to default on change
+                    }, { once: true });
+                }
+            }
+
+            if (parsedStats.length > 0) {
+                showToast(`Parsing successful! ${parsedStats.length} stats updated`, true);
+            } else {
+                console.log("No supported stats were parsed from the extracted text.");
+                showToast("Parsing failed! Make sure you are ONLY screenshotting the stats rows from the Character page and nothing else", false);
+            }
+        }
+        catch (e) {
+            console.error(e);
+            showToast(e, false);
+        }
+
+    });
+});
 
 // Expose functions to window for HTML onclick handlers
 window.switchTab = switchTab;

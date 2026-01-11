@@ -7,6 +7,7 @@
     <title>Damage Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js/dist/tesseract.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -39,22 +40,22 @@
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
-            if (savedTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            }
-        })();
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
     </script>
 
     <link rel="stylesheet" href="styles.css">
 
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GKDLXCWZ9R"></script>
-	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GKDLXCWZ9R"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-	gtag('config', 'G-GKDLXCWZ9R');
-	</script>
+        gtag('config', 'G-GKDLXCWZ9R');
+    </script>
 </head>
 
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
@@ -194,6 +195,7 @@
                             </div>
                         </div>
                     </div>
+                    <div id="debug-ocr"> </div>
 
                     <!-- Character Level and Job Tier -->
                     <div style="margin-bottom: 16px; padding: 12px 0; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
@@ -229,6 +231,10 @@
 
                     <!-- Character Stats Sub-tab -->
                     <div id="base-stats-character-stats" class="base-stats-subtab active">
+                    <section class="paste-image-section" id="base-stats-paste-image-section" style="display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px;">
+                        <div class="paste-icon"><strong>Auto-fill Stats</strong> 📋</div>
+                        <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('stats-autofill')" style="position: absolute; right: 10px;">?</span>
+                    </section>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                         <div class="input-group">
                             <label>Attack</label>
@@ -264,17 +270,17 @@
                             <input type="number" step="0.1" id="stat-damage-base" value="0">
                         </div>
                         <div class="input-group">
-                            <label>Current Main Stat % <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('main-stat-pct')">?</span></label>
-                            <input type="number" step="0.1" id="main-stat-pct-base" value="0">
-                        </div>
-                        <div class="input-group">
                             <label>Damage (%)</label>
                             <input type="number" step="0.1" id="damage-base" value="10">
                         </div>
                         <div class="input-group">
                             <label>Damage Amplification (x)</label>
                             <input type="number" step="0.1" id="damage-amp-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
+                                    onclick="openHelpSidebar('def-pen')">?</span></label>
+                            <input type="number" step="0.1" id="def-pen-base" value="0">
                         </div>
                         <div class="input-group">
                             <label>Boss Monster Damage (%)</label>
@@ -322,10 +328,22 @@
                             <input type="number" step="0.1" id="skill-coeff-base" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
                         </div>
                         <div class="input-group">
-                            <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('def-pen')">?</span></label>
-                            <input type="number" step="0.1" id="def-pen-base" value="0">
+                            <label>Skill Mastery Bonus (%) <span class="info-icon" role="img" aria-label="Info"
+                                    onclick="openHelpSidebar('skill-mastery')">?</span></label>
+                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
                         </div>
+                        <div class="input-group">
+                            <label>Skill Mastery Bonus - Boss Only (%) <span class="info-icon" role="img"
+                                    aria-label="Info"
+                                    onclick="openHelpSidebar('skill-mastery-boss')">?</span></label>
+                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Current Main Stat % <span class="info-icon" role="img" aria-label="Info"
+                                    onclick="openHelpSidebar('main-stat-pct')">?</span></label>
+                            <input type="number" step="0.1" id="main-stat-pct-base" value="0">
+                        </div>
+
                         <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
                         </div>
                         <div class="input-group" style="grid-column: 1 / -1;">
@@ -925,12 +943,12 @@
 
                     <button class="calculate-btn" onclick="runScrollSimulation()" id="scroll-run-btn">Run Simulation</button>
 
-                    <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
-                        <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
-                            <div id="scroll-progress-bar" style="height: 100%; background: var(--accent-primary); transition: width 0.3s; width: 0%;"></div>
+                <div id="scroll-progress-container" style="display: none; margin-top: 15px;">
+                    <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                        <div id="scroll-progress-bar" style="height: 100%; background: var(--accent-primary); transition: width 0.3s; width: 0%;"></div>
                         </div>
-                        <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
-                    </div>
+                    <p id="scroll-progress-text" style="text-align: center; color: var(--text-secondary); margin-top: 8px;"></p>
+                </div>
 
                     <div id="scroll-results-container" style="margin-top: 20px;">
                         <!-- Results will be populated by JavaScript -->
@@ -992,92 +1010,92 @@
 
                 <!-- Selected Slot Main Tab Content -->
                 <div id="cube-main-selected-content" style="display: block;">
-                <!-- Potential Type Toggle -->
+                    <!-- Potential Type Toggle -->
                 <div style="margin-bottom: 20px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px; padding: 15px;">
                     <label style="font-weight: 600; font-size: 0.95em; color: var(--text-primary); display: block; margin-bottom: 10px;">Potential Type</label>
-                    <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px;">
                         <button id="cube-regular-potential-btn" class="cube-potential-type-btn active" onclick="switchPotentialType('regular')" style="flex: 1; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            Regular Potential
-                        </button>
+                                Regular Potential
+                            </button>
                         <button id="cube-bonus-potential-btn" class="cube-potential-type-btn" onclick="switchPotentialType('bonus')" style="flex: 1; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            Bonus Potential
-                        </button>
+                                Bonus Potential
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Rarity Selector -->
-                <div style="margin-bottom: 20px;">
+                    <!-- Rarity Selector -->
+                    <div style="margin-bottom: 20px;">
                     <label style="font-weight: 600; font-size: 0.95em; color: var(--text-primary); display: block; margin-bottom: 8px;">Slot Potential Rarity</label>
-                    <select id="cube-rarity-selector" class="cube-rarity-select"></select>
-                </div>
+                        <select id="cube-rarity-selector" class="cube-rarity-select"></select>
+                    </div>
 
-                <!-- Selected Slot Sub-Tab Navigation -->
-                <div id="tab-container-cube-tab" class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <!-- Selected Slot Sub-Tab Navigation -->
+                    <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button id="cube-tab-comparison" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Comparison</button>
                     <button id="cube-tab-rankings" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Slot Theoretical Best</button>
-                </div>
+                    </div>
 
-                <!-- Comparison Tab Content -->
-                <div id="cube-comparison-content" style="display: block;">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Set A (Current) - Styled like Equipped Item -->
+                    <!-- Comparison Tab Content -->
+                    <div id="cube-comparison-content" style="display: block;">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Set A (Current) - Styled like Equipped Item -->
                         <div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 2px solid var(--accent-success); border-radius: 12px; padding: 20px; box-shadow: 0 4px 16px var(--shadow);">
                             <h3 style="color: var(--accent-success); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Set A (Current)</h3>
 
-                            <div style="margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 1</label>
                                 <select id="cube-setA-line1-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                            </div>
+                                </div>
 
-                            <div style="margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 2</label>
                                 <select id="cube-setA-line2-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                            </div>
+                                </div>
 
-                            <div style="margin-bottom: 0;">
+                                <div style="margin-bottom: 0;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 3</label>
                                 <select id="cube-setA-line3-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Set B (Comparison) - Styled like Comparison Items -->
+                            <!-- Set B (Comparison) - Styled like Comparison Items -->
                         <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-500 dark:border-blue-400 rounded-xl p-5 shadow-lg">
                             <h3 class="text-blue-600 dark:text-blue-400 mb-4 text-lg font-semibold">Set B (Comparison)</h3>
 
-                            <div style="margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 1</label>
                                 <select id="cube-setB-line1-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                            </div>
+                                </div>
 
-                            <div style="margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 2</label>
                                 <select id="cube-setB-line2-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                            </div>
+                                </div>
 
-                            <div style="margin-bottom: 0;">
+                                <div style="margin-bottom: 0;">
                                 <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 3</label>
                                 <select id="cube-setB-line3-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Comparison Results -->
+                        <div id="cube-comparison-results"></div>
                     </div>
 
-                    <!-- Comparison Results -->
-                    <div id="cube-comparison-results"></div>
-                </div>
-
-                <!-- Rankings Tab Content -->
-                <div id="cube-rankings-content" style="display: none;">
-                    <!-- Progress Bar -->
-                    <div id="cube-rankings-progress" style="display: none; margin-bottom: 25px;">
+                    <!-- Rankings Tab Content -->
+                    <div id="cube-rankings-content" style="display: none;">
+                        <!-- Progress Bar -->
+                        <div id="cube-rankings-progress" style="display: none; margin-bottom: 25px;">
                         <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
                             <div id="cube-rankings-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
-                        </div>
+                            </div>
                         <p id="cube-rankings-progress-text" style="text-align: center; color: var(--text-secondary); font-weight: 600;"></p>
-                    </div>
+                        </div>
 
-                    <!-- Rankings Results -->
-                    <div id="cube-rankings-results"></div>
-                </div>
+                        <!-- Rankings Results -->
+                        <div id="cube-rankings-results"></div>
+                    </div>
                 </div>
 
                 <!-- Simulation Main Tab Content -->
