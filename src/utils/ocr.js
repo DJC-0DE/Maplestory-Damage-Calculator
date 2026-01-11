@@ -163,7 +163,7 @@ function applyConvolution(imageData, kernel, width, height) {
     return result;
 }
 
-export function functionParseBaseStatText(text) {
+export function parseBaseStatText(text) {
     const displayNamesToInput = {
         "Attack": "attack-base",
         "Critical Rate": "crit-rate-base",
@@ -172,10 +172,15 @@ export function functionParseBaseStatText(text) {
         "Stat Prop. Damage": "stat-damage-base",
         "Damage": "damage-base",
         "Damage Amplification": "damage-amp-base",
+        "Defense Penetration": "def-pen-base",
         "Boss Monster Damage": "boss-damage-base",
         "Normal Monster Damage": "normal-damage-base",
         "Min Damage Multiplier": "min-damage-base", // sometimes broken due to multi line 
         "Max Damage Multiplier": "max-damage-base",
+        "1st Job Skill Lv.": "skill-level-1st-base",
+        "2nd Job Skill Lv.": "skill-level-2nd-base",
+        "3rd Job Skill Lv.": "skill-level-3rd-base",
+        "4th Job Skill Lv.": "skill-level-4th-base",
         "Final Damage": "final-damage-base",
     }
 
@@ -186,6 +191,11 @@ export function functionParseBaseStatText(text) {
         .filter((x, idx) => !(idx === 0 && !/\d/.test(x)))
         .filter(x => x)
         .map((x) => { // split into [stat, value]
+            if (/^\d/.test(x)) { // starts with digit, i.e: 1st Job Skill 
+                const matches = x.match(/^(\d\D*)(.*)$/);
+                return [matches[1].trim(), matches[2].trim()];
+            }
+
             const matches = x.match(/^(\D*)(.*)$/);
             return [matches[1].trim(), matches[2].trim()]
         })
@@ -223,7 +233,6 @@ export function functionParseBaseStatText(text) {
             return [x[0], value]
         })
 
-
     let matchedData = cleanData.flatMap(x => {
         const displayName = x[0];
         const value = x[1];
@@ -245,11 +254,10 @@ export function functionParseBaseStatText(text) {
         .sort((a, b) => b - a);
 
     if (statValues.length > 0) {
-        if (statValues.length != 4) {
-            throw new Error("All 4 stats (STR/DEX/INT/LUK) must be visible to calculate primary/secondary stat");
-        }
         matchedData.push(["primary-main-stat-base", statValues[0]]);
-        matchedData.push(["secondary-main-stat-base", statValues[1]]);
+        if (statValues.length > 1) {
+            matchedData.push(["secondary-main-stat-base", statValues[1]]);
+        }
     }
 
     return matchedData;

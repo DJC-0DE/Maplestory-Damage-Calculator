@@ -1667,7 +1667,6 @@ select option {
     /* background: #6186ac; */
     text-align: center;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: #334155;
 }
 
 .paste-image-section:hover {
@@ -1676,7 +1675,9 @@ select option {
 
 .paste-icon {
     font-size: 15px;
+    color: var(--text-secondary);
 }
+
 /* Skill Mastery Table Styles */
 .mastery-table {
     width: 100%;
