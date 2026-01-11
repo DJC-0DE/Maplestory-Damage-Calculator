@@ -142,14 +142,28 @@
         <span></span>
     </button>
 
+    <!-- Help Sidebar Backdrop (for mobile) -->
+    <div id="help-sidebar-backdrop" class="help-sidebar-backdrop" onclick="closeHelpSidebar()"></div>
+
+    <!-- Help Sidebar -->
+    <aside id="help-sidebar" class="help-sidebar" style="display: none;">
+        <div class="help-sidebar-header">
+            <h3 id="help-sidebar-title" class="help-sidebar-title">Help</h3>
+            <button id="help-sidebar-close" class="help-close-btn" onclick="closeHelpSidebar()">&times;</button>
+        </div>
+        <div class="help-sidebar-content" id="help-sidebar-content">
+            <!-- Dynamic help content goes here -->
+        </div>
+    </aside>
+
     <!-- Main Content Area -->
     <div class="main-content">
         <!-- Page: Loadout -->
         <div id="page-setup" class="page-container">
         <!-- Loadout Content -->
-        <div id="character-setup-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5" style="position: relative;">
-            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Loadout</div>
-            <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+        <div id="character-setup-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3" style="position: relative;">
+            <div class="text-2xl mb-2 text-center text-blue-600 dark:text-blue-400 font-semibold">Loadout</div>
+            <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'base-stats')">Base Stats</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'weapon-levels')">Weapon Levels</button>
                 <!-- <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('setup', 'artifacts')">Artifacts</button> -->
@@ -157,9 +171,9 @@
 
             <!-- Base Stats Tab -->
             <div id="setup-base-stats" class="tab-content active">
-                <div class="bg-transparent p-4">
+                <div class="bg-transparent p-2">
                     <!-- Class Selector -->
-                    <div style="margin-bottom: 16px; padding: 12px; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="margin-bottom: 8px; padding: 8px; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;">
                             <div onclick="selectClass('hero')" id="class-hero" class="class-selector" title="Hero">
                                 <img src="media/classes/hero.png" alt="Hero" style="width: 48px; height: 48px; object-fit: contain;">
@@ -198,7 +212,7 @@
                     <div id="debug-ocr"> </div>
 
                     <!-- Character Level and Job Tier -->
-                    <div style="margin-bottom: 16px; padding: 12px 0; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <div style="margin-bottom: 8px; padding: 8px; background: var(--background); border: 1px solid var(--border-color); border-radius: 8px;">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items: end;">
                             <div class="input-group">
                                 <label>Character Level</label>
@@ -223,7 +237,7 @@
                     </div>
 
                     <!-- Sub-tabs for Stats and Skill Mastery -->
-                    <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <div class="flex flex-wrap gap-2.5 mb-2 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0" style="display: none;">
                         <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('character-stats')">Stats</button>
                         <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-mastery')">Skill Mastery</button>
                         <button style="display: none;" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchBaseStatsSubTab('skill-details')">Skill Details</button>
@@ -231,155 +245,368 @@
 
                     <!-- Character Stats Sub-tab -->
                     <div id="base-stats-character-stats" class="base-stats-subtab active">
-                    <section class="paste-image-section" id="base-stats-paste-image-section" style="display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px;">
+                    <section class="paste-image-section" id="base-stats-paste-image-section" style="display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 12px;">
                         <div class="paste-icon"><strong>Auto-fill Stats</strong> 📋</div>
                         <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('stats-autofill')" style="position: absolute; right: 10px;">?</span>
                     </section>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                        <div class="input-group">
-                            <label>Attack</label>
-                            <input type="number" id="attack-base" value="500">
-                        </div>
-                        <div class="input-group">
-                            <label>Critical Rate (%)</label>
-                            <input type="number" step="0.1" id="crit-rate-base" value="15">
-                        </div>
-                        <div class="input-group">
-                            <label>Critical Damage (%)</label>
-                            <input type="number" step="0.1" id="crit-damage-base" value="15">
-                        </div>
-                        <div class="input-group">
-                            <label>Attack Speed (%)</label>
-                            <input type="number" step="0.1" id="attack-speed-base" value="0">
-                        </div>
-                        <div class="input-group" id="defense-input-group" style="display: none;">
-                            <label>Defense <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('defense')">?</span></label>
-                            <input type="number" id="defense-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Primary Main Stat</label>
-                            <input type="number" id="primary-main-stat-base" value="1000">
-                        </div>
-                        <div class="input-group">
-                            <label>Secondary Main Stat</label>
-                            <input type="number" id="secondary-main-stat-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Stat Prop. Damage (%)</label>
-                            <input type="number" step="0.1" id="stat-damage-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Damage (%)</label>
-                            <input type="number" step="0.1" id="damage-base" value="10">
-                        </div>
-                        <div class="input-group">
-                            <label>Damage Amplification (x)</label>
-                            <input type="number" step="0.1" id="damage-amp-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('def-pen')">?</span></label>
-                            <input type="number" step="0.1" id="def-pen-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Boss Monster Damage (%)</label>
-                            <input type="number" step="0.1" id="boss-damage-base" value="10">
-                        </div>
-                        <div class="input-group">
-                            <label>Normal Monster Damage (%)</label>
-                            <input type="number" step="0.1" id="normal-damage-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Min Damage Multiplier (%)</label>
-                            <input type="number" step="0.1" id="min-damage-base" value="50">
-                        </div>
-                        <div class="input-group">
-                            <label>Max Damage Multiplier (%)</label>
-                            <input type="number" step="0.1" id="max-damage-base" value="100">
-                        </div>
-                        <div class="input-group">
-                            <label>Final Damage (%)</label>
-                            <input type="number" step="0.1" id="final-damage-base" value="0">
-                        </div>
-                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 0px 0;">
-                        </div>
-                        <div class="input-group">
-                            <label>1st Job Skill Level</label>
-                            <input type="number" id="skill-level-1st-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
-                        </div>
-                        <div class="input-group">
-                            <label>2nd Job Skill Level</label>
-                            <input type="number" id="skill-level-2nd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
-                        </div>
-                        <div class="input-group">
-                            <label>3rd Job Skill Level</label>
-                            <input type="number" id="skill-level-3rd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
-                        </div>
-                        <div class="input-group">
-                            <label>4th Job Skill Level</label>
-                            <input type="number" id="skill-level-4th-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
-                        </div>
-                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
-                        </div>
-                        <div class="input-group" style="display: none;">
-                            <label>Skill Coefficient (%) <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('skill-coeff')">?</span></label>
-                            <input type="number" step="0.1" id="skill-coeff-base" readonly style="background: var(--background); cursor: not-allowed; opacity: 0.7;">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus (%) <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('skill-mastery')">?</span></label>
-                            <input type="number" step="0.1" id="skill-mastery-base" value="21">
-                        </div>
-                        <div class="input-group">
-                            <label>Skill Mastery Bonus - Boss Only (%) <span class="info-icon" role="img"
-                                    aria-label="Info"
-                                    onclick="openHelpSidebar('skill-mastery-boss')">?</span></label>
-                            <input type="number" step="0.1" id="skill-mastery-boss-base" value="0">
-                        </div>
-                        <div class="input-group">
-                            <label>Current Main Stat % <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('main-stat-pct')">?</span></label>
-                            <input type="number" step="0.1" id="main-stat-pct-base" value="0">
+
+                    <!-- Two-column container: Stats on left, Target Content on right -->
+                    <div class="stats-two-column-container">
+                        <!-- Left Column: Stats List -->
+                        <div class="stats-list-column">
+                            <!-- Core Combat Stats -->
+                            <div class="stat-row">
+                                <label>Attack</label>
+                                <input type="number" id="attack-base" value="500">
+                            </div>
+                            <div class="stat-row">
+                                <label>Defense <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('defense')">?</span></label>
+                                <input type="number" id="defense-base" value="0">
+                            </div>
+                            <div class="stat-row">
+                                <label>Critical Rate (%)</label>
+                                <input type="number" step="0.1" id="crit-rate-base" value="15">
+                            </div>
+                            <div class="stat-row">
+                                <label>Critical Damage (%)</label>
+                                <input type="number" step="0.1" id="crit-damage-base" value="15">
+                            </div>
+                            <div class="stat-row">
+                                <label>Attack Speed (%)</label>
+                                <input type="number" step="0.1" id="attack-speed-base" value="0">
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="stat-divider"></div>
+
+                            <!-- Main Stats (class-based visibility) -->
+                            <div class="stat-row" id="str-row">
+                                <label>STR</label>
+                                <input type="number" id="str-base" value="1000">
+                            </div>
+                            <div class="stat-row" id="dex-row">
+                                <label>DEX</label>
+                                <input type="number" id="dex-base" value="0">
+                            </div>
+                            <div class="stat-row" id="int-row">
+                                <label>INT</label>
+                                <input type="number" id="int-base" value="1000">
+                            </div>
+                            <div class="stat-row" id="luk-row">
+                                <label>LUK</label>
+                                <input type="number" id="luk-base" value="0">
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="stat-divider"></div>
+
+                            <!-- Damage Modifiers -->
+                            <div class="stat-row">
+                                <label>Stat Prop. Damage (%)</label>
+                                <input type="number" step="0.1" id="stat-damage-base" value="0">
+                            </div>
+                            <div class="stat-row">
+                                <label>Damage (%)</label>
+                                <input type="number" step="0.1" id="damage-base" value="10">
+                            </div>
+                            <div class="stat-row">
+                                <label>Damage Amplification (x)</label>
+                                <input type="number" step="0.1" id="damage-amp-base" value="0">
+                            </div>
+                            <div class="stat-row" style="display: none;">
+                                <label>Basic Attack Damage (%)</label>
+                                <input type="number" step="0.1" id="basic-attack-damage-base" value="0">
+                            </div>
+                            <div class="stat-row" style="display: none;">
+                                <label>Skill Damage (%)</label>
+                                <input type="number" step="0.1" id="skill-damage-base" value="0">
+                            </div>
+                            <div class="stat-row">
+                                <label>Defense Penetration (%) <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('def-pen')">?</span></label>
+                                <input type="number" step="0.1" id="def-pen-base" value="0">
+                            </div>
+                            <div class="stat-row">
+                                <label>Boss Monster Damage (%)</label>
+                                <input type="number" step="0.1" id="boss-damage-base" value="10">
+                            </div>
+                            <div class="stat-row">
+                                <label>Normal Monster Damage (%)</label>
+                                <input type="number" step="0.1" id="normal-damage-base" value="0">
+                            </div>
+                            <div class="stat-row">
+                                <label>Min Damage Multiplier (%)</label>
+                                <input type="number" step="0.1" id="min-damage-base" value="50">
+                            </div>
+                            <div class="stat-row">
+                                <label>Max Damage Multiplier (%)</label>
+                                <input type="number" step="0.1" id="max-damage-base" value="100">
+                            </div>
+                            <div class="stat-row">
+                                <label>Final Damage (%)</label>
+                                <input type="number" step="0.1" id="final-damage-base" value="0">
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="stat-divider"></div>
+
+                            <!-- Skill Levels -->
+                            <div class="stat-row">
+                                <label>1st Job Skill Level</label>
+                                <input type="number" id="skill-level-1st-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+                            <div class="stat-row">
+                                <label>2nd Job Skill Level</label>
+                                <input type="number" id="skill-level-2nd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+                            <div class="stat-row">
+                                <label>3rd Job Skill Level</label>
+                                <input type="number" id="skill-level-3rd-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+                            <div class="stat-row">
+                                <label>4th Job Skill Level</label>
+                                <input type="number" id="skill-level-4th-base" value="0" min="0" onchange="updateSkillCoefficient(); saveToLocalStorage()">
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="stat-divider"></div>
+
+                            <!-- Main Stat % -->
+                            <div class="stat-row">
+                                <label>Current Main Stat % <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('main-stat-pct')">?</span></label>
+                                <input type="number" step="0.1" id="main-stat-pct-base" value="0">
+                            </div>
+
+                            <!-- Hidden fields that are used elsewhere but kept for compatibility -->
+                            <input type="hidden" id="primary-main-stat-base" value="1000">
+                            <input type="hidden" id="secondary-main-stat-base" value="0">
+                            <input type="hidden" id="skill-mastery-base" value="21">
+                            <input type="hidden" id="skill-mastery-boss-base" value="0">
+                            <input type="hidden" id="skill-coeff-base" value="0">
                         </div>
 
-                        <div style="grid-column: 1 / -1; border-top: 2px solid var(--border-color); margin: 10px 0;">
-                        </div>
-                        <div class="input-group" style="grid-column: 1 / -1;">
-                            <label>Target Content Type <span class="info-icon" role="img" aria-label="Info"
-                                    onclick="openHelpSidebar('target-stage')">?</span></label>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px;">
-                                <div onclick="selectContentType('none')" id="content-none" class="content-type-selector" title="Training Dummy">
-                                    <span style="font-size: 24px;">🎯</span>
-                                    <span>None</span>
-                                </div>
-                                <div onclick="selectContentType('stageHunt')" id="content-stageHunt" class="content-type-selector" title="Stage Hunt">
-                                    <span style="font-size: 24px;">🗺️</span>
-                                    <span>Stage Hunt</span>
-                                </div>
-                                <div onclick="selectContentType('chapterBoss')" id="content-chapterBoss" class="content-type-selector" title="Chapter Boss">
-                                    <span style="font-size: 24px;">👑</span>
-                                    <span>Chapter Boss</span>
-                                </div>
-                                <div onclick="selectContentType('worldBoss')" id="content-worldBoss" class="content-type-selector" title="World Boss">
-                                    <span style="font-size: 24px;">🌍</span>
-                                    <span>World Boss</span>
-                                </div>
-                                <div onclick="selectContentType('growthDungeon')" id="content-growthDungeon" class="content-type-selector" title="Growth Dungeon">
-                                    <span style="font-size: 24px;">📈</span>
-                                    <span>Growth Dungeon</span>
+                        <!-- Right Column: Skill Mastery and Target Content -->
+                        <div class="right-column-stack">
+                            <!-- Skill Mastery Section -->
+                            <div class="skill-mastery-section">
+                            <label style="font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 8px;">Skill Mastery Bonus <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('skill-mastery')">?</span></label>
+
+                            <!-- 3rd Job Mastery Table -->
+                            <div id="mastery-table-3rd" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>64</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-64" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-64">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>68</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-68" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-68">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>72</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-72" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-72">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>76</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-76" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-76">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>80</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-80" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-80">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>84</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-boss-84" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-boss-84">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>88</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-88" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-88">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>92</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-3rd-all-92" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-3rd-all-92">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-3rd-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-3rd-boss-total">0%</div>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Sub-category selector for Stage Hunts and Growth Dungeons -->
-                            <select id="target-subcategory" onchange="updateStageDropdown()" style="display: none; margin-bottom: 12px;">
-                                <!-- Populated by JavaScript based on content type -->
-                            </select>
-                            <!-- Final stage selection -->
-                            <select id="target-stage-base" onchange="saveToLocalStorage(); updateAnalysisTabs();" style="display: none;">
-                                <!-- Populated by JavaScript based on content type/subcategory selection -->
-                            </select>
+
+                            <!-- 4th Job Mastery Table -->
+                            <div id="mastery-table-4th" style="background: var(--background); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px; display: none;">
+                                <table class="mastery-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>All Monsters</th>
+                                            <th>Boss Only</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>102</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-102" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-102">10%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>106</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-106" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-106">11%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>111</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-111" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-111">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>116</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-116" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-116">12%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>120</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-120" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-120">13%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>124</td>
+                                            <td>—</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-boss-124" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-boss-124">10%</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>128</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-128" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-128">14%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td>132</td>
+                                            <td>
+                                                <input type="checkbox" id="mastery-4th-all-132" onchange="updateMasteryBonuses()">
+                                                <label for="mastery-4th-all-132">15%</label>
+                                            </td>
+                                            <td>—</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="mastery-totals-container">
+                                    <div class="mastery-total-box">
+                                        <div class="mastery-total-label">Total (All Monsters)</div>
+                                        <div class="mastery-total-value all-monsters" id="mastery-4th-all-total">0%</div>
+                                    </div>
+                                    <div class="mastery-total-box boss-total">
+                                        <div class="mastery-total-label">Total (Boss Only)</div>
+                                        <div class="mastery-total-value boss-only" id="mastery-4th-boss-total">0%</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Target Content Type Section -->
+                        <div class="target-content-section">
+                            <div class="target-content-box">
+                                <label class="target-content-label">Target Content Type <span class="info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('target-stage')">?</span></label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 12px;">
+                                    <div onclick="selectContentType('none')" id="content-none" class="content-type-selector" title="Training Dummy">
+                                        <span style="font-size: 24px;">🎯</span>
+                                        <span>None</span>
+                                    </div>
+                                    <div onclick="selectContentType('stageHunt')" id="content-stageHunt" class="content-type-selector" title="Stage Hunt">
+                                        <span style="font-size: 24px;">🗺️</span>
+                                        <span>Stage Hunt</span>
+                                    </div>
+                                    <div onclick="selectContentType('chapterBoss')" id="content-chapterBoss" class="content-type-selector" title="Chapter Boss">
+                                        <span style="font-size: 24px;">👑</span>
+                                        <span>Chapter Boss</span>
+                                    </div>
+                                    <div onclick="selectContentType('worldBoss')" id="content-worldBoss" class="content-type-selector" title="World Boss">
+                                        <span style="font-size: 24px;">🌍</span>
+                                        <span>World Boss</span>
+                                    </div>
+                                    <div onclick="selectContentType('growthDungeon')" id="content-growthDungeon" class="content-type-selector" title="Growth Dungeon">
+                                        <span style="font-size: 24px;">📈</span>
+                                        <span>Growth Dungeon</span>
+                                    </div>
+                                </div>
+                                <!-- Sub-category selector for Stage Hunts and Growth Dungeons -->
+                                <select id="target-subcategory" onchange="updateStageDropdown()" style="display: none; margin-bottom: 12px;">
+                                    <!-- Populated by JavaScript based on content type -->
+                                </select>
+                                <!-- Final stage selection -->
+                                <select id="target-stage-base" onchange="saveToLocalStorage(); updateAnalysisTabs();" style="display: none;">
+                                    <!-- Populated by JavaScript based on content type/subcategory selection -->
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                        <!-- End Right Column -->
                     </div>
                     </div>
                     <!-- End Character Stats Sub-tab -->
@@ -742,20 +969,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Help Sidebar Backdrop (for mobile) -->
-            <div id="help-sidebar-backdrop" class="help-sidebar-backdrop" onclick="closeHelpSidebar()"></div>
-
-            <!-- Help Sidebar -->
-            <div id="help-sidebar" class="help-sidebar" style="display: none;">
-                <div class="help-sidebar-header">
-                    <h3 id="help-sidebar-title" class="help-sidebar-title">Help</h3>
-                    <button id="help-sidebar-close" class="help-close-btn" onclick="closeHelpSidebar()">&times;</button>
-                </div>
-                <div class="help-sidebar-content" id="help-sidebar-content">
-                    <!-- Dynamic help content goes here -->
-                </div>
-            </div>
         </div>
         </div>
         <!-- End Page: Character Setup -->
@@ -763,9 +976,9 @@
         <!-- Page: Gear Lab -->
         <div id="page-optimization" class="page-container" style="display: none;">
         <!-- Gear Lab Content -->
-        <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
-            <div class="text-2xl mb-5 text-center text-blue-600 dark:text-blue-400 font-semibold">Gear Lab 🧪</div>
-            <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+        <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3">
+            <div class="text-2xl mb-2 text-center text-blue-600 dark:text-blue-400 font-semibold">Gear Lab 🧪</div>
+            <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'item-comparison')">Item Comparison</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'inner-ability')">Inner Ability</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'artifact-potential')">Artifact Potential</button>
@@ -775,7 +988,7 @@
 
             <!-- Item Comparison Tab -->
             <div id="analysis-item-comparison" class="tab-content active">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-3">
                     <!-- Equipped Item -->
                     <div>
                         <h3 style="color: var(--accent-success); margin-bottom: 8px; font-size: 1em; font-weight: 600;">
@@ -839,7 +1052,7 @@
 
             <!-- Inner Ability Analysis Tab -->
             <div id="analysis-inner-ability" class="tab-content">
-                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('my-ability-pages')">My Ability Pages</button>
                     <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
                         Comparison</button>
@@ -879,7 +1092,7 @@
             <!-- Scroll Optimizer Tab -->
             <div id="analysis-scroll-optimizer" class="tab-content">
                 <!-- Sub-tabs for Scrolling -->
-                <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('my-slot-performance')">My Slot Performance</button>
                     <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchScrollingSubTab('simulation')">Simulation</button>
                 </div>
@@ -978,7 +1191,7 @@
                 </div>
 
                 <!-- Main Tab Navigation -->
-                <div id="tab-container-main" class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                <div id="tab-container-main" class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button id="cube-main-tab-selected" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Selected Slot</button>
                     <button id="cube-main-tab-summary" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Summary</button>
                     <button id="cube-main-tab-simulation" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Simulation</button>
@@ -1030,7 +1243,7 @@
                     </div>
 
                     <!-- Selected Slot Sub-Tab Navigation -->
-                    <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+                    <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                     <button id="cube-tab-comparison" class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Comparison</button>
                     <button id="cube-tab-rankings" class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg">Slot Theoretical Best</button>
                     </div>
@@ -1143,12 +1356,12 @@
         <!-- Page: Stat Hub -->
         <div id="page-predictions" class="page-container" style="display: none;">
         <!-- Stat Hub Content -->
-        <div id="stat-damage-predictions-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-5">
-            <div class="text-2xl mb-5 text-center font-semibold">
+        <div id="stat-damage-predictions-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3">
+            <div class="text-2xl mb-2 text-center font-semibold">
                 <span class="stat-hub-logo-large">Stat<span class="stat-hub-highlight-large">Hub</span></span>
             </div>
 
-            <div class="flex flex-wrap gap-2.5 mb-5 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
+            <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
                 <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('predictions', 'stat-tables')">Stat Predictions</button>
                 <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('predictions', 'equivalency')">Stat Equivalency</button>
             </div>

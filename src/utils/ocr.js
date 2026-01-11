@@ -166,9 +166,14 @@ function applyConvolution(imageData, kernel, width, height) {
 export function parseBaseStatText(text) {
     const displayNamesToInput = {
         "Attack": "attack-base",
+        "Defense": "defense-base",
         "Critical Rate": "crit-rate-base",
         "Critical Damage": "crit-damage-base",
         "Attack Speed": "attack-speed-base",
+        "STR": "str-base",
+        "DEX": "dex-base",
+        "LUK": "luk-base",
+        "INT": "int-base",        
         "Stat Prop. Damage": "stat-damage-base",
         "Damage": "damage-base",
         "Damage Amplification": "damage-amp-base",
@@ -246,19 +251,6 @@ export function parseBaseStatText(text) {
 
         return [];
     })
-
-
-    const statValues = cleanData.filter(x => ["STR", "DEX", "INT", "LUK"]
-        .some(stat => x[0].startsWith(stat)))
-        .map(x => x[1])
-        .sort((a, b) => b - a);
-
-    if (statValues.length > 0) {
-        matchedData.push(["primary-main-stat-base", statValues[0]]);
-        if (statValues.length > 1) {
-            matchedData.push(["secondary-main-stat-base", statValues[1]]);
-        }
-    }
-
+    
     return matchedData;
 }

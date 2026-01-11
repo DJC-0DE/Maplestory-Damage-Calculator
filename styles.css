@@ -454,6 +454,195 @@ select option {
     color: #f3f4f6;
 }
 
+/* ========================================
+   STATS TWO-COLUMN LAYOUT
+   ======================================== */
+
+/* Main container - side by side */
+.stats-two-column-container {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+/* Stats list (left column) */
+.stats-list-column {
+    flex: 0 0 600px;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dark .stats-list-column {
+    background: rgba(55, 65, 81, 0.3);
+    border-color: #4b5563;
+}
+
+/* Right column - contains skill mastery and target content stacked */
+.right-column-stack {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* Individual stat row */
+.stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 12px;
+    margin: 0 -12px;
+    border-radius: 4px;
+}
+
+/* Alternating row backgrounds */
+.stat-row:nth-child(even) {
+    background-color: rgba(243, 244, 246, 0.5);
+}
+
+.dark .stat-row:nth-child(even) {
+    background-color: rgba(55, 65, 81, 0.4);
+}
+
+.stat-row label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    letter-spacing: 0.025em;
+}
+
+.dark .stat-row label {
+    color: #9ca3af;
+}
+
+.stat-row input {
+    width: 130px;
+    text-align: right;
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dark .stat-row input {
+    border-color: #4b5563;
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+.stat-row input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dark .stat-row input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* Stat divider between sections */
+.stat-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #d1d5db, transparent);
+    margin: 6px 0;
+}
+
+.dark .stat-divider {
+    background: linear-gradient(to right, transparent, #4b5563, transparent);
+}
+
+/* Skill Mastery Section */
+.skill-mastery-section {
+    width: 100%;
+}
+
+/* Target Content Section */
+.target-content-section {
+    width: 100%;
+}
+
+.target-content-box {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dark .target-content-box {
+    background: rgba(55, 65, 81, 0.3);
+    border-color: #4b5563;
+}
+
+.target-content-label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+.dark .target-content-label {
+    color: #60a5fa;
+}
+
+/* Fix dropdown styling */
+.target-content-box select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    color: #111827;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.dark .target-content-box select {
+    border-color: #4b5563;
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+.target-content-box select option {
+    background-color: white;
+    color: #111827;
+}
+
+.dark .target-content-box select option {
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .stats-two-column-container {
+        flex-direction: column;
+    }
+
+    .stats-list-column {
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
+
+    .right-column-stack {
+        width: 100%;
+    }
+}
+
 /* Tab system */
 .tab-content {
     display: none;
@@ -1305,20 +1494,21 @@ select option {
 
 /* Help Sidebar */
 .help-sidebar {
-    position: absolute;
-    z-index: 1000;
-    background: var(--background);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    max-height: calc(100vh - 120px);
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 360px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     display: flex;
     flex-direction: column;
+    z-index: 999;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
 }
 
 .dark .help-sidebar {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
 }
 
 .help-sidebar-header {
@@ -1396,15 +1586,6 @@ select option {
     font-size: 0.9em;
 }
 
-/* Desktop positioning */
-@media (min-width: 768px) {
-    .help-sidebar {
-        left: calc(100% + 20px);
-        width: 360px;
-        top: 0;
-    }
-}
-
 /* Backdrop for mobile */
 .help-sidebar-backdrop {
     position: fixed;
@@ -1413,7 +1594,7 @@ select option {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 999;
+    z-index: 998;
     display: none;
 }
 
@@ -1421,20 +1602,14 @@ select option {
     display: block;
 }
 
-/* Mobile positioning */
-@media (max-width: 767px) {
+/* Mobile Responsive */
+@media (max-width: 1023px) {
     .help-sidebar {
-        position: fixed;
-        left: 5%;
-        right: 5%;
-        top: 20px;
-        max-height: calc(100vh - 80px);
-        z-index: 1001;
-        background: white;
+        transform: translateX(100%);
     }
 
-    .dark .help-sidebar {
-        background: #1f2937;
+    .help-sidebar.mobile-open {
+        transform: translateX(0);
     }
 }
 

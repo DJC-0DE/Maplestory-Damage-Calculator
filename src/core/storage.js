@@ -17,7 +17,8 @@ const BASE_SETUP_FIELDS = [
     'normal-damage', 'skill-coeff', 'skill-mastery', 'skill-mastery-boss',
     'min-damage', 'max-damage', 'primary-main-stat', 'secondary-main-stat', 'final-damage',
     'target-stage', 'defense', 'main-stat-pct',
-    'skill-level-1st', 'skill-level-2nd', 'skill-level-3rd', 'skill-level-4th'
+    'skill-level-1st', 'skill-level-2nd', 'skill-level-3rd', 'skill-level-4th',
+    'str', 'dex', 'int', 'luk'
 ];
 
 // Save all data to localStorage

@@ -177,9 +177,12 @@ export function openHelpSidebar(helpKey) {
     // Show sidebar
     sidebar.style.display = 'flex';
 
-    // Only show backdrop on mobile (< 768px)
-    if (backdrop && window.innerWidth < 768) {
-        backdrop.classList.add('active');
+    // Only show backdrop and mobile-open class on mobile (< 1024px)
+    if (window.innerWidth < 1024) {
+        sidebar.classList.add('mobile-open');
+        if (backdrop) {
+            backdrop.classList.add('active');
+        }
     }
 }
 
@@ -188,7 +191,13 @@ export function closeHelpSidebar() {
     const backdrop = document.getElementById('help-sidebar-backdrop');
 
     if (sidebar) {
-        sidebar.style.display = 'none';
+        sidebar.classList.remove('mobile-open');
+        // Use a timeout to allow the transform animation to complete before hiding
+        setTimeout(() => {
+            if (!sidebar.classList.contains('mobile-open')) {
+                sidebar.style.display = 'none';
+            }
+        }, 300);
     }
     if (backdrop) {
         backdrop.classList.remove('active');

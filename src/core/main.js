@@ -530,6 +530,40 @@ export function selectClass(className) {
             }
         }
 
+        // Show/hide main stats based on class
+        const strRow = document.getElementById('str-row');
+        const dexRow = document.getElementById('dex-row');
+        const intRow = document.getElementById('int-row');
+        const lukRow = document.getElementById('luk-row');
+
+        // Hide all first
+        if (strRow) strRow.style.display = 'none';
+        if (dexRow) dexRow.style.display = 'none';
+        if (intRow) intRow.style.display = 'none';
+        if (lukRow) lukRow.style.display = 'none';
+
+        // Show relevant stats based on class
+        if (className === 'hero' || className === 'dark-knight') {
+            // Warriors: STR (primary), DEX (secondary)
+            if (strRow) strRow.style.display = 'flex';
+            if (dexRow) dexRow.style.display = 'flex';
+        } else if (className === 'bowmaster' || className === 'marksman') {
+            // Archers: DEX (primary), STR (secondary)
+            if (dexRow) dexRow.style.display = 'flex';
+            if (strRow) strRow.style.display = 'flex';
+        } else if (className === 'arch-mage-il' || className === 'arch-mage-fp') {
+            // Mages: INT (primary), LUK (secondary)
+            if (intRow) intRow.style.display = 'flex';
+            if (lukRow) lukRow.style.display = 'flex';
+        } else if (className === 'night-lord' || className === 'shadower') {
+            // Thieves: LUK (primary), DEX (secondary)
+            if (lukRow) lukRow.style.display = 'flex';
+            if (dexRow) dexRow.style.display = 'flex';
+        }
+
+        // Sync new stat inputs with hidden primary/secondary fields
+        syncMainStatsToHidden();
+
         try {
             localStorage.setItem('selectedClass', className);
         } catch (error) {
@@ -538,6 +572,38 @@ export function selectClass(className) {
 
         // Update class warning in cube potential tab
         updateClassWarning();
+    }
+}
+
+// Sync main stat inputs (STR, DEX, INT, LUK) with hidden primary/secondary fields
+function syncMainStatsToHidden() {
+    const className = getSelectedClass();
+    const strInput = document.getElementById('str-base');
+    const dexInput = document.getElementById('dex-base');
+    const intInput = document.getElementById('int-base');
+    const lukInput = document.getElementById('luk-base');
+    const primaryInput = document.getElementById('primary-main-stat-base');
+    const secondaryInput = document.getElementById('secondary-main-stat-base');
+
+    if (!primaryInput || !secondaryInput) return;
+
+    // Map class to primary/secondary stats
+    if (className === 'hero' || className === 'dark-knight') {
+        // Warriors: STR (primary), DEX (secondary)
+        if (strInput) primaryInput.value = strInput.value || 1000;
+        if (dexInput) secondaryInput.value = dexInput.value || 0;
+    } else if (className === 'bowmaster' || className === 'marksman') {
+        // Archers: DEX (primary), STR (secondary)
+        if (dexInput) primaryInput.value = dexInput.value || 1000;
+        if (strInput) secondaryInput.value = strInput.value || 0;
+    } else if (className === 'arch-mage-il' || className === 'arch-mage-fp') {
+        // Mages: INT (primary), LUK (secondary)
+        if (intInput) primaryInput.value = intInput.value || 1000;
+        if (lukInput) secondaryInput.value = lukInput.value || 0;
+    } else if (className === 'night-lord' || className === 'shadower') {
+        // Thieves: LUK (primary), DEX (secondary)
+        if (lukInput) primaryInput.value = lukInput.value || 1000;
+        if (dexInput) secondaryInput.value = dexInput.value || 0;
     }
 }
 
@@ -1004,8 +1070,8 @@ function initializeDefaultTabStates() {
         const tabContainers = [
             document.querySelector('#analysis-inner-ability .flex.flex-wrap'),
             document.querySelector('#analysis-scroll-optimizer .flex.flex-wrap'),
-            document.querySelector('#analysis-cube-potential #tab=container-main'),
-            document.querySelector('#analysis-cube-potential #tab=container-cube-tab'),
+            document.querySelector('#analysis-cube-potential #tab-container-main'),
+            document.querySelector('#analysis-cube-potential #tab-container-cube-tab'),
             document.querySelector('#cube-main-selected-content .flex.flex-wrap:has(#cube-tab-comparison)')
         ].filter(Boolean);
 
@@ -1062,6 +1128,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     });
+
+    // Add event listeners to main stat inputs to sync with hidden fields
+    const strInput = document.getElementById('str-base');
+    const dexInput = document.getElementById('dex-base');
+    const intInput = document.getElementById('int-base');
+    const lukInput = document.getElementById('luk-base');
+
+    [strInput, dexInput, intInput, lukInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', () => {
+                syncMainStatsToHidden();
+                saveToLocalStorage();
+            });
+        }
+    });
+
+    // Initialize main stat visibility on page load
+    const selectedClass = getSelectedClass();
+    if (selectedClass) {
+        selectClass(selectedClass);
+    }
 });
 
 // Expose functions to window for HTML onclick handlers
