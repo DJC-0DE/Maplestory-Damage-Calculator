@@ -67,47 +67,35 @@ export function getUpgradeCost(rarity, tier, level) {
     // Apply tier multiplier (1.2x for each tier above T4)
     let tierAdjustedCost = baseCost * Math.pow(1.2, tierSteps);
 
-    if(rarity === "ancient" && (tier === "t3" || tier === "t2"))
-    {
-        if(tier === "t3")
-        {
+    if (rarity === "ancient" && (tier === "t3" || tier === "t2")) {
+        if (tier === "t3") {
             tierAdjustedCost = 70000;
-        } else if (tier === "t2")
-        {
+        } else if (tier === "t2") {
             tierAdjustedCost = 120000;
-        }        
+        }
     }
 
-    // Apply level-based multiplier
-    let levelMultiplier = 1;
-    let oneToFiftyPow = 1.01;
+    const basePowers = [1.01, 1.015, 1.02, 1.025];
+    const powers = [...basePowers];
 
-     if(rarity === "ancient" && (tier === "t3" || tier === "t2"))
-    {
-        if(tier === "t3")
-        {
-            tierAdjustedCost = 70000;
-        } else if (tier === "t2")
-        {
-            tierAdjustedCost = 120000;
-        }        
-
-        oneToFiftyPow = 1.015;
+    // Ancient bonus + tier override
+    if (rarity === "ancient" && (tier === "t2" || tier === "t3")) {
+        tierAdjustedCost = tier === "t3" ? 70000 : 120000;
+        for (let i = 0; i < powers.length; i++) {
+            powers[i] += 0.005;
+        }
     }
 
-    if (level <= 50) {
-        // Level 1->2 to 50->51: BaseCost × 1.01^(Level-1)
-        levelMultiplier = Math.pow(oneToFiftyPow, level - 1);
-    } else if (level <= 100) {
-        // Level 51->52 to 100->101: BaseCost × 1.01^49 × 1.015^(Level-50)
-        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, level - 50);
-    } else if (level <= 150) {
-        // Level 101->102 to 150->151: BaseCost × 1.01^49 × 1.015^50 × 1.02^(Level-100)
-        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, 50) * Math.pow(1.02, level - 100);
-    } else {
-        // Level 151->152 to 199->200: BaseCost × 1.01^49 × 1.015^50 × 1.02^50 × 1.025^(Level-150)
-        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, 50) * Math.pow(1.02, 50) * Math.pow(1.025, level - 150);
-    }
+    const [p1, p2, p3, p4] = powers;
+
+    let levelMultiplier =
+        level <= 50
+            ? Math.pow(p1, level - 1)
+            : level <= 100
+                ? Math.pow(p1, 49) * Math.pow(p2, level - 50)
+                : level <= 150
+                    ? Math.pow(p1, 49) * Math.pow(p2, 50) * Math.pow(p3, level - 100)
+                    : Math.pow(p1, 49) * Math.pow(p2, 50) * Math.pow(p3, 50) * Math.pow(p4, level - 150);
 
     const finalCost = tierAdjustedCost * levelMultiplier;
 
