@@ -80,19 +80,33 @@ export function getUpgradeCost(rarity, tier, level) {
 
     // Apply level-based multiplier
     let levelMultiplier = 1;
+    let oneToFiftyPow = 1.01;
+
+     if(rarity === "ancient" && (tier === "t3" || tier === "t2"))
+    {
+        if(tier === "t3")
+        {
+            tierAdjustedCost = 70000;
+        } else if (tier === "t2")
+        {
+            tierAdjustedCost = 120000;
+        }        
+
+        oneToFiftyPow = 1.015;
+    }
 
     if (level <= 50) {
         // Level 1->2 to 50->51: BaseCost × 1.01^(Level-1)
-        levelMultiplier = Math.pow(1.01, level - 1);
+        levelMultiplier = Math.pow(oneToFiftyPow, level - 1);
     } else if (level <= 100) {
         // Level 51->52 to 100->101: BaseCost × 1.01^49 × 1.015^(Level-50)
-        levelMultiplier = Math.pow(1.01, 49) * Math.pow(1.015, level - 50);
+        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, level - 50);
     } else if (level <= 150) {
         // Level 101->102 to 150->151: BaseCost × 1.01^49 × 1.015^50 × 1.02^(Level-100)
-        levelMultiplier = Math.pow(1.01, 49) * Math.pow(1.015, 50) * Math.pow(1.02, level - 100);
+        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, 50) * Math.pow(1.02, level - 100);
     } else {
         // Level 151->152 to 199->200: BaseCost × 1.01^49 × 1.015^50 × 1.02^50 × 1.025^(Level-150)
-        levelMultiplier = Math.pow(1.01, 49) * Math.pow(1.015, 50) * Math.pow(1.02, 50) * Math.pow(1.025, level - 150);
+        levelMultiplier = Math.pow(oneToFiftyPow, 49) * Math.pow(1.015, 50) * Math.pow(1.02, 50) * Math.pow(1.025, level - 150);
     }
 
     const finalCost = tierAdjustedCost * levelMultiplier;
