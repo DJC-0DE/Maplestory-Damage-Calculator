@@ -3,6 +3,9 @@
 import { renderArtifactPotential } from '@core/artifact-potential.js';
 import { resetSubTabsToDefault } from '@core/router.js';
 
+window.switchTab = switchTab;
+window.switchScrollingSubTab = switchScrollingSubTab;
+
 // Tab switching function
 export function switchTab(group, tabName) {
     // Get all tab contents and buttons within the group

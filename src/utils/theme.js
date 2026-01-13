@@ -5,6 +5,8 @@ import { updateWeaponBonuses } from '@ui/weapons-ui.js';
 import { handleEquippedCheckboxChange } from '@ui/weapons-ui.js';
 import { handleWeaponLevelChange, updateEquippedWeaponIndicator } from '@ui/weapons-ui.js';
 
+window.toggleTheme = toggleTheme;
+
 export function toggleTheme() {
     const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');

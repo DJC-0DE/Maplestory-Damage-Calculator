@@ -36,14 +36,13 @@ import {
     populateStageDropdown, selectContentType, updateStageDropdown
 } from '@core/base-stats/target-select.js';
 import { extractText, parseBaseStatText } from '@utils/ocr.js';
-import { loadTheme, toggleTheme } from '@ui/theme.js';
+import { loadTheme } from '@utils/theme.js';
 import { initializeHeroPowerPresets, loadHeroPowerPresets, switchPreset, handlePresetEquipped } from '@ui/presets-ui.js';
 import { calculateCurrencyUpgrades } from '@ui/weapons-ui.js';
 import { toggleSubDetails, toggleDetails } from '@ui/results-display.js';
 import { initializeWeapons, updateWeaponBonuses, setWeaponStars, previewStars, resetStarPreview, handleEquippedCheckboxChange, handleWeaponLevelChange } from '@ui/weapons-ui.js';
 import { initializeEquipmentSlots, loadEquipmentSlots, unequipItem, equipItem, addEquippedStat, removeEquippedStat, saveEquipmentSlots } from '@ui/equipment-ui.js';
 import { calculateEquipmentSlotDPS } from '@ui/results-display.js';
-import { switchTab, switchScrollingSubTab } from '@ui/tabs.js';
 import { openHelpSidebar, closeHelpSidebar, scrollToSection } from '@ui/help-sidebar.js';
 import { displayResults } from '@ui/results-display.js';
 import { initializeCompanionsUI } from '@ui/companions-ui.js';
@@ -694,23 +693,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Expose functions to window for HTML onclick handlers
-window.switchTab = switchTab;
-window.switchScrollingSubTab = switchScrollingSubTab;
-window.toggleTheme = toggleTheme;
-window.unequipItem = unequipItem;
-window.equipItem = equipItem;
-window.addEquippedStat = addEquippedStat;
-window.removeEquippedStat = removeEquippedStat;
-window.saveEquipmentSlots = saveEquipmentSlots;
-window.calculateEquipmentSlotDPS = calculateEquipmentSlotDPS;
 window.setWeaponStars = setWeaponStars;
 window.previewStars = previewStars;
 window.resetStarPreview = resetStarPreview;
 window.handleEquippedCheckboxChange = handleEquippedCheckboxChange;
 window.handleWeaponLevelChange = handleWeaponLevelChange;
 window.calculateCurrencyUpgrades = calculateCurrencyUpgrades;
-window.toggleSubDetails = toggleSubDetails;
-window.toggleDetails = toggleDetails;
 window.switchPreset = switchPreset;
 window.handlePresetEquipped = handlePresetEquipped;
 window.openHelpSidebar = openHelpSidebar;

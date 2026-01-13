@@ -7,6 +7,12 @@ import { getSelectedClass, getSelectedJobTier } from '@core/state.js';
 import { removeComparisonItem, addComparisonItem, addComparisonItemStat } from '@ui/comparison-ui.js';
 import { comparisonItemCount, equippedStatCount, setEquippedStatCount, availableStats, allItemStatProperties } from '@core/constants.js';
 
+window.unequipItem = unequipItem;
+window.equipItem = equipItem;
+window.addEquippedStat = addEquippedStat;
+window.removeEquippedStat = removeEquippedStat;
+window.saveEquipmentSlots = saveEquipmentSlots;
+
 export function unequipItem() {
     // Get equipped item data
     const equippedItem = getItemStats('equipped');
@@ -276,7 +282,6 @@ export function initializeEquipmentSlots() {
     }, 0);
 }
 
-
 export function saveEquipmentSlots() {
     const slots = {};
     const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
@@ -295,7 +300,6 @@ export function saveEquipmentSlots() {
 
     localStorage.setItem('equipmentSlots', JSON.stringify(slots));
 }
-
 
 export function loadEquipmentSlots() {
     const saved = localStorage.getItem('equipmentSlots');

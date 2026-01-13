@@ -59,7 +59,6 @@ export function createPresetContentHTML(presetId, isActive = false) {
     `;
 }
 
-
 export function switchPreset(presetId) {
     // Hide all preset contents
     for (let i = 1; i <= 10; i++) {
@@ -77,7 +76,6 @@ export function switchPreset(presetId) {
     if (selectedContent) selectedContent.classList.add('active');
     if (selectedTab) selectedTab.classList.add('active');
 }
-
 
 export function handlePresetEquipped(presetId) {
     const checkbox = document.getElementById(`preset-${presetId}-equipped`);
@@ -132,7 +130,6 @@ export function saveHeroPowerPresets() {
     renderTheoreticalBest();
 }
 
-
 export function loadHeroPowerPresets() {
     const saved = localStorage.getItem('heroPowerPresets');
     if (!saved) return;
@@ -169,5 +166,3 @@ export function loadHeroPowerPresets() {
         console.error('Failed to load hero power presets:', error);
     }
 }
-
-// Equipment Slots Management

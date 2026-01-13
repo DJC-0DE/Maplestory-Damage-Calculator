@@ -5,6 +5,10 @@ import { calculateDamage } from '@core/calculations/damage-calculations.js';
 import { getWeaponAttackBonus } from '@core/state.js';
 import { getStats } from '@core/state.js';
 
+window.calculateEquipmentSlotDPS = calculateEquipmentSlotDPS;
+window.toggleSubDetails = toggleSubDetails;
+window.toggleDetails = toggleDetails;
+
 export function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedDamageValues = null) {
     const bossResults = calculateDamage(stats, 'boss');
     const normalResults = calculateDamage(stats, 'normal');
@@ -289,7 +293,6 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
     return html;
 }
 
-
 export function toggleSubDetails(id) {
     const section = document.getElementById(id);
     const icon = document.getElementById(`${id}-icon`);
@@ -302,7 +305,6 @@ export function toggleSubDetails(id) {
         icon.textContent = '▲';
     }
 }
-
 
 export function toggleDetails(id) {
     const detailsSection = document.getElementById(`details-${id}`);
@@ -318,8 +320,6 @@ export function toggleDetails(id) {
         toggleButton.textContent = 'Hide Detailed Breakdown';
     }
 }
-
-// Hero Power Ability preset management
 
 export function calculateEquipmentSlotDPS() {
     const baseStats = getStats('base');
