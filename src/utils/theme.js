@@ -1,9 +1,9 @@
 // Theme toggle functionality
 
-import { initializeWeapons } from '@ui/weapons-ui.js';
-import { updateWeaponBonuses } from '@ui/weapons-ui.js';
-import { handleEquippedCheckboxChange } from '@ui/weapons-ui.js';
-import { handleWeaponLevelChange, updateEquippedWeaponIndicator } from '@ui/weapons-ui.js';
+import { initializeWeapons } from '@core/weapon-levels/weapons-ui.js';
+import { updateWeaponBonuses } from '@core/weapon-levels/weapons-ui.js';
+import { handleEquippedCheckboxChange } from '@core/weapon-levels/weapons-ui.js';
+import { handleWeaponLevelChange, updateEquippedWeaponIndicator } from '@core/weapon-levels/weapons-ui.js';
 import { rarities, tiers } from '@core/constants.js';
 
 window.toggleTheme = toggleTheme;

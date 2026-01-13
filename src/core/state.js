@@ -1,6 +1,6 @@
 // Pure state extraction - no UI, no calculations
 import { stageData } from '@data/stage-data.js';
-import { calculateWeaponAttacks } from '@core/calculations/weapon-calculations.js';
+import { calculateWeaponAttacks } from '@core/weapon-levels/weapon-calculations.js';
 import { itemStatProperties, allItemStatProperties, rarities, tiers } from '@core/constants.js';
 // Handles reading DOM state into structured data
 

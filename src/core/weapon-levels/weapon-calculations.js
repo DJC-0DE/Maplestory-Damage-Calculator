@@ -1,7 +1,7 @@
 import { weaponBaseAttackEquipped } from '@core/constants.js';
 
 // Get weapon level multiplier based on level (from weapon-damage-stats.txt)
-export function getWeaponLevelMultiplier(level) {
+function getWeaponLevelMultiplier(level) {
     if (!level || level <= 1) return 1.0;
     if (level <= 100) return 1 + (0.3 * (level - 1)) / 100;
     if (level <= 130) return 1 + (30.3 + 0.7 * (level - 101)) / 100;
@@ -12,7 +12,7 @@ export function getWeaponLevelMultiplier(level) {
 }
 
 // Get inventory divisor based on rarity
-export function getInventoryDivisor(rarity) {
+function getInventoryDivisor(rarity) {
     return ['legendary', 'mystic', 'ancient'].includes(rarity) ? 4 : 3.5;
 }
 

@@ -1,6 +1,6 @@
 // Weapons UI functionality
 
-import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain } from '@core/calculations/weapon-calculations.js';
+import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain } from '@core/weapon-levels/weapon-calculations.js';
 import { calculateDamage } from '@core/calculations/damage-calculations.js';
 import { saveToLocalStorage } from '@core/storage.js';
 import { getStats, calculate } from '@core/main.js';

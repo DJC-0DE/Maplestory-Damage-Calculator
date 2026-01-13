@@ -33,7 +33,7 @@ import {
 import { extractText, parseBaseStatText } from '@utils/ocr.js';
 import { loadTheme } from '@utils/theme.js';
 import { initializeHeroPowerPresets, loadHeroPowerPresets} from '@ui/presets-ui.js';
-import { initializeWeapons, updateWeaponBonuses} from '@ui/weapons-ui.js';
+import { initializeWeapons, updateWeaponBonuses} from '@core/weapon-levels/weapons-ui.js';
 import { initializeEquipmentSlots, loadEquipmentSlots } from '@ui/equipment-ui.js';
 import { displayResults } from '@ui/results-display.js';
 import { initializeCompanionsUI } from '@ui/companions-ui.js';
@@ -42,6 +42,7 @@ import { getStatType, isDexMainStatClass, isIntMainStatClass, isLukMainStatClass
 import { updateSkillCoefficient } from './base-stats/base-stats.js';
 import '@utils/tabs.js';
 import '@utils/stat-chart.js';
+import '@ui/help-sidebar.js';
 
 // Data extraction functions
 // getStats and getItemStats moved to state.js

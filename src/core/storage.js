@@ -4,7 +4,7 @@ import { renderArtifactPotential } from '@core/artifact-potential.js';
 import { clearCubeRankingsCache } from '@core/cube/cube-potential.js';
 import { addComparisonItemStat, addComparisonItem } from '@ui/comparison-ui.js';
 import { addEquippedStat } from '@ui/equipment-ui.js';
-import { handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from '@ui/weapons-ui.js';
+import { handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from '@core/weapon-levels/weapons-ui.js';
 import { rarities, tiers, comparisonItemCount, equippedStatCount } from '@core/constants.js';
 import { getCompanionsState, setCompanionsState } from '@core/state.js';
 import { refreshCompanionsUI } from '@ui/companions-ui.js';
