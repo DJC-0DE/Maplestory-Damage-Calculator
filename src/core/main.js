@@ -43,6 +43,7 @@ import { updateSkillCoefficient } from './base-stats/base-stats.js';
 import '@utils/tabs.js';
 import '@utils/stat-chart.js';
 import '@ui/help-sidebar.js';
+import '@core/scroll-optimizer.js';
 
 // Data extraction functions
 // getStats and getItemStats moved to state.js
