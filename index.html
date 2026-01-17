@@ -813,12 +813,12 @@
         <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3">
             <div class="text-2xl mb-2 text-center text-blue-600 dark:text-blue-400 font-semibold">Gear Lab 🧪</div>
             <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
-                <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'item-comparison'); checkPendingSlotNavigation();">Item Comparison</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'inner-ability')">Inner Ability</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'artifact-potential')">Artifact Potential</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'scroll-optimizer')">Scrolling</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'cube-potential')">Cube Potential</button>
-                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchTab('analysis', 'stat-breakdown'); updateStatBreakdown();">Stat Breakdown</button>
+                <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'item-comparison'); checkPendingSlotNavigation();">Item Comparison</button>
+                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'inner-ability')">Inner Ability</button>
+                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'artifact-potential')">Artifact Potential</button>
+                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'scroll-optimizer')">Scrolling</button>
+                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'cube-potential')">Cube Potential</button>
+                <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="navigateToTab('optimization', 'stat-breakdown'); updateStatBreakdown();">Stat Breakdown</button>
             </div>
 
             <!-- Item Comparison Tab - Enhanced UI/UX -->
