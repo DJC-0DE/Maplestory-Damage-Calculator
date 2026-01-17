@@ -919,12 +919,11 @@
 
             <!-- Inner Ability Analysis Tab -->
             <div id="analysis-inner-ability" class="tab-content">
-                <div class="flex flex-wrap gap-2.5 mb-3 border-b-2 border-gray-200/50 dark:border-gray-700/50 pb-0">
-                    <button class="tab-button active px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('my-ability-pages')">My Ability Pages</button>
-                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('preset-comparison')">Preset
-                        Comparison</button>
-                    <button class="tab-button px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-300 border-b-[3px] border-transparent -mb-0.5 rounded-t-lg" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical
-                        Best</button>
+                <!-- Premium Tab Navigation -->
+                <div class="ia-tab-navigation">
+                    <button class="ia-tab-button active" onclick="switchInnerAbilityTab('my-ability-pages')">My Ability Pages</button>
+                    <button class="ia-tab-button" onclick="switchInnerAbilityTab('preset-comparison')">Preset Comparison</button>
+                    <button class="ia-tab-button" onclick="switchInnerAbilityTab('theoretical-best')">Theoretical Best</button>
                 </div>
 
                 <!-- My Ability Pages Sub-Tab -->

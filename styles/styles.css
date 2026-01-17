@@ -24,6 +24,7 @@
 @import url('./features/skill-mastery.css');
 @import url('./features/comparison.css');
 @import url('./features/extra-stats.css');
+@import url('./features/inner-ability.css');
 
 /* Branding */
 @import url('./branding/logo.css');

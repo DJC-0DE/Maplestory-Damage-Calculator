@@ -10,11 +10,11 @@ export function initializeHeroPowerPresets() {
     const container = document.getElementById('hero-power-presets-container');
     if (!container) return;
 
-    // Create tabs
-    let tabsHTML = '<div class="preset-tabs" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px;">';
+    // Create premium tabs
+    let tabsHTML = '<div class="ia-presets-tabs-container">';
     for (let i = 1; i <= 10; i++) {
         const activeClass = i === 1 ? 'active' : '';
-        tabsHTML += `<button class="preset-tab ${activeClass}" id="preset-tab-${i}" onclick="switchPreset(${i})">${i}</button>`;
+        tabsHTML += `<button class="ia-preset-tab ${activeClass}" id="preset-tab-${i}" onclick="switchPreset(${i})">${i}</button>`;
     }
     tabsHTML += '</div>';
 
@@ -37,26 +37,28 @@ export function createPresetContentHTML(presetId, isActive = false) {
     const activeClass = isActive ? 'active' : '';
 
     return `
-        <div class="preset-content ${activeClass}" id="preset-${presetId}-content">
-            <div class="preset-equipped-checkbox">
-                <input type="checkbox" id="preset-${presetId}-equipped" onchange="handlePresetEquipped(${presetId})">
-                <label for="preset-${presetId}-equipped">Currently Equipped</label>
-            </div>
-            <div class="inner-ability-lines">
-                ${Array.from({ length: 6 }, (_, i) => `
-                    <div class="inner-ability-line">
-                        <div class="input-group">
-                            <label>Line ${i + 1} - Stat</label>
+        <div class="ia-preset-content ${activeClass}" id="preset-${presetId}-content">
+            <div class="ia-preset-card">
+                <!-- Currently Equipped Checkbox -->
+                <div class="ia-equipped-checkbox-wrapper">
+                    <input type="checkbox" id="preset-${presetId}-equipped" onchange="handlePresetEquipped(${presetId})">
+                    <label for="preset-${presetId}-equipped">Currently Equipped</label>
+                </div>
+
+                <!-- Inner Ability Lines - Premium Grid Layout -->
+                <div class="ia-lines-grid">
+                    ${Array.from({ length: 6 }, (_, i) => `
+                        <div class="ia-line-card">
+                            <div class="ia-line-number">Line ${i + 1}</div>
+                            <label>Stat</label>
                             <select id="preset-${presetId}-line-${i + 1}-stat" onchange="saveHeroPowerPresets()">
                                 ${optionsHTML}
                             </select>
-                        </div>
-                        <div class="input-group">
                             <label>Value</label>
                             <input type="number" step="0.1" id="preset-${presetId}-line-${i + 1}-value" placeholder="0" onchange="saveHeroPowerPresets()">
                         </div>
-                    </div>
-                `).join('')}
+                    `).join('')}
+                </div>
             </div>
         </div>
     `;

@@ -1,0 +1,1007 @@
+/* ========================================
+   INNER ABILITY - Premium Data-Centric Aesthetic
+   Cyberpunk Fintech Terminal × Gaming HUD
+   ======================================== */
+
+/* Premium Typography Import */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ========================================
+   DESIGN TOKENS - Premium Color & Spacing System
+   ======================================== */
+
+:root {
+    /* Typography - Premium Pairing */
+    --ia-font-display: 'Space Grotesk', -apple-system, sans-serif;
+    --ia-font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+    /* Contribution Colors - Premium Palette */
+    --ia-inner-ability: #ec4899;
+    --ia-equipment: #10b981;
+    --ia-scrolling: #3b82f6;
+    --ia-cube: #f59e0b;
+    --ia-companion: #a855f7;
+    --ia-main-stat: #ef4444;
+    --ia-unlockable: #14b8a6;
+    --ia-guild: #8b5cf6;
+    --ia-base: #64748b;
+
+    /* Premium Gradients */
+    --ia-gradient-primary: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fb7185 100%);
+    --ia-gradient-rank-1: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    --ia-gradient-rank-2: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%);
+    --ia-gradient-rank-3: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+    --ia-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --ia-gradient-purple: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+
+    /* Glassmorphism Surfaces */
+    --ia-glass-bg: rgba(15, 23, 42, 0.6);
+    --ia-glass-border: rgba(255, 255, 255, 0.08);
+    --ia-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --ia-glass-blur: blur(12px);
+
+    /* Surface Hierarchy */
+    --ia-surface-elevated: rgba(30, 41, 59, 0.7);
+    --ia-surface-base: rgba(15, 23, 42, 0.5);
+    --ia-surface-subtle: rgba(51, 65, 85, 0.3);
+
+    /* Border System */
+    --ia-border-glass: rgba(255, 255, 255, 0.06);
+    --ia-border-hover: rgba(255, 255, 255, 0.12);
+    --ia-border-active: rgba(255, 255, 255, 0.18);
+
+    /* Spacing Scale - Precise */
+    --ia-space-2xs: 2px;
+    --ia-space-xs: 4px;
+    --ia-space-sm: 6px;
+    --ia-space-md: 10px;
+    --ia-space-lg: 14px;
+    --ia-space-xl: 20px;
+    --ia-space-2xl: 28px;
+
+    /* Animation Curves - Premium Feel */
+    --ia-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ia-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ia-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ia-duration-fast: 150ms;
+    --ia-duration-base: 250ms;
+    --ia-duration-slow: 400ms;
+
+    /* Glow Effects */
+    --ia-glow-subtle: 0 0 20px rgba(236, 72, 153, 0.15);
+    --ia-glow-medium: 0 0 30px rgba(236, 72, 153, 0.25);
+    --ia-glow-strong: 0 0 40px rgba(236, 72, 153, 0.35);
+    --ia-glow-rank-1: 0 0 30px rgba(251, 191, 36, 0.4);
+}
+
+/* Dark Mode Premium Adjustments */
+.dark {
+    --ia-glass-bg: rgba(15, 23, 42, 0.75);
+    --ia-glass-border: rgba(255, 255, 255, 0.06);
+    --ia-surface-elevated: rgba(30, 41, 59, 0.8);
+    --ia-surface-base: rgba(15, 23, 42, 0.6);
+    --ia-surface-subtle: rgba(51, 65, 85, 0.4);
+}
+
+/* ========================================
+   ANIMATED MESH GRADIENT BACKGROUND
+   ======================================== */
+
+#analysis-inner-ability {
+    font-family: var(--ia-font-display);
+    position: relative;
+    background: linear-gradient(135deg,
+        rgba(236, 72, 153, 0.03) 0%,
+        rgba(168, 85, 247, 0.02) 50%,
+        rgba(20, 184, 166, 0.03) 100%);
+    border-radius: 16px;
+    padding: var(--ia-space-xl);
+    animation: fadeIn var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+#analysis-inner-ability::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: linear-gradient(135deg,
+        rgba(236, 72, 153, 0.1),
+        rgba(168, 85, 247, 0.08),
+        rgba(20, 184, 166, 0.1));
+    z-index: -1;
+    opacity: 0.5;
+    animation: gradientShift 8s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        filter: hue-rotate(15deg);
+    }
+}
+
+/* ========================================
+   PREMIUM TAB SYSTEM - Glassmorphic Navigation
+   ======================================== */
+
+.ia-tab-navigation {
+    display: flex;
+    gap: var(--ia-space-sm);
+    padding: var(--ia-space-sm);
+    background: var(--ia-glass-bg);
+    backdrop-filter: var(--ia-glass-blur);
+    -webkit-backdrop-filter: var(--ia-glass-blur);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    margin-bottom: var(--ia-space-xl);
+    box-shadow: var(--ia-glass-shadow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.ia-tab-button {
+    flex: 1;
+    padding: 12px 18px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.ia-tab-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05));
+    opacity: 0;
+    transition: opacity var(--ia-duration-base) var(--ia-ease-smooth);
+    border-radius: 8px;
+}
+
+.ia-tab-button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 60%;
+    height: 2px;
+    background: var(--ia-gradient-primary);
+    transition: transform var(--ia-duration-base) var(--ia-ease-spring);
+    border-radius: 2px 2px 0 0;
+}
+
+.ia-tab-button:hover {
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.ia-tab-button:hover::before {
+    opacity: 1;
+}
+
+.ia-tab-button.active {
+    background: var(--ia-surface-elevated);
+    color: var(--ia-inner-ability);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2),
+                0 0 0 1px var(--ia-glass-border);
+}
+
+.ia-tab-button.active::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+/* Tab content with staggered animation */
+.ia-tab-content {
+    display: none;
+}
+
+.ia-tab-content.active {
+    display: block;
+    animation: slideUp var(--ia-duration-base) var(--ia-ease-spring);
+}
+
+/* ========================================
+   MY ABILITY PAGES - Premium Preset System
+   ======================================== */
+
+/* Preset Tabs Container */
+.ia-presets-tabs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ia-space-sm);
+    padding: var(--ia-space-md);
+    background: var(--ia-surface-subtle);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    margin-bottom: var(--ia-space-lg);
+}
+
+/* Premium Preset Tab Button */
+.ia-preset-tab {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 16px;
+    background: var(--ia-surface-base);
+    border: 2px solid var(--ia-glass-border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .ia-preset-tab {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.ia-preset-tab:hover {
+    color: var(--ia-inner-ability);
+    background: var(--ia-surface-elevated);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.dark .ia-preset-tab:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ia-preset-tab.active {
+    color: var(--ia-inner-ability);
+    border-color: var(--ia-inner-ability);
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(244, 114, 182, 0.08));
+    box-shadow: var(--ia-glow-subtle), 0 4px 12px rgba(236, 72, 153, 0.2);
+}
+
+/* Equipped Badge - Premium Glow */
+.ia-preset-tab.equipped::after {
+    content: '✓';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: var(--ia-gradient-success);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75em;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.5);
+    }
+    50% {
+        box-shadow: 0 2px 12px rgba(16, 185, 129, 0.7);
+    }
+}
+
+/* ========================================
+   PRESET CONTENT CARD - Glassmorphic Panel
+   ======================================== */
+
+.ia-preset-content {
+    display: none;
+}
+
+.ia-preset-content.active {
+    display: block;
+    animation: slideUp var(--ia-duration-base) var(--ia-ease-spring);
+}
+
+.ia-preset-card {
+    background: var(--ia-surface-base);
+    backdrop-filter: var(--ia-glass-blur);
+    -webkit-backdrop-filter: var(--ia-glass-blur);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    padding: var(--ia-space-lg);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top Accent Bar */
+.ia-preset-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--ia-gradient-primary);
+    opacity: 0.9;
+}
+
+.ia-preset-card:hover {
+    border-color: var(--ia-border-hover);
+    box-shadow: var(--ia-glow-medium),
+                0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Currently Equipped Checkbox - Premium Toggle */
+.ia-equipped-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--ia-space-md);
+    padding: var(--ia-space-md);
+    background: var(--ia-surface-subtle);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 10px;
+    margin-bottom: var(--ia-space-lg);
+}
+
+.ia-equipped-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--ia-inner-ability);
+    flex-shrink: 0;
+}
+
+.ia-equipped-checkbox-wrapper label {
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    letter-spacing: 0.01em;
+}
+
+/* ========================================
+   INNER ABILITY LINES - Premium Grid Layout
+   ======================================== */
+
+.ia-lines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--ia-space-md);
+}
+
+@media (min-width: 1024px) {
+    .ia-lines-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .ia-lines-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.ia-line-card {
+    background: var(--ia-surface-subtle);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 10px;
+    padding: var(--ia-space-md);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+}
+
+.ia-line-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: var(--ia-space-md);
+    bottom: var(--ia-space-md);
+    width: 3px;
+    background: var(--ia-gradient-primary);
+    border-radius: 2px 0 0 2px;
+    opacity: 0;
+    transition: opacity var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+.ia-line-card:hover {
+    background: var(--ia-surface-base);
+    border-color: var(--ia-border-hover);
+    transform: translateX(3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ia-line-card:hover::before {
+    opacity: 1;
+}
+
+.ia-line-number {
+    font-family: var(--ia-font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ia-inner-ability);
+    margin-bottom: var(--ia-space-sm);
+}
+
+/* Premium Inputs */
+.ia-line-card label {
+    display: block;
+    font-family: var(--ia-font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: var(--ia-space-xs);
+}
+
+.ia-line-card select,
+.ia-line-card input[type="number"] {
+    width: 100%;
+    padding: 10px var(--ia-space-md);
+    background: var(--ia-surface-elevated);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 8px;
+    font-family: var(--ia-font-display);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    margin-bottom: var(--ia-space-sm);
+}
+
+.ia-line-card select:focus,
+.ia-line-card input[type="number"]:focus {
+    outline: none;
+    border-color: var(--ia-inner-ability);
+    background: var(--ia-glass-bg);
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+.ia-line-card input[type="number"] {
+    font-family: var(--ia-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+/* ========================================
+   PRESET COMPARISON - Premium Data Grid
+   ======================================== */
+
+.ia-comparison-table-wrapper {
+    background: var(--ia-surface-base);
+    backdrop-filter: var(--ia-glass-blur);
+    -webkit-backdrop-filter: var(--ia-glass-blur);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--ia-glass-shadow);
+}
+
+.ia-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ia-comparison-table thead {
+    background: var(--ia-surface-elevated);
+}
+
+.ia-comparison-table th {
+    padding: var(--ia-space-md) var(--ia-space-lg);
+    text-align: left;
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--ia-glass-border);
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+}
+
+.ia-comparison-table th:hover {
+    background: var(--ia-surface-subtle);
+    color: var(--text-primary);
+}
+
+.ia-comparison-table th.sortable::after {
+    content: '⇅';
+    margin-left: var(--ia-space-sm);
+    opacity: 0.3;
+    font-size: 0.9em;
+}
+
+.ia-comparison-table tbody tr {
+    border-bottom: 1px solid var(--ia-glass-border);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+.ia-comparison-table tbody tr:hover {
+    background: var(--ia-surface-subtle);
+}
+
+.ia-comparison-table tbody tr.expandable {
+    cursor: pointer;
+}
+
+.ia-comparison-table tbody tr.expandable:hover {
+    background: rgba(236, 72, 153, 0.08);
+}
+
+.ia-comparison-table td {
+    padding: var(--ia-space-md) var(--ia-space-lg);
+    font-family: var(--ia-font-display);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+/* Premium Rank Badges */
+.ia-rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-family: var(--ia-font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.ia-rank-badge::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+    pointer-events: none;
+}
+
+.ia-rank-badge.rank-1 {
+    background: var(--ia-gradient-rank-1);
+    box-shadow: var(--ia-glow-rank-1), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ia-rank-badge.rank-2 {
+    background: var(--ia-gradient-rank-2);
+    color: #1f2937;
+}
+
+.ia-rank-badge.rank-3 {
+    background: var(--ia-gradient-rank-3);
+}
+
+.ia-rank-badge.rank-default {
+    background: var(--ia-surface-elevated);
+    color: var(--text-secondary);
+}
+
+/* Equipped Badge */
+.ia-equipped-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--ia-gradient-success);
+    border-radius: 6px;
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: white;
+    margin-left: var(--ia-space-sm);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+/* DPS Values - Premium Mono */
+.ia-dps-value {
+    font-family: var(--ia-font-mono);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.ia-dps-positive {
+    color: var(--ia-equipment);
+    font-weight: 700;
+}
+
+.ia-dps-negative {
+    color: var(--ia-main-stat);
+    font-weight: 700;
+}
+
+.ia-dps-percent {
+    font-weight: 600;
+    opacity: 0.85;
+    font-size: 0.85em;
+    margin-left: var(--ia-space-xs);
+}
+
+/* ========================================
+   LINE BREAKDOWN - Premium Expansion
+   ======================================== */
+
+.ia-line-breakdown-row {
+    background: var(--ia-surface-subtle);
+    border-top: 1px solid var(--ia-glass-border);
+}
+
+.ia-line-breakdown-content {
+    padding: var(--ia-space-lg);
+    animation: slideDown var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+.ia-line-breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--ia-space-md);
+    background: var(--ia-surface-base);
+    border: 1px solid var(--ia-glass-border);
+    border-left: 3px solid var(--ia-inner-ability);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: var(--ia-space-sm);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+.ia-line-breakdown-item:hover {
+    background: var(--ia-surface-elevated);
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ia-line-breakdown-item:last-child {
+    border-left-color: var(--ia-equipment);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.ia-line-breakdown-stat {
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.ia-line-breakdown-value {
+    font-family: var(--ia-font-mono);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ia-equipment);
+}
+
+/* ========================================
+   THEORETICAL BEST - Premium Data Display
+   ======================================== */
+
+.ia-theoretical-section {
+    margin-bottom: var(--ia-space-2xl);
+}
+
+.ia-theoretical-title {
+    font-family: var(--ia-font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--ia-space-lg) 0;
+}
+
+/* Scrollable Table Container */
+.ia-table-scrollable {
+    max-height: 600px;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: var(--ia-surface-base);
+    border: 1px solid var(--ia-glass-border);
+    box-shadow: var(--ia-glass-shadow);
+}
+
+/* Custom Scrollbar */
+.ia-table-scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ia-table-scrollable::-webkit-scrollbar-track {
+    background: var(--ia-surface-subtle);
+    border-radius: 4px;
+}
+
+.ia-table-scrollable::-webkit-scrollbar-thumb {
+    background: var(--ia-gradient-primary);
+    border-radius: 4px;
+}
+
+.ia-table-scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--ia-inner-ability);
+}
+
+/* Rarity Badges - Premium Glow */
+.ia-rarity-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-family: var(--ia-font-display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: white;
+    margin-right: var(--ia-space-sm);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+}
+
+.ia-rarity-badge.rarity-mystic {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+}
+
+.ia-rarity-badge.rarity-ancient {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 2px 10px rgba(249, 115, 22, 0.4);
+}
+
+.ia-rarity-badge.rarity-legendary {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+}
+
+.ia-rarity-badge.rarity-unique {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+    color: #1f2937;
+}
+
+.ia-rarity-badge.rarity-epic {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
+}
+
+.ia-rarity-badge.rarity-rare {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+}
+
+.ia-rarity-badge.rarity-epic,
+.ia-rarity-badge.rarity-rare {
+    color: white;
+}
+
+/* ========================================
+   COMBO CARDS - Premium Glassmorphic Panels
+   ======================================== */
+
+.ia-combo-card {
+    background: var(--ia-surface-base);
+    backdrop-filter: var(--ia-glass-blur);
+    -webkit-backdrop-filter: var(--ia-glass-blur);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    padding: var(--ia-space-lg);
+    margin-bottom: var(--ia-space-lg);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top Accent Bar */
+.ia-combo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--ia-gradient-purple);
+    opacity: 0.9;
+}
+
+.ia-combo-card:hover {
+    border-color: var(--ia-border-hover);
+    box-shadow: var(--ia-glow-medium),
+                0 8px 24px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+.ia-combo-card h4 {
+    font-family: var(--ia-font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--ia-space-md) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--ia-space-sm);
+    flex-wrap: wrap;
+}
+
+/* Combo Lines Grid */
+.ia-combo-lines {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ia-space-sm);
+    margin-bottom: var(--ia-space-md);
+}
+
+.ia-combo-line {
+    display: flex;
+    align-items: center;
+    gap: var(--ia-space-sm);
+    padding: var(--ia-space-md);
+    background: var(--ia-surface-subtle);
+    border: 1px solid var(--ia-glass-border);
+    border-left: 3px solid var(--ia-inner-ability);
+    border-radius: 0 8px 8px 0;
+    font-family: var(--ia-font-display);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+.ia-combo-line:hover {
+    background: var(--ia-surface-base);
+    transform: translateX(3px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Total DPS Display - Premium */
+.ia-combo-total {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08));
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    padding: var(--ia-space-lg);
+    text-align: center;
+    font-family: var(--ia-font-mono);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ia-equipment);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+.ia-combo-total:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+/* ========================================
+   EMPTY STATE - Premium Design
+   ======================================== */
+
+.ia-empty-state {
+    text-align: center;
+    padding: var(--ia-space-2xl);
+    color: var(--text-secondary);
+    font-family: var(--ia-font-display);
+    font-size: 0.95rem;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+/* ========================================
+   ANIMATIONS - Premium Feel
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered entrance for cards */
+.ia-line-card,
+.ia-combo-card {
+    animation: slideUp var(--ia-duration-base) var(--ia-ease-spring) backwards;
+}
+
+.ia-line-card:nth-child(1),
+.ia-combo-card:nth-child(1) { animation-delay: 0ms; }
+.ia-line-card:nth-child(2),
+.ia-combo-card:nth-child(2) { animation-delay: 50ms; }
+.ia-line-card:nth-child(3),
+.ia-combo-card:nth-child(3) { animation-delay: 100ms; }
+.ia-line-card:nth-child(4),
+.ia-combo-card:nth-child(4) { animation-delay: 150ms; }
+.ia-line-card:nth-child(5),
+.ia-combo-card:nth-child(5) { animation-delay: 200ms; }
+.ia-line-card:nth-child(6),
+.ia-combo-card:nth-child(6) { animation-delay: 250ms; }
+.ia-line-card:nth-child(n+7),
+.ia-combo-card:nth-child(n+7) { animation-delay: 300ms; }
+
+/* ========================================
+   ACCESSIBILITY - Focus States
+   ======================================== */
+
+.ia-tab-button:focus-visible,
+.ia-preset-tab:focus-visible,
+.ia-line-card select:focus-visible,
+.ia-line-card input:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ia-inner-ability),
+                var(--ia-glow-subtle);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 767px) {
+    .ia-tab-navigation {
+        flex-wrap: wrap;
+    }
+
+    .ia-tab-button {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .ia-lines-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ia-comparison-table {
+        font-size: 0.85rem;
+    }
+
+    .ia-comparison-table th,
+    .ia-comparison-table td {
+        padding: var(--ia-space-sm) var(--ia-space-md);
+    }
+}
+
+/* ========================================
+   END INNER ABILITY - Premium Aesthetic
+   ======================================== */

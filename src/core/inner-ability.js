@@ -311,8 +311,8 @@ export function switchInnerAbilityTab(tabName) {
         tab.style.display = 'none';
     });
 
-    // Remove active from all buttons
-    document.querySelectorAll('#analysis-inner-ability .tab-button').forEach(btn => {
+    // Remove active from all buttons - update to use new ia-tab-button class
+    document.querySelectorAll('#analysis-inner-ability .ia-tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
 
@@ -325,7 +325,7 @@ export function switchInnerAbilityTab(tabName) {
 
     // Activate button - Find the button by matching the onclick attribute
     // This works both when called from a click event and during initialization
-    const buttons = document.querySelectorAll('#analysis-inner-ability .tab-button');
+    const buttons = document.querySelectorAll('#analysis-inner-ability .ia-tab-button');
     buttons.forEach(btn => {
         const onclickAttr = btn.getAttribute('onclick');
         if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
@@ -349,7 +349,7 @@ export function renderPresetComparison() {
     const comparisons = calculatePresetComparisons();
 
     if (comparisons.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No configured presets found. Add lines to your presets in the My Ability Pages tab.</p>';
+        container.innerHTML = '<div class="ia-empty-state">No configured presets found. Add lines to your presets in the My Ability Pages tab.</div>';
         return;
     }
 
@@ -379,7 +379,8 @@ export function renderPresetComparison() {
         return presetSortAsc ? valA - valB : valB - valA;
     });
 
-    let html = '<table class="ia-table"><thead><tr>';
+    let html = '<div class="ia-comparison-table-wrapper">';
+    html += '<table class="ia-comparison-table"><thead><tr>';
     html += '<th class="sortable" onclick="sortPresetTable(0)">Rank</th>';
     html += '<th class="sortable" onclick="sortPresetTable(1)">Preset</th>';
     html += '<th class="sortable" onclick="sortPresetTable(2)">Boss DPS Gain</th>';
@@ -395,17 +396,18 @@ export function renderPresetComparison() {
     function makeDpsCell(gain, equippedGain, isEquippedRow) {
         if (equippedComp && !isEquippedRow) {
             const percent = equippedGain !== 0 ? ((gain - equippedGain) / equippedGain) * 100 : 0;
-            const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
-            return `<td><span class="${cls}">+${formatNumber(gain)} <span style="font-weight:600; opacity:0.85; font-size:0.85em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></span></td>`;
+            const cls = percent >= 0 ? 'ia-dps-positive' : 'ia-dps-negative';
+            return `<td><span class="ia-dps-value ${cls}">+${formatNumber(gain)} <span class="ia-dps-percent">(${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></span></td>`;
         } else {
             // No equipped preset or this is the equipped row — plain value
-            return `<td>+${formatNumber(gain)}</td>`;
+            return `<td><span class="ia-dps-value">+${formatNumber(gain)}</span></td>`;
         }
     }
 
     comparisons.forEach((comp, index) => {
-        const rankBadge = index < 3 ? `<span class="preset-rank rank-${index + 1}">${index + 1}</span>` : `<span class="preset-rank">${index + 1}</span>`;
-        const equippedBadge = comp.isEquipped ? '<span class="preset-equipped-badge" style="margin-left: 8px;">Equipped</span>' : '';
+        const rankClass = index < 3 ? `rank-${index + 1}` : 'rank-default';
+        const rankBadge = `<span class="ia-rank-badge ${rankClass}">${index + 1}</span>`;
+        const equippedBadge = comp.isEquipped ? '<span class="ia-equipped-badge">Equipped</span>' : '';
 
         html += `<tr class="expandable" onclick="toggleLineBreakdown(${comp.id})">`;
         html += `<td>${rankBadge}</td>`;
@@ -416,22 +418,22 @@ export function renderPresetComparison() {
         html += '</tr>';
 
         // Line breakdown row
-        html += `<tr id="breakdown-${comp.id}" style="display: none;"><td colspan="4">`;
-        html += '<div class="line-breakdown expanded">';
+        html += `<tr id="breakdown-${comp.id}" class="ia-line-breakdown-row" style="display: none;"><td colspan="4">`;
+        html += '<div class="ia-line-breakdown-content">';
         comp.lineContributions.forEach(line => {
-            html += `<div class="line-breakdown-item">`;
-            html += `<span>${line.stat}: ${line.value}</span>`;
-            html += `<span class="dps-positive">+${formatNumber(line.dpsContribution)} DPS</span>`;
+            html += `<div class="ia-line-breakdown-item">`;
+            html += `<span class="ia-line-breakdown-stat">${line.stat}: ${line.value}</span>`;
+            html += `<span class="ia-line-breakdown-value">+${formatNumber(line.dpsContribution)} DPS</span>`;
             html += `</div>`;
         });
-        html += `<div class="line-breakdown-item">`;
-        html += `<span><strong>Total</strong></span>`;
-        html += `<span class="dps-positive"><strong>+${formatNumber(comp.bossDPSGain)} DPS</strong></span>`;
+        html += `<div class="ia-line-breakdown-item">`;
+        html += `<span class="ia-line-breakdown-stat"><strong>Total</strong></span>`;
+        html += `<span class="ia-line-breakdown-value"><strong>+${formatNumber(comp.bossDPSGain)} DPS</strong></span>`;
         html += `</div>`;
         html += '</div></td></tr>';
     });
 
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -452,9 +454,10 @@ export function renderTheoreticalBest() {
         });
     }
 
-    let html = '<h3 style="margin-bottom: 15px;">All Possible Rolls Ranked</h3>';
-    html += '<div style="max-height: 600px; overflow-y: auto; border-radius: 12px;">';
-    html += '<table class="ia-table"><thead><tr>';
+    let html = '<div class="ia-theoretical-section">';
+    html += '<h3 class="ia-theoretical-title">All Possible Rolls Ranked</h3>';
+    html += '<div class="ia-table-scrollable">';
+    html += '<table class="ia-comparison-table"><thead><tr>';
     html += '<th>Stat & Roll</th>';
     html += '<th>Value</th>';
     html += '<th class="sortable" onclick="sortTheoreticalTable(2)">DPS Gain</th>';
@@ -463,83 +466,81 @@ export function renderTheoreticalBest() {
     results.forEach(result => {
         const rarityLetter = result.rarity.charAt(0).toUpperCase();
         const rarityClass = `rarity-${result.rarity.toLowerCase()}`;
-        const badge = `<span class="rarity-badge ${rarityClass}">${rarityLetter}</span>`;
+        const badge = `<span class="ia-rarity-badge ${rarityClass}">${rarityLetter}</span>`;
+        const percentClass = result.percentIncrease > 0 ? 'ia-dps-positive' : 'ia-dps-negative';
 
         html += '<tr>';
         html += `<td>${badge}${result.stat} ${result.roll} Roll</td>`;
-        html += `<td>${result.value}</td>`;
-        html += `<td>+${formatNumber(result.dpsGain)} <span class="${result.percentIncrease > 0 ? 'dps-positive' : 'dps-negative'}" style="font-weight:600; opacity:0.85; font-size:0.85em;"> (${result.percentIncrease >= 0 ? '+' : ''}${result.percentIncrease.toFixed(2)}%)</span></td>`;
+        html += `<td class="ia-dps-value">${result.value}</td>`;
+        html += `<td><span class="ia-dps-value">+${formatNumber(result.dpsGain)}</span> <span class="${percentClass} ia-dps-percent">(${result.percentIncrease >= 0 ? '+' : ''}${result.percentIncrease.toFixed(2)}%)</span></td>`;
         html += '</tr>';
     });
 
-    html += '</tbody></table></div>';
+    html += '</tbody></table></div></div>';
 
     // Best Combinations
-    html += '<h3 style="margin-top: 30px; margin-bottom: 15px;">Best Possible Combinations</h3>';
+    html += '<div class="ia-theoretical-section">';
+    html += '<h3 class="ia-theoretical-title">Best Possible Combinations</h3>';
 
     // Unique Only
-    html += '<div class="combo-card">';
-    html += '<h4><span class="rarity-badge rarity-unique">U</span>Best with Unique Only (3 Lines)</h4>';
-    html += '<div class="combo-lines">';
+    html += '<div class="ia-combo-card">';
+    html += '<h4><span class="ia-rarity-badge rarity-unique">U</span>Best with Unique Only (3 Lines)</h4>';
+    html += '<div class="ia-combo-lines">';
     combinations.uniqueOnly.lines.forEach(line => {
         const rarityClass = `rarity-${line.rarity.toLowerCase()}`;
-        html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
+        html += `<div class="ia-combo-line"><span class="ia-rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
     {
         const percent = (combinations.uniqueOnly.totalDPS / baselineBossDps) * 100;
-        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
-        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueOnly.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+        html += `<div class="ia-combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueOnly.totalDPS)} <span class="ia-dps-percent">(${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
     }
     html += '</div>';
 
     // Unique + Legendary
-    html += '<div class="combo-card">';
-    html += '<h4><span class="rarity-badge rarity-unique">U</span><span class="rarity-badge rarity-legendary">L</span>Best with Unique + Legendary (Up to 5 Lines)</h4>';
-    html += '<div class="combo-lines">';
+    html += '<div class="ia-combo-card">';
+    html += '<h4><span class="ia-rarity-badge rarity-unique">U</span><span class="ia-rarity-badge rarity-legendary">L</span>Best with Unique + Legendary (Up to 5 Lines)</h4>';
+    html += '<div class="ia-combo-lines">';
     combinations.uniqueLegendary.lines.forEach(line => {
         const rarityClass = `rarity-${line.rarity.toLowerCase()}`;
-        html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
+        html += `<div class="ia-combo-line"><span class="ia-rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
     {
         const percent = (combinations.uniqueLegendary.totalDPS / baselineBossDps) * 100;
-        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
-        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueLegendary.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+        html += `<div class="ia-combo-total">Total DPS Gain: +${formatNumber(combinations.uniqueLegendary.totalDPS)} <span class="ia-dps-percent">(${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
     }
     html += '</div>';
 
     // Mystic + Legendary + Unique
-    html += '<div class="combo-card">';
-    html += '<h4><span class="rarity-badge rarity-mystic">M</span><span class="rarity-badge rarity-legendary">L</span><span class="rarity-badge rarity-unique">U</span>Best with Mystic + Legendary + Unique (Up to 6 Lines)</h4>';
-    html += '<div class="combo-lines">';
+    html += '<div class="ia-combo-card">';
+    html += '<h4><span class="ia-rarity-badge rarity-mystic">M</span><span class="ia-rarity-badge rarity-legendary">L</span><span class="ia-rarity-badge rarity-unique">U</span>Best with Mystic + Legendary + Unique (Up to 6 Lines)</h4>';
+    html += '<div class="ia-combo-lines">';
     combinations.mysticLegendaryUnique.lines.forEach(line => {
         const rarityClass = `rarity-${line.rarity.toLowerCase()}`;
-        html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
+        html += `<div class="ia-combo-line"><span class="ia-rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
     {
         const percent = (combinations.mysticLegendaryUnique.totalDPS / baselineBossDps) * 100;
-        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
-        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.mysticLegendaryUnique.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+        html += `<div class="ia-combo-total">Total DPS Gain: +${formatNumber(combinations.mysticLegendaryUnique.totalDPS)} <span class="ia-dps-percent">(${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
     }
     html += '</div>';
 
     // All Rarities
-    html += '<div class="combo-card">';
+    html += '<div class="ia-combo-card">';
     html += '<h4>Best with All Rarities (6 Lines)</h4>';
-    html += '<div class="combo-lines">';
+    html += '<div class="ia-combo-lines">';
     combinations.allRarities.lines.forEach(line => {
         const rarityClass = `rarity-${line.rarity.toLowerCase()}`;
-        html += `<div class="combo-line"><span class="rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
+        html += `<div class="ia-combo-line"><span class="ia-rarity-badge ${rarityClass}">${line.rarity.charAt(0)}</span>${line.stat}: ${line.value}</div>`;
     });
     html += '</div>';
     {
         const percent = (combinations.allRarities.totalDPS / baselineBossDps) * 100;
-        const cls = percent >= 0 ? 'dps-positive' : 'dps-negative';
-        html += `<div class="combo-total">Total DPS Gain: +${formatNumber(combinations.allRarities.totalDPS)} <span class="${cls}" style="font-weight:600; opacity:0.85; font-size:0.95em;"> (${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
+        html += `<div class="ia-combo-total">Total DPS Gain: +${formatNumber(combinations.allRarities.totalDPS)} <span class="ia-dps-percent">(${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%)</span></div>`;
     }
-    html += '</div>';
+    html += '</div></div>';
 
     container.innerHTML = html;
 }
