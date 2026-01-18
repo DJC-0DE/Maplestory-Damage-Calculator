@@ -1,0 +1,1223 @@
+/* ========================================
+   WEAPON LEVELS TAB - PREMIUM ARMORY UI
+   Extends STYLE-GUIDE.md with rarity-first design
+
+   DESIGN SYSTEM:
+   - Philosophy: Rarity-Focused Premium Visual Language
+   - Typography: Inter (display) + JetBrains Mono (data/tokens)
+   - Theme: Luxury Gaming Interface × Fintech Data Visualization
+   - Surfaces: Glassmorphic with rarity-based gradient accents
+   - Animations: Spring physics for stars, smooth transitions for states
+
+   USAGE:
+   - Weapon cards: .weapon-card with data-rarity attribute
+   - Star selector: .weapon-stars with .star-individual children
+   - Equipped toggle: .weapon-equipped-toggle
+   - Efficiency display: .weapon-efficiency-bar
+   - Priority chain: .weapon-priority-chain
+   - Currency calculator: .weapon-currency-calculator
+   - Summary stats: .wl-summary-stats
+
+   RARITY COLOR SYSTEM:
+   - Normal: Subtle gray (minimal glow)
+   - Rare: Soft blue (gentle glow)
+   - Epic: Vibrant purple (medium glow)
+   - Unique: Golden yellow (strong glow)
+   - Legendary: Brilliant green (intense glow)
+   - Mystic: Crimson red (powerful glow)
+   - Ancient: Fiery orange (maximum glow)
+   ======================================== */
+
+/* Premium Typography Import - Space Grotesk + JetBrains Mono
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*/
+
+/* ========================================
+   DESIGN TOKENS - Weapon Levels System
+   Inherits and extends STYLE-GUIDE.md variables
+   ======================================== */
+
+:root {
+    /* Typography */
+    --wl-font-display: 'Inter', -apple-system, sans-serif;
+    --wl-font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+    /* Rarity Color Palette - Hex values from constants */
+    --wl-rarity-normal: #a0a0a0;
+    --wl-rarity-rare: #6699ff;
+    --wl-rarity-epic: #9966ff;
+    --wl-rarity-unique: #ffd26d;
+    --wl-rarity-legendary: #33ce85;
+    --wl-rarity-mystic: #ff3f42;
+    --wl-rarity-ancient: #2266cc;
+
+    /* Rarity Glow Intensities - Progressive by tier */
+    --wl-glow-normal: 0 0 8px rgba(160, 160, 160, 0.2);
+    --wl-glow-rare: 0 0 12px rgba(102, 153, 255, 0.25);
+    --wl-glow-epic: 0 2px 16px rgba(153, 102, 255, 0.3);
+    --wl-glow-unique: 0 2px 20px rgba(255, 210, 109, 0.35);
+    --wl-glow-legendary: 0 4px 24px rgba(51, 206, 133, 0.4);
+    --wl-glow-mystic: 0 4px 28px rgba(255, 63, 66, 0.45);
+    --wl-glow-ancient: 0 6px 32px rgba(34, 102, 204, 0.5);
+
+    /* Surfaces - Glassmorphic */
+    --wl-surface-card: rgba(15, 23, 42, 0.5);
+    --wl-surface-card-hover: rgba(15, 23, 42, 0.65);
+    --wl-surface-equipped: linear-gradient(135deg, rgba(51, 206, 133, 0.12), rgba(16, 185, 129, 0.06));
+
+    /* Borders */
+    --wl-border-subtle: rgba(148, 163, 184, 0.12);
+    --wl-border-medium: rgba(148, 163, 184, 0.2);
+    --wl-border-strong: rgba(148, 163, 184, 0.3);
+
+    /* Spacing Scale */
+    --wl-space-xs: 4px;
+    --wl-space-sm: 8px;
+    --wl-space-md: 12px;
+    --wl-space-lg: 16px;
+    --wl-space-xl: 24px;
+
+    /* Animation */
+    --wl-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --wl-ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    --wl-duration-fast: 150ms;
+    --wl-duration-base: 200ms;
+    --wl-duration-slow: 300ms;
+
+    /* Equipped State */
+    --wl-equipped-glow: 0 0 30px rgba(51, 206, 133, 0.35);
+    --wl-equipped-border: rgba(51, 206, 133, 0.6);
+}
+
+/* Dark Mode Adjustments */
+.dark {
+    --wl-surface-card: rgba(15, 23, 42, 0.7);
+    --wl-surface-card-hover: rgba(15, 23, 42, 0.85);
+    --wl-border-subtle: rgba(148, 163, 184, 0.08);
+    --wl-border-medium: rgba(148, 163, 184, 0.15);
+    --wl-border-strong: rgba(148, 163, 184, 0.25);
+}
+
+/* ========================================
+   INFO BANNER - Premium Instructions
+   ======================================== */
+
+.wl-info-banner {
+    background: linear-gradient(135deg,
+        rgba(245, 158, 11, 0.1),
+        rgba(251, 146, 60, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 12px;
+    padding: var(--wl-space-lg) var(--wl-space-xl);
+    margin-bottom: var(--wl-space-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle accent bar */
+.wl-info-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #fb923c);
+    opacity: 0.8;
+}
+
+.wl-info-banner-content {
+    color: var(--text-primary);
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.wl-info-banner-content strong {
+    color: #f59e0b;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Warning Banner */
+.wl-warning-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wl-space-sm);
+    background: linear-gradient(135deg,
+        rgba(239, 68, 68, 0.1),
+        rgba(220, 38, 38, 0.05));
+    border: 2px solid rgba(239, 68, 68, 0.25);
+    border-radius: 12px;
+    padding: var(--wl-space-md) var(--wl-space-lg);
+    margin-bottom: var(--wl-space-lg);
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+.wl-warning-banner:hover {
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+}
+
+.wl-warning-banner-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.wl-warning-banner-text {
+    color: #ef4444;
+    font-family: var(--wl-font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: -0.01em;
+}
+
+/* ========================================
+   SUMMARY STATS - Premium Metrics Display
+   ======================================== */
+
+.wl-summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--wl-space-md);
+    margin-bottom: var(--wl-space-xl);
+}
+
+.wl-summary-card {
+    background: linear-gradient(135deg,
+        rgba(16, 185, 129, 0.12),
+        rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 12px;
+    padding: var(--wl-space-lg);
+    text-align: center;
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top accent bar */
+.wl-summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981, #06b6d4);
+    opacity: 0.8;
+}
+
+.wl-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.wl-summary-label {
+    display: block;
+    font-family: var(--wl-font-display);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-sm);
+    letter-spacing: 0.02em;
+}
+
+.wl-summary-value {
+    font-family: var(--wl-font-mono);
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #10b981;
+    letter-spacing: -0.03em;
+}
+
+/* ========================================
+   WEAPONS GRID - 4 Per Row Layout
+   ======================================== */
+
+#weapons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--wl-space-md);
+    margin-bottom: var(--wl-space-xl);
+}
+
+/* ========================================
+   SUB-TAB SYSTEM
+   ======================================== */
+
+.weapon-levels-subtab {
+    display: none;
+}
+
+.weapon-levels-subtab.active {
+    display: block !important;
+    animation: fadeIn var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+/* ========================================
+   WEAPON CARD - Rarity-First Design
+   ======================================== */
+
+.weapon-card {
+    position: relative;
+    background: var(--wl-surface-card);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--wl-border-subtle);
+    border-radius: 14px;
+    padding: var(--wl-space-lg);
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+    cursor: default;
+    overflow: hidden;
+}
+
+/* Top accent bar - rarity colored */
+.weapon-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.9;
+    transition: opacity var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+/* Hover state */
+.weapon-card:hover {
+    background: var(--wl-surface-card-hover);
+    border-color: var(--wl-border-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dark .weapon-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Disabled state */
+.weapon-card--disabled,
+.weapon-card[style*="opacity: 0.4"] {
+    opacity: 0.35 !important;
+    pointer-events: none;
+    filter: grayscale(0.8);
+}
+
+/* No data message */
+.weapon-no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    padding: var(--wl-space-lg) 0;
+    font-family: var(--wl-font-display);
+}
+
+/* ========================================
+   RARITY-SPECIFIC CARD STYLING
+   ======================================== */
+
+.weapon-card[data-rarity="normal"] {
+    color: var(--wl-rarity-normal);
+}
+
+.weapon-card[data-rarity="rare"] {
+    color: var(--wl-rarity-rare);
+}
+
+.weapon-card[data-rarity="epic"] {
+    color: var(--wl-rarity-epic);
+}
+
+.weapon-card[data-rarity="unique"] {
+    color: var(--wl-rarity-unique);
+}
+
+.weapon-card[data-rarity="legendary"] {
+    color: var(--wl-rarity-legendary);
+}
+
+.weapon-card[data-rarity="mystic"] {
+    color: var(--wl-rarity-mystic);
+}
+
+.weapon-card[data-rarity="ancient"] {
+    color: var(--wl-rarity-ancient);
+}
+
+/* Enhanced hover glow by rarity */
+.weapon-card[data-rarity="normal"]:hover {
+    box-shadow: 0 0 16px rgba(160, 160, 160, 0.3);
+}
+
+.weapon-card[data-rarity="rare"]:hover {
+    box-shadow: 0 0 20px rgba(102, 153, 255, 0.4);
+}
+
+.weapon-card[data-rarity="epic"]:hover {
+    box-shadow: 0 4px 24px rgba(153, 102, 255, 0.45);
+}
+
+.weapon-card[data-rarity="unique"]:hover {
+    box-shadow: 0 4px 28px rgba(255, 210, 109, 0.5);
+}
+
+.weapon-card[data-rarity="legendary"]:hover {
+    box-shadow: 0 6px 32px rgba(51, 206, 133, 0.55);
+}
+
+.weapon-card[data-rarity="mystic"]:hover {
+    box-shadow: 0 6px 36px rgba(255, 63, 66, 0.6);
+}
+
+.weapon-card[data-rarity="ancient"]:hover {
+    box-shadow: 0 8px 40px rgba(34, 102, 204, 0.65);
+}
+
+/* ========================================
+   EQUIPPED STATE - Rarity-Aware Premium Distinction
+   ======================================== */
+
+/* Base equipped state */
+.weapon-card.equipped {
+    background: var(--wl-surface-equipped);
+    transform: scale(1.02);
+}
+
+/* Rarity-specific equipped states - border and glow match rarity */
+.weapon-card[data-rarity="normal"].equipped {
+    border-color: rgba(160, 160, 160, 0.6);
+    box-shadow: 0 0 30px rgba(160, 160, 160, 0.35), var(--wl-glow-normal);
+}
+
+.weapon-card[data-rarity="rare"].equipped {
+    border-color: rgba(102, 153, 255, 0.6);
+    box-shadow: 0 0 30px rgba(102, 153, 255, 0.35), var(--wl-glow-rare);
+}
+
+.weapon-card[data-rarity="epic"].equipped {
+    border-color: rgba(153, 102, 255, 0.6);
+    box-shadow: 0 0 30px rgba(153, 102, 255, 0.35), var(--wl-glow-epic);
+}
+
+.weapon-card[data-rarity="unique"].equipped {
+    border-color: rgba(255, 210, 109, 0.6);
+    box-shadow: 0 0 30px rgba(255, 210, 109, 0.35), var(--wl-glow-unique);
+}
+
+.weapon-card[data-rarity="legendary"].equipped {
+    border-color: rgba(51, 206, 133, 0.6);
+    box-shadow: 0 0 30px rgba(51, 206, 133, 0.35), var(--wl-glow-legendary);
+}
+
+.weapon-card[data-rarity="mystic"].equipped {
+    border-color: rgba(255, 63, 66, 0.6);
+    box-shadow: 0 0 30px rgba(255, 63, 66, 0.35), var(--wl-glow-mystic);
+}
+
+.weapon-card[data-rarity="ancient"].equipped {
+    border-color: rgba(34, 102, 204, 0.6);
+    box-shadow: 0 0 30px rgba(34, 102, 204, 0.35), var(--wl-glow-ancient);
+}
+
+/* ========================================
+   WEAPON HEADER - Typography-First
+   ======================================== */
+
+.weapon-header {
+    font-family: var(--wl-font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align: center;
+    margin-bottom: var(--wl-space-md);
+    text-transform: uppercase;
+}
+
+/* Rarity-specific header colors - overrides cards.css blue */
+.weapon-card[data-rarity="normal"] .weapon-header {
+    color: var(--wl-rarity-normal);
+}
+
+.weapon-card[data-rarity="rare"] .weapon-header {
+    color: var(--wl-rarity-rare);
+}
+
+.weapon-card[data-rarity="epic"] .weapon-header {
+    color: var(--wl-rarity-epic);
+}
+
+.weapon-card[data-rarity="unique"] .weapon-header {
+    color: var(--wl-rarity-unique);
+}
+
+.weapon-card[data-rarity="legendary"] .weapon-header {
+    color: var(--wl-rarity-legendary);
+}
+
+.weapon-card[data-rarity="mystic"] .weapon-header {
+    color: var(--wl-rarity-mystic);
+}
+
+.weapon-card[data-rarity="ancient"] .weapon-header {
+    color: var(--wl-rarity-ancient);
+}
+
+/* ========================================
+   STAR RATING SYSTEM - Premium Interaction
+   ======================================== */
+
+.weapon-stars {
+    display: flex;
+    gap: var(--wl-space-xs);
+    justify-content: center;
+    margin-bottom: var(--wl-space-md);
+}
+
+.star-individual {
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all var(--wl-duration-fast) var(--wl-ease-spring);
+    filter: grayscale(0.7);
+    opacity: 0.25;
+    transform: scale(0.85);
+}
+
+.star-individual:hover {
+    filter: grayscale(0);
+    opacity: 0.7;
+    transform: scale(1.1);
+}
+
+.star-individual[style*="opacity: 1"],
+.star-individual.active {
+    filter: grayscale(0);
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Satisfying spring animation when star becomes active */
+@keyframes starPop {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.star-individual.pop {
+    animation: starPop 300ms var(--wl-ease-spring);
+}
+
+/* ========================================
+   EQUIPPED TOGGLE - Premium Checkbox
+   ======================================== */
+
+.weapon-equipped-toggle {
+    position: absolute;
+    top: var(--wl-space-sm);
+    right: var(--wl-space-sm);
+}
+
+.weapon-equipped-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.weapon-equipped-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--wl-surface-card);
+    border: 2px solid var(--wl-border-medium);
+    border-radius: 6px;
+    font-family: var(--wl-font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+    user-select: none;
+}
+
+.weapon-equipped-label:hover {
+    border-color: var(--wl-border-strong);
+    background: var(--wl-surface-card-hover);
+    transform: scale(1.05);
+}
+
+/* Checked state - rarity-specific colors */
+.weapon-card[data-rarity="normal"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-normal);
+    border-color: var(--wl-rarity-normal);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(160, 160, 160, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="rare"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-rare);
+    border-color: var(--wl-rarity-rare);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(102, 153, 255, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="epic"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-epic);
+    border-color: var(--wl-rarity-epic);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(153, 102, 255, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="unique"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-unique);
+    border-color: var(--wl-rarity-unique);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(255, 210, 109, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="legendary"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-legendary);
+    border-color: var(--wl-rarity-legendary);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(51, 206, 133, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="mystic"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-mystic);
+    border-color: var(--wl-rarity-mystic);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(255, 63, 66, 0.4);
+    transform: scale(1.08);
+}
+
+.weapon-card[data-rarity="ancient"] .weapon-equipped-toggle input:checked + .weapon-equipped-label {
+    background: var(--wl-rarity-ancient);
+    border-color: var(--wl-rarity-ancient);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(34, 102, 204, 0.4);
+    transform: scale(1.08);
+}
+
+/* Focus state for accessibility - rarity-aware */
+.weapon-card[data-rarity="normal"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-normal);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="rare"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-rare);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="epic"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-epic);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="unique"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-unique);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="legendary"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-legendary);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="mystic"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-mystic);
+    outline-offset: 2px;
+}
+
+.weapon-card[data-rarity="ancient"] .weapon-equipped-label:focus-visible {
+    outline: 2px solid var(--wl-rarity-ancient);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   LEVEL INPUT - Premium Form Control
+   ======================================== */
+
+.weapon-input-group {
+    margin-bottom: var(--wl-space-md);
+}
+
+.weapon-input-group label {
+    display: block;
+    font-family: var(--wl-font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-xs);
+    letter-spacing: 0.02em;
+}
+
+.weapon-input {
+    width: 100%;
+    padding: 10px var(--wl-space-md);
+    background: var(--wl-surface-card);
+    border: 1px solid var(--wl-border-medium);
+    border-radius: 8px;
+    font-family: var(--wl-font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+.weapon-input:focus {
+    outline: none;
+    border-color: currentColor;
+    background: var(--wl-surface-card-hover);
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.weapon-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    font-weight: 400;
+}
+
+/* ========================================
+   STATS DISPLAY - Typography Hierarchy
+   ======================================== */
+
+.weapon-stats {
+    font-family: var(--wl-font-mono);
+}
+
+.weapon-inventory-display {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-sm);
+    letter-spacing: -0.01em;
+}
+
+.weapon-equipped-display {
+    display: none;
+    margin-top: var(--wl-space-sm);
+    padding-top: var(--wl-space-sm);
+    border-top: 1px solid var(--wl-border-subtle);
+}
+
+.weapon-card.equipped .weapon-equipped-display {
+    display: block;
+}
+
+.weapon-equipped-label-text {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+    font-family: var(--wl-font-display);
+}
+
+.weapon-equipped-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: currentColor;
+    letter-spacing: -0.02em;
+}
+
+/* ========================================
+   UPGRADE EFFICIENCY - Heat-Mapped Display
+   ======================================== */
+
+.weapon-upgrade-efficiency {
+    display: none;
+    margin-top: var(--wl-space-sm);
+    padding: var(--wl-space-sm) var(--wl-space-md);
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.weapon-upgrade-efficiency.visible {
+    display: block;
+}
+
+.weapon-efficiency-text {
+    font-family: var(--wl-font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+}
+
+/* Efficiency color gradient - automatically applied via JS */
+.weapon-efficiency-text.high {
+    color: #10b981;
+}
+
+.weapon-efficiency-text.medium {
+    color: #22c55e;
+}
+
+.weapon-efficiency-text.low {
+    color: #84cc16;
+}
+
+/* ========================================
+   UPGRADE PRIORITY CONTAINER
+   ======================================== */
+
+.wl-priority-container {
+    margin-top: var(--wl-space-xl);
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.08),
+        rgba(139, 92, 246, 0.04));
+    border: 1px solid var(--wl-border-medium);
+    border-radius: 16px;
+    padding: var(--wl-space-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top gradient accent */
+.wl-priority-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    opacity: 0.8;
+}
+
+.wl-priority-header {
+    text-align: center;
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-lg);
+    letter-spacing: 0.02em;
+}
+
+.wl-priority-chain {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wl-space-sm);
+    justify-content: center;
+    align-items: center;
+    font-family: var(--wl-font-display);
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.wl-priority-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wl-space-xs);
+    padding: 4px var(--wl-space-md);
+    background: var(--wl-surface-card);
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+/* Rarity colors for priority items */
+.wl-priority-item[data-rarity="normal"] {
+    color: var(--wl-rarity-normal);
+}
+
+.wl-priority-item[data-rarity="rare"] {
+    color: var(--wl-rarity-rare);
+}
+
+.wl-priority-item[data-rarity="epic"] {
+    color: var(--wl-rarity-epic);
+}
+
+.wl-priority-item[data-rarity="unique"] {
+    color: var(--wl-rarity-unique);
+}
+
+.wl-priority-item[data-rarity="legendary"] {
+    color: var(--wl-rarity-legendary);
+}
+
+.wl-priority-item[data-rarity="mystic"] {
+    color: var(--wl-rarity-mystic);
+}
+
+.wl-priority-item[data-rarity="ancient"] {
+    color: var(--wl-rarity-ancient);
+}
+
+.wl-priority-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.wl-priority-divider {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin: 0 2px;
+}
+
+/* ========================================
+   CURRENCY CALCULATOR - Premium Planning Tool
+   ======================================== */
+
+.wl-currency-section {
+    margin-top: var(--wl-space-xl);
+    padding-top: var(--wl-space-xl);
+    border-top: 1px solid var(--wl-border-subtle);
+}
+
+.wl-currency-header {
+    text-align: center;
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-md);
+    letter-spacing: 0.02em;
+}
+
+.wl-currency-input-group {
+    display: flex;
+    gap: var(--wl-space-md);
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--wl-space-lg);
+}
+
+.wl-currency-label {
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.wl-currency-input {
+    width: 200px;
+    padding: 10px var(--wl-space-md);
+    background: var(--wl-surface-card);
+    border: 2px solid var(--wl-border-medium);
+    border-radius: 10px;
+    font-family: var(--wl-font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.06);
+}
+
+.wl-currency-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12),
+                0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.wl-currency-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    font-weight: 400;
+}
+
+/* Currency Results */
+.wl-currency-results {
+    display: none;
+    background: linear-gradient(135deg,
+        rgba(6, 182, 212, 0.12),
+        rgba(59, 130, 246, 0.08));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    border-radius: 12px;
+    padding: var(--wl-space-lg);
+    animation: fadeIn var(--wl-duration-slow) var(--wl-ease-smooth);
+}
+
+.wl-currency-results.visible {
+    display: block;
+}
+
+.wl-currency-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wl-space-md);
+    margin-bottom: var(--wl-space-md);
+}
+
+.wl-currency-metric {
+    text-align: center;
+}
+
+.wl-currency-metric-label {
+    display: block;
+    font-family: var(--wl-font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--wl-space-xs);
+}
+
+.wl-currency-metric-value {
+    font-family: var(--wl-font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #10b981;
+    letter-spacing: -0.03em;
+}
+
+.wl-currency-path {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wl-space-sm);
+    justify-content: center;
+    align-items: center;
+    padding: var(--wl-space-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+}
+
+.wl-currency-path-item {
+    font-weight: 700;
+    transition: transform var(--wl-duration-base) var(--wl-ease-smooth);
+}
+
+/* Rarity colors for currency path items */
+.wl-currency-path-item[data-rarity="normal"] {
+    color: var(--wl-rarity-normal);
+}
+
+.wl-currency-path-item[data-rarity="rare"] {
+    color: var(--wl-rarity-rare);
+}
+
+.wl-currency-path-item[data-rarity="epic"] {
+    color: var(--wl-rarity-epic);
+}
+
+.wl-currency-path-item[data-rarity="unique"] {
+    color: var(--wl-rarity-unique);
+}
+
+.wl-currency-path-item[data-rarity="legendary"] {
+    color: var(--wl-rarity-legendary);
+}
+
+.wl-currency-path-item[data-rarity="mystic"] {
+    color: var(--wl-rarity-mystic);
+}
+
+.wl-currency-path-item[data-rarity="ancient"] {
+    color: var(--wl-rarity-ancient);
+}
+
+.wl-currency-path-item:hover {
+    transform: scale(1.05);
+}
+
+.wl-currency-path-divider {
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Apply Button */
+.wl-apply-button {
+    display: block;
+    width: 100%;
+    margin-top: var(--wl-space-md);
+    padding: 12px var(--wl-space-lg);
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 10px;
+    font-family: var(--wl-font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all var(--wl-duration-base) var(--wl-ease-smooth);
+    letter-spacing: 0.02em;
+}
+
+.wl-apply-button:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.wl-apply-button:active {
+    transform: translateY(0);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered card entrance */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.weapon-card {
+    animation: cardEntrance 300ms var(--wl-ease-spring) backwards;
+}
+
+/* Stagger delay based on child position */
+.weapon-card:nth-child(1) { animation-delay: 0ms; }
+.weapon-card:nth-child(2) { animation-delay: 25ms; }
+.weapon-card:nth-child(3) { animation-delay: 50ms; }
+.weapon-card:nth-child(4) { animation-delay: 75ms; }
+.weapon-card:nth-child(5) { animation-delay: 100ms; }
+.weapon-card:nth-child(6) { animation-delay: 125ms; }
+.weapon-card:nth-child(7) { animation-delay: 150ms; }
+.weapon-card:nth-child(8) { animation-delay: 175ms; }
+.weapon-card:nth-child(n+9) { animation-delay: 200ms; }
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1200px) {
+    #weapons-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .wl-summary-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    #weapons-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    #weapons-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--wl-space-sm);
+    }
+
+    .wl-summary-stats {
+        grid-template-columns: 1fr;
+        gap: var(--wl-space-sm);
+    }
+
+    .wl-summary-card {
+        padding: var(--wl-space-md);
+    }
+
+    .weapon-card {
+        padding: var(--wl-space-md);
+    }
+
+    .wl-currency-metrics {
+        grid-template-columns: 1fr;
+        gap: var(--wl-space-sm);
+    }
+
+    .wl-currency-input {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .weapon-header {
+        font-size: 0.75rem;
+    }
+
+    .star-individual {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #weapons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wl-priority-chain {
+        font-size: 0.85rem;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY - Focus States
+   ======================================== */
+
+.weapon-input:focus-visible,
+.weapon-equipped-label:focus-visible,
+.wl-currency-input:focus-visible,
+.wl-apply-button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .weapon-card,
+    .star-individual,
+    .weapon-equipped-label,
+    .weapon-input,
+    .wl-currency-input,
+    .wl-apply-button {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ========================================
+   END WEAPON LEVELS STYLES
+   ======================================== */

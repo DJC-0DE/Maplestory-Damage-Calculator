@@ -13,6 +13,39 @@ window.resetStarPreview = resetStarPreview;
 window.handleEquippedCheckboxChange = handleEquippedCheckboxChange;
 window.handleWeaponLevelChange = handleWeaponLevelChange;
 window.calculateCurrencyUpgrades = calculateCurrencyUpgrades;
+window.switchWeaponLevelsTab = switchWeaponLevelsTab;
+
+// Switch weapon levels sub-tabs
+export function switchWeaponLevelsTab(tabName) {
+    const allSubTabContent = document.querySelectorAll('.weapon-levels-subtab');
+    const allSubTabButtons = document.querySelectorAll('#weapon-levels-subtab-button');
+
+    // Hide all subtabs
+    allSubTabContent.forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+    });
+
+    // Remove active from all buttons
+    allSubTabButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected subtab
+    const selectedTab = document.getElementById(`weapon-levels-${tabName}`);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+        selectedTab.style.display = 'block';
+    }
+
+    // Activate button - Find the button by matching the onclick attribute
+    allSubTabButtons.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(tabName)) {
+            btn.classList.add('active');
+        }
+    });
+}
 
 export function initializeWeapons() {
     const weaponsGrid = document.getElementById('weapons-grid');
@@ -22,72 +55,62 @@ export function initializeWeapons() {
         tiers.forEach(tier => {
             const baseAtk = weaponBaseAttackEquipped[rarity]?.[tier];
             const rarityCapitalized = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-            let rarityColor = rarityColors[rarityCapitalized] || '#ffffff';
-
-            // For Normal rarity, use dark grey in light theme and white in dark theme
-            if (rarityCapitalized === 'Normal') {
-                const isDark = document.documentElement.classList.contains('dark');
-                rarityColor = isDark ? '#ffffff' : '#2a2a2a';
-            }
 
             // Ancient T4 is enabled, T3/T2/T1 are disabled
             const isDisabled = rarity === 'ancient' && tier === 't1';
 
             if (baseAtk === null || baseAtk === undefined || isDisabled) {
-                html += `<div class="weapon-card" style="opacity: 0.4;">
-                    <div class="weapon-header" style="color: ${rarityColor};">${tier.toUpperCase()} ${rarityCapitalized}</div>
-                    <div style="text-align: center; color: var(--text-secondary); font-size: 0.8em; padding: 15px 0;">No data</div>
+                html += `<div class="weapon-card weapon-card--disabled" data-rarity="${rarity}">
+                    <div class="weapon-header">${tier.toUpperCase()} ${rarityCapitalized}</div>
+                    <div class="weapon-no-data">No data</div>
                 </div>`;
             } else {
                 // Default stars: 5 for normal/rare/epic/unique, 1 for legendary/mystic/ancient
                 const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
 
-                html += `<div class="weapon-card" id="weapon-${rarity}-${tier}">
+                html += `<div class="weapon-card" id="weapon-${rarity}-${tier}" data-rarity="${rarity}">
                     <!-- Equipped Checkbox in top right -->
-                    <div style="position: absolute; top: 8px; right: 8px;">
+                    <div class="weapon-equipped-toggle">
                         <input type="checkbox" id="equipped-checkbox-${rarity}-${tier}"
-                               style="display: none;"
                                onchange="handleEquippedCheckboxChange('${rarity}', '${tier}')">
                         <label for="equipped-checkbox-${rarity}-${tier}"
-                               style="cursor: pointer; display: flex; align-items: center; justify-content: center;
-                                      width: 24px; height: 24px; border: 2px solid var(--border-color);
-                                      border-radius: 4px; background: var(--background);
-                                      font-weight: bold; font-size: 0.9em; color: var(--text-secondary);
-                                      transition: all 0.2s;"
+                               class="weapon-equipped-label"
                                id="equipped-label-${rarity}-${tier}">E</label>
                     </div>
 
-                    <div class="weapon-header" style="color: ${rarityColor};">${tier.toUpperCase()} ${rarityCapitalized}</div>
+                    <div class="weapon-header">${tier.toUpperCase()} ${rarityCapitalized}</div>
 
                     <!-- Star Rating -->
-                    <div style="display: flex; gap: 4px; justify-content: center; margin: 8px 0;">`;
+                    <div class="weapon-stars">`;
 
                 for (let i = 1; i <= 5; i++) {
-                    html += `<span onclick="setWeaponStars('${rarity}', '${tier}', ${i})"
+                    const activeClass = i <= defaultStars ? 'active' : '';
+                    html += `<span class="star-individual ${activeClass}"
+                                   onclick="setWeaponStars('${rarity}', '${tier}', ${i})"
                                    onmouseenter="previewStars('${rarity}', '${tier}', ${i})"
                                    onmouseleave="resetStarPreview('${rarity}', '${tier}')"
-                                   id="star-${rarity}-${tier}-${i}"
-                                   style="cursor: pointer; font-size: 1.1em; transition: all 0.2s; opacity: ${i <= defaultStars ? 1 : 0.3};">⭐</span>`;
+                                   id="star-${rarity}-${tier}-${i}">⭐</span>`;
                 }
 
                 html += `</div>
                     <input type="hidden" id="stars-${rarity}-${tier}" value="${defaultStars}">
 
-                    <div class="input-group" style="margin-bottom: 8px;">
-                        <label style="margin-bottom: 4px;">Level:</label>
+                    <div class="weapon-input-group">
+                        <label for="level-${rarity}-${tier}">Level</label>
                         <input type="number" min="0" max="200" class="weapon-input" id="level-${rarity}-${tier}"
                                placeholder="0-200" value="0" oninput="handleWeaponLevelChange('${rarity}', '${tier}')">
                     </div>
-                    <div style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 8px;">
-                        <span id="inventory-display-${rarity}-${tier}">0.0% inventory attack</span>
+
+                    <div class="weapon-stats">
+                        <span class="weapon-inventory-display" id="inventory-display-${rarity}-${tier}">0.0% inventory attack</span>
                     </div>
-                    <div id="upgrade-gain-container-${rarity}-${tier}" style="font-size: 0.8em; margin-bottom: 8px; display: none;">
-                        <span id="upgrade-gain-${rarity}-${tier}"></span>
+
+                    <div class="weapon-upgrade-efficiency" id="upgrade-gain-container-${rarity}-${tier}">
+                        <span class="weapon-efficiency-text" id="upgrade-gain-${rarity}-${tier}"></span>
                     </div>
-                    <div id="equipped-display-${rarity}-${tier}" style="display: none; margin-top: 8px;">
-                        <div style="color: var(--text-secondary); font-size: 0.85em;">
-                            Equipped: <span id="equipped-value-${rarity}-${tier}">0.0%</span>
-                        </div>
+
+                    <div class="weapon-equipped-display" id="equipped-display-${rarity}-${tier}" style="display:none;">
+                        <span class="weapon-equipped-value" id="equipped-value-${rarity}-${tier}">0.0% equipped attack</span>
                     </div>
                 </div>`;
             }
@@ -127,7 +150,15 @@ export function setWeaponStars(rarity, tier, stars) {
     for (let i = 1; i <= 5; i++) {
         const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
         if (starElem) {
-            starElem.style.opacity = i <= newStars ? '1' : '0.3';
+            const isActive = i <= newStars;
+            starElem.classList.toggle('active', isActive);
+
+            // Add pop animation for newly active stars
+            if (isActive && i > currentStars) {
+                starElem.classList.remove('pop');
+                void starElem.offsetWidth; // Trigger reflow
+                starElem.classList.add('pop');
+            }
         }
     }
 
@@ -141,7 +172,10 @@ export function previewStars(rarity, tier, stars) {
     for (let i = 1; i <= 5; i++) {
         const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
         if (starElem) {
-            starElem.style.opacity = i <= stars ? '1' : '0.3';
+            const shouldBeActive = i <= stars;
+            starElem.style.opacity = shouldBeActive ? '1' : '0.25';
+            starElem.style.filter = shouldBeActive ? 'grayscale(0)' : 'grayscale(0.7)';
+            starElem.style.transform = shouldBeActive ? 'scale(1)' : 'scale(0.85)';
         }
     }
 }
@@ -155,7 +189,10 @@ export function resetStarPreview(rarity, tier) {
     for (let i = 1; i <= 5; i++) {
         const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
         if (starElem) {
-            starElem.style.opacity = i <= currentStars ? '1' : '0.3';
+            // Remove inline styles and let CSS classes handle it
+            starElem.style.opacity = '';
+            starElem.style.filter = '';
+            starElem.style.transform = '';
         }
     }
 }
@@ -177,11 +214,7 @@ export function handleEquippedCheckboxChange(rarity, tier) {
                     const otherCard = document.getElementById(`weapon-${r}-${t}`);
 
                     if (otherCheckbox) otherCheckbox.checked = false;
-                    if (otherLabel) {
-                        otherLabel.style.background = 'var(--background)';
-                        otherLabel.style.borderColor = 'var(--border-color)';
-                        otherLabel.style.color = 'var(--text-secondary)';
-                    }
+                    // CSS handles the label state via :checked pseudo-class
                     if (otherDisplay) otherDisplay.style.display = 'none';
                     if (otherCard) otherCard.classList.remove('equipped');
                 }
@@ -195,28 +228,14 @@ export function handleEquippedCheckboxChange(rarity, tier) {
 
         const equippedValue = document.getElementById(`equipped-value-${rarity}-${tier}`);
         if (equippedValue) {
-            equippedValue.textContent = `${equippedAttack.toFixed(1)}%`;
+            equippedValue.textContent = `${equippedAttack.toFixed(1)}% equipped attack`;
         }
 
         if (equippedDisplay) equippedDisplay.style.display = 'block';
         if (card) card.classList.add('equipped');
-
-        // Style the checkbox label
-        if (label) {
-            label.style.background = 'var(--accent-primary)';
-            label.style.borderColor = 'var(--accent-primary)';
-            label.style.color = '#ffffff';
-        }
     } else {
         if (equippedDisplay) equippedDisplay.style.display = 'none';
         if (card) card.classList.remove('equipped');
-
-        // Reset the checkbox label style
-        if (label) {
-            label.style.background = 'var(--background)';
-            label.style.borderColor = 'var(--border-color)';
-            label.style.color = 'var(--text-secondary)';
-        }
     }
 
     saveToLocalStorage();
@@ -245,7 +264,7 @@ export function updateWeaponUpgradeColors() {
     const minGain = Math.min(...gainValues);
     const maxGain = Math.max(...gainValues);
 
-    // Apply colors to each upgrade display
+    // Apply CSS classes to each upgrade display
     rarities.forEach(rarity => {
         tiers.forEach(tier => {
             const upgradeGainDisplay = document.getElementById(`upgrade-gain-${rarity}-${tier}`);
@@ -255,14 +274,15 @@ export function updateWeaponUpgradeColors() {
                     // Normalize value between 0 (min) and 1 (max)
                     const normalized = maxGain === minGain ? 1 : (gainPer1k - minGain) / (maxGain - minGain);
 
-                    // Color from deep forest green (low) to vibrant green (high)
-                    // Deep forest green: rgb(34, 139, 34) or #228B22
-                    // Vibrant green: rgb(16, 185, 129) or #10b981
-                    const r = Math.round(34 + (16 - 34) * normalized);
-                    const g = Math.round(139 + (185 - 139) * normalized);
-                    const b = Math.round(34 + (129 - 34) * normalized);
-
-                    upgradeGainDisplay.style.color = `rgb(${r}, ${g}, ${b})`;
+                    // Apply CSS class based on efficiency tier
+                    upgradeGainDisplay.classList.remove('high', 'medium', 'low');
+                    if (normalized > 0.66) {
+                        upgradeGainDisplay.classList.add('high');
+                    } else if (normalized > 0.33) {
+                        upgradeGainDisplay.classList.add('medium');
+                    } else {
+                        upgradeGainDisplay.classList.add('low');
+                    }
                 }
             }
         });
@@ -337,17 +357,17 @@ export function handleWeaponLevelChange(rarity, tier) {
             upgradeGainDisplay.dataset.gainPer1k = isEquipped ? totalGainPer1k : gainPer1k;
 
             if (upgradeGainContainer) {
-                upgradeGainContainer.style.display = 'block';
+                upgradeGainContainer.classList.add('visible');
             }
         } else {
             // Hide if no gain or can't calculate
             if (upgradeGainContainer) {
-                upgradeGainContainer.style.display = 'none';
+                upgradeGainContainer.classList.remove('visible');
             }
         }
     } else {
         if (upgradeGainContainer) {
-            upgradeGainContainer.style.display = 'none';
+            upgradeGainContainer.classList.remove('visible');
         }
         if (upgradeGainDisplay) {
             delete upgradeGainDisplay.dataset.gainPer1k;
@@ -359,7 +379,7 @@ export function handleWeaponLevelChange(rarity, tier) {
     if (equippedDisplay && equippedDisplay.style.display !== 'none') {
         const equippedValue = document.getElementById(`equipped-value-${rarity}-${tier}`);
         if (equippedValue) {
-            equippedValue.textContent = `${equippedAttack.toFixed(1)}%`;
+            equippedValue.textContent = `${equippedAttack.toFixed(1)}% equipped attack`;
         }
     }
 
@@ -546,14 +566,13 @@ export function updateUpgradePriorityChain() {
     // Build HTML for display
     let html = '';
     groupedUpgrades.forEach((group, index) => {
-        const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
         const tierUpper = group.tier.toUpperCase();
         const rarityFirstLetter = group.rarity.charAt(0).toUpperCase();
 
-        html += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count}</span>`;
+        html += `<span class="wl-priority-item" data-rarity="${group.rarity}">${tierUpper} ${rarityFirstLetter} x${group.count}</span>`;
 
         if (index < groupedUpgrades.length - 1) {
-            html += ' <span style="color: var(--text-secondary);">→</span> ';
+            html += ' <span class="wl-priority-divider">→</span> ';
         }
     });
 
@@ -572,7 +591,7 @@ export function calculateCurrencyUpgrades() {
     const currency = parseFloat(currencyInput.value) || 0;
 
     if (currency <= 0) {
-        resultsDiv.style.display = 'none';
+        resultsDiv.classList.remove('visible');
         return;
     }
 
@@ -606,7 +625,7 @@ export function calculateCurrencyUpgrades() {
     });
 
     if (weaponStates.length === 0) {
-        resultsDiv.style.display = 'none';
+        resultsDiv.classList.remove('visible');
         return;
     }
 
@@ -692,10 +711,10 @@ export function calculateCurrencyUpgrades() {
     if (upgradeSequence.length === 0) {
         // If no upgrades could be bought with the entered currency, show a friendly message
         // instead of hiding the results block so the user knows to save up.
-        resultsDiv.style.display = 'block';
+        resultsDiv.classList.add('visible');
         if (attackGainDisplay) attackGainDisplay.textContent = `+0.00%`;
         if (dpsGainDisplay) dpsGainDisplay.textContent = `+0.00%`;
-        if (pathDisplay) pathDisplay.innerHTML = `<span style="color: var(--text-secondary);">Most impactful upgrade can't be afforded — save up!</span>`;
+        if (pathDisplay) pathDisplay.innerHTML = `<span class="wl-currency-path-divider">Most impactful upgrade can't be afforded — save up!</span>`;
         // Hide the apply button since there is no path to apply
         const applyUpgradesBtn = document.getElementById('apply-upgrade-path-btn');
         if (applyUpgradesBtn) applyUpgradesBtn.style.display = 'none';
@@ -768,14 +787,13 @@ export function calculateCurrencyUpgrades() {
     // Build path HTML (horizontal list)
     let pathHTML = '';
     collatedUpgrades.forEach((group, index) => {
-        const rarityColor = rarityColors[group.rarity.charAt(0).toUpperCase() + group.rarity.slice(1)];
         const tierUpper = group.tier.toUpperCase();
         const rarityFirstLetter = group.rarity.charAt(0).toUpperCase();
         const weaponKey = `${group.rarity}-${group.tier}`;
-        pathHTML += `<span style="color: ${rarityColor}; font-weight: 600;">${tierUpper} ${rarityFirstLetter} x${group.count} (${weaponLevels[weaponKey]})</span>`;
+        pathHTML += `<span class="wl-currency-path-item" data-rarity="${group.rarity}">${tierUpper} ${rarityFirstLetter} x${group.count} (${weaponLevels[weaponKey]})</span>`;
 
         if (index < collatedUpgrades.length - 1) {
-            pathHTML += ' <span style="color: var(--text-secondary);">,</span> ';
+            pathHTML += ' <span class="wl-currency-path-divider">,</span> ';
         }
     });
 
@@ -783,7 +801,7 @@ export function calculateCurrencyUpgrades() {
     attackGainDisplay.textContent = `+${totalAttackGain.toFixed(2)}%`;
     dpsGainDisplay.textContent = `+${dpsGainPct.toFixed(2)}%`;
     pathDisplay.innerHTML = pathHTML;
-    resultsDiv.style.display = 'block';
+    resultsDiv.classList.add('visible');
     const applyUpgradesBtn = document.getElementById('apply-upgrade-path-btn');
 
     // Ensure the apply button is visible when there is a valid path

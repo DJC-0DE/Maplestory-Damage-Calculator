@@ -87,6 +87,47 @@
     position: relative;
 }
 
+.table-scrollable {
+    max-height: 600px;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+
+@media (max-width: 767px) {
+    .table-scrollable {
+        max-height: 400px;
+    }
+}
+
+
+/* ========================================
+   SCROLLABLE TABLE CONTAINER
+   Premium glassmorphic variant extending base .table-scrollable
+   ======================================== */
+
+/* Custom scrollbar */
+.table-scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-scrollable::-webkit-scrollbar-track {
+    background: rgba(51, 65, 85, 0.3);
+    border-radius: 4px;
+}
+
+.dark .table-scrollable::-webkit-scrollbar-track {
+    background: rgba(51, 65, 85, 0.4);
+}
+
+.table-scrollable::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
+    border-radius: 4px;
+}
+
+.table-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #f97316;
+}
+
 .table th:hover {
     background: var(--table-surface-subtle);
     color: var(--text-primary);

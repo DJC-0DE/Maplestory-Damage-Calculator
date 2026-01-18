@@ -125,6 +125,7 @@ export function findEquivalentPercentage(stats, statKey, targetDPSGain, baseDPS,
 }
 
 // Calculate stat weights - generates HTML for stat damage predictions
+// ULTRA-COMPACT REDESIGN: Horizontal tabbed dashboard with minimal vertical footprint
 export function calculateStatWeights(setup, stats) {
     const baseBossDPS = calculateDamage(stats, 'boss').dps;
     const baseNormalDPS = calculateDamage(stats, 'normal').dps;
@@ -134,7 +135,6 @@ export function calculateStatWeights(setup, stats) {
     const mainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
     const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
     const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
-    // Use global selectedClass variable (set by selectClass() function)
     const currentSelectedClass = typeof selectedClass !== 'undefined' ? currentSelectedClass() : null;
 
     // Flat attack increases
@@ -145,20 +145,20 @@ export function calculateStatWeights(setup, stats) {
 
     // Percentage-based stats
     const percentageStats = [
-        { key: 'skillCoeff', label: 'Skill Coefficient' },
+        { key: 'skillCoeff', label: 'Skill Coeff' },
         { key: 'skillMastery', label: 'Skill Mastery' },
         { key: 'damage', label: 'Damage' },
-        { key: 'finalDamage', label: 'Final Damage' },
-        { key: 'bossDamage', label: 'Boss Damage' },
-        { key: 'normalDamage', label: 'Monster Damage' },
+        { key: 'finalDamage', label: 'Final Dmg' },
+        { key: 'bossDamage', label: 'Boss Dmg' },
+        { key: 'normalDamage', label: 'Mob Dmg' },
         { key: 'statDamage', label: 'Main Stat %' },
-        { key: 'damageAmp', label: 'Damage Amplification' },
-        { key: 'minDamage', label: 'Min Damage Multiplier' },
-        { key: 'maxDamage', label: 'Max Damage Multiplier' },
-        { key: 'critRate', label: 'Critical Rate' },
-        { key: 'critDamage', label: 'Critical Damage' },
-        { key: 'attackSpeed', label: 'Attack Speed' },
-        { key: 'defPen', label: 'Defense Penetration' }
+        { key: 'damageAmp', label: 'Dmg Amp' },
+        { key: 'minDamage', label: 'Min Dmg' },
+        { key: 'maxDamage', label: 'Max Dmg' },
+        { key: 'critRate', label: 'Crit Rate' },
+        { key: 'critDamage', label: 'Crit Dmg' },
+        { key: 'attackSpeed', label: 'Atk Speed' },
+        { key: 'defPen', label: 'Def Pen' }
     ];
 
     const percentIncreases = [1, 5, 10, 25, 50, 75];
@@ -172,27 +172,29 @@ export function calculateStatWeights(setup, stats) {
         'attackSpeed': { denominator: 150 }
     };
 
+    // ============================================
+    // ULTRA-COMPACT HORIZONTAL TABBED DASHBOARD
+    // ============================================
     let html = '';
 
-    // ========== TABLE 1: FLAT STAT INCREASES ==========
-    html += '<div style="margin-bottom: 30px;">';
-    html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Flat Stat Increases</h3>';
-    html += '<table class="table">';
-    html += '<thead><tr><th>Stat</th>';
-    for (let i = 0; i < 6; i++) {
-        html += `<th style="text-align:right;">Increase</th>`;
-    }
+    // Tab navigation
+    html += '<div class="stat-predictions-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid rgba(255,255,255,0.08);">';
+    html += `<button class="stat-pred-tab active" data-tab="flat" onclick="switchStatPredictionTab('${setup}', 'flat')" style="background: transparent; border: none; padding: 10px 16px; font-family: var(--table-font-display); font-weight: 600; font-size: 0.875rem; color: var(--accent-primary); cursor: pointer; border-bottom: 3px solid var(--accent-primary); transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: -0.01em;">Flat Stats</button>`;
+    html += `<button class="stat-pred-tab" data-tab="percentage" onclick="switchStatPredictionTab('${setup}', 'percentage')" style="background: transparent; border: none; padding: 10px 16px; font-family: var(--table-font-display); font-weight: 600; font-size: 0.875rem; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: -0.01em;">Percentage Stats</button>`;
+    html += '</div>';
+
+    // ========== FLAT STATS PANEL ==========
+    html += `<div id="stat-pred-panel-${setup}-flat" class="stat-pred-panel active" style="display: block;">`;
+    html += '<div class="table-wrapper" style="background: var(--table-surface-base); backdrop-filter: var(--table-glass-blur); border: 1px solid var(--table-glass-border); border-radius: 12px; overflow: hidden; box-shadow: var(--table-glass-shadow);">';
+    html += `<table class="table table--compact table--numeric" id="stat-pred-table-${setup}-flat">`;
+    html += '<thead><tr><th style="padding: 8px 10px; font-size: 0.75rem;">Stat</th>';
+    attackIncreases.forEach((inc, idx) => {
+        html += `<th style="padding: 8px 10px; font-size: 0.75rem; text-align: right; cursor: pointer; user-select: none; transition: background 200ms;" onclick="sortStatPredictions('${setup}', 'flat', ${idx + 1}, this)" onmouseover="this.style.background='var(--table-surface-subtle)'" onmouseout="this.style.background='transparent'">+${formatNumber(inc)} <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8em; margin-left: 4px;">⇅</span></th>`;
+    });
     html += '</tr></thead><tbody>';
 
-    // Attack increments row
-    html += '<tr style="background: rgba(79, 195, 247, 0.15);"><td style="color: #4fc3f7; font-weight: bold;"></td>';
-    attackIncreases.forEach(inc => {
-        html += `<td style="text-align: right; color: #4fc3f7; font-weight: bold;">+${formatNumber(inc)}</td>`;
-    });
-    html += '</tr>';
-
     // Attack row
-    html += `<tr><td class="stat-name"><button onclick="toggleStatChart('${setup}', 'attack', 'Attack', true)" style="background: none; border: none; cursor: pointer; font-size: 1.2em; margin-right: 8px; color: var(--accent-primary);" title="Toggle graph">📊</button>Attack</td>`;
+    html += `<tr><td style="padding: 8px 10px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);"><button onclick="toggleStatChart('${setup}', 'attack', 'Attack', true)" style="background: none; border: none; cursor: pointer; font-size: 1em; margin-right: 6px; color: var(--accent-primary); opacity: 0.7; transition: opacity 200ms;" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Attack</td>`;
     attackIncreases.forEach(increase => {
         const modifiedStats = { ...stats };
         const oldValue = stats.attack;
@@ -203,22 +205,15 @@ export function calculateStatWeights(setup, stats) {
         const newDPS = calculateDamage(modifiedStats, 'boss').dps;
         const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100).toFixed(2);
 
-        const tooltip = `+${formatNumber(increase)} Attack\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nEffective increase (with ${weaponAttackBonus.toFixed(1)}% weapon bonus): +${formatNumber(effectiveIncrease)}\nOld DPS: ${formatNumber(baseBossDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+        const tooltip = `+${formatNumber(increase)} Attack\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nEffective: +${formatNumber(effectiveIncrease)}\nGain: ${gain}%`;
 
-        html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
+        html += `<td style="padding: 8px 10px; text-align: right; font-family: var(--table-font-mono); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; font-size: 0.85rem;" title="${tooltip}"><span style="color: var(--text-primary);">+${gain}%</span></td>`;
     });
     html += '</tr>';
-    html += `<tr id="chart-row-${setup}-attack" style="display: none;"><td colspan="7" style="padding: 20px; background: var(--background);"><canvas id="chart-${setup}-attack"></canvas></td></tr>`;
-
-    // Main Stat increments row
-    html += '<tr style="background: rgba(79, 195, 247, 0.15);"><td style="color: #4fc3f7; font-weight: bold;"></td>';
-    mainStatIncreases.forEach(inc => {
-        html += `<td style="text-align: right; color: #4fc3f7; font-weight: bold;">+${formatNumber(inc)}</td>`;
-    });
-    html += '</tr>';
+    html += `<tr id="chart-row-${setup}-attack" class="chart-row" style="display: none;"><td colspan="7" style="padding: 16px; background: var(--background); border-top: 1px solid var(--table-glass-border);"><canvas id="chart-${setup}-attack"></canvas></td></tr>`;
 
     // Main Stat row
-    html += `<tr><td class="stat-name"><button onclick="toggleStatChart('${setup}', 'mainStat', 'Main Stat', true)" style="background: none; border: none; cursor: pointer; font-size: 1.2em; margin-right: 8px; color: var(--accent-primary);" title="Toggle graph">📊</button>Main Stat (100 = 1% Stat Dmg)</td>`;
+    html += `<tr><td style="padding: 8px 10px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);"><button onclick="toggleStatChart('${setup}', 'mainStat', 'Main Stat', true)" style="background: none; border: none; cursor: pointer; font-size: 1em; margin-right: 6px; color: var(--accent-primary); opacity: 0.7; transition: opacity 200ms;" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Main Stat</td>`;
     mainStatIncreases.forEach(increase => {
         const modifiedStats = { ...stats };
         const oldValue = stats.statDamage;
@@ -229,59 +224,49 @@ export function calculateStatWeights(setup, stats) {
         const newDPS = calculateDamage(modifiedStats, 'boss').dps;
         const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100).toFixed(2);
 
-        const tooltip = `+${formatNumber(increase)} Main Stat\n+${statDamageIncrease.toFixed(2)}% Stat Damage\nOld Stat Damage: ${oldValue.toFixed(2)}%, New: ${newValue.toFixed(2)}%\nOld DPS: ${formatNumber(baseBossDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+        const tooltip = `+${formatNumber(increase)} Main Stat\n+${statDamageIncrease.toFixed(2)}% Stat Damage\nGain: ${gain}%`;
 
-        html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
+        html += `<td style="padding: 8px 10px; text-align: right; font-family: var(--table-font-mono); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; font-size: 0.85rem;" title="${tooltip}"><span style="color: var(--text-primary);">+${gain}%</span></td>`;
     });
     html += '</tr>';
-    html += `<tr id="chart-row-${setup}-mainStat" style="display: none;"><td colspan="7" style="padding: 20px; background: var(--background);"><canvas id="chart-${setup}-mainStat"></canvas></td></tr>`;
+    html += `<tr id="chart-row-${setup}-mainStat" class="chart-row" style="display: none;"><td colspan="7" style="padding: 16px; background: var(--background); border-top: 1px solid var(--table-glass-border);"><canvas id="chart-${setup}-mainStat"></canvas></td></tr>`;
 
     html += '</tbody></table>';
     html += '</div>';
+    html += '</div>';
 
-    // ========== TABLE 2: PERCENTAGE STAT INCREASES ==========
-    html += '<div style="margin-bottom: 30px;">';
-    html += '<h3 style="color: var(--accent-primary); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Percentage Stat Increases</h3>';
-    html += '<table class="table">';
-    html += '<thead><tr><th>Stat</th>';
-    for (let i = 0; i < 6; i++) {
-        html += `<th style="text-align:right;">Increase</th>`;
-    }
+    // ========== PERCENTAGE STATS PANEL ==========
+    html += `<div id="stat-pred-panel-${setup}-percentage" class="stat-pred-panel" style="display: none;">`;
+    html += '<div class="table-wrapper" style="background: var(--table-surface-base); backdrop-filter: var(--table-glass-blur); border: 1px solid var(--table-glass-border); border-radius: 12px; overflow: hidden; box-shadow: var(--table-glass-shadow);">';
+    html += `<table class="table table--compact table--numeric" id="stat-pred-table-${setup}-percentage">`;
+    html += '<thead><tr><th style="padding: 8px 10px; font-size: 0.75rem;">Stat</th>';
+    percentIncreases.forEach((inc, idx) => {
+        html += `<th style="padding: 8px 10px; font-size: 0.75rem; text-align: right; cursor: pointer; user-select: none; transition: background 200ms;" onclick="sortStatPredictions('${setup}', 'percentage', ${idx + 1}, this)" onmouseover="this.style.background='var(--table-surface-subtle)'" onmouseout="this.style.background='transparent'">+${inc}% <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8em; margin-left: 4px;">⇅</span></th>`;
+    });
     html += '</tr></thead><tbody>';
 
-    // Percentage increments row
-    html += '<tr style="background: rgba(79, 195, 247, 0.15);"><td style="color: #4fc3f7; font-weight: bold;"></td>';
-    percentIncreases.forEach(inc => {
-        html += `<td style="text-align: right; color: #4fc3f7; font-weight: bold;">+${inc}%</td>`;
-    });
-    html += '</tr>';
-
-    // Percentage stats
+    // Percentage stats rows
     percentageStats.forEach(stat => {
         let labelContent = stat.label;
         if (multiplicativeStats[stat.key]) {
-            labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive.">ℹ️</span>`;
+            labelContent += ` <span style="font-size: 0.7em; opacity: 0.5;" title="Multiplicative">⚡</span>`;
         } else if (diminishingReturnStats[stat.key]) {
-            labelContent += ` <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative, but have diminishing returns.">ℹ️</span>`;
+            //labelContent += ` <span style="font-size: 0.7em; opacity: 0.5;" title="Diminishing returns">📉</span>`;
         }
 
-        html += `<tr><td class="stat-name"><button onclick="toggleStatChart('${setup}', '${stat.key}', '${stat.label}', false)" style="background: none; border: none; cursor: pointer; font-size: 1.2em; margin-right: 8px; color: var(--accent-primary);" title="Toggle graph">📊</button>${labelContent}</td>`;
+        html += `<tr><td style="padding: 8px 10px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);"><button onclick="toggleStatChart('${setup}', '${stat.key}', '${stat.label}', false)" style="background: none; border: none; cursor: pointer; font-size: 1em; margin-right: 6px; color: var(--accent-primary); opacity: 0.7; transition: opacity 200ms;" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>${labelContent}</td>`;
 
         percentIncreases.forEach(increase => {
-            // Calculate cumulative gain by stepping through 1% at a time
             let cumulativeGainPct = 0;
             let currentStepStats = { ...stats };
             const baseDPS = stat.key === "bossDamage" ? baseBossDPS : baseNormalDPS;
             let previousDPS = baseDPS;
 
             let stepSize = increase <= 5 ? 0.1 : 1;
-
-            // Step through in 1% increments (or 0.1% for small increases)
-            if (multiplicativeStats[stat.key])
-            {
+            if (multiplicativeStats[stat.key]) {
                 stepSize = increase;
             }
-            
+
             const numSteps = Math.round(increase / stepSize);
 
             for (let step = 1; step <= numSteps; step++) {
@@ -289,9 +274,7 @@ export function calculateStatWeights(setup, stats) {
                 const modifiedStats = { ...currentStepStats };
                 const oldValue = currentStepStats[stat.key];
 
-                // Special handling for Main Stat % - it's additive with existing Main Stat % bonuses
                 if (stat.key === 'statDamage') {
-                    // Use the shared calculation function
                     const currentMainStatPctAtStep = mainStatPct + (step - 1) * stepSize;
                     const statDamageGain = calculateMainStatPercentGain(
                         stepIncrease,
@@ -300,14 +283,11 @@ export function calculateStatWeights(setup, stats) {
                         defense,
                         currentSelectedClass
                     );
-
-                    // Apply the gain to current stat damage
                     modifiedStats[stat.key] = oldValue + statDamageGain;
                 } else if (multiplicativeStats[stat.key]) {
                     modifiedStats[stat.key] = (((1 + oldValue / 100) * (1 + stepIncrease / 100)) - 1) * 100;
                 } else if (diminishingReturnStats[stat.key]) {
                     const factor = diminishingReturnStats[stat.key].denominator;
-                    // Use the formula to combine the current value with the new source
                     modifiedStats[stat.key] = (1 - (1 - oldValue / factor) * (1 - stepIncrease / factor)) * factor;
                 } else {
                     modifiedStats[stat.key] = oldValue + stepIncrease;
@@ -317,39 +297,134 @@ export function calculateStatWeights(setup, stats) {
                 const stepGain = ((newDPS - previousDPS) / baseDPS * 100);
                 cumulativeGainPct += stepGain;
 
-                // Update for next iteration
                 currentStepStats = modifiedStats;
                 previousDPS = newDPS;
             }
 
             const gain = cumulativeGainPct.toFixed(2);
             const newValue = currentStepStats[stat.key];
-
-            // Create tooltip - special handling for Main Stat %
             const oldValue = stats[stat.key];
             const newDPS = previousDPS;
 
             let tooltip;
             if (stat.key === 'statDamage') {
                 const statDamageIncrease = (newValue - oldValue).toFixed(2);
-                tooltip = `+${increase}% Main Stat\nStat Damage increase: +${statDamageIncrease}%\nOld Stat Damage: ${formatNumber(oldValue)}%, New: ${formatNumber(newValue)}%\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+                tooltip = `+${increase}% Main Stat\nStat Damage: +${statDamageIncrease}%\nGain: ${gain}%`;
             } else {
-                tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nOld DPS: ${formatNumber(baseDPS)}, New DPS: ${formatNumber(newDPS)}\nGain: ${gain}%`;
+                tooltip = `+${increase}%\nOld: ${formatNumber(oldValue)}, New: ${formatNumber(newValue)}\nGain: ${gain}%`;
             }
 
-            html += `<td class="gain-cell" title="${tooltip}"><span class="gain-positive">+${gain}%</span></td>`;
+            html += `<td style="padding: 8px 10px; text-align: right; font-family: var(--table-font-mono); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; font-size: 0.85rem;" title="${tooltip}"><span style="color: var(--text-primary);">+${gain}%</span></td>`;
         });
 
         html += '</tr>';
-        html += `<tr id="chart-row-${setup}-${stat.key}" style="display: none;"><td colspan="7" style="padding: 20px; background: var(--background);"><canvas id="chart-${setup}-${stat.key}"></canvas></td></tr>`;
+        html += `<tr id="chart-row-${setup}-${stat.key}" class="chart-row" style="display: none;"><td colspan="7" style="padding: 16px; background: var(--background); border-top: 1px solid var(--table-glass-border);"><canvas id="chart-${setup}-${stat.key}"></canvas></td></tr>`;
     });
 
     html += '</tbody></table>';
     html += '</div>';
-
+    html += '</div>';
 
     document.getElementById(`stat-weights-${setup}`).innerHTML = html;
 }
+
+// Tab switching function for stat predictions
+window.switchStatPredictionTab = function(setup, tabName) {
+    // Update tab buttons
+    const container = document.getElementById(`stat-weights-${setup}`);
+    const tabs = container.querySelectorAll('.stat-pred-tab');
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+            tab.style.color = 'var(--accent-primary)';
+            tab.style.borderBottomColor = 'var(--accent-primary)';
+        } else {
+            tab.classList.remove('active');
+            tab.style.color = 'var(--text-secondary)';
+            tab.style.borderBottomColor = 'transparent';
+        }
+    });
+
+    // Update panels
+    const panels = container.querySelectorAll('.stat-pred-panel');
+    panels.forEach(panel => {
+        if (panel.id === `stat-pred-panel-${setup}-${tabName}`) {
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    });
+};
+
+// Column sorting for stat predictions tables
+window.sortStatPredictions = function(setup, tabName, colIndex, headerElement) {
+    const tableId = `stat-pred-table-${setup}-${tabName}`;
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    // Get all data rows (exclude chart rows)
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('chart-row'));
+
+    // Parse numeric values from the clicked column and create row data
+    const rowData = rows.map(row => {
+        const cell = row.querySelector(`td:nth-child(${colIndex + 1})`);
+        if (!cell) return { row, value: -Infinity };
+
+        const span = cell.querySelector('span');
+        const text = span ? span.textContent : cell.textContent;
+        // Extract numeric value (handles "+1.23%" format)
+        const value = parseFloat(text.replace(/[+%]/g, ''));
+        return { row, value };
+    });
+
+    // Determine sort direction
+    const currentSort = headerElement.dataset.sort || 'none';
+    let newDirection = 'asc';
+
+    if (currentSort === 'asc') {
+        newDirection = 'desc';
+    } else if (currentSort === 'desc') {
+        newDirection = 'asc'; // Toggle back to asc
+    }
+
+    // Sort rows based on values
+    rowData.sort((a, b) => {
+        if (newDirection === 'asc') {
+            return a.value - b.value;
+        } else {
+            return b.value - a.value;
+        }
+    });
+
+    // Reorder rows in DOM (keeping chart rows with their data rows)
+    rowData.forEach((item, index) => {
+        const dataRow = item.row;
+        const chartRow = dataRow.nextElementSibling;
+        tbody.appendChild(dataRow);
+        if (chartRow && chartRow.classList.contains('chart-row')) {
+            tbody.appendChild(chartRow);
+        }
+    });
+
+    // Update sort indicators
+    const tableHeaders = table.querySelectorAll('th .sort-indicator');
+    tableHeaders.forEach(indicator => {
+        indicator.textContent = '⇅';
+        indicator.style.opacity = '0.3';
+    });
+
+    const clickedIndicator = headerElement.querySelector('.sort-indicator');
+    if (clickedIndicator) {
+        clickedIndicator.textContent = newDirection === 'asc' ? '▲' : '▼';
+        clickedIndicator.style.opacity = '1';
+    }
+
+    // Store sort state
+    headerElement.dataset.sort = newDirection;
+};
 
 // Calculate stat equivalency - shows what other stats equal a given stat increase
 export function calculateStatEquivalency(sourceStat) {
@@ -624,7 +699,7 @@ export function calculateStatEquivalency(sourceStat) {
         if (statConfig.isMultiplicative) {
             icon = ' <span style="font-size: 0.9em; opacity: 0.7;" title="Multiplicative stat">ℹ️</span>';
         } else if (statConfig.isDiminishing) {
-            icon = ' <span style="font-size: 0.9em; opacity: 0.7;" title="Diminishing returns">ℹ️</span>';
+            //icon = ' <span style="font-size: 0.9em; opacity: 0.7;" title="Diminishing returns">ℹ️</span>';
         }
 
         html += '<tr>';
