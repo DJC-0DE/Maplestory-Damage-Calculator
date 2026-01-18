@@ -246,13 +246,98 @@ const STAT_BREAKDOWN_STYLES = `
     }
 
     /* ========================================
-       PREMIUM STAT CARDS - Glassmorphic Design
+       COMPACT CONFIG SECTION - Collapsible Design
+       ======================================== */
+
+    .stat-breakdown-config-wrapper {
+        margin-bottom: var(--sb-space-xl);
+    }
+
+    .stat-config-toggle {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 14px var(--sb-space-md);
+        background: var(--sb-surface-base);
+        backdrop-filter: var(--sb-glass-blur);
+        -webkit-backdrop-filter: var(--sb-glass-blur);
+        border: 1px solid var(--sb-glass-border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all var(--sb-duration-base) var(--sb-ease-smooth);
+        margin-bottom: var(--sb-space-md);
+        box-shadow: var(--sb-glow-subtle);
+    }
+
+    .stat-config-toggle:hover {
+        border-color: var(--sb-border-hover);
+        box-shadow: var(--sb-glow-medium);
+        transform: translateY(-1px);
+    }
+
+    .stat-config-toggle-text {
+        display: flex;
+        align-items: center;
+        gap: var(--sb-space-sm);
+        font-family: var(--sb-font-display);
+        font-weight: 700;
+        font-size: 0.9375rem;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+    }
+
+    .stat-config-toggle-icon {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--accent-primary);
+        transition: transform var(--sb-duration-base) var(--sb-ease-smooth);
+    }
+
+    .stat-config-toggle-subtitle {
+        font-family: var(--sb-font-display);
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        letter-spacing: 0.01em;
+        margin-left: 20px;
+    }
+
+    .stat-config-content {
+        display: none;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: all var(--sb-duration-slow) var(--sb-ease-smooth);
+    }
+
+    .stat-config-content.expanded {
+        display: block;
+        max-height: 2000px;
+        opacity: 1;
+        animation: slideDown var(--sb-duration-base) var(--sb-ease-smooth);
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            max-height: 0;
+        }
+        to {
+            opacity: 1;
+            max-height: 2000px;
+        }
+    }
+
+    /* ========================================
+       PREMIUM STAT CARDS - Compact Design
        ======================================== */
 
     .unlockable-stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: var(--sb-space-md);
+        gap: var(--sb-space-sm);
     }
 
     @media (max-width: 1200px) {
@@ -272,8 +357,8 @@ const STAT_BREAKDOWN_STYLES = `
         backdrop-filter: var(--sb-glass-blur);
         -webkit-backdrop-filter: var(--sb-glass-blur);
         border: 1px solid var(--sb-glass-border);
-        border-radius: 12px;
-        padding: var(--sb-space-md);
+        border-radius: 10px;
+        padding: var(--sb-space-sm);
         transition: all var(--sb-duration-base) var(--sb-ease-smooth);
         position: relative;
         overflow: hidden;
@@ -311,12 +396,12 @@ const STAT_BREAKDOWN_STYLES = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: var(--sb-space-sm);
+        margin-bottom: 6px;
     }
 
     .stat-card-title {
         font-weight: 600;
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
         color: var(--text-primary);
         letter-spacing: 0.01em;
         text-transform: uppercase;
@@ -325,13 +410,13 @@ const STAT_BREAKDOWN_STYLES = `
     .stat-card-value-row {
         display: flex;
         align-items: center;
-        gap: var(--sb-space-sm);
+        gap: 6px;
     }
 
     .stat-card-value {
         font-family: var(--sb-font-mono);
         font-weight: 700;
-        font-size: 1.125rem;
+        font-size: 1rem;
         font-variant-numeric: tabular-nums;
         letter-spacing: -0.02em;
     }
@@ -348,18 +433,18 @@ const STAT_BREAKDOWN_STYLES = `
     }
 
     /* ========================================
-       PREMIUM LOCK TOGGLE - Iconic Design
+       PREMIUM LOCK TOGGLE - Compact Design
        ======================================== */
 
     .stat-lock-toggle {
-        width: 36px;
-        height: 36px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: var(--sb-surface-subtle);
         border: 1px solid var(--sb-glass-border);
-        border-radius: 8px;
+        border-radius: 6px;
         cursor: pointer;
         transition: all var(--sb-duration-base) var(--sb-ease-smooth);
         color: var(--text-secondary);
@@ -379,18 +464,18 @@ const STAT_BREAKDOWN_STYLES = `
     }
 
     .stat-lock-toggle svg {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         stroke-width: 2;
     }
 
     /* ========================================
-       PREMIUM SLIDER SECTION
+       COMPACT SLIDER SECTION
        ======================================== */
 
     .stat-slider-section {
-        margin-top: var(--sb-space-md);
-        padding-top: var(--sb-space-md);
+        margin-top: var(--sb-space-sm);
+        padding-top: var(--sb-space-sm);
         border-top: 1px solid var(--sb-glass-border);
     }
 
@@ -398,11 +483,11 @@ const STAT_BREAKDOWN_STYLES = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: var(--sb-space-sm);
+        margin-bottom: 6px;
     }
 
     .stat-slider-label {
-        font-size: 0.6875rem;
+        font-size: 0.625rem;
         font-weight: 600;
         color: var(--text-secondary);
         text-transform: uppercase;
@@ -411,7 +496,7 @@ const STAT_BREAKDOWN_STYLES = `
 
     .stat-slider-value {
         font-family: var(--sb-font-mono);
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
         font-weight: 600;
         color: var(--text-primary);
         background: var(--sb-gradient-primary);
@@ -420,14 +505,14 @@ const STAT_BREAKDOWN_STYLES = `
         background-clip: text;
     }
 
-    /* Premium Range Slider */
+    /* Compact Range Slider */
     .stat-range-slider {
         -webkit-appearance: none;
         appearance: none;
         width: 100%;
-        height: 6px;
+        height: 4px;
         background: var(--sb-surface-subtle);
-        border-radius: 3px;
+        border-radius: 2px;
         outline: none;
         cursor: pointer;
         position: relative;
@@ -436,21 +521,21 @@ const STAT_BREAKDOWN_STYLES = `
     .stat-range-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 18px;
-        height: 18px;
+        width: 14px;
+        height: 14px;
         background: var(--sb-gradient-teal);
-        border: 3px solid rgba(15, 23, 42, 0.8);
+        border: 2px solid rgba(15, 23, 42, 0.8);
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 2px 10px rgba(20, 184, 166, 0.4),
-                    0 0 0 4px rgba(20, 184, 166, 0.1);
+        box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3),
+                    0 0 0 3px rgba(20, 184, 166, 0.08);
         transition: all var(--sb-duration-fast) var(--sb-ease-spring);
     }
 
     .stat-range-slider::-webkit-slider-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 3px 15px rgba(20, 184, 166, 0.5),
-                    0 0 0 6px rgba(20, 184, 166, 0.15);
+        box-shadow: 0 2px 10px rgba(20, 184, 166, 0.4),
+                    0 0 0 4px rgba(20, 184, 166, 0.12);
     }
 
     .stat-range-slider::-webkit-slider-thumb:active {
@@ -458,31 +543,31 @@ const STAT_BREAKDOWN_STYLES = `
     }
 
     .stat-range-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
+        width: 14px;
+        height: 14px;
         background: var(--sb-gradient-teal);
-        border: 3px solid rgba(15, 23, 42, 0.8);
+        border: 2px solid rgba(15, 23, 42, 0.8);
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 2px 10px rgba(20, 184, 166, 0.4),
-                    0 0 0 4px rgba(20, 184, 166, 0.1);
+        box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3),
+                    0 0 0 3px rgba(20, 184, 166, 0.08);
         transition: all var(--sb-duration-fast) var(--sb-ease-spring);
     }
 
     .stat-range-slider::-moz-range-thumb:hover {
         transform: scale(1.15);
-        box-shadow: 0 3px 15px rgba(20, 184, 166, 0.5),
-                    0 0 0 6px rgba(20, 184, 166, 0.15);
+        box-shadow: 0 2px 10px rgba(20, 184, 166, 0.4),
+                    0 0 0 4px rgba(20, 184, 166, 0.12);
     }
 
     /* ========================================
-       GUILD BONUS CARDS - Purple Gradient Variant
+       GUILD BONUS CARDS - Compact Grid
        ======================================== */
 
     .guild-bonuses-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--sb-space-md);
+        gap: var(--sb-space-sm);
     }
 
     @media (max-width: 768px) {
@@ -504,35 +589,36 @@ const STAT_BREAKDOWN_STYLES = `
 
     .guild-card .stat-range-slider::-webkit-slider-thumb {
         background: var(--sb-gradient-purple);
-        box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4),
-                    0 0 0 4px rgba(168, 85, 247, 0.1);
+        box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3),
+                    0 0 0 3px rgba(168, 85, 247, 0.08);
     }
 
     .guild-card .stat-range-slider::-webkit-slider-thumb:hover {
-        box-shadow: 0 3px 15px rgba(168, 85, 247, 0.5),
-                    0 0 0 6px rgba(168, 85, 247, 0.15);
+        box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4),
+                    0 0 0 4px rgba(168, 85, 247, 0.12);
     }
 
     .guild-card .stat-range-slider::-moz-range-thumb {
         background: var(--sb-gradient-purple);
-        box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4),
-                    0 0 0 4px rgba(168, 85, 247, 0.1);
+        box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3),
+                    0 0 0 3px rgba(168, 85, 247, 0.08);
+        transition: all var(--sb-duration-fast) var(--sb-ease-spring);
     }
 
     .guild-card .stat-range-slider::-moz-range-thumb:hover {
-        box-shadow: 0 3px 15px rgba(168, 85, 247, 0.5),
-                    0 0 0 6px rgba(168, 85, 247, 0.15);
+        box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4),
+                    0 0 0 4px rgba(168, 85, 247, 0.12);
     }
 
     /* ========================================
-       PREMIUM BREAKDOWN CARDS - Data Visualization
+       PREMIUM BREAKDOWN CARDS - Compact Data Visualization
        ======================================== */
 
     .stat-breakdown-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-        gap: var(--sb-space-md);
-        margin-top: var(--sb-space-2xl);
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: var(--sb-space-sm);
+        margin-top: var(--sb-space-xl);
     }
 
     @media (max-width: 768px) {
@@ -546,8 +632,8 @@ const STAT_BREAKDOWN_STYLES = `
         backdrop-filter: var(--sb-glass-blur);
         -webkit-backdrop-filter: var(--sb-glass-blur);
         border: 1px solid var(--sb-glass-border);
-        border-radius: 12px;
-        padding: var(--sb-space-md);
+        border-radius: 10px;
+        padding: var(--sb-space-sm);
         transition: all var(--sb-duration-base) var(--sb-ease-smooth);
         position: relative;
         overflow: hidden;
@@ -583,14 +669,14 @@ const STAT_BREAKDOWN_STYLES = `
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: var(--sb-space-md);
-        padding-bottom: var(--sb-space-md);
+        margin-bottom: var(--sb-space-sm);
+        padding-bottom: var(--sb-space-sm);
         border-bottom: 1px solid var(--sb-glass-border);
     }
 
     .breakdown-title {
         font-weight: 700;
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
         color: var(--text-primary);
         letter-spacing: 0.02em;
         text-transform: uppercase;
@@ -599,7 +685,7 @@ const STAT_BREAKDOWN_STYLES = `
     .breakdown-total {
         font-family: var(--sb-font-mono);
         font-weight: 700;
-        font-size: 1.125rem;
+        font-size: 1rem;
         background: var(--sb-gradient-primary);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -1253,33 +1339,60 @@ function renderLevelStatsContent() {
 }
 
 // ============================================================================
-// TAB SYSTEM
+// TAB SYSTEM - Compact Collapsible Design
 // ============================================================================
 
 function createTabsStructure() {
     return `
-        <div class="stat-breakdown-tabs">
-            <button class="stat-tab-button active" data-tab="special-stats" onclick="switchExtraStatsTab('special-stats')">
-                Special Stats
+        <div class="stat-breakdown-config-wrapper">
+            <button class="stat-config-toggle" onclick="toggleConfigSection()" id="config-toggle-btn">
+                <span class="stat-config-toggle-text">
+                    <span class="stat-config-toggle-icon" id="config-toggle-icon">▾</span>
+                    Stat Configuration
+                </span>
+                <span class="stat-config-toggle-subtitle">Special Stats • Guild Bonuses • Level Stats</span>
             </button>
-            <button class="stat-tab-button" data-tab="guild-bonuses" onclick="switchExtraStatsTab('guild-bonuses')">
-                Guild Bonuses
-            </button>
-            <button class="stat-tab-button" data-tab="level-stats" onclick="switchExtraStatsTab('level-stats')">
-                Level Stats
-            </button>
-        </div>
-        <div class="stat-tab-content active" id="special-stats-content">
-            ${renderSpecialStatsContent()}
-        </div>
-        <div class="stat-tab-content" id="guild-bonuses-content">
-            ${renderGuildBonusesContent()}
-        </div>
-        <div class="stat-tab-content" id="level-stats-content">
-            ${renderLevelStatsContent()}
+            <div class="stat-config-content" id="config-content">
+                <div class="stat-breakdown-tabs">
+                    <button class="stat-tab-button active" data-tab="special-stats" onclick="switchExtraStatsTab('special-stats')">
+                        Special Stats
+                    </button>
+                    <button class="stat-tab-button" data-tab="guild-bonuses" onclick="switchExtraStatsTab('guild-bonuses')">
+                        Guild Bonuses
+                    </button>
+                    <button class="stat-tab-button" data-tab="level-stats" onclick="switchExtraStatsTab('level-stats')">
+                        Level Stats
+                    </button>
+                </div>
+                <div class="stat-tab-content active" id="special-stats-content">
+                    ${renderSpecialStatsContent()}
+                </div>
+                <div class="stat-tab-content" id="guild-bonuses-content">
+                    ${renderGuildBonusesContent()}
+                </div>
+                <div class="stat-tab-content" id="level-stats-content">
+                    ${renderLevelStatsContent()}
+                </div>
+            </div>
         </div>
     `;
 }
+
+window.toggleConfigSection = function() {
+    const content = document.getElementById('config-content');
+    const icon = document.getElementById('config-toggle-icon');
+    const toggle = document.getElementById('config-toggle-btn');
+
+    if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        icon.style.transform = 'rotate(0deg)';
+        toggle.classList.remove('expanded');
+    } else {
+        content.classList.add('expanded');
+        icon.style.transform = 'rotate(180deg)';
+        toggle.classList.add('expanded');
+    }
+};
 
 // ============================================================================
 // STAT BREAKDOWN GRID
