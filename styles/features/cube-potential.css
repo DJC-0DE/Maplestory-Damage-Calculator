@@ -39,6 +39,10 @@
 .dark .cube-slot-btn.active {
     background: linear-gradient(135deg, rgba(0, 122, 255, 0.25), rgba(88, 86, 214, 0.2));
 }
+ 
+#cube-comparison-content  .input-field {
+color: black;
+}
 
 .cube-rarity-select {
     padding: 8px 16px;
