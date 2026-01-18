@@ -812,7 +812,7 @@
         <!-- Gear Lab Content -->
         <div id="character-optimization-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3">
             <div class="optimization-page-header">
-                <h1 class="optimization-page-title">Gear Lab 🧪</h1>
+                <h1 class="optimization-page-title">Gear Lab</h1>
             </div>
             <div class="optimization-main-tabs">
                 <button class="optimization-tab-button active" data-tab="item-comparison" onclick="switchTabAndUpdateURL('analysis', 'item-comparison', event); checkPendingSlotNavigation();">Item Comparison</button>
@@ -987,171 +987,222 @@
                     </div>
                 </div>
 
-                <!-- Slot Selector -->
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; font-size: 1.05em; color: var(--accent-primary); display: block; margin-bottom: 10px;">Equipment Slot</label>
-                        <div id="cube-slot-selector" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;"></div>
-                    </div>
+                <!-- Flattened Main Tab Navigation -->
+                <div id="tab-container-main" class="cube-main-tabs">
+                    <button id="cube-main-tab-comparison" class="cube-main-tab-button active" data-tab="comparison">
+                        <span class="cube-tab-icon">⚔️</span>
+                        <span class="cube-tab-label">Comparison</span>
+                    </button>
+                    <button id="cube-main-tab-rankings" class="cube-main-tab-button" data-tab="rankings">
+                        <span class="cube-tab-icon">🏆</span>
+                        <span class="cube-tab-label">Best Potentials</span>
+                    </button>
+                    <button id="cube-main-tab-summary" class="cube-main-tab-button" data-tab="summary">
+                        <span class="cube-tab-icon">📊</span>
+                        <span class="cube-tab-label">All Slots Summary</span>
+                    </button>
+                    <button id="cube-main-tab-simulation" class="cube-main-tab-button" data-tab="simulation">
+                        <span class="cube-tab-icon">🧪</span>
+                        <span class="cube-tab-label">Simulation</span>
+                    </button>
                 </div>
 
-                <!-- Main Tab Navigation -->
-                <div id="tab-container-main" class="optimization-sub-tabs">
-                    <button id="cube-main-tab-selected" class="optimization-sub-tab-button active">Selected Slot</button>
-                    <button id="cube-main-tab-summary" class="optimization-sub-tab-button">Summary</button>
-                    <button id="cube-main-tab-simulation" class="optimization-sub-tab-button">Simulation</button>
+                <!-- Comparison Tab Content -->
+                <div id="cube-comparison-content" class="cube-tab-content active">
+                    <!-- Equipment Slot Selector (inside Comparison tab) -->
+                    <div class="cube-slot-selector-wrapper">
+                        <label for="cube-slot-selector" class="cube-slot-label">Equipment Slot</label>
+                        <div id="cube-slot-selector" class="cube-slot-buttons-container"></div>
+                    </div>
+
+                    <!-- Context Controls for Comparison Tab (Potential Type & Rarity) -->
+                    <div id="cube-comparison-controls" class="cube-context-controls" style="display: block;">
+                        <div class="cube-controls-grid">
+                            <!-- Potential Type Toggle -->
+                            <div class="cube-control-group">
+                                <label class="cube-control-label">Potential Type</label>
+                                <div class="cube-potential-type-buttons">
+                                    <button id="cube-regular-potential-btn" class="cube-potential-type-btn active" onclick="switchPotentialType('regular')">
+                                        <span class="cube-type-icon">✦</span>
+                                        <span>Regular</span>
+                                    </button>
+                                    <button id="cube-bonus-potential-btn" class="cube-potential-type-btn" onclick="switchPotentialType('bonus')">
+                                        <span class="cube-type-icon">✧</span>
+                                        <span>Bonus</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Rarity Selector -->
+                            <div class="cube-control-group">
+                                <label for="cube-rarity-selector" class="cube-control-label">Slot Rarity</label>
+                                <select id="cube-rarity-selector" class="cube-rarity-select">
+                                    <option value="normal">Normal</option>
+                                    <option value="rare">Rare</option>
+                                    <option value="epic">Epic</option>
+                                    <option value="unique">Unique</option>
+                                    <option value="legendary">Legendary</option>
+                                    <option value="mystic">Mystic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cube-comparison-grid">
+                        <!-- Set A (Current) Card -->
+                        <div class="cube-set-card cube-set-card--a">
+                            <div class="cube-set-card-header">
+                                <h3 class="cube-set-card-title">Set A (Current)</h3>
+                                <span class="cube-set-card-subtitle">Your configured potential</span>
+                            </div>
+
+                            <div class="cube-set-card-body">
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setA-line1-stat">Line 1</label>
+                                    <select id="cube-setA-line1-stat" class="cube-line-select"></select>
+                                </div>
+
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setA-line2-stat">Line 2</label>
+                                    <select id="cube-setA-line2-stat" class="cube-line-select"></select>
+                                </div>
+
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setA-line3-stat">Line 3</label>
+                                    <select id="cube-setA-line3-stat" class="cube-line-select"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Set B (Comparison) Card -->
+                        <div class="cube-set-card cube-set-card--b">
+                            <div class="cube-set-card-header">
+                                <h3 class="cube-set-card-title">Set B (Comparison)</h3>
+                                <span class="cube-set-card-subtitle">Test alternative potential</span>
+                            </div>
+
+                            <div class="cube-set-card-body">
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setB-line1-stat">Line 1</label>
+                                    <select id="cube-setB-line1-stat" class="cube-line-select"></select>
+                                </div>
+
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setB-line2-stat">Line 2</label>
+                                    <select id="cube-setB-line2-stat" class="cube-line-select"></select>
+                                </div>
+
+                                <div class="cube-line-input-group">
+                                    <label class="cube-line-label" for="cube-setB-line3-stat">Line 3</label>
+                                    <select id="cube-setB-line3-stat" class="cube-line-select"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Results -->
+                    <div id="cube-comparison-results" class="cube-results-section"></div>
                 </div>
 
-                <!-- Summary Main Tab Content -->
-                <div id="cube-main-summary-content" style="display: none;">
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
-                            All Slots Potential Summary
-                        </h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9em;">
-                            Overview of Set A DPS gains for all equipment slots (Regular and Bonus Potential)
-                        </p>
-                    </div>
-
-                    <!-- Loading Progress -->
-                    <div id="cube-summary-progress" style="display: none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px;">
-                        <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 8px; text-align: center;">
-                            <span id="cube-summary-progress-text">Loading rankings...</span>
-                        </div>
-                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div id="cube-summary-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
-                        </div>
-                    </div>
-
-                    <div id="cube-summary-results"></div>
-                </div>
-
-                <!-- Selected Slot Main Tab Content -->
-                <div id="cube-main-selected-content" style="display: block;">
-                    <!-- Potential Type Toggle -->
-                <div style="margin-bottom: 20px; background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.3); border-radius: 12px; padding: 15px;">
-                    <label style="font-weight: 600; font-size: 0.95em; color: var(--text-primary); display: block; margin-bottom: 10px;">Potential Type</label>
-                        <div style="display: flex; gap: 10px;">
-                        <button id="cube-regular-potential-btn" class="cube-potential-type-btn active" onclick="switchPotentialType('regular')" style="flex: 1; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                                Regular Potential
-                            </button>
-                        <button id="cube-bonus-potential-btn" class="cube-potential-type-btn" onclick="switchPotentialType('bonus')" style="flex: 1; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                                Bonus Potential
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Rarity Selector -->
-                    <div style="margin-bottom: 20px;">
-                    <label style="font-weight: 600; font-size: 0.95em; color: var(--text-primary); display: block; margin-bottom: 8px;">Slot Potential Rarity</label>
-                        <select id="cube-rarity-selector" class="cube-rarity-select"></select>
-                    </div>
-
-                    <!-- Selected Slot Sub-Tab Navigation -->
-                    <div class="optimization-sub-tabs">
-                    <button id="cube-tab-comparison" class="optimization-sub-tab-button active">Comparison</button>
-                    <button id="cube-tab-rankings" class="optimization-sub-tab-button">Slot Theoretical Best</button>
-                    </div>
-
-                    <!-- Comparison Tab Content -->
-                    <div id="cube-comparison-content" style="display: block;">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Set A (Current) - Styled like Equipped Item -->
-                        <div style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(0, 122, 255, 0.05)); border: 2px solid var(--accent-success); border-radius: 12px; padding: 20px; box-shadow: 0 4px 16px var(--shadow);">
-                            <h3 style="color: var(--accent-success); margin-bottom: 15px; font-size: 1.1em; font-weight: 600;">Set A (Current)</h3>
-
-                                <div style="margin-bottom: 15px;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 1</label>
-                                <select id="cube-setA-line1-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
-
-                                <div style="margin-bottom: 15px;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 2</label>
-                                <select id="cube-setA-line2-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
-
-                                <div style="margin-bottom: 0;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 3</label>
-                                <select id="cube-setA-line3-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
+                <!-- Best Potentials Tab Content -->
+                <div id="cube-rankings-content" class="cube-tab-content">
+                    <!-- Controls for Rankings (Independent slot & rarity selectors) -->
+                    <div id="cube-rankings-controls" class="cube-context-controls" style="display: block;">
+                        <div class="cube-controls-grid">
+                            <!-- Slot Selector -->
+                            <div class="cube-control-group">
+                                <label for="cube-rankings-slot-selector" class="cube-control-label">Equipment Slot</label>
+                                <select id="cube-rankings-slot-selector" class="cube-rarity-select">
+                                    <!-- Populated by JavaScript -->
+                                </select>
+                                <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: var(--cube-space-sm);">
+                                    Some slots have unique potential lines available only to them
+                                </p>
                             </div>
 
-                            <!-- Set B (Comparison) - Styled like Comparison Items -->
-                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-500 dark:border-blue-400 rounded-xl p-5 shadow-lg">
-                            <h3 class="text-blue-600 dark:text-blue-400 mb-4 text-lg font-semibold">Set B (Comparison)</h3>
-
-                                <div style="margin-bottom: 15px;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 1</label>
-                                <select id="cube-setB-line1-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
-
-                                <div style="margin-bottom: 15px;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 2</label>
-                                <select id="cube-setB-line2-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
-
-                                <div style="margin-bottom: 0;">
-                                <label style="font-weight: 600; margin-bottom: 8px; display: block; color: var(--text-primary); font-size: 0.9em;">Line 3</label>
-                                <select id="cube-setB-line3-stat" class="input-field" style="padding: 10px; font-size: 0.9em; width: 100%;"></select>
-                                </div>
+                            <!-- Rarity Selector -->
+                            <div class="cube-control-group">
+                                <label for="cube-rankings-rarity-selector" class="cube-control-label">Rarity Tier</label>
+                                <select id="cube-rankings-rarity-selector" class="cube-rarity-select">
+                                    <option value="normal">Normal</option>
+                                    <option value="rare">Rare</option>
+                                    <option value="epic" selected>Epic</option>
+                                    <option value="unique">Unique</option>
+                                    <option value="legendary">Legendary</option>
+                                    <option value="mystic">Mystic</option>
+                                </select>
+                                <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: var(--cube-space-sm);">
+                                    View best combinations for this rarity (independent of saved config)
+                                </p>
                             </div>
                         </div>
-
-                        <!-- Comparison Results -->
-                        <div id="cube-comparison-results"></div>
-                    </div>
-
-                    <!-- Rankings Tab Content -->
-                    <div id="cube-rankings-content" style="display: none;">
-                        <!-- Progress Bar -->
-                        <div id="cube-rankings-progress" style="display: none; margin-bottom: 25px;">
-                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
-                            <div id="cube-rankings-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
-                            </div>
-                        <p id="cube-rankings-progress-text" style="text-align: center; color: var(--text-secondary); font-weight: 600;"></p>
-                        </div>
-
-                        <!-- Rankings Results -->
-                        <div id="cube-rankings-results"></div>
-                    </div>
-                </div>
-
-                <!-- Simulation Main Tab Content -->
-                <div id="cube-main-simulation-content" style="display: none;">
-                    <div style="margin-bottom: 20px;">
-                        <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
-                            Cube Potential Optimization Simulator
-                        </h3>
-                        <p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
-                            Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses fictious slots that are all set to normal with 0 tries attempted. This does not account for your current slots or their rarities!.
-                        </p>
-                    </div>
-
-                    <!-- Simulation Controls -->
-                    <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            <div class="input-group">
-                                <label style="font-weight: 600; color: var(--text-primary);">Cube Budget</label>
-                                <input type="number" id="simulation-cube-budget" value="1000" min="100" max="50000" step="100" style="padding: 10px; border-radius: 8px;">
-                            </div>
-                            <div class="input-group">
-                                <label style="font-weight: 600; color: var(--text-primary);">Number of Simulations</label>
-                                <input type="number" id="simulation-count" value="1000" min="100" max="10000" step="100" style="padding: 10px; border-radius: 8px;">
-                            </div>
-                        </div>
-                        <button class="calculate-btn" onclick="runCubeSimulation()" id="cube-simulation-run-btn">Run Simulation</button>
                     </div>
 
                     <!-- Progress Bar -->
-                    <div id="cube-simulation-progress" style="display: none; margin-bottom: 20px;">
-                        <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
-                            <div id="cube-simulation-progress-fill" style="background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    <div id="cube-rankings-progress" class="cube-progress-bar" style="display: none;">
+                        <div class="cube-progress-track">
+                            <div id="cube-rankings-progress-fill" class="cube-progress-fill"></div>
                         </div>
-                        <p id="cube-simulation-progress-text" style="text-align: center; color: var(--text-secondary); font-weight: 600;"></p>
+                        <p id="cube-rankings-progress-text" class="cube-progress-text">Calculating best combinations...</p>
+                    </div>
+
+                    <!-- Rankings Results -->
+                    <div id="cube-rankings-results" class="cube-rankings-results"></div>
+                </div>
+
+                <!-- All Slots Summary Tab Content -->
+                <div id="cube-summary-content" class="cube-tab-content">
+                    <div class="cube-summary-header">
+                        <h3 class="cube-summary-title">All Slots Potential Summary</h3>
+                        <p class="cube-summary-description">Overview of Set A DPS gains for all equipment slots (Regular and Bonus Potential)</p>
+                    </div>
+
+                    <!-- Loading Progress -->
+                    <div id="cube-summary-progress" class="cube-progress-bar" style="display: none;">
+                        <div class="cube-progress-track">
+                            <div id="cube-summary-progress-fill" class="cube-progress-fill"></div>
+                        </div>
+                        <p id="cube-summary-progress-text" class="cube-progress-text">Loading rankings across all slots...</p>
+                    </div>
+
+                    <div id="cube-summary-results" class="cube-summary-results"></div>
+                </div>
+
+                <!-- Simulation Tab Content -->
+                <div id="cube-simulation-content" class="cube-tab-content">
+                    <div class="cube-simulation-header">
+                        <h3 class="cube-simulation-title">Cube Potential Optimization Simulator</h3>
+                        <p class="cube-simulation-description">Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses fictional slots that are all set to normal with 0 tries attempted. This does not account for your current slots or their rarities!</p>
+                    </div>
+
+                    <!-- Simulation Controls -->
+                    <div class="cube-simulation-controls">
+                        <div class="cube-simulation-inputs">
+                            <div class="cube-sim-input-group">
+                                <label for="simulation-cube-budget" class="cube-sim-label">Cube Budget</label>
+                                <input type="number" id="simulation-cube-budget" value="1000" min="100" max="50000" step="100" class="cube-sim-input">
+                            </div>
+                            <div class="cube-sim-input-group">
+                                <label for="simulation-count" class="cube-sim-label">Number of Simulations</label>
+                                <input type="number" id="simulation-count" value="1000" min="100" max="10000" step="100" class="cube-sim-input">
+                            </div>
+                        </div>
+                        <button class="cube-sim-run-btn" onclick="runCubeSimulation()" id="cube-simulation-run-btn">
+                            <span class="cube-sim-btn-icon">▶</span>
+                            <span>Run Simulation</span>
+                        </button>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div id="cube-simulation-progress" class="cube-progress-bar" style="display: none;">
+                        <div class="cube-progress-track">
+                            <div id="cube-simulation-progress-fill" class="cube-progress-fill"></div>
+                        </div>
+                        <p id="cube-simulation-progress-text" class="cube-progress-text">Running simulations...</p>
                     </div>
 
                     <!-- Results -->
-                    <div id="cube-simulation-results"></div>
+                    <div id="cube-simulation-results" class="cube-simulation-results"></div>
                 </div>
             </div>
 
@@ -1171,7 +1222,7 @@
         <div id="stat-damage-predictions-card" class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-3 shadow-lg mb-3">
             <div class="optimization-page-header">
                 <h1 class="optimization-page-title">
-                    <span class="stat-hub-logo-large">Stat<span class="stat-hub-highlight-large">Hub</span></span>
+                    <span class="stat-hub-logo-large">Stat Hub</span>
                 </h1>
             </div>
 

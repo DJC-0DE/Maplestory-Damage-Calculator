@@ -279,50 +279,46 @@ function handleHashChange() {
     restoreTabState(pageName, tabName);
 }
 
-// Reset cube main tabs to default (Selected Slot)
+// Reset cube tabs to default (Comparison) - flattened 4-tab structure
 function resetCubeMainTabs() {
     const mainTabButtons = [
-        document.getElementById('cube-main-tab-selected'),
+        document.getElementById('cube-main-tab-comparison'),
+        document.getElementById('cube-main-tab-rankings'),
         document.getElementById('cube-main-tab-summary'),
         document.getElementById('cube-main-tab-simulation')
     ];
     const mainTabContents = [
-        document.getElementById('cube-main-selected-content'),
-        document.getElementById('cube-main-summary-content'),
-        document.getElementById('cube-main-simulation-content')
+        document.getElementById('cube-comparison-content'),
+        document.getElementById('cube-rankings-content'),
+        document.getElementById('cube-summary-content'),
+        document.getElementById('cube-simulation-content')
     ];
+
+    // Control sections
+    const comparisonControls = document.getElementById('cube-comparison-controls');
+    const rankingsControls = document.getElementById('cube-rankings-controls');
 
     // Reset all to inactive/hidden
     mainTabButtons.forEach(btn => btn?.classList.remove('active'));
     mainTabContents.forEach(content => {
-        if (content) content.style.display = 'none';
+        if (content) content.classList.remove('active');
     });
 
-    // Activate default (Selected Slot)
-    mainTabButtons[0]?.classList.add('active');
-    if (mainTabContents[0]) mainTabContents[0].style.display = 'block';
-}
-
-// Reset cube sub-tabs to default (Comparison)
-function resetCubeSubTabs() {
-    const subTabButtons = [
-        document.getElementById('cube-tab-comparison'),
-        document.getElementById('cube-tab-rankings')
-    ];
-    const subTabContents = [
-        document.getElementById('cube-comparison-content'),
-        document.getElementById('cube-rankings-content')
-    ];
-
-    // Reset all to inactive/hidden
-    subTabButtons.forEach(btn => btn?.classList.remove('active'));
-    subTabContents.forEach(content => {
-        if (content) content.style.display = 'none';
-    });
+    // Hide all control sections
+    if (comparisonControls) comparisonControls.style.display = 'none';
+    if (rankingsControls) rankingsControls.style.display = 'none';
 
     // Activate default (Comparison)
-    subTabButtons[0]?.classList.add('active');
-    if (subTabContents[0]) subTabContents[0].style.display = 'block';
+    mainTabButtons[0]?.classList.add('active');
+    if (mainTabContents[0]) mainTabContents[0].classList.add('active');
+
+    // Show comparison controls
+    if (comparisonControls) comparisonControls.style.display = 'block';
+}
+
+// Legacy function name for compatibility
+function resetCubeSubTabs() {
+    // No-op with flattened structure, handled by resetCubeMainTabs
 }
 
 // Reset sub-tabs to their default state based on the main tab

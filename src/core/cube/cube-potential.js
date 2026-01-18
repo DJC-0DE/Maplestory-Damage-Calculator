@@ -134,6 +134,12 @@ export function selectCubeSlot(slotId) {
         raritySelector.value = cubeSlotData[currentCubeSlot][currentPotentialType].rarity;
     }
 
+    // Sync Rankings rarity dropdown when slot changes
+    const rankingsRaritySelector = document.getElementById('cube-rankings-rarity-selector');
+    if (rankingsRaritySelector) {
+        rankingsRaritySelector.value = cubeSlotData[currentCubeSlot][currentPotentialType].rarity;
+    }
+
     // Update UI for this slot
     updateCubePotentialUI();
 

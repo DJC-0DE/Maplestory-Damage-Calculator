@@ -182,76 +182,214 @@ export function setupRaritySelector() {
     };
 }
 
-// Setup tab switching
+// Setup tab switching - flattened 4-tab structure
 export async function setupCubeTabs() {
-    // Main tabs
-    const mainSummaryTab = document.getElementById('cube-main-tab-summary');
-    const mainSelectedTab = document.getElementById('cube-main-tab-selected');
-    const mainSimulationTab = document.getElementById('cube-main-tab-simulation');
-    const mainSummaryContent = document.getElementById('cube-main-summary-content');
-    const mainSelectedContent = document.getElementById('cube-main-selected-content');
-    const mainSimulationContent = document.getElementById('cube-main-simulation-content');
+    // Main tabs (flattened structure)
+    const comparisonTab = document.getElementById('cube-main-tab-comparison');
+    const rankingsTab = document.getElementById('cube-main-tab-rankings');
+    const summaryTab = document.getElementById('cube-main-tab-summary');
+    const simulationTab = document.getElementById('cube-main-tab-simulation');
 
-    // Sub-tabs within Selected Slot
-    const comparisonTab = document.getElementById('cube-tab-comparison');
-    const rankingsTab = document.getElementById('cube-tab-rankings');
+    // Tab content sections
     const comparisonContent = document.getElementById('cube-comparison-content');
     const rankingsContent = document.getElementById('cube-rankings-content');
+    const summaryContent = document.getElementById('cube-summary-content');
+    const simulationContent = document.getElementById('cube-simulation-content');
 
-    mainSelectedTab.classList.add('active');
+    // Control sections (Comparison has its own controls, Rankings has independent rarity)
+    const comparisonControls = document.getElementById('cube-comparison-controls');
+    const rankingsControls = document.getElementById('cube-rankings-controls');
 
-    // Setup main tab switching
-    if (mainSummaryTab && mainSelectedTab && mainSimulationTab && mainSummaryContent && mainSelectedContent && mainSimulationContent) {      
-        mainSummaryTab.addEventListener('click', async () => {
-            mainSummaryTab.classList.add('active');
-            mainSelectedTab.classList.remove('active');
-            mainSimulationTab.classList.remove('active');
-            mainSummaryContent.style.display = 'block';
-            mainSelectedContent.style.display = 'none';
-            mainSimulationContent.style.display = 'none';
+    // Setup independent rankings rarity selector
+    setupRankingsRaritySelector();
+
+    // Ensure comparison tab is active by default
+    if (comparisonTab) comparisonTab.classList.add('active');
+
+    // Setup tab switching
+    if (comparisonTab && rankingsTab && summaryTab && simulationTab &&
+        comparisonContent && rankingsContent && summaryContent && simulationContent) {
+
+        // Comparison tab click
+        comparisonTab.addEventListener('click', () => {
+            switchCubeTab('comparison', {
+                comparisonTab, rankingsTab, summaryTab, simulationTab
+            }, {
+                comparisonContent, rankingsContent, summaryContent, simulationContent
+            }, comparisonControls, rankingsControls);
+        });
+
+        // Rankings tab click
+        rankingsTab.addEventListener('click', () => {
+            switchCubeTab('rankings', {
+                comparisonTab, rankingsTab, summaryTab, simulationTab
+            }, {
+                comparisonContent, rankingsContent, summaryContent, simulationContent
+            }, comparisonControls, rankingsControls);
+
+            // Sync rankings slot selector with current selected slot from Comparison tab
+            const rankingsSlotSelector = document.getElementById('cube-rankings-slot-selector');
+            if (rankingsSlotSelector) {
+                rankingsSlotSelector.value = currentCubeSlot;
+            }
+
+            // Check if rankings are ready, if not show them (with loading if needed)
+            displayOrCalculateRankings();
+        });
+
+        // Summary tab click
+        summaryTab.addEventListener('click', async () => {
+            switchCubeTab('summary', {
+                comparisonTab, rankingsTab, summaryTab, simulationTab
+            }, {
+                comparisonContent, rankingsContent, summaryContent, simulationContent
+            }, comparisonControls, rankingsControls);
 
             // Display summary and start loading any missing rankings
             displayAllSlotsSummary();
             await loadAllRankingsForSummary();
         });
 
-        mainSelectedTab.addEventListener('click', () => {
-            mainSelectedTab.classList.add('active');
-            mainSummaryTab.classList.remove('active');
-            mainSimulationTab.classList.remove('active');
-            mainSelectedContent.style.display = 'block';
-            mainSummaryContent.style.display = 'none';
-            mainSimulationContent.style.display = 'none';
-        });
-
-        mainSimulationTab.addEventListener('click', () => {
-            mainSimulationTab.classList.add('active');
-            mainSummaryTab.classList.remove('active');
-            mainSelectedTab.classList.remove('active');
-            mainSimulationContent.style.display = 'block';
-            mainSummaryContent.style.display = 'none';
-            mainSelectedContent.style.display = 'none';
+        // Simulation tab click
+        simulationTab.addEventListener('click', () => {
+            switchCubeTab('simulation', {
+                comparisonTab, rankingsTab, summaryTab, simulationTab
+            }, {
+                comparisonContent, rankingsContent, summaryContent, simulationContent
+            }, comparisonControls, rankingsControls);
         });
     }
+}
 
-    // Setup sub-tab switching within Selected Slot
-    if (comparisonTab && rankingsTab && comparisonContent && rankingsContent) {
-        comparisonTab.addEventListener('click', () => {
+// Setup independent selectors for Rankings tab
+function setupRankingsRaritySelector() {
+    const raritySelector = document.getElementById('cube-rankings-rarity-selector');
+    const slotSelector = document.getElementById('cube-rankings-slot-selector');
+
+    if (!raritySelector || !slotSelector) return;
+
+    // Populate slot selector
+    slotNames.forEach(slot => {
+        const option = document.createElement('option');
+        option.value = slot.id;
+        option.textContent = slot.name;
+        slotSelector.appendChild(option);
+    });
+
+    // Set default to current slot (from Comparison tab)
+    slotSelector.value = currentCubeSlot;
+
+    // Slot selector change handler
+    slotSelector.addEventListener('change', () => {
+        currentRankingsPage = 1; // Reset to page 1 when slot changes
+        // Read both values from DOM to ensure we have latest
+        const slotId = slotSelector.value;
+        const rarity = raritySelector.value;
+
+        // Sync back to global state for consistency with Comparison tab
+        if (slotId !== currentCubeSlot) {
+            currentCubeSlot = slotId;
+            updateSlotButtonColors();
+        }
+
+        displayOrCalculateRankingsForSlotAndRarity(slotId, rarity);
+    });
+
+    // Rarity selector change handler
+    raritySelector.addEventListener('change', () => {
+        currentRankingsPage = 1; // Reset to page 1 when rarity changes
+        // Read both values from DOM to ensure we have latest
+        const slotId = slotSelector.value;
+        const rarity = raritySelector.value;
+        displayOrCalculateRankingsForSlotAndRarity(slotId, rarity);
+    });
+}
+
+// Display rankings for a specific slot and rarity (independent of saved slot data)
+export function displayOrCalculateRankingsForSlotAndRarity(slotId, rarity) {
+    // If already calculated, display immediately
+    if (rankingsCache[slotId]?.[rarity]) {
+        displayRankings(rankingsCache[slotId][rarity], rarity);
+        return;
+    }
+
+    // If calculation is in progress, show progress bar and wait
+    const key = `${slotId}-${rarity}`;
+    if (rankingsInProgress[key]) {
+        const progressBar = document.getElementById('cube-rankings-progress');
+        if (progressBar) progressBar.style.display = 'block';
+
+        let pollCount = 0;
+        const maxPolls = 600;
+        const checkInterval = setInterval(() => {
+            pollCount++;
+
+            if (rankingsCache[slotId]?.[rarity]) {
+                clearInterval(checkInterval);
+                displayRankings(rankingsCache[slotId][rarity], rarity);
+            } else if (!rankingsInProgress[key]) {
+                clearInterval(checkInterval);
+                calculateRankingsForRarity(rarity, slotId);
+            } else if (pollCount >= maxPolls) {
+                clearInterval(checkInterval);
+                console.error('Rankings calculation timeout');
+                if (progressBar) progressBar.style.display = 'none';
+            }
+        }, 100);
+    } else {
+        // Not calculated and not in progress, start calculation
+        calculateRankingsForRarity(rarity, slotId);
+    }
+}
+
+// Display rankings for a specific rarity (uses independent selectors)
+export function displayOrCalculateRankingsForRarity(rarity) {
+    const slotSelector = document.getElementById('cube-rankings-slot-selector');
+    const slotId = slotSelector ? slotSelector.value : currentCubeSlot;
+    displayOrCalculateRankingsForSlotAndRarity(slotId, rarity);
+}
+
+// Helper function to switch tabs
+function switchCubeTab(activeTabName, tabs, contents, comparisonControls, rankingsControls) {
+    const { comparisonTab, rankingsTab, summaryTab, simulationTab } = tabs;
+    const { comparisonContent, rankingsContent, summaryContent, simulationContent } = contents;
+
+    // Remove active class from all tabs
+    comparisonTab.classList.remove('active');
+    rankingsTab.classList.remove('active');
+    summaryTab.classList.remove('active');
+    simulationTab.classList.remove('active');
+
+    // Hide all content
+    comparisonContent.classList.remove('active');
+    rankingsContent.classList.remove('active');
+    summaryContent.classList.remove('active');
+    simulationContent.classList.remove('active');
+
+    // Hide all control sections
+    if (comparisonControls) comparisonControls.style.display = 'none';
+    if (rankingsControls) rankingsControls.style.display = 'none';
+
+    // Activate selected tab
+    switch (activeTabName) {
+        case 'comparison':
             comparisonTab.classList.add('active');
-            rankingsTab.classList.remove('active');
-            comparisonContent.style.display = 'block';
-            rankingsContent.style.display = 'none';
-        });
-
-        rankingsTab.addEventListener('click', () => {
+            comparisonContent.classList.add('active');
+            if (comparisonControls) comparisonControls.style.display = 'block';
+            break;
+        case 'rankings':
             rankingsTab.classList.add('active');
-            comparisonTab.classList.remove('active');
-            rankingsContent.style.display = 'block';
-            comparisonContent.style.display = 'none';
-
-            // Check if rankings are ready, if not show them (with loading if needed)
-            displayOrCalculateRankings();
-        });
+            rankingsContent.classList.add('active');
+            if (rankingsControls) rankingsControls.style.display = 'block';
+            break;
+        case 'summary':
+            summaryTab.classList.add('active');
+            summaryContent.classList.add('active');
+            break;
+        case 'simulation':
+            simulationTab.classList.add('active');
+            simulationContent.classList.add('active');
+            break;
     }
 }
 
@@ -730,11 +868,13 @@ export function getRankingComparison(dpsGain, rarity) {
     };
 }
 
-// Display rankings or calculate them if not ready
+// Display rankings or calculate them if not ready (uses independent selectors)
 export function displayOrCalculateRankings() {
-    const cubeSlotData = getCubeSlotData();
-    const slotId = currentCubeSlot;
-    const rarity = cubeSlotData[currentCubeSlot][currentPotentialType].rarity;
+    const raritySelector = document.getElementById('cube-rankings-rarity-selector');
+    const slotSelector = document.getElementById('cube-rankings-slot-selector');
+
+    const rarity = raritySelector ? raritySelector.value : 'epic';
+    const slotId = slotSelector ? slotSelector.value : currentCubeSlot;
     const key = `${slotId}-${rarity}`;
 
     // If already calculated, display immediately
@@ -760,7 +900,7 @@ export function displayOrCalculateRankings() {
             } else if (!rankingsInProgress[key]) {
                 // Calculation failed or was cancelled, try again
                 clearInterval(checkInterval);
-                calculateRankings();
+                calculateRankingsForRarity(rarity, slotId);
             } else if (pollCount >= maxPolls) {
                 // Timeout - something went wrong, stop polling
                 clearInterval(checkInterval);
@@ -770,7 +910,7 @@ export function displayOrCalculateRankings() {
         }, 100);
     } else {
         // Not calculated and not in progress, start calculation
-        displayOrCalculateRankings();
+        calculateRankingsForRarity(rarity, slotId);
     }
 }
 
@@ -867,9 +1007,11 @@ export async function loadAllRankingsForSummary() {
 }
 
 export function changeRankingsPage(newPage) {
-    const cubeSlotData = getCubeSlotData();
-    const slotId = currentCubeSlot;
-    const rarity = cubeSlotData[currentCubeSlot][currentPotentialType].rarity;
+    const raritySelector = document.getElementById('cube-rankings-rarity-selector');
+    const slotSelector = document.getElementById('cube-rankings-slot-selector');
+
+    const rarity = raritySelector ? raritySelector.value : 'epic';
+    const slotId = slotSelector ? slotSelector.value : currentCubeSlot;
     const rankings = rankingsCache[slotId]?.[rarity];
     if (!rankings) return;
 
