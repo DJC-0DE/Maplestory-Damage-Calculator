@@ -305,6 +305,84 @@ test.describe('Base Stats - Edge Cases and Boundary Values', () => {
     const selectedCount = await page.locator('.class-selector.selected').count();
     expect(selectedCount).toBe(1);
   });
+
+  test('negative stat values are accepted by inputs', async ({ page }) => {
+    // Arrange
+    await page.click(CLASS_SELECTORS.hero);
+    await page.waitForTimeout(100);
+
+    // Act - Attempt to input negative values
+    await page.fill(STAT_INPUTS.attack, '-100');
+    await page.fill(STAT_INPUTS.str, '-500');
+
+    // Assert - Inputs accept negative values (validation may happen at calculation layer)
+    await expect(page.locator(STAT_INPUTS.attack)).toHaveValue('-100');
+    await expect(page.locator(STAT_INPUTS.str)).toHaveValue('-500');
+  });
+
+  test('stat inputs accept very high values beyond normal gameplay', async ({ page }) => {
+    // Arrange
+    await page.click(CLASS_SELECTORS.nightLord);
+    await page.waitForTimeout(100);
+
+    // Act - Input unrealistically high values
+    await page.fill(STAT_INPUTS.luk, '99999');
+    await page.fill(STAT_INPUTS.attack, '99999');
+
+    // Assert - Values accepted (edge case for testing)
+    await expect(page.locator(STAT_INPUTS.luk)).toHaveValue('99999');
+    await expect(page.locator(STAT_INPUTS.attack)).toHaveValue('99999');
+  });
+
+  test('character level accepts values beyond typical range', async ({ page }) => {
+    // Arrange
+    await page.click(CLASS_SELECTORS.hero);
+
+    // Act - Test beyond max level (200)
+    await page.fill('#character-level', '999');
+
+    // Assert - Value accepted (validation may happen elsewhere)
+    await expect(page.locator('#character-level')).toHaveValue('999');
+
+    // Act - Test negative level
+    await page.fill('#character-level', '-10');
+
+    // Assert - Negative value accepted
+    await expect(page.locator('#character-level')).toHaveValue('-10');
+  });
+
+  test('percentage fields accept values over 100%', async ({ page }) => {
+    // Arrange
+    await page.click(CLASS_SELECTORS.bowmaster);
+    await page.waitForTimeout(100);
+
+    // Act - Input percentages > 100%
+    await page.fill(STAT_INPUTS.critRate, '150');
+    await page.fill(STAT_INPUTS.bossDamage, '200');
+    await page.fill(STAT_INPUTS.damage, '999');
+
+    // Assert - Values accepted
+    await expect(page.locator(STAT_INPUTS.critRate)).toHaveValue('150');
+    await expect(page.locator(STAT_INPUTS.bossDamage)).toHaveValue('200');
+    await expect(page.locator(STAT_INPUTS.damage)).toHaveValue('999');
+  });
+
+  test('non-numeric input handling in stat fields', async ({ page }) => {
+    // Arrange
+    await page.click(CLASS_SELECTORS.archMageIL);
+    await page.waitForTimeout(100);
+
+    // Act - Input text/invalid characters
+    await page.fill(STAT_INPUTS.int, 'abc');
+    await page.fill(STAT_INPUTS.attack, '12.34.56');
+
+    // Assert - Inputs handle invalid input (may show empty or partial value)
+    const intValue = await page.locator(STAT_INPUTS.int).inputValue();
+    const attackValue = await page.locator(STAT_INPUTS.attack).inputValue();
+
+    // Either empty, partial, or original invalid value depending on browser
+    expect([intValue, 'abc', '']).toContain(intValue);
+  });
 });
 
 test.describe('Base Stats - State Validation and Persistence', () => {

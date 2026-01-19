@@ -116,6 +116,13 @@ export function saveToLocalStorage() {
         });
     });
 
+    // Save active weapon levels sub-tab
+    const activeWeaponLevelsTab = document.querySelector('.weapon-levels-subtab.active');
+    if (activeWeaponLevelsTab) {
+        // Extract tab name from id like "weapon-levels-weapons-grid" -> "weapons-grid"
+        data.activeWeaponLevelsTab = activeWeaponLevelsTab.id.replace('weapon-levels-', '');
+    }
+
     // Save Equipment Slots
     const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
     data.equipmentSlots = {};
@@ -329,6 +336,11 @@ export function loadFromLocalStorage() {
 
         // Update equipped weapon indicator after loading
         updateEquippedWeaponIndicator();
+
+        // Restore active weapon levels sub-tab
+        if (data.activeWeaponLevelsTab && window.switchWeaponLevelsTab) {
+            window.switchWeaponLevelsTab(data.activeWeaponLevelsTab);
+        }
 
         // Load Equipment Slots
         if (data.equipmentSlots) {
