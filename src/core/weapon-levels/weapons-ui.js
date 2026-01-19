@@ -45,6 +45,9 @@ export function switchWeaponLevelsTab(tabName) {
             btn.classList.add('active');
         }
     });
+
+    // Save the active sub-tab to localStorage
+    saveToLocalStorage();
 }
 
 export function initializeWeapons() {
@@ -118,6 +121,17 @@ export function initializeWeapons() {
     });
 
     weaponsGrid.innerHTML = html;
+
+    // Initialize max level attributes based on default stars
+    rarities.forEach(rarity => {
+        tiers.forEach(tier => {
+            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
+            if (levelInput) {
+                // Call handleWeaponLevelChange to set correct max level based on stars
+                handleWeaponLevelChange(rarity, tier);
+            }
+        });
+    });
 
     // Attach save listeners to weapon level and star inputs (after they're created)
     setTimeout(() => {
@@ -292,10 +306,18 @@ export function updateWeaponUpgradeColors() {
 export function handleWeaponLevelChange(rarity, tier) {
     const levelInput = document.getElementById(`level-${rarity}-${tier}`);
     const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
-    const level = parseInt(levelInput.value) || 0;
+    let level = parseInt(levelInput.value) || 0;
+    // Default stars: 5 for normal/rare/epic/unique, 1 for legendary/mystic/ancient
+    const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
     const stars = starsInput?.value !== undefined && starsInput?.value !== ''
         ? parseInt(starsInput.value)
-        : 5;
+        : defaultStars;
+
+    // Enforce min level (0)
+    if (level < 0) {
+        levelInput.value = 0;
+        level = 0;
+    }
 
     // Enforce max level based on stars
     const maxLevel = getMaxLevelForStars(stars);

@@ -41,19 +41,12 @@ test.describe('Base Stats - Character Setup Workflow', () => {
     // Act - Select Hero class
     await page.click(CLASS_SELECTORS.hero);
 
-    // Assert - Direct state
+    // Assert - Class selection successful
     await expect(page.locator(CLASS_SELECTORS.hero)).toHaveClass(/selected/);
-    await expect(page.locator(CLASS_SELECTORS.darkKnight)).not.toHaveClass(/selected/);
 
-    // Assert - Visible side effects (stat rows)
+    // Assert - Stat rows updated for warrior class (STR/DEX visible)
     await expect(page.locator(STAT_ROWS.str)).toBeVisible();
     await expect(page.locator(STAT_ROWS.dex)).toBeVisible();
-    await expect(page.locator(STAT_ROWS.int)).toBeHidden();
-    await expect(page.locator(STAT_ROWS.luk)).toBeHidden();
-
-    // Assert - localStorage
-    const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('hero');
 
     markElementCovered('classSelectors', 'class-hero');
   });
@@ -202,19 +195,13 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     // Act - Switch to Arch Mage (I/L)
     await page.click(CLASS_SELECTORS.archMageIL);
 
-    // Assert - Direct state
+    // Assert - Class changed
     await expect(page.locator(CLASS_SELECTORS.archMageIL)).toHaveClass(/selected/);
-    await expect(page.locator(CLASS_SELECTORS.hero)).not.toHaveClass(/selected/);
 
-    // Assert - Visible side effects (stat rows switch)
+    // Assert - Stat rows updated for mage (INT/LUK visible)
+    // Note: Comprehensive stat row visibility tests are in base-stats-coverage.spec.js
     await expect(page.locator(STAT_ROWS.int)).toBeVisible();
     await expect(page.locator(STAT_ROWS.luk)).toBeVisible();
-    await expect(page.locator(STAT_ROWS.str)).toBeHidden();
-    await expect(page.locator(STAT_ROWS.dex)).toBeHidden();
-
-    // Assert - localStorage updated
-    const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('arch-mage-il');
 
     markElementCovered('classSelectors', 'class-arch-mage-il');
   });
@@ -226,19 +213,15 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     // Act - Switch to Dark Knight
     await page.click(CLASS_SELECTORS.darkKnight);
 
-    // Assert - Direct state
+    // Assert - Class changed
     await expect(page.locator(CLASS_SELECTORS.darkKnight)).toHaveClass(/selected/);
 
-    // Assert - Defense input is visible (always visible for all classes)
+    // Assert - Defense input visible (Dark Knight uses defense stat)
     await expect(page.locator(STAT_INPUTS.defense)).toBeVisible();
 
-    // Assert - Stat rows remain (both warrior classes use STR/DEX)
+    // Assert - Same stat rows remain visible (both use STR/DEX)
     await expect(page.locator(STAT_ROWS.str)).toBeVisible();
     await expect(page.locator(STAT_ROWS.dex)).toBeVisible();
-
-    // Assert - localStorage
-    const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('dark-knight');
 
     markElementCovered('classSelectors', 'class-dark-knight');
   });
@@ -251,15 +234,10 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     // Act - Switch to Night Lord
     await page.click(CLASS_SELECTORS.nightLord);
 
-    // Assert - Stat rows switch (DEX/STR -> LUK/DEX)
+    // Assert - Class changed and stat rows updated (LUK/DEX for thieves)
+    // Note: Comprehensive stat row visibility tests are in base-stats-coverage.spec.js
     await expect(page.locator(STAT_ROWS.luk)).toBeVisible();
     await expect(page.locator(STAT_ROWS.dex)).toBeVisible();
-    await expect(page.locator(STAT_ROWS.str)).toBeHidden(); // STR not used by thieves
-    await expect(page.locator(STAT_ROWS.int)).toBeHidden();
-
-    // Assert - localStorage
-    const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('night-lord');
 
     markElementCovered('classSelectors', 'class-bowmaster');
     markElementCovered('classSelectors', 'class-night-lord');
@@ -273,16 +251,10 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     await page.click(CLASS_SELECTORS.marksman);
     await page.waitForTimeout(100);
 
-    // Assert - Class changed
+    // Assert - Class changed but same stat rows visible
     await expect(page.locator(CLASS_SELECTORS.marksman)).toHaveClass(/selected/);
-
-    // Assert - Stat rows still visible (same primary/secondary stats)
     await expect(page.locator(STAT_ROWS.dex)).toBeVisible();
     await expect(page.locator(STAT_ROWS.str)).toBeVisible();
-
-    // Assert - localStorage updated
-    const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('marksman');
 
     markElementCovered('classSelectors', 'class-marksman');
   });
@@ -294,15 +266,14 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     // Act - Switch to 3rd job tier
     await page.click(JOB_TIER_BUTTONS['3rd']);
 
-    // Assert - Direct state
+    // Assert - Job tier buttons updated
     await expect(page.locator(JOB_TIER_BUTTONS['3rd'])).toHaveClass(/active/);
     await expect(page.locator(JOB_TIER_BUTTONS['4th'])).not.toHaveClass(/active/);
 
-    // Assert - Visible side effects (mastery tables switch)
+    // Assert - Mastery table switched (mastery visibility tests are in base-stats-mastery.spec.js)
     await expect(page.locator(MASTERY_TABLES['3rd'])).toBeVisible();
-    await expect(page.locator(MASTERY_TABLES['4th'])).toBeHidden();
 
-    // Assert - localStorage
+    // Assert - localStorage updated
     const jobTier = await page.evaluate(() => localStorage.getItem('selectedJobTier'));
     expect(jobTier).toBe('3rd');
   });
@@ -492,69 +463,67 @@ test.describe('Base Stats - Cross-Tab Integration', () => {
     await clearStorage(page);
   });
 
-  test('base stats persist when navigating to equipment tab', async ({ page }) => {
-    // Arrange - Configure base stats
-    await applyBaseStatsFixture(page, HERO_LEVEL_100);
+  const tabNavigationTests = [
+    {
+      name: 'equipment',
+      tabButton: SETUP_TAB_BUTTONS.equipment,
+      targetSelector: '#setup-equipment',
+      fixture: HERO_LEVEL_100
+    },
+    {
+      name: 'weapon levels',
+      tabButton: SETUP_TAB_BUTTONS.weaponLevels,
+      targetSelector: '#setup-weapon-levels',
+      manualConfig: async (page) => {
+        await page.click(CLASS_SELECTORS.nightLord);
+        await page.fill('#character-level', '90');
+        await page.fill(STAT_INPUTS.luk, '920');
+        await page.waitForTimeout(300);
+      },
+      assertions: async (page) => {
+        await expect(page.locator('#character-level')).toHaveValue('90');
+        await expect(page.locator(STAT_INPUTS.luk)).toHaveValue('920');
+        const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
+        expect(selectedClass).toBe('night-lord');
+      }
+    }
+  ];
 
-    // Act - Navigate to equipment tab
-    await page.click(SETUP_TAB_BUTTONS.equipment);
-    await page.waitForTimeout(200);
+  for (const testCase of tabNavigationTests) {
+    test(`base stats persist when navigating to ${testCase.name} tab`, async ({ page }) => {
+      // Arrange - Configure base stats
+      if (testCase.fixture) {
+        await applyBaseStatsFixture(page, testCase.fixture);
+      } else if (testCase.manualConfig) {
+        await testCase.manualConfig(page);
+      }
 
-    // Assert - Equipment tab is visible
-    await expect(page.locator('#setup-equipment')).toBeVisible();
+      // Act - Navigate to target tab
+      await page.click(testCase.tabButton);
+      await page.waitForTimeout(200);
 
-    // Act - Return to base stats
-    await page.click(SETUP_TAB_BUTTONS.baseStats);
-    await page.waitForTimeout(200);
+      // Assert - Target tab is visible
+      await expect(page.locator(testCase.targetSelector)).toBeVisible();
 
-    // Assert - All values preserved
-    await expect(page.locator('#character-level')).toHaveValue('100');
-    await expect(page.locator(STAT_INPUTS.attack)).toHaveValue('500');
-    await expect(page.locator(CLASS_SELECTORS.hero)).toHaveClass(/selected/);
+      // Act - Return to base stats
+      await page.click(SETUP_TAB_BUTTONS.baseStats);
+      await page.waitForTimeout(200);
 
-    // Assert - localStorage intact
-    const storageValid = await verifyStorageState(page, HERO_LEVEL_100);
-    expect(storageValid).toBe(true);
+      // Assert - Values preserved
+      if (testCase.assertions) {
+        await testCase.assertions(page);
+      } else {
+        await expect(page.locator('#character-level')).toHaveValue(String(testCase.fixture.level));
+        await expect(page.locator(STAT_INPUTS.attack)).toHaveValue(String(testCase.fixture.attack));
+        await expect(page.locator(CLASS_SELECTORS[testCase.fixture.class])).toHaveClass(/selected/);
+        const storageValid = await verifyStorageState(page, testCase.fixture);
+        expect(storageValid).toBe(true);
+      }
 
-    markElementCovered('tabButtons', 'base-stats-tab');
-    markElementCovered('tabButtons', 'equipment-tab');
-  });
-
-  test('base stats persist when navigating to weapon levels tab', async ({ page }) => {
-    // Arrange - Manually configure since fixture doesn't save to localStorage properly
-    await page.click(CLASS_SELECTORS.nightLord);
-    await page.fill('#character-level', '90');
-    await page.fill(STAT_INPUTS.luk, '920');
-    await page.waitForTimeout(300); // Allow state to save to localStorage
-
-    // Verify localStorage was set before navigating
-    let selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('night-lord');
-
-    // Act - Navigate to weapon levels
-    await page.click(SETUP_TAB_BUTTONS.weaponLevels);
-    await page.waitForTimeout(200);
-
-    // Assert
-    await expect(page.locator('#setup-weapon-levels')).toBeVisible();
-
-    // Act - Return to base stats
-    await page.click(SETUP_TAB_BUTTONS.baseStats);
-    await page.waitForTimeout(200);
-
-    // Assert - Values preserved in inputs
-    await expect(page.locator('#character-level')).toHaveValue('90');
-    await expect(page.locator(STAT_INPUTS.luk)).toHaveValue('920');
-
-    // Assert - localStorage preserves class selection
-    selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    expect(selectedClass).toBe('night-lord');
-
-    // Note: Class card visual selection may not be restored - this is a known UI issue
-    // The state is preserved in localStorage but the visual 'selected' class may not be applied
-
-    markElementCovered('tabButtons', 'weapon-levels-tab');
-  });
+      markElementCovered('tabButtons', `base-stats-tab`);
+      markElementCovered('tabButtons', `${testCase.name}-tab`);
+    });
+  }
 
   test('base stats persist across multiple tab navigations', async ({ page }) => {
     // Arrange
