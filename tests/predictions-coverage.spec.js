@@ -2,71 +2,82 @@
 // Validates all UI elements are present and functional
 // Run with: npm test -- predictions-coverage.spec.js
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 import {
   PREDICTIONS_TAB_BUTTONS,
   PREDICTIONS_TAB_CONTENT,
   STAT_TABLES_SELECTORS,
   EQUIVALENCY_INPUTS,
   EQUIVALENCY_RESULTS,
-  GRAPH_SELECTORS
-} from './helpers/predictions-selectors.js';
+  GRAPH_SELECTORS,
+} from "./helpers/predictions-selectors.js";
 import {
   navigateToStatPredictions,
   navigateToStatEquivalency,
   navigateToBaseStats,
   clearStorage,
-  applyBaseStatsFixture
-} from './helpers/fixture-helpers.js';
+  applyBaseStatsFixture,
+} from "./helpers/fixture-helpers.js";
 import {
   PREDICTIONS_ELEMENTS,
   markPredictionsElementCovered,
   generatePredictionsCoverageReport,
   logPredictionsCoverageReport,
-  isPredictionsElementCovered
-} from './helpers/predictions-coverage.js';
+  isPredictionsElementCovered,
+} from "./helpers/predictions-coverage.js";
 import {
   HERO_LEVEL_60,
   HERO_LEVEL_100,
   HERO_WELL_GEARED_4TH,
   HERO_CAP_CRIT_RATE,
   HERO_CAP_ATTACK_SPEED,
-  HERO_MINIMAL_STATS
-} from './fixtures/predictions-fixtures.js';
+  HERO_MINIMAL_STATS,
+} from "./fixtures/predictions-fixtures.js";
 
-test.describe('Stat Predictions - Element Inventory', () => {
+test.describe("Stat Predictions - Element Inventory", () => {
   test.beforeEach(async ({ page }) => {
     await navigateToBaseStats(page);
     await clearStorage(page);
     await applyBaseStatsFixture(page, HERO_LEVEL_60);
   });
 
-  test('all predictions tab buttons are present', async ({ page }) => {
+  test("all predictions tab buttons are present", async ({ page }) => {
     await navigateToStatPredictions(page);
 
     // Assert - Stat tables tab button exists
-    await expect(page.locator(PREDICTIONS_TAB_BUTTONS.statTables)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_BUTTONS.statTables),
+    ).toBeVisible();
 
     // Assert - Equivalency tab button exists
-    await expect(page.locator(PREDICTIONS_TAB_BUTTONS.equivalency)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_BUTTONS.equivalency),
+    ).toBeVisible();
 
-    markPredictionsElementCovered('predictionsTabButtons', 'stat-tables-tab');
-    markPredictionsElementCovered('predictionsTabButtons', 'equivalency-tab');
+    markPredictionsElementCovered("predictionsTabButtons", "stat-tables-tab");
+    markPredictionsElementCovered("predictionsTabButtons", "equivalency-tab");
   });
 
-  test('all predictions tab content containers exist', async ({ page }) => {
+  test("all predictions tab content containers exist", async ({ page }) => {
     await navigateToStatPredictions(page);
 
     // Assert - Stat tables content container
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.statTables)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.statTables),
+    ).toBeVisible();
 
     // Assert - Equivalency content container (may be hidden initially)
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.equivalency)).toBeAttached();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.equivalency),
+    ).toBeAttached();
 
-    markPredictionsElementCovered('statTablesElements', 'stat-weights-base-container');
+    markPredictionsElementCovered(
+      "statTablesElements",
+      "stat-weights-base-container",
+    );
   });
 
-  test('all equivalency input fields are present', async ({ page }) => {
+  test("all equivalency input fields are present", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Verify all 16+ equivalency inputs
@@ -78,26 +89,30 @@ test.describe('Stat Predictions - Element Inventory', () => {
 
     // Mark all inputs as covered
     for (const inputId of PREDICTIONS_ELEMENTS.equivalencyInputs) {
-      markPredictionsElementCovered('equivalencyInputs', inputId);
+      markPredictionsElementCovered("equivalencyInputs", inputId);
     }
   });
 
-  test('equivalency container is present', async ({ page }) => {
+  test("equivalency container is present", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Assert - Equivalency container exists
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.equivalency)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.equivalency),
+    ).toBeVisible();
   });
 
-  test('predictions container is present', async ({ page }) => {
+  test("predictions container is present", async ({ page }) => {
     await navigateToStatPredictions(page);
     await page.waitForTimeout(300); // Allow predictions to load
 
     // Assert - Predictions container exists
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.statTables)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.statTables),
+    ).toBeVisible();
   });
 
-  test('stat tables results container is present', async ({ page }) => {
+  test("stat tables results container is present", async ({ page }) => {
     await navigateToStatPredictions(page);
     await page.waitForTimeout(300);
 
@@ -110,29 +125,31 @@ test.describe('Stat Predictions - Element Inventory', () => {
   });
 });
 
-test.describe('Stat Predictions - Edge Cases Coverage', () => {
+test.describe("Stat Predictions - Edge Cases Coverage", () => {
   test.beforeEach(async ({ page }) => {
     await navigateToBaseStats(page);
     await clearStorage(page);
   });
 
-  test('handles character with no base stats configured', async ({ page }) => {
+  test("handles character with no base stats configured", async ({ page }) => {
     // Arrange - Don't configure any stats
     await navigateToStatPredictions(page);
 
     // Assert - Should not crash
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.statTables)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.statTables),
+    ).toBeVisible();
 
     // Assert - Should show graceful handling (empty state or message)
     const hasNoErrors = await page.evaluate(() => {
       // Check for no console errors or broken UI
-      const container = document.querySelector('#stat-weights-base');
+      const container = document.querySelector("#stat-weights-base");
       return container !== null;
     });
     expect(hasNoErrors).toBe(true);
   });
 
-  test('handles character with all stats at zero', async ({ page }) => {
+  test("handles character with all stats at zero", async ({ page }) => {
     // Arrange - Configure minimal stats character
     await applyBaseStatsFixture(page, HERO_MINIMAL_STATS);
     await navigateToStatPredictions(page);
@@ -142,7 +159,7 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles character at multiple hard caps', async ({ page }) => {
+  test("handles character at multiple hard caps", async ({ page }) => {
     // Arrange - Configure character at crit rate cap
     await applyBaseStatsFixture(page, HERO_CAP_CRIT_RATE);
     await navigateToStatPredictions(page);
@@ -161,14 +178,14 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles extreme stat values', async ({ page }) => {
+  test("handles extreme stat values", async ({ page }) => {
     // Arrange - Configure with extreme values
-    await page.click('#class-hero');
-    await page.fill('#character-level', '200');
-    await page.fill('#attack-base', '99999');
-    await page.fill('#str-base', '99999');
-    await page.fill('#damage-base', '999');
-    await page.fill('#boss-damage-base', '300');
+    await page.click("#class-hero");
+    await page.fill("#character-level", "200");
+    await page.fill("#attack-base", "99999");
+    await page.fill("#str-base", "99999");
+    await page.fill("#damage-base", "999");
+    await page.fill("#boss-damage-base", "300");
     await page.waitForTimeout(100);
 
     // Act - Navigate to predictions
@@ -179,10 +196,10 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles negative stat values gracefully', async ({ page }) => {
+  test("handles negative stat values gracefully", async ({ page }) => {
     // Arrange - Try to enter negative values
-    await page.click('#class-hero');
-    await page.fill('#attack-base', '-100');
+    await page.click("#class-hero");
+    await page.fill("#attack-base", "-100");
     await page.waitForTimeout(100);
 
     // Act - Navigate to predictions
@@ -193,12 +210,12 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles decimal precision in predictions', async ({ page }) => {
+  test("handles decimal precision in predictions", async ({ page }) => {
     // Arrange - Configure with decimal values
-    await page.click('#class-hero');
-    await page.fill('#attack-base', '123.45');
-    await page.fill('#damage-amp-base', '1.234');
-    await page.fill('#def-pen-base', '12.34');
+    await page.click("#class-hero");
+    await page.fill("#attack-base", "123.45");
+    await page.fill("#damage-amp-base", "1.234");
+    await page.fill("#def-pen-base", "12.34");
     await page.waitForTimeout(100);
 
     // Act
@@ -209,19 +226,19 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles rapid stat changes without breaking', async ({ page }) => {
+  test("handles rapid stat changes without breaking", async ({ page }) => {
     // Arrange
     await applyBaseStatsFixture(page, HERO_LEVEL_100);
 
     // Act - Rapidly change stats
     await navigateToBaseStats(page);
-    await page.fill('#attack-base', '100');
+    await page.fill("#attack-base", "100");
     await page.waitForTimeout(50);
 
-    await page.fill('#attack-base', '200');
+    await page.fill("#attack-base", "200");
     await page.waitForTimeout(50);
 
-    await page.fill('#attack-base', '300');
+    await page.fill("#attack-base", "300");
     await page.waitForTimeout(50);
 
     await navigateToStatPredictions(page);
@@ -231,7 +248,7 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles switching between tabs rapidly', async ({ page }) => {
+  test("handles switching between tabs rapidly", async ({ page }) => {
     // Arrange
     await applyBaseStatsFixture(page, HERO_WELL_GEARED_4TH);
     await navigateToStatPredictions(page);
@@ -250,11 +267,13 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await page.waitForTimeout(300);
 
     // Assert - Both tabs should work correctly
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.statTables)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.statTables),
+    ).toBeVisible();
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles page refresh with predictions active', async ({ page }) => {
+  test("handles page refresh with predictions active", async ({ page }) => {
     // Arrange
     await applyBaseStatsFixture(page, HERO_LEVEL_100);
     await navigateToStatPredictions(page);
@@ -268,7 +287,7 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
     await expect(page.locator(STAT_TABLES_SELECTORS.container)).toBeVisible();
   });
 
-  test('handles navigation away and back to predictions', async ({ page }) => {
+  test("handles navigation away and back to predictions", async ({ page }) => {
     // Arrange
     await applyBaseStatsFixture(page, HERO_WELL_GEARED_4TH);
     await navigateToStatPredictions(page);
@@ -291,18 +310,20 @@ test.describe('Stat Predictions - Edge Cases Coverage', () => {
   });
 });
 
-test.describe('Stat Predictions - Equivalency Edge Cases', () => {
+test.describe("Stat Predictions - Equivalency Edge Cases", () => {
   test.beforeEach(async ({ page }) => {
     await navigateToBaseStats(page);
     await clearStorage(page);
     await applyBaseStatsFixture(page, HERO_LEVEL_60);
   });
 
-  test('handles equivalency with no base stats configured', async ({ page }) => {
+  test("handles equivalency with no base stats configured", async ({
+    page,
+  }) => {
     // Arrange - Clear base stats
     await navigateToBaseStats(page);
-    await page.fill('#attack-base', '');
-    await page.fill('#str-base', '');
+    await page.fill("#attack-base", "");
+    await page.fill("#str-base", "");
     await page.waitForTimeout(100);
 
     // Act - Navigate to equivalency
@@ -312,24 +333,24 @@ test.describe('Stat Predictions - Equivalency Edge Cases', () => {
     await expect(page.locator(EQUIVALENCY_INPUTS.attack)).toBeVisible();
 
     // Try entering values
-    await page.fill(EQUIVALENCY_INPUTS.attack, '100');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "100");
     await page.waitForTimeout(200);
 
     // Should not crash
     const hasNoErrors = await page.evaluate(() => {
-      return document.querySelector('#equiv-attack') !== null;
+      return document.querySelector("#equiv-attack") !== null;
     });
     expect(hasNoErrors).toBe(true);
   });
 
-  test('handles equivalency with capped stats', async ({ page }) => {
+  test("handles equivalency with capped stats", async ({ page }) => {
     // Arrange - Character at hard cap
     await navigateToBaseStats(page);
     await applyBaseStatsFixture(page, HERO_CAP_CRIT_RATE);
     await navigateToStatEquivalency(page);
 
     // Act - Enter capped stat value
-    await page.fill(EQUIVALENCY_INPUTS.critRate, '10');
+    await page.fill(EQUIVALENCY_INPUTS.critRate, "10");
     await page.waitForTimeout(200);
 
     // Assert - Should calculate appropriate equivalent (may be zero/minimal)
@@ -350,24 +371,26 @@ test.describe('Stat Predictions - Equivalency Edge Cases', () => {
     expect(hasValidResults).toBe(true);
   });
 
-  test('handles equivalency with extreme input values', async ({ page }) => {
+  test("handles equivalency with extreme input values", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Act - Enter extreme values
-    await page.fill(EQUIVALENCY_INPUTS.attack, '99999');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "99999");
     await page.waitForTimeout(200);
 
     // Assert - Should handle gracefully (container visible)
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.equivalency)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.equivalency),
+    ).toBeVisible();
   });
 
-  test('handles equivalency with zero values', async ({ page }) => {
+  test("handles equivalency with zero values", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Act - Enter zero values
-    await page.fill(EQUIVALENCY_INPUTS.attack, '0');
-    await page.fill(EQUIVALENCY_INPUTS.mainStat, '0');
-    await page.fill(EQUIVALENCY_INPUTS.damage, '0');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "0");
+    await page.fill(EQUIVALENCY_INPUTS.mainStat, "0");
+    await page.fill(EQUIVALENCY_INPUTS.damage, "0");
     await page.waitForTimeout(200);
 
     // Assert - Should handle gracefully
@@ -388,32 +411,34 @@ test.describe('Stat Predictions - Equivalency Edge Cases', () => {
     expect(hasValidResults).toBe(true);
   });
 
-  test('handles rapid equivalency input changes', async ({ page }) => {
+  test("handles rapid equivalency input changes", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Act - Rapidly change inputs
-    await page.fill(EQUIVALENCY_INPUTS.attack, '100');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "100");
     await page.waitForTimeout(50);
 
-    await page.fill(EQUIVALENCY_INPUTS.attack, '200');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "200");
     await page.waitForTimeout(50);
 
-    await page.fill(EQUIVALENCY_INPUTS.mainStat, '150');
+    await page.fill(EQUIVALENCY_INPUTS.mainStat, "150");
     await page.waitForTimeout(50);
 
-    await page.fill(EQUIVALENCY_INPUTS.damage, '25');
+    await page.fill(EQUIVALENCY_INPUTS.damage, "25");
     await page.waitForTimeout(200);
 
     // Assert - Final state valid (container visible)
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.equivalency)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.equivalency),
+    ).toBeVisible();
   });
 
-  test('handles equivalency page refresh', async ({ page }) => {
+  test("handles equivalency page refresh", async ({ page }) => {
     await navigateToStatEquivalency(page);
 
     // Arrange - Set values
-    await page.fill(EQUIVALENCY_INPUTS.attack, '150');
-    await page.fill(EQUIVALENCY_INPUTS.damage, '30');
+    await page.fill(EQUIVALENCY_INPUTS.attack, "150");
+    await page.fill(EQUIVALENCY_INPUTS.damage, "30");
     await page.waitForTimeout(200);
 
     // Act - Refresh page
@@ -421,7 +446,9 @@ test.describe('Stat Predictions - Equivalency Edge Cases', () => {
     await page.waitForTimeout(300);
 
     // Assert - Container still visible after refresh
-    await expect(page.locator(PREDICTIONS_TAB_CONTENT.equivalency)).toBeVisible();
+    await expect(
+      page.locator(PREDICTIONS_TAB_CONTENT.equivalency),
+    ).toBeVisible();
   });
 
   test.afterAll(async () => {
@@ -429,52 +456,58 @@ test.describe('Stat Predictions - Equivalency Edge Cases', () => {
   });
 });
 
-test.describe('Stat Predictions - Coverage Report Verification', () => {
+test.describe("Stat Predictions - Coverage Report Verification", () => {
   test.beforeEach(async ({ page }) => {
     await navigateToBaseStats(page);
     await clearStorage(page);
   });
 
-  test('generates accurate coverage report', async ({ page }) => {
+  test("generates accurate coverage report", async ({ page }) => {
     // Arrange - Mark some elements as covered
-    markPredictionsElementCovered('predictionsTabButtons', 'stat-tables-tab');
-    markPredictionsElementCovered('predictionsTabButtons', 'equivalency-tab');
-    markPredictionsElementCovered('equivalencyInputs', 'equiv-attack');
-    markPredictionsElementCovered('equivalencyInputs', 'equiv-main-stat');
+    markPredictionsElementCovered("predictionsTabButtons", "stat-tables-tab");
+    markPredictionsElementCovered("predictionsTabButtons", "equivalency-tab");
+    markPredictionsElementCovered("equivalencyInputs", "equiv-attack");
+    markPredictionsElementCovered("equivalencyInputs", "equiv-main-stat");
 
     // Act - Generate report
     const report = generatePredictionsCoverageReport();
 
     // Assert - Report structure
-    expect(report).toHaveProperty('totalElements');
-    expect(report).toHaveProperty('testedElements');
-    expect(report).toHaveProperty('overallPercentage');
-    expect(report).toHaveProperty('categories');
+    expect(report).toHaveProperty("totalElements");
+    expect(report).toHaveProperty("testedElements");
+    expect(report).toHaveProperty("overallPercentage");
+    expect(report).toHaveProperty("categories");
 
     // Assert - Categories exist
-    expect(report.categories).toHaveProperty('predictionsTabButtons');
-    expect(report.categories).toHaveProperty('equivalencyInputs');
+    expect(report.categories).toHaveProperty("predictionsTabButtons");
+    expect(report.categories).toHaveProperty("equivalencyInputs");
 
     // Assert - Percentages calculated
     expect(report.overallPercentage).toBeGreaterThanOrEqual(0);
     expect(report.overallPercentage).toBeLessThanOrEqual(100);
   });
 
-  test('coverage report tracks tested elements correctly', async ({ page }) => {
+  test("coverage report tracks tested elements correctly", async ({ page }) => {
     // This test verifies the coverage tracking system itself
     // Note: Coverage state may be polluted from previous tests in the same run
 
     // Act - Check that coverage system works
-    const isCovered = isPredictionsElementCovered('predictionsTabButtons', 'stat-tables-tab');
+    const isCovered = isPredictionsElementCovered(
+      "predictionsTabButtons",
+      "stat-tables-tab",
+    );
 
     // Assert - Coverage tracking functions (value depends on previous test execution)
-    expect(typeof isCovered).toBe('boolean');
+    expect(typeof isCovered).toBe("boolean");
   });
 
-  test('logPredictionsCoverageReport outputs to console', async ({ page }) => {
+  test("logPredictionsCoverageReport outputs to console", async ({ page }) => {
     // Arrange - Mark some elements
-    markPredictionsElementCovered('predictionsTabButtons', 'stat-tables-tab');
-    markPredictionsElementCovered('statTablesElements', 'stat-weights-base-container');
+    markPredictionsElementCovered("predictionsTabButtons", "stat-tables-tab");
+    markPredictionsElementCovered(
+      "statTablesElements",
+      "stat-weights-base-container",
+    );
 
     // Act - Log report (should not throw)
     expect(() => {

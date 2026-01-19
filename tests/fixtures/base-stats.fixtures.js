@@ -15,8 +15,8 @@
 // ============================================================================
 
 export const HERO_LEVEL_60 = {
-  class: 'hero',
-  jobTier: '3rd',
+  class: "hero",
+  jobTier: "3rd",
   level: 60,
   attack: 150,
   defense: 0,
@@ -37,14 +37,14 @@ export const HERO_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true, '3rd-all-68': false },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true, "3rd-all-68": false },
+  targetContent: "none",
 };
 
 export const HERO_LEVEL_80 = {
-  class: 'hero',
-  jobTier: '3rd',
+  class: "hero",
+  jobTier: "3rd",
   level: 80,
   attack: 250,
   defense: 100,
@@ -65,20 +65,20 @@ export const HERO_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': false,
-    '3rd-all-76': true,
-    '3rd-all-80': false
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": false,
+    "3rd-all-76": true,
+    "3rd-all-80": false,
   },
-  targetContent: 'none'
+  targetContent: "none",
 };
 
 export const HERO_LEVEL_90 = {
-  class: 'hero',
-  jobTier: '3rd',
+  class: "hero",
+  jobTier: "3rd",
   level: 90,
   attack: 350,
   defense: 200,
@@ -99,22 +99,22 @@ export const HERO_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-boss-84': false,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-boss-84": false,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const HERO_LEVEL_100 = {
-  class: 'hero',
-  jobTier: '4th',
+  class: "hero",
+  jobTier: "4th",
   level: 100,
   attack: 500,
   defense: 300,
@@ -135,19 +135,19 @@ export const HERO_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': false,
-    '4th-all-116': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": false,
+    "4th-all-116": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const HERO_LEVEL_120 = {
-  class: 'hero',
-  jobTier: '4th',
+  class: "hero",
+  jobTier: "4th",
   level: 120,
   attack: 800,
   defense: 500,
@@ -168,18 +168,18 @@ export const HERO_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': false,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": false,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -187,8 +187,8 @@ export const HERO_LEVEL_120 = {
 // ============================================================================
 
 export const DARK_KNIGHT_LEVEL_60 = {
-  class: 'dark-knight',
-  jobTier: '3rd',
+  class: "dark-knight",
+  jobTier: "3rd",
   level: 60,
   attack: 140,
   defense: 50,
@@ -209,14 +209,14 @@ export const DARK_KNIGHT_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const DARK_KNIGHT_LEVEL_80 = {
-  class: 'dark-knight',
-  jobTier: '3rd',
+  class: "dark-knight",
+  jobTier: "3rd",
   level: 80,
   attack: 240,
   defense: 150,
@@ -237,18 +237,18 @@ export const DARK_KNIGHT_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'none'
+  targetContent: "none",
 };
 
 export const DARK_KNIGHT_LEVEL_90 = {
-  class: 'dark-knight',
-  jobTier: '3rd',
+  class: "dark-knight",
+  jobTier: "3rd",
   level: 90,
   attack: 340,
   defense: 250,
@@ -269,21 +269,21 @@ export const DARK_KNIGHT_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const DARK_KNIGHT_LEVEL_100 = {
-  class: 'dark-knight',
-  jobTier: '4th',
+  class: "dark-knight",
+  jobTier: "4th",
   level: 100,
   attack: 480,
   defense: 350,
@@ -304,19 +304,19 @@ export const DARK_KNIGHT_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const DARK_KNIGHT_LEVEL_120 = {
-  class: 'dark-knight',
-  jobTier: '4th',
+  class: "dark-knight",
+  jobTier: "4th",
   level: 120,
   attack: 780,
   defense: 550,
@@ -337,18 +337,18 @@ export const DARK_KNIGHT_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -356,8 +356,8 @@ export const DARK_KNIGHT_LEVEL_120 = {
 // ============================================================================
 
 export const BOWMASTER_LEVEL_60 = {
-  class: 'bowmaster',
-  jobTier: '3rd',
+  class: "bowmaster",
+  jobTier: "3rd",
   level: 60,
   attack: 160,
   defense: 0,
@@ -378,14 +378,14 @@ export const BOWMASTER_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const BOWMASTER_LEVEL_80 = {
-  class: 'bowmaster',
-  jobTier: '3rd',
+  class: "bowmaster",
+  jobTier: "3rd",
   level: 80,
   attack: 260,
   defense: 80,
@@ -406,18 +406,18 @@ export const BOWMASTER_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const BOWMASTER_LEVEL_90 = {
-  class: 'bowmaster',
-  jobTier: '3rd',
+  class: "bowmaster",
+  jobTier: "3rd",
   level: 90,
   attack: 370,
   defense: 180,
@@ -438,21 +438,21 @@ export const BOWMASTER_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const BOWMASTER_LEVEL_100 = {
-  class: 'bowmaster',
-  jobTier: '4th',
+  class: "bowmaster",
+  jobTier: "4th",
   level: 100,
   attack: 520,
   defense: 280,
@@ -473,19 +473,19 @@ export const BOWMASTER_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const BOWMASTER_LEVEL_120 = {
-  class: 'bowmaster',
-  jobTier: '4th',
+  class: "bowmaster",
+  jobTier: "4th",
   level: 120,
   attack: 850,
   defense: 480,
@@ -506,18 +506,18 @@ export const BOWMASTER_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -525,8 +525,8 @@ export const BOWMASTER_LEVEL_120 = {
 // ============================================================================
 
 export const MARKSMAN_LEVEL_60 = {
-  class: 'marksman',
-  jobTier: '3rd',
+  class: "marksman",
+  jobTier: "3rd",
   level: 60,
   attack: 155,
   defense: 0,
@@ -547,14 +547,14 @@ export const MARKSMAN_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const MARKSMAN_LEVEL_80 = {
-  class: 'marksman',
-  jobTier: '3rd',
+  class: "marksman",
+  jobTier: "3rd",
   level: 80,
   attack: 255,
   defense: 70,
@@ -575,18 +575,18 @@ export const MARKSMAN_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const MARKSMAN_LEVEL_90 = {
-  class: 'marksman',
-  jobTier: '3rd',
+  class: "marksman",
+  jobTier: "3rd",
   level: 90,
   attack: 360,
   defense: 170,
@@ -607,21 +607,21 @@ export const MARKSMAN_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const MARKSMAN_LEVEL_100 = {
-  class: 'marksman',
-  jobTier: '4th',
+  class: "marksman",
+  jobTier: "4th",
   level: 100,
   attack: 510,
   defense: 270,
@@ -642,19 +642,19 @@ export const MARKSMAN_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const MARKSMAN_LEVEL_120 = {
-  class: 'marksman',
-  jobTier: '4th',
+  class: "marksman",
+  jobTier: "4th",
   level: 120,
   attack: 830,
   defense: 470,
@@ -675,18 +675,18 @@ export const MARKSMAN_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -694,8 +694,8 @@ export const MARKSMAN_LEVEL_120 = {
 // ============================================================================
 
 export const NIGHT_LORD_LEVEL_60 = {
-  class: 'night-lord',
-  jobTier: '3rd',
+  class: "night-lord",
+  jobTier: "3rd",
   level: 60,
   attack: 145,
   defense: 0,
@@ -716,14 +716,14 @@ export const NIGHT_LORD_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const NIGHT_LORD_LEVEL_80 = {
-  class: 'night-lord',
-  jobTier: '3rd',
+  class: "night-lord",
+  jobTier: "3rd",
   level: 80,
   attack: 245,
   defense: 60,
@@ -744,18 +744,18 @@ export const NIGHT_LORD_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const NIGHT_LORD_LEVEL_90 = {
-  class: 'night-lord',
-  jobTier: '3rd',
+  class: "night-lord",
+  jobTier: "3rd",
   level: 90,
   attack: 355,
   defense: 160,
@@ -776,21 +776,21 @@ export const NIGHT_LORD_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const NIGHT_LORD_LEVEL_100 = {
-  class: 'night-lord',
-  jobTier: '4th',
+  class: "night-lord",
+  jobTier: "4th",
   level: 100,
   attack: 505,
   defense: 260,
@@ -811,19 +811,19 @@ export const NIGHT_LORD_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const NIGHT_LORD_LEVEL_120 = {
-  class: 'night-lord',
-  jobTier: '4th',
+  class: "night-lord",
+  jobTier: "4th",
   level: 120,
   attack: 840,
   defense: 460,
@@ -844,18 +844,18 @@ export const NIGHT_LORD_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -863,8 +863,8 @@ export const NIGHT_LORD_LEVEL_120 = {
 // ============================================================================
 
 export const SHADOWER_LEVEL_60 = {
-  class: 'shadower',
-  jobTier: '3rd',
+  class: "shadower",
+  jobTier: "3rd",
   level: 60,
   attack: 140,
   defense: 0,
@@ -885,14 +885,14 @@ export const SHADOWER_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const SHADOWER_LEVEL_80 = {
-  class: 'shadower',
-  jobTier: '3rd',
+  class: "shadower",
+  jobTier: "3rd",
   level: 80,
   attack: 240,
   defense: 80,
@@ -913,18 +913,18 @@ export const SHADOWER_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const SHADOWER_LEVEL_90 = {
-  class: 'shadower',
-  jobTier: '3rd',
+  class: "shadower",
+  jobTier: "3rd",
   level: 90,
   attack: 350,
   defense: 180,
@@ -945,21 +945,21 @@ export const SHADOWER_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const SHADOWER_LEVEL_100 = {
-  class: 'shadower',
-  jobTier: '4th',
+  class: "shadower",
+  jobTier: "4th",
   level: 100,
   attack: 500,
   defense: 280,
@@ -980,19 +980,19 @@ export const SHADOWER_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const SHADOWER_LEVEL_120 = {
-  class: 'shadower',
-  jobTier: '4th',
+  class: "shadower",
+  jobTier: "4th",
   level: 120,
   attack: 820,
   defense: 480,
@@ -1013,18 +1013,18 @@ export const SHADOWER_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -1032,8 +1032,8 @@ export const SHADOWER_LEVEL_120 = {
 // ============================================================================
 
 export const ARCH_MAGE_IL_LEVEL_60 = {
-  class: 'arch-mage-il',
-  jobTier: '3rd',
+  class: "arch-mage-il",
+  jobTier: "3rd",
   level: 60,
   attack: 145,
   defense: 0,
@@ -1054,14 +1054,14 @@ export const ARCH_MAGE_IL_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const ARCH_MAGE_IL_LEVEL_80 = {
-  class: 'arch-mage-il',
-  jobTier: '3rd',
+  class: "arch-mage-il",
+  jobTier: "3rd",
   level: 80,
   attack: 245,
   defense: 100,
@@ -1082,18 +1082,18 @@ export const ARCH_MAGE_IL_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const ARCH_MAGE_IL_LEVEL_90 = {
-  class: 'arch-mage-il',
-  jobTier: '3rd',
+  class: "arch-mage-il",
+  jobTier: "3rd",
   level: 90,
   attack: 355,
   defense: 200,
@@ -1114,21 +1114,21 @@ export const ARCH_MAGE_IL_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const ARCH_MAGE_IL_LEVEL_100 = {
-  class: 'arch-mage-il',
-  jobTier: '4th',
+  class: "arch-mage-il",
+  jobTier: "4th",
   level: 100,
   attack: 505,
   defense: 300,
@@ -1149,19 +1149,19 @@ export const ARCH_MAGE_IL_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const ARCH_MAGE_IL_LEVEL_120 = {
-  class: 'arch-mage-il',
-  jobTier: '4th',
+  class: "arch-mage-il",
+  jobTier: "4th",
   level: 120,
   attack: 830,
   defense: 500,
@@ -1182,18 +1182,18 @@ export const ARCH_MAGE_IL_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };
 
 // ============================================================================
@@ -1201,8 +1201,8 @@ export const ARCH_MAGE_IL_LEVEL_120 = {
 // ============================================================================
 
 export const ARCH_MAGE_FP_LEVEL_60 = {
-  class: 'arch-mage-fp',
-  jobTier: '3rd',
+  class: "arch-mage-fp",
+  jobTier: "3rd",
   level: 60,
   attack: 145,
   defense: 0,
@@ -1223,14 +1223,14 @@ export const ARCH_MAGE_FP_LEVEL_60 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 0,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 5, '4th': 0 },
-  mastery: { '3rd-all-64': true },
-  targetContent: 'none'
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 5, "4th": 0 },
+  mastery: { "3rd-all-64": true },
+  targetContent: "none",
 };
 
 export const ARCH_MAGE_FP_LEVEL_80 = {
-  class: 'arch-mage-fp',
-  jobTier: '3rd',
+  class: "arch-mage-fp",
+  jobTier: "3rd",
   level: 80,
   attack: 245,
   defense: 100,
@@ -1251,18 +1251,18 @@ export const ARCH_MAGE_FP_LEVEL_80 = {
   maxDamage: 100,
   finalDamage: 0,
   mainStatPct: 30,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 15, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 15, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-all-76': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-all-76": true,
   },
-  targetContent: 'stageHunt'
+  targetContent: "stageHunt",
 };
 
 export const ARCH_MAGE_FP_LEVEL_90 = {
-  class: 'arch-mage-fp',
-  jobTier: '3rd',
+  class: "arch-mage-fp",
+  jobTier: "3rd",
   level: 90,
   attack: 355,
   defense: 200,
@@ -1283,21 +1283,21 @@ export const ARCH_MAGE_FP_LEVEL_90 = {
   maxDamage: 100,
   finalDamage: 5,
   mainStatPct: 60,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 25, '4th': 0 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 25, "4th": 0 },
   mastery: {
-    '3rd-all-64': true,
-    '3rd-all-68': true,
-    '3rd-boss-72': true,
-    '3rd-all-76': true,
-    '3rd-all-80': true,
-    '3rd-all-88': true
+    "3rd-all-64": true,
+    "3rd-all-68": true,
+    "3rd-boss-72": true,
+    "3rd-all-76": true,
+    "3rd-all-80": true,
+    "3rd-all-88": true,
   },
-  targetContent: 'chapterBoss'
+  targetContent: "chapterBoss",
 };
 
 export const ARCH_MAGE_FP_LEVEL_100 = {
-  class: 'arch-mage-fp',
-  jobTier: '4th',
+  class: "arch-mage-fp",
+  jobTier: "4th",
   level: 100,
   attack: 505,
   defense: 300,
@@ -1318,19 +1318,19 @@ export const ARCH_MAGE_FP_LEVEL_100 = {
   maxDamage: 100,
   finalDamage: 10,
   mainStatPct: 90,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 10 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 10 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-all-116': true,
-    '4th-all-120': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
   },
-  targetContent: 'worldBoss'
+  targetContent: "worldBoss",
 };
 
 export const ARCH_MAGE_FP_LEVEL_120 = {
-  class: 'arch-mage-fp',
-  jobTier: '4th',
+  class: "arch-mage-fp",
+  jobTier: "4th",
   level: 120,
   attack: 830,
   defense: 500,
@@ -1351,16 +1351,16 @@ export const ARCH_MAGE_FP_LEVEL_120 = {
   maxDamage: 100,
   finalDamage: 20,
   mainStatPct: 150,
-  skillLevels: { '1st': 0, '2nd': 0, '3rd': 30, '4th': 30 },
+  skillLevels: { "1st": 0, "2nd": 0, "3rd": 30, "4th": 30 },
   mastery: {
-    '4th-all-102': true,
-    '4th-all-106': true,
-    '4th-boss-111': true,
-    '4th-all-116': true,
-    '4th-all-120': true,
-    '4th-boss-124': true,
-    '4th-all-128': true,
-    '4th-all-132': true
+    "4th-all-102": true,
+    "4th-all-106": true,
+    "4th-boss-111": true,
+    "4th-all-116": true,
+    "4th-all-120": true,
+    "4th-boss-124": true,
+    "4th-all-128": true,
+    "4th-all-132": true,
   },
-  targetContent: 'growthDungeon'
+  targetContent: "growthDungeon",
 };

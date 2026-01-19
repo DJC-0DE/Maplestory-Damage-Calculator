@@ -1,5 +1,5 @@
 // Equipment Slot Card Component
-import { availableStats } from '@core/constants.js';
+import { availableStats } from "@core/constants.js";
 
 /**
  * Create an equipment slot card element
@@ -7,12 +7,12 @@ import { availableStats } from '@core/constants.js';
  * @returns {HTMLElement} The slot card element
  */
 export function createEquipmentSlot(slot) {
-    const card = document.createElement('div');
-    card.id = `equipment-slot-${slot.id}`;
-    card.className = 'equipment-slot-card';
+  const card = document.createElement("div");
+  card.id = `equipment-slot-${slot.id}`;
+  card.className = "equipment-slot-card";
 
-    // Build slot HTML
-    let html = `
+  // Build slot HTML
+  let html = `
         <div class="equipment-slot-header">
             <div class="equipment-slot-name">${slot.name}</div>
             <div class="equipment-slot-actions">
@@ -29,17 +29,17 @@ export function createEquipmentSlot(slot) {
             </div>
     `;
 
-    // Add Main Stat field for Ring, Neck, Eye Accessory
-    if (slot.hasMainStat) {
-        html += `
+  // Add Main Stat field for Ring, Neck, Eye Accessory
+  if (slot.hasMainStat) {
+    html += `
             <div class="equipment-input-group">
                 <label class="equipment-input-label" for="equipment-${slot.id}-main-stat">Main Stat</label>
                 <input type="number" step="1" id="equipment-${slot.id}-main-stat" value="0" min="0" onchange="saveSlotData('${slot.id}'); notifyStatContributors();" class="equipment-input-field">
             </div>
         `;
-    }
+  }
 
-    html += `
+  html += `
         </div>
 
         <div class="equipment-stats-section">
@@ -55,10 +55,10 @@ export function createEquipmentSlot(slot) {
         </div>
     `;
 
-    card.innerHTML = html;
+  card.innerHTML = html;
 
-    // Mark this slot as needing initialization (will be checked by loadEquipmentData)
-    card.dataset.needsInit = 'true';
+  // Mark this slot as needing initialization (will be checked by loadEquipmentData)
+  card.dataset.needsInit = "true";
 
-    return card;
+  return card;
 }

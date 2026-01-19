@@ -1,125 +1,181 @@
-import { weaponBaseAttackEquipped } from '@core/constants.js';
-import { weaponUpgradeCosts } from './weapon-data.js';
+import { weaponBaseAttackEquipped } from "@core/constants.js";
+import { weaponUpgradeCosts } from "./weapon-data.js";
 
 // Get weapon level multiplier based on level (from weapon-damage-stats.txt)
 function getWeaponLevelMultiplier(level) {
-    if (!level || level <= 1) return 1.0;
-    if (level <= 100) return 1 + (0.3 * (level - 1)) / 100;
-    if (level <= 130) return 1 + (30.3 + 0.7 * (level - 101)) / 100;
-    if (level <= 155) return 1 + (51.4 + 0.8 * (level - 131)) / 100;
-    if (level <= 175) return 1 + (71.5 + 0.9 * (level - 156)) / 100;
-    if (level <= 200) return 1 + (89.6 + 1.0 * (level - 176)) / 100;
-    return 1 + 113.6 / 100; // Cap at level 200
+  if (!level || level <= 1) return 1.0;
+  if (level <= 100) return 1 + (0.3 * (level - 1)) / 100;
+  if (level <= 130) return 1 + (30.3 + 0.7 * (level - 101)) / 100;
+  if (level <= 155) return 1 + (51.4 + 0.8 * (level - 131)) / 100;
+  if (level <= 175) return 1 + (71.5 + 0.9 * (level - 156)) / 100;
+  if (level <= 200) return 1 + (89.6 + 1.0 * (level - 176)) / 100;
+  return 1 + 113.6 / 100; // Cap at level 200
 }
 
 // Get inventory divisor based on rarity
 function getInventoryDivisor(rarity) {
-    return ['legendary', 'mystic', 'ancient'].includes(rarity) ? 4 : 3.5;
+  return ["legendary", "mystic", "ancient"].includes(rarity) ? 4 : 3.5;
 }
 
 // Calculate weapon attack percentages from level
 export function calculateWeaponAttacks(rarity, tier, level) {
-    const baseEquipped = weaponBaseAttackEquipped[rarity]?.[tier];
-    if (baseEquipped === null || baseEquipped === undefined || !level || level <= 0) {
-        return { inventoryAttack: 0, equippedAttack: 0 };
-    }
+  const baseEquipped = weaponBaseAttackEquipped[rarity]?.[tier];
+  if (
+    baseEquipped === null ||
+    baseEquipped === undefined ||
+    !level ||
+    level <= 0
+  ) {
+    return { inventoryAttack: 0, equippedAttack: 0 };
+  }
 
-    // Calculate equipped attack: base × level multiplier
-    const levelMultiplier = getWeaponLevelMultiplier(level);
-    const equippedBeforeRound = baseEquipped * levelMultiplier;
+  // Calculate equipped attack: base × level multiplier
+  const levelMultiplier = getWeaponLevelMultiplier(level);
+  const equippedBeforeRound = baseEquipped * levelMultiplier;
 
-    // Round down to nearest 0.1% (as specified in formula image)
-    const equippedAttack = Math.floor(equippedBeforeRound * 10) / 10;
+  // Round down to nearest 0.1% (as specified in formula image)
+  const equippedAttack = Math.floor(equippedBeforeRound * 10) / 10;
 
-    // Calculate inventory attack: equipped / divisor
-    const divisor = getInventoryDivisor(rarity);
-    const inventoryAttack = equippedAttack / divisor;
+  // Calculate inventory attack: equipped / divisor
+  const divisor = getInventoryDivisor(rarity);
+  const inventoryAttack = equippedAttack / divisor;
 
-    return { inventoryAttack, equippedAttack };
+  return { inventoryAttack, equippedAttack };
 }
 
 // Get max level based on star rating
 export function getMaxLevelForStars(stars) {
-    const maxLevels = { 0: 100, 1: 120, 2: 140, 3: 160, 4: 180, 5: 200 };
-    return maxLevels[stars] || 100;
+  const maxLevels = { 0: 100, 1: 120, 2: 140, 3: 160, 4: 180, 5: 200 };
+  return maxLevels[stars] || 100;
 }
 
 // Calculate upgrade cost for a weapon at a specific level
-  export function getUpgradeCost(rarity, tier, level) {
-      const tierNum = parseInt(tier.replace('t', ''));
-      const cost = weaponUpgradeCosts[rarity]?.[tierNum]?.[level+1];
-      return cost || 0;
-  }
+export function getUpgradeCost(rarity, tier, level) {
+  const tierNum = parseInt(tier.replace("t", ""));
+  const cost = weaponUpgradeCosts[rarity]?.[tierNum]?.[level + 1];
+  return cost || 0;
+}
 
 // Calculate inventory attack gain from spending resources
-export function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources, isEquipped = false) {
-    if (currentLevel <= 0) {
-        return { levelsGained: 0, newLevel: currentLevel, attackGain: 0, equippedAttackGain: 0, resourcesUsed: 0, efficiency: 0, singleLevelCost: 0 };
-    }
+export function calculateUpgradeGain(
+  rarity,
+  tier,
+  currentLevel,
+  stars,
+  resources,
+  isEquipped = false,
+) {
+  if (currentLevel <= 0) {
+    return {
+      levelsGained: 0,
+      newLevel: currentLevel,
+      attackGain: 0,
+      equippedAttackGain: 0,
+      resourcesUsed: 0,
+      efficiency: 0,
+      singleLevelCost: 0,
+    };
+  }
 
-    const maxLevel = getMaxLevelForStars(stars);
+  const maxLevel = getMaxLevelForStars(stars);
 
-    // Check the cost of the next level
-    const nextLevelCost = getUpgradeCost(rarity, tier, currentLevel);
+  // Check the cost of the next level
+  const nextLevelCost = getUpgradeCost(rarity, tier, currentLevel);
 
-    // If the next level costs more than available resources, show gain for that level anyway
-    if (nextLevelCost > resources && currentLevel < maxLevel) {
-        const currentAttack = calculateWeaponAttacks(rarity, tier, currentLevel).inventoryAttack;
-        const nextLevelAttack = calculateWeaponAttacks(rarity, tier, currentLevel + 1).inventoryAttack;
-        const attackGain = nextLevelAttack - currentAttack;
-
-        // Calculate equipped attack gain if equipped
-        const currentEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel).equippedAttack;
-        const nextEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel + 1).equippedAttack;
-        const equippedAttackGain = isEquipped ? (nextEquippedAttack - currentEquippedAttack) : 0;
-
-        return {
-            levelsGained: 0,
-            newLevel: currentLevel,
-            attackGain: attackGain,
-            equippedAttackGain: equippedAttackGain,
-            resourcesUsed: 0,
-            efficiency: 0,
-            singleLevelCost: nextLevelCost,
-            isUnaffordable: true
-        };
-    }
-
-    let level = currentLevel;
-    let remainingResources = resources;
-    let totalCost = 0;
-    let iterations = 0;
-    const maxIterations = 300; // Prevent infinite loops
-
-    // Simulate upgrades until we run out of resources or hit max level
-    while (level < maxLevel && remainingResources > 0 && iterations < maxIterations) {
-        const cost = getUpgradeCost(rarity, tier, level);
-        if (cost <= 0 || cost > remainingResources) break;
-
-        remainingResources -= cost;
-        totalCost += cost;
-        level++;
-        iterations++;
-    }
-
-    // Calculate attack gain
-    const currentAttack = calculateWeaponAttacks(rarity, tier, currentLevel).inventoryAttack;
-    const newAttack = calculateWeaponAttacks(rarity, tier, level).inventoryAttack;
-    const attackGain = newAttack - currentAttack;
+  // If the next level costs more than available resources, show gain for that level anyway
+  if (nextLevelCost > resources && currentLevel < maxLevel) {
+    const currentAttack = calculateWeaponAttacks(
+      rarity,
+      tier,
+      currentLevel,
+    ).inventoryAttack;
+    const nextLevelAttack = calculateWeaponAttacks(
+      rarity,
+      tier,
+      currentLevel + 1,
+    ).inventoryAttack;
+    const attackGain = nextLevelAttack - currentAttack;
 
     // Calculate equipped attack gain if equipped
-    const currentEquippedAttack = calculateWeaponAttacks(rarity, tier, currentLevel).equippedAttack;
-    const newEquippedAttack = calculateWeaponAttacks(rarity, tier, level).equippedAttack;
-    const equippedAttackGain = isEquipped ? (newEquippedAttack - currentEquippedAttack) : 0;
+    const currentEquippedAttack = calculateWeaponAttacks(
+      rarity,
+      tier,
+      currentLevel,
+    ).equippedAttack;
+    const nextEquippedAttack = calculateWeaponAttacks(
+      rarity,
+      tier,
+      currentLevel + 1,
+    ).equippedAttack;
+    const equippedAttackGain = isEquipped
+      ? nextEquippedAttack - currentEquippedAttack
+      : 0;
 
     return {
-        levelsGained: level - currentLevel,
-        newLevel: level,
-        attackGain: attackGain,
-        equippedAttackGain: equippedAttackGain,
-        resourcesUsed: totalCost,
-        efficiency: totalCost > 0 ? attackGain / (totalCost / 1000) : 0,
-        singleLevelCost: 0,
-        isUnaffordable: false
+      levelsGained: 0,
+      newLevel: currentLevel,
+      attackGain: attackGain,
+      equippedAttackGain: equippedAttackGain,
+      resourcesUsed: 0,
+      efficiency: 0,
+      singleLevelCost: nextLevelCost,
+      isUnaffordable: true,
     };
+  }
+
+  let level = currentLevel;
+  let remainingResources = resources;
+  let totalCost = 0;
+  let iterations = 0;
+  const maxIterations = 300; // Prevent infinite loops
+
+  // Simulate upgrades until we run out of resources or hit max level
+  while (
+    level < maxLevel &&
+    remainingResources > 0 &&
+    iterations < maxIterations
+  ) {
+    const cost = getUpgradeCost(rarity, tier, level);
+    if (cost <= 0 || cost > remainingResources) break;
+
+    remainingResources -= cost;
+    totalCost += cost;
+    level++;
+    iterations++;
+  }
+
+  // Calculate attack gain
+  const currentAttack = calculateWeaponAttacks(
+    rarity,
+    tier,
+    currentLevel,
+  ).inventoryAttack;
+  const newAttack = calculateWeaponAttacks(rarity, tier, level).inventoryAttack;
+  const attackGain = newAttack - currentAttack;
+
+  // Calculate equipped attack gain if equipped
+  const currentEquippedAttack = calculateWeaponAttacks(
+    rarity,
+    tier,
+    currentLevel,
+  ).equippedAttack;
+  const newEquippedAttack = calculateWeaponAttacks(
+    rarity,
+    tier,
+    level,
+  ).equippedAttack;
+  const equippedAttackGain = isEquipped
+    ? newEquippedAttack - currentEquippedAttack
+    : 0;
+
+  return {
+    levelsGained: level - currentLevel,
+    newLevel: level,
+    attackGain: attackGain,
+    equippedAttackGain: equippedAttackGain,
+    resourcesUsed: totalCost,
+    efficiency: totalCost > 0 ? attackGain / (totalCost / 1000) : 0,
+    singleLevelCost: 0,
+    isUnaffordable: false,
+  };
 }

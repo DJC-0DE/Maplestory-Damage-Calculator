@@ -11,17 +11,20 @@
  * - Reliable persistence across tab switches, refreshes, etc.
  */
 
-import { saveToLocalStorage } from '@core/state/storage.js';
-import { availableStats } from '@core/constants.js';
-import { calculate } from '@core/main.js';
+import { saveToLocalStorage } from "@core/state/storage.js";
+import { availableStats } from "@core/constants.js";
+import { calculate } from "@core/main.js";
 import {
-    updateItem,
-    removeItem,
-    loadSlot,
-    getSlotItems,
-    getItem
-} from '@core/state/comparison-state.js';
-import { equipItemFromComparison, getCurrentSlot } from '@ui/comparison/slot-comparison.js';
+  updateItem,
+  removeItem,
+  loadSlot,
+  getSlotItems,
+  getItem,
+} from "@core/state/comparison-state.js";
+import {
+  equipItemFromComparison,
+  getCurrentSlot,
+} from "@ui/comparison/slot-comparison.js";
 
 // Track active comparison item
 let activeComparisonItemId = null;
@@ -32,9 +35,9 @@ const currentItemMapping = new Map(); // itemId -> guid
 
 // Configuration object for magic numbers
 const COMPARISON_CONFIG = {
-    MAX_STATS_PER_ITEM: 6,
-    ANIMATION_DURATION_MS: 200,
-    MIN_TOUCH_TARGET_SIZE: 44 // px
+  MAX_STATS_PER_ITEM: 6,
+  ANIMATION_DURATION_MS: 200,
+  MIN_TOUCH_TARGET_SIZE: 44, // px
 };
 
 // ============================================================================
@@ -48,30 +51,38 @@ const COMPARISON_CONFIG = {
  * @returns {Object|null} Item data or null if elements not found
  */
 function collectItemDataFromDOM(currentSlot, itemId) {
-    const nameInput = document.getElementById(`item-${currentSlot}-${itemId}-name`);
-    const attackInput = document.getElementById(`item-${currentSlot}-${itemId}-attack`);
-    const statsContainer = document.getElementById(`item-${currentSlot}-${itemId}-stats-container`);
+  const nameInput = document.getElementById(
+    `item-${currentSlot}-${itemId}-name`,
+  );
+  const attackInput = document.getElementById(
+    `item-${currentSlot}-${itemId}-attack`,
+  );
+  const statsContainer = document.getElementById(
+    `item-${currentSlot}-${itemId}-stats-container`,
+  );
 
-    if (!nameInput || !attackInput || !statsContainer) {
-        console.error(`[ComparisonUI] Missing DOM elements for item ${itemId}`);
-        return null;
-    }
+  if (!nameInput || !attackInput || !statsContainer) {
+    console.error(`[ComparisonUI] Missing DOM elements for item ${itemId}`);
+    return null;
+  }
 
-    // Collect stats
-    const stats = [];
-    statsContainer.querySelectorAll(`[id^="item-${currentSlot}-${itemId}-stat-"]`).forEach(statDiv => {
-        const typeInput = statDiv.querySelector('[id$="-type"]');
-        const valueInput = statDiv.querySelector('[id$="-value"]');
-        if (typeInput && valueInput) {
-            stats.push({ type: typeInput.value, value: valueInput.value });
-        }
+  // Collect stats
+  const stats = [];
+  statsContainer
+    .querySelectorAll(`[id^="item-${currentSlot}-${itemId}-stat-"]`)
+    .forEach((statDiv) => {
+      const typeInput = statDiv.querySelector('[id$="-type"]');
+      const valueInput = statDiv.querySelector('[id$="-value"]');
+      if (typeInput && valueInput) {
+        stats.push({ type: typeInput.value, value: valueInput.value });
+      }
     });
 
-    return {
-        name: nameInput.value,
-        attack: parseFloat(attackInput.value) || 0,
-        stats: stats
-    };
+  return {
+    name: nameInput.value,
+    attack: parseFloat(attackInput.value) || 0,
+    stats: stats,
+  };
 }
 
 /**
@@ -81,12 +92,14 @@ function collectItemDataFromDOM(currentSlot, itemId) {
  * @returns {string|null} Item GUID or null if not found
  */
 function getGuidFromItemId(currentSlot, itemId) {
-    const itemDiv = document.getElementById(`comparison-item-${currentSlot}-${itemId}`);
-    if (!itemDiv) {
-        console.error(`[ComparisonUI] Item div not found for ${itemId}`);
-        return null;
-    }
-    return itemDiv.dataset.guid || null;
+  const itemDiv = document.getElementById(
+    `comparison-item-${currentSlot}-${itemId}`,
+  );
+  if (!itemDiv) {
+    console.error(`[ComparisonUI] Item div not found for ${itemId}`);
+    return null;
+  }
+  return itemDiv.dataset.guid || null;
 }
 
 // ============================================================================
@@ -100,47 +113,46 @@ function getGuidFromItemId(currentSlot, itemId) {
  * @returns {Promise<boolean>} True if successful
  */
 async function saveSlotItemData(guid) {
-    try {
-        const currentSlot = getCurrentSlot();
+  try {
+    const currentSlot = getCurrentSlot();
 
-        // Find itemId from guid
-        let itemId = null;
-        for (const [uiItemId, itemGuid] of currentItemMapping.entries()) {
-            if (itemGuid === guid) {
-                itemId = uiItemId;
-                break;
-            }
-        }
-
-        if (itemId === null) {
-            console.error(`[ComparisonUI] Could not find itemId for guid ${guid}`);
-            return false;
-        }
-
-        // Collect data from DOM
-        const itemData = collectItemDataFromDOM(currentSlot, itemId);
-        if (!itemData) {
-            return false;
-        }
-
-        // Update state (this handles queuing and persistence)
-        const success = await updateItem(currentSlot, guid, itemData);
-
-        if (!success) {
-             console.error(`[ComparisonUI] Failed to save item ${guid}`);
-        }
-
-        return success;
-
-    } catch (error) {
-        console.error(`[ComparisonUI] Error saving item:`, error);
-        return false;
+    // Find itemId from guid
+    let itemId = null;
+    for (const [uiItemId, itemGuid] of currentItemMapping.entries()) {
+      if (itemGuid === guid) {
+        itemId = uiItemId;
+        break;
+      }
     }
+
+    if (itemId === null) {
+      console.error(`[ComparisonUI] Could not find itemId for guid ${guid}`);
+      return false;
+    }
+
+    // Collect data from DOM
+    const itemData = collectItemDataFromDOM(currentSlot, itemId);
+    if (!itemData) {
+      return false;
+    }
+
+    // Update state (this handles queuing and persistence)
+    const success = await updateItem(currentSlot, guid, itemData);
+
+    if (!success) {
+      console.error(`[ComparisonUI] Failed to save item ${guid}`);
+    }
+
+    return success;
+  } catch (error) {
+    console.error(`[ComparisonUI] Error saving item:`, error);
+    return false;
+  }
 }
 
 // Global save function
-window.saveSlotItemData = function(guid) {
-    saveSlotItemData(guid);
+window.saveSlotItemData = function (guid) {
+  saveSlotItemData(guid);
 };
 
 // ============================================================================
@@ -152,92 +164,117 @@ window.saveSlotItemData = function(guid) {
  * @param {string} slotId - Equipment slot ID
  * @returns {Promise<boolean>} True if successful
  */
-window.loadSlotItems = async function(slotId) {
-    try {
-        // Clear current mapping
-        currentItemMapping.clear();
+window.loadSlotItems = async function (slotId) {
+  try {
+    // Clear current mapping
+    currentItemMapping.clear();
 
-        // Clear UI
-        const tabsContainer = document.getElementById('comparison-tabs-container');
-        const itemsContainer = document.getElementById('comparison-items-container');
+    // Clear UI
+    const tabsContainer = document.getElementById("comparison-tabs-container");
+    const itemsContainer = document.getElementById(
+      "comparison-items-container",
+    );
 
-        if (tabsContainer) {
-            // Preserve the add button
-            const addButton = tabsContainer.querySelector('button[data-type="add-button"]');
-            const addButtonClone = addButton ? addButton.cloneNode(true) : null;
-            tabsContainer.innerHTML = '';
-            if (addButtonClone) {
-                tabsContainer.appendChild(addButtonClone);
-            }
-        }
-
-        if (itemsContainer) {
-            itemsContainer.innerHTML = '';
-        }
-
-        // Load items from state
-        const items = await loadSlot(slotId);
-
-        if (items.length === 0) {
-            showEmptyComparisonState();
-            return true;
-        }
-
-        hideEmptyComparisonState();
-
-        const currentSlot = getCurrentSlot();
-
-        // Create UI for each item
-        items.forEach((itemData, index) => {
-            const itemId = index + 1;
-            const guid = itemData.guid;
-
-            // Store mapping
-            currentItemMapping.set(itemId, guid);
-
-            // Create tab
-            const tabButton = createComparisonTab(currentSlot, itemId, guid, itemData.name);
-            const tabsContainer = document.getElementById('comparison-tabs-container');
-            const addButton = tabsContainer.querySelector('button[data-type="add-button"]');
-            tabsContainer.insertBefore(tabButton, addButton);
-
-            // Create item card
-            const itemDiv = createComparisonItemCard(currentSlot, itemId, guid, itemData);
-            document.getElementById('comparison-items-container').appendChild(itemDiv);
-
-            // Load stats
-            const statsContainer = document.getElementById(`item-${currentSlot}-${itemId}-stats-container`);
-            if (itemData.stats && itemData.stats.length > 0) {
-                statsContainer.innerHTML = '';
-                itemData.stats.forEach((statData, statIndex) => {
-                    addComparisonItemStat(itemId);
-                    const statId = statIndex + 1;
-                    const typeInput = document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}-type`);
-                    const valueInput = document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}-value`);
-                    if (typeInput) {
-                        typeInput.value = statData.type;
-                        typeInput.setAttribute('onchange', `saveSlotItemData('${guid}')`);
-                    }
-                    if (valueInput) {
-                        valueInput.value = statData.value;
-                        valueInput.setAttribute('onchange', `saveSlotItemData('${guid}')`);
-                    }
-                });
-            }
-
-            // Select first item by default
-            if (index === 0) {
-                switchComparisonItemTab(itemId);
-            }
-        });
-
-        return true;
-
-    } catch (error) {
-        console.error(`[ComparisonUI] Failed to load slot ${slotId}:`, error);
-        showEmptyComparisonState();
-        return false;
+    if (tabsContainer) {
+      // Preserve the add button
+      const addButton = tabsContainer.querySelector(
+        'button[data-type="add-button"]',
+      );
+      const addButtonClone = addButton ? addButton.cloneNode(true) : null;
+      tabsContainer.innerHTML = "";
+      if (addButtonClone) {
+        tabsContainer.appendChild(addButtonClone);
+      }
     }
+
+    if (itemsContainer) {
+      itemsContainer.innerHTML = "";
+    }
+
+    // Load items from state
+    const items = await loadSlot(slotId);
+
+    if (items.length === 0) {
+      showEmptyComparisonState();
+      return true;
+    }
+
+    hideEmptyComparisonState();
+
+    const currentSlot = getCurrentSlot();
+
+    // Create UI for each item
+    items.forEach((itemData, index) => {
+      const itemId = index + 1;
+      const guid = itemData.guid;
+
+      // Store mapping
+      currentItemMapping.set(itemId, guid);
+
+      // Create tab
+      const tabButton = createComparisonTab(
+        currentSlot,
+        itemId,
+        guid,
+        itemData.name,
+      );
+      const tabsContainer = document.getElementById(
+        "comparison-tabs-container",
+      );
+      const addButton = tabsContainer.querySelector(
+        'button[data-type="add-button"]',
+      );
+      tabsContainer.insertBefore(tabButton, addButton);
+
+      // Create item card
+      const itemDiv = createComparisonItemCard(
+        currentSlot,
+        itemId,
+        guid,
+        itemData,
+      );
+      document
+        .getElementById("comparison-items-container")
+        .appendChild(itemDiv);
+
+      // Load stats
+      const statsContainer = document.getElementById(
+        `item-${currentSlot}-${itemId}-stats-container`,
+      );
+      if (itemData.stats && itemData.stats.length > 0) {
+        statsContainer.innerHTML = "";
+        itemData.stats.forEach((statData, statIndex) => {
+          addComparisonItemStat(itemId);
+          const statId = statIndex + 1;
+          const typeInput = document.getElementById(
+            `item-${currentSlot}-${itemId}-stat-${statId}-type`,
+          );
+          const valueInput = document.getElementById(
+            `item-${currentSlot}-${itemId}-stat-${statId}-value`,
+          );
+          if (typeInput) {
+            typeInput.value = statData.type;
+            typeInput.setAttribute("onchange", `saveSlotItemData('${guid}')`);
+          }
+          if (valueInput) {
+            valueInput.value = statData.value;
+            valueInput.setAttribute("onchange", `saveSlotItemData('${guid}')`);
+          }
+        });
+      }
+
+      // Select first item by default
+      if (index === 0) {
+        switchComparisonItemTab(itemId);
+      }
+    });
+
+    return true;
+  } catch (error) {
+    console.error(`[ComparisonUI] Failed to load slot ${slotId}:`, error);
+    showEmptyComparisonState();
+    return false;
+  }
 };
 
 // ============================================================================
@@ -249,7 +286,7 @@ window.loadSlotItems = async function(slotId) {
  * @returns {number} Number of items
  */
 function getSlotItemCount() {
-    return currentItemMapping.size;
+  return currentItemMapping.size;
 }
 
 /**
@@ -257,18 +294,22 @@ function getSlotItemCount() {
  * @param {number} itemId - UI item ID
  */
 export function updateComparisonItemTabName(itemId) {
-    const currentSlot = getCurrentSlot();
-    const nameInput = document.getElementById(`item-${currentSlot}-${itemId}-name`);
-    const tabButton = document.getElementById(`comparison-tab-${currentSlot}-${itemId}`);
+  const currentSlot = getCurrentSlot();
+  const nameInput = document.getElementById(
+    `item-${currentSlot}-${itemId}-name`,
+  );
+  const tabButton = document.getElementById(
+    `comparison-tab-${currentSlot}-${itemId}`,
+  );
 
-    if (nameInput && tabButton) {
-        const nameSpan = tabButton.querySelector('.tab-item-name');
-        if (nameSpan) {
-            nameSpan.textContent = nameInput.value || `Item ${itemId}`;
-        }
+  if (nameInput && tabButton) {
+    const nameSpan = tabButton.querySelector(".tab-item-name");
+    if (nameSpan) {
+      nameSpan.textContent = nameInput.value || `Item ${itemId}`;
     }
+  }
 
-    saveToLocalStorage();
+  saveToLocalStorage();
 }
 window.updateComparisonItemTabName = updateComparisonItemTabName;
 
@@ -277,34 +318,42 @@ window.updateComparisonItemTabName = updateComparisonItemTabName;
  * @param {number} itemId - UI item ID
  */
 export function switchComparisonItemTab(itemId) {
-    const currentSlot = getCurrentSlot();
+  const currentSlot = getCurrentSlot();
 
-    // Hide all items
-    const allItems = document.querySelectorAll(`[id^="comparison-item-${currentSlot}-"]`);
-    allItems.forEach(item => {
-        item.style.display = 'none';
-    });
+  // Hide all items
+  const allItems = document.querySelectorAll(
+    `[id^="comparison-item-${currentSlot}-"]`,
+  );
+  allItems.forEach((item) => {
+    item.style.display = "none";
+  });
 
-    // Deactivate all tabs
-    const allTabs = document.querySelectorAll(`[id^="comparison-tab-${currentSlot}-"]`);
-    allTabs.forEach(tab => {
-        tab.classList.remove('active');
-        tab.setAttribute('aria-selected', 'false');
-    });
+  // Deactivate all tabs
+  const allTabs = document.querySelectorAll(
+    `[id^="comparison-tab-${currentSlot}-"]`,
+  );
+  allTabs.forEach((tab) => {
+    tab.classList.remove("active");
+    tab.setAttribute("aria-selected", "false");
+  });
 
-    // Show selected item
-    const selectedItem = document.getElementById(`comparison-item-${currentSlot}-${itemId}`);
-    if (selectedItem) {
-        selectedItem.style.display = 'block';
-        activeComparisonItemId = itemId;
-    }
+  // Show selected item
+  const selectedItem = document.getElementById(
+    `comparison-item-${currentSlot}-${itemId}`,
+  );
+  if (selectedItem) {
+    selectedItem.style.display = "block";
+    activeComparisonItemId = itemId;
+  }
 
-    // Activate selected tab
-    const selectedTab = document.getElementById(`comparison-tab-${currentSlot}-${itemId}`);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-        selectedTab.setAttribute('aria-selected', 'true');
-    }
+  // Activate selected tab
+  const selectedTab = document.getElementById(
+    `comparison-tab-${currentSlot}-${itemId}`,
+  );
+  if (selectedTab) {
+    selectedTab.classList.add("active");
+    selectedTab.setAttribute("aria-selected", "true");
+  }
 }
 window.switchComparisonItemTab = switchComparisonItemTab;
 
@@ -317,7 +366,7 @@ window.switchComparisonItemTab = switchComparisonItemTab;
  * @returns {string} GUID
  */
 function generateGuid() {
-    return 'item-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  return "item-" + Date.now() + "-" + Math.random().toString(36).substr(2, 9);
 }
 
 /**
@@ -329,36 +378,39 @@ function generateGuid() {
  * @returns {HTMLElement} Tab button element
  */
 function createComparisonTab(currentSlot, itemId, guid, name) {
-    const tabButton = document.createElement('button');
-    tabButton.id = `comparison-tab-${currentSlot}-${itemId}`;
-    tabButton.dataset.guid = guid;
-    tabButton.className = 'comparison-tab-button';
-    tabButton.setAttribute('role', 'tab');
-    tabButton.setAttribute('aria-selected', 'false');
-    tabButton.setAttribute('aria-controls', `comparison-item-${currentSlot}-${itemId}`);
-    tabButton.onclick = () => switchComparisonItemTab(itemId);
+  const tabButton = document.createElement("button");
+  tabButton.id = `comparison-tab-${currentSlot}-${itemId}`;
+  tabButton.dataset.guid = guid;
+  tabButton.className = "comparison-tab-button";
+  tabButton.setAttribute("role", "tab");
+  tabButton.setAttribute("aria-selected", "false");
+  tabButton.setAttribute(
+    "aria-controls",
+    `comparison-item-${currentSlot}-${itemId}`,
+  );
+  tabButton.onclick = () => switchComparisonItemTab(itemId);
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'tab-item-name';
-    nameSpan.textContent = name || `Item ${itemId}`;
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "tab-item-name";
+  nameSpan.textContent = name || `Item ${itemId}`;
 
-    const removeButton = document.createElement('button');
-    removeButton.className = 'comparison-tab-remove';
-    removeButton.setAttribute('aria-label', `Remove ${name || `Item ${itemId}`}`);
-    removeButton.onclick = (e) => {
-        e.stopPropagation();
-        removeComparisonItem(itemId);
-    };
-    removeButton.innerHTML = `
+  const removeButton = document.createElement("button");
+  removeButton.className = "comparison-tab-remove";
+  removeButton.setAttribute("aria-label", `Remove ${name || `Item ${itemId}`}`);
+  removeButton.onclick = (e) => {
+    e.stopPropagation();
+    removeComparisonItem(itemId);
+  };
+  removeButton.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
         </svg>
     `;
 
-    tabButton.appendChild(nameSpan);
-    tabButton.appendChild(removeButton);
+  tabButton.appendChild(nameSpan);
+  tabButton.appendChild(removeButton);
 
-    return tabButton;
+  return tabButton;
 }
 
 /**
@@ -369,16 +421,24 @@ function createComparisonTab(currentSlot, itemId, guid, name) {
  * @param {Object} itemData - Item data
  * @returns {HTMLElement} Item card element
  */
-function createComparisonItemCard(currentSlot, itemId, guid, itemData = { name: '', attack: 0, stats: [] }) {
-    const itemDiv = document.createElement('div');
-    itemDiv.id = `comparison-item-${currentSlot}-${itemId}`;
-    itemDiv.dataset.guid = guid;
-    itemDiv.className = 'comparison-item-card';
-    itemDiv.style.display = 'none';
-    itemDiv.setAttribute('role', 'tabpanel');
-    itemDiv.setAttribute('aria-labelledby', `comparison-tab-${currentSlot}-${itemId}`);
+function createComparisonItemCard(
+  currentSlot,
+  itemId,
+  guid,
+  itemData = { name: "", attack: 0, stats: [] },
+) {
+  const itemDiv = document.createElement("div");
+  itemDiv.id = `comparison-item-${currentSlot}-${itemId}`;
+  itemDiv.dataset.guid = guid;
+  itemDiv.className = "comparison-item-card";
+  itemDiv.style.display = "none";
+  itemDiv.setAttribute("role", "tabpanel");
+  itemDiv.setAttribute(
+    "aria-labelledby",
+    `comparison-tab-${currentSlot}-${itemId}`,
+  );
 
-    itemDiv.innerHTML = `
+  itemDiv.innerHTML = `
         <div class="comparison-card-inner">
             <div class="comparison-card-header">
                 <div class="comparison-inputs-row">
@@ -417,7 +477,7 @@ function createComparisonItemCard(currentSlot, itemId, guid, itemData = { name: 
         </div>
     `;
 
-    return itemDiv;
+  return itemDiv;
 }
 
 // ============================================================================
@@ -428,38 +488,44 @@ function createComparisonItemCard(currentSlot, itemId, guid, itemData = { name: 
  * Add a new comparison item
  */
 export async function addComparisonItem() {
-    try {
-        const currentSlot = getCurrentSlot();
-        const itemId = getSlotItemCount() + 1;
-        const guid = generateGuid();
+  try {
+    const currentSlot = getCurrentSlot();
+    const itemId = getSlotItemCount() + 1;
+    const guid = generateGuid();
 
-        hideEmptyComparisonState();
+    hideEmptyComparisonState();
 
-        // Create UI
-        const tabsContainer = document.getElementById('comparison-tabs-container');
-        const tabButton = createComparisonTab(currentSlot, itemId, guid, `Item ${itemId}`);
+    // Create UI
+    const tabsContainer = document.getElementById("comparison-tabs-container");
+    const tabButton = createComparisonTab(
+      currentSlot,
+      itemId,
+      guid,
+      `Item ${itemId}`,
+    );
 
-        const addButton = tabsContainer.querySelector('button[data-type="add-button"]');
-        tabsContainer.insertBefore(tabButton, addButton);
+    const addButton = tabsContainer.querySelector(
+      'button[data-type="add-button"]',
+    );
+    tabsContainer.insertBefore(tabButton, addButton);
 
-        const itemDiv = createComparisonItemCard(currentSlot, itemId, guid);
-        document.getElementById('comparison-items-container').appendChild(itemDiv);
+    const itemDiv = createComparisonItemCard(currentSlot, itemId, guid);
+    document.getElementById("comparison-items-container").appendChild(itemDiv);
 
-        // Update mapping
-        currentItemMapping.set(itemId, guid);
+    // Update mapping
+    currentItemMapping.set(itemId, guid);
 
-        // Save to state
-        await updateItem(currentSlot, guid, {
-            name: `Item ${itemId}`,
-            attack: 0,
-            stats: []
-        });
+    // Save to state
+    await updateItem(currentSlot, guid, {
+      name: `Item ${itemId}`,
+      attack: 0,
+      stats: [],
+    });
 
-        switchComparisonItemTab(itemId);
-
-    } catch (error) {
-        console.error('[ComparisonUI] Failed to add comparison item:', error);
-    }
+    switchComparisonItemTab(itemId);
+  } catch (error) {
+    console.error("[ComparisonUI] Failed to add comparison item:", error);
+  }
 }
 window.addComparisonItem = addComparisonItem;
 
@@ -468,50 +534,57 @@ window.addComparisonItem = addComparisonItem;
  * @param {number} itemId - UI item ID
  */
 export async function removeComparisonItem(itemId) {
-    try {
-        const currentSlot = getCurrentSlot();
-        const guid = getGuidFromItemId(currentSlot, itemId);
+  try {
+    const currentSlot = getCurrentSlot();
+    const guid = getGuidFromItemId(currentSlot, itemId);
 
-        if (!guid) {
-            console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
-            return;
-        }
-
-        const item = document.getElementById(`comparison-item-${currentSlot}-${itemId}`);
-        const tab = document.getElementById(`comparison-tab-${currentSlot}-${itemId}`);
-
-        if (item && tab) {
-            // Animate out
-            item.style.opacity = '0';
-            tab.style.opacity = '0';
-
-            setTimeout(async () => {
-                item.remove();
-                tab.remove();
-                currentItemMapping.delete(itemId);
-
-                // Update state
-                await removeItem(currentSlot, guid);
-
-                if (activeComparisonItemId === itemId) {
-                    const remainingTabs = document.querySelectorAll(`[id^="comparison-tab-${currentSlot}-"]`);
-
-                    if (remainingTabs.length > 0) {
-                        const firstTabId = parseInt(remainingTabs[0].id.replace(`comparison-tab-${currentSlot}-`, ''));
-                        switchComparisonItemTab(firstTabId);
-                    } else {
-                        activeComparisonItemId = null;
-                        showEmptyComparisonState();
-                    }
-                }
-
-                calculate();
-            }, COMPARISON_CONFIG.ANIMATION_DURATION_MS);
-        }
-
-    } catch (error) {
-        console.error('[ComparisonUI] Failed to remove comparison item:', error);
+    if (!guid) {
+      console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
+      return;
     }
+
+    const item = document.getElementById(
+      `comparison-item-${currentSlot}-${itemId}`,
+    );
+    const tab = document.getElementById(
+      `comparison-tab-${currentSlot}-${itemId}`,
+    );
+
+    if (item && tab) {
+      // Animate out
+      item.style.opacity = "0";
+      tab.style.opacity = "0";
+
+      setTimeout(async () => {
+        item.remove();
+        tab.remove();
+        currentItemMapping.delete(itemId);
+
+        // Update state
+        await removeItem(currentSlot, guid);
+
+        if (activeComparisonItemId === itemId) {
+          const remainingTabs = document.querySelectorAll(
+            `[id^="comparison-tab-${currentSlot}-"]`,
+          );
+
+          if (remainingTabs.length > 0) {
+            const firstTabId = parseInt(
+              remainingTabs[0].id.replace(`comparison-tab-${currentSlot}-`, ""),
+            );
+            switchComparisonItemTab(firstTabId);
+          } else {
+            activeComparisonItemId = null;
+            showEmptyComparisonState();
+          }
+        }
+
+        calculate();
+      }, COMPARISON_CONFIG.ANIMATION_DURATION_MS);
+    }
+  } catch (error) {
+    console.error("[ComparisonUI] Failed to remove comparison item:", error);
+  }
 }
 window.removeComparisonItem = removeComparisonItem;
 
@@ -520,38 +593,44 @@ window.removeComparisonItem = removeComparisonItem;
  * @param {number} itemId - UI item ID
  */
 export async function addComparisonItemStat(itemId) {
-    try {
-        const currentSlot = getCurrentSlot();
-        const container = document.getElementById(`item-${currentSlot}-${itemId}-stats-container`);
-        const currentStats = container.children.length;
+  try {
+    const currentSlot = getCurrentSlot();
+    const container = document.getElementById(
+      `item-${currentSlot}-${itemId}-stats-container`,
+    );
+    const currentStats = container.children.length;
 
-        if (currentStats >= COMPARISON_CONFIG.MAX_STATS_PER_ITEM) {
-            alert(`Maximum ${COMPARISON_CONFIG.MAX_STATS_PER_ITEM} stats allowed per item`);
-            return;
-        }
+    if (currentStats >= COMPARISON_CONFIG.MAX_STATS_PER_ITEM) {
+      alert(
+        `Maximum ${COMPARISON_CONFIG.MAX_STATS_PER_ITEM} stats allowed per item`,
+      );
+      return;
+    }
 
-        const guid = getGuidFromItemId(currentSlot, itemId);
-        if (!guid) {
-            console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
-            return;
-        }
+    const guid = getGuidFromItemId(currentSlot, itemId);
+    if (!guid) {
+      console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
+      return;
+    }
 
-        let statId = 1;
-        while (document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}`)) {
-            statId++;
-        }
+    let statId = 1;
+    while (
+      document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}`)
+    ) {
+      statId++;
+    }
 
-        const statDiv = document.createElement('div');
-        statDiv.id = `item-${currentSlot}-${itemId}-stat-${statId}`;
-        statDiv.className = 'comparison-stat-row';
-        statDiv.style.cssText = '--animation-order: ' + statId;
+    const statDiv = document.createElement("div");
+    statDiv.id = `item-${currentSlot}-${itemId}-stat-${statId}`;
+    statDiv.className = "comparison-stat-row";
+    statDiv.style.cssText = "--animation-order: " + statId;
 
-        let optionsHTML = '';
-        availableStats.forEach(stat => {
-            optionsHTML += `<option value="${stat.value}">${stat.label}</option>`;
-        });
+    let optionsHTML = "";
+    availableStats.forEach((stat) => {
+      optionsHTML += `<option value="${stat.value}">${stat.label}</option>`;
+    });
 
-        statDiv.innerHTML = `
+    statDiv.innerHTML = `
             <div class="input-group comparison-stat-group">
                 <label for="item-${currentSlot}-${itemId}-stat-${statId}-type" class="comparison-stat-label">Stat Type</label>
                 <select id="item-${currentSlot}-${itemId}-stat-${statId}-type" aria-label="Stat type">
@@ -569,20 +648,23 @@ export async function addComparisonItemStat(itemId) {
             </button>
         `;
 
-        container.appendChild(statDiv);
+    container.appendChild(statDiv);
 
-        const typeInput = document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}-type`);
-        const valueInput = document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}-value`);
+    const typeInput = document.getElementById(
+      `item-${currentSlot}-${itemId}-stat-${statId}-type`,
+    );
+    const valueInput = document.getElementById(
+      `item-${currentSlot}-${itemId}-stat-${statId}-value`,
+    );
 
-        typeInput.onchange = () => saveSlotItemData(guid);
-        valueInput.onchange = () => saveSlotItemData(guid);
+    typeInput.onchange = () => saveSlotItemData(guid);
+    valueInput.onchange = () => saveSlotItemData(guid);
 
-        // Save after adding stat
-        await saveSlotItemData(guid);
-
-    } catch (error) {
-        console.error('[ComparisonUI] Failed to add comparison item stat:', error);
-    }
+    // Save after adding stat
+    await saveSlotItemData(guid);
+  } catch (error) {
+    console.error("[ComparisonUI] Failed to add comparison item stat:", error);
+  }
 }
 window.addComparisonItemStat = addComparisonItemStat;
 
@@ -592,29 +674,33 @@ window.addComparisonItemStat = addComparisonItemStat;
  * @param {number} statId - Stat ID
  */
 export async function removeComparisonItemStat(itemId, statId) {
-    try {
-        const currentSlot = getCurrentSlot();
-        const guid = getGuidFromItemId(currentSlot, itemId);
+  try {
+    const currentSlot = getCurrentSlot();
+    const guid = getGuidFromItemId(currentSlot, itemId);
 
-        if (!guid) {
-            console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
-            return;
-        }
-
-        const stat = document.getElementById(`item-${currentSlot}-${itemId}-stat-${statId}`);
-        if (stat) {
-            stat.style.opacity = '0';
-            stat.style.transform = 'translateX(-20px)';
-            setTimeout(async () => {
-                stat.remove();
-                // Save after removing stat
-                await saveSlotItemData(guid);
-            }, COMPARISON_CONFIG.ANIMATION_DURATION_MS);
-        }
-
-    } catch (error) {
-        console.error('[ComparisonUI] Failed to remove comparison item stat:', error);
+    if (!guid) {
+      console.error(`[ComparisonUI] Could not find guid for item ${itemId}`);
+      return;
     }
+
+    const stat = document.getElementById(
+      `item-${currentSlot}-${itemId}-stat-${statId}`,
+    );
+    if (stat) {
+      stat.style.opacity = "0";
+      stat.style.transform = "translateX(-20px)";
+      setTimeout(async () => {
+        stat.remove();
+        // Save after removing stat
+        await saveSlotItemData(guid);
+      }, COMPARISON_CONFIG.ANIMATION_DURATION_MS);
+    }
+  } catch (error) {
+    console.error(
+      "[ComparisonUI] Failed to remove comparison item stat:",
+      error,
+    );
+  }
 }
 window.removeComparisonItemStat = removeComparisonItemStat;
 
@@ -626,11 +712,11 @@ window.removeComparisonItemStat = removeComparisonItemStat;
  * Show empty state when no comparison items exist
  */
 function showEmptyComparisonState() {
-    const container = document.getElementById('comparison-items-container');
-    if (container && container.children.length === 0) {
-        const emptyState = document.createElement('div');
-        emptyState.className = 'comparison-empty-state';
-        emptyState.innerHTML = `
+  const container = document.getElementById("comparison-items-container");
+  if (container && container.children.length === 0) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "comparison-empty-state";
+    emptyState.innerHTML = `
             <div class="comparison-empty-icon">
                 <svg width="48" height="48" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -640,17 +726,17 @@ function showEmptyComparisonState() {
             <p class="comparison-empty-text">No comparison items yet</p>
             <p class="comparison-empty-subtext">Add items to compare with your equipped gear</p>
         `;
-        container.appendChild(emptyState);
-    }
+    container.appendChild(emptyState);
+  }
 }
 
 /**
  * Remove empty state when items are added
  */
 function hideEmptyComparisonState() {
-    const container = document.getElementById('comparison-items-container');
-    if (container) {
-        const emptyStates = container.querySelectorAll('.comparison-empty-state');
-        emptyStates.forEach(state => state.remove());
-    }
+  const container = document.getElementById("comparison-items-container");
+  if (container) {
+    const emptyStates = container.querySelectorAll(".comparison-empty-state");
+    emptyStates.forEach((state) => state.remove());
+  }
 }

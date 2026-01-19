@@ -1,4 +1,4 @@
-import { COMPANION_DATA } from './companion-data.js';
+import { COMPANION_DATA } from "./companion-data.js";
 
 // Expose getCompanionEffects globally for use in state.js
 window.getCompanionEffects = null; // Will be set after function definition
@@ -13,17 +13,25 @@ window.getCompanionEffects = null; // Will be set after function definition
 export function getCompanionEffects(className, rarity, level) {
   // Validate inputs
   if (!COMPANION_DATA.classes.includes(className)) {
-    console.warn(`Invalid class: ${className}. Available classes:`, COMPANION_DATA.classes);
+    console.warn(
+      `Invalid class: ${className}. Available classes:`,
+      COMPANION_DATA.classes,
+    );
     return null;
   }
 
   if (!COMPANION_DATA.rarities.includes(rarity)) {
-    console.warn(`Invalid rarity: ${rarity}. Available rarities:`, COMPANION_DATA.rarities);
+    console.warn(
+      `Invalid rarity: ${rarity}. Available rarities:`,
+      COMPANION_DATA.rarities,
+    );
     return null;
   }
 
   if (level < 1 || level > COMPANION_DATA.maxLevel) {
-    console.warn(`Invalid level: ${level}. Must be between 1 and ${COMPANION_DATA.maxLevel}`);
+    console.warn(
+      `Invalid level: ${level}. Must be between 1 and ${COMPANION_DATA.maxLevel}`,
+    );
     return null;
   }
 
@@ -45,7 +53,7 @@ export function getCompanionEffects(className, rarity, level) {
     inventoryEffect: levelData.inventoryEffect,
     equipEffect: levelData.equipEffect,
     supporterCode: rarityData.supporterCode,
-    supporterIndex: rarityData.supporterIndex
+    supporterIndex: rarityData.supporterIndex,
   };
 }
 
@@ -114,7 +122,7 @@ export function calculateTotalCompanionEffects(companions) {
 
   return {
     inventoryEffects: totalInventoryEffects,
-    equipEffects: totalEquipEffects
+    equipEffects: totalEquipEffects,
   };
 }
 

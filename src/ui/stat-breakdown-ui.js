@@ -1,8 +1,19 @@
 // Stat Breakdown UI - Shows where base stats come from (equipment and companions)
 // REDESIGNED: Premium fintech-meets-gaming-HUD aesthetic with glassmorphism & data visualization
-import { getContributedStats, onContributedStatsChange, getUnlockableStatConfigs, getUnlockableStat, updateUnlockableStat, updateUnlockableStatsContributions, getGuildBonusConfigs, getGuildBonus, updateGuildBonus, updateGuildBonusesContributions } from '@core/state/state.js';
-import { getWeaponAttackBonus } from '@core/state/state.js';
-import { saveToLocalStorage } from '@core/state/storage.js';
+import {
+  getContributedStats,
+  onContributedStatsChange,
+  getUnlockableStatConfigs,
+  getUnlockableStat,
+  updateUnlockableStat,
+  updateUnlockableStatsContributions,
+  getGuildBonusConfigs,
+  getGuildBonus,
+  updateGuildBonus,
+  updateGuildBonusesContributions,
+} from "@core/state/state.js";
+import { getWeaponAttackBonus } from "@core/state/state.js";
+import { saveToLocalStorage } from "@core/state/storage.js";
 
 // ============================================================================
 // CSS DESIGN SYSTEM - Premium Data-Driven Aesthetic
@@ -1030,10 +1041,10 @@ const STAT_BREAKDOWN_STYLES = `
 `;
 
 // Inject styles on module load
-if (typeof document !== 'undefined') {
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = STAT_BREAKDOWN_STYLES;
-    document.head.appendChild(styleSheet);
+if (typeof document !== "undefined") {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = STAT_BREAKDOWN_STYLES;
+  document.head.appendChild(styleSheet);
 }
 
 // ============================================================================
@@ -1041,98 +1052,98 @@ if (typeof document !== 'undefined') {
 // ============================================================================
 
 const STAT_DEFINITIONS = {
-    'mainStat': {
-        displayName: 'Main Stat',
-        inputId: 'primary-main-stat-base',
-        isPercentage: false,
-        companionKeys: ['MainStat']
-    },
-    'attack': {
-        displayName: 'Attack',
-        inputId: 'attack-base',
-        isPercentage: false,
-        needsDivision: true,
-        companionKeys: ['Attack']
-    },
-    'defense': {
-        displayName: 'Defense',
-        inputId: 'defense-base',
-        isPercentage: false
-    },
-    'critRate': {
-        displayName: 'Critical Rate',
-        inputId: 'crit-rate-base',
-        isPercentage: true
-    },
-    'critDamage': {
-        displayName: 'Critical Damage',
-        inputId: 'crit-damage-base',
-        isPercentage: true
-    },
-    'attackSpeed': {
-        displayName: 'Attack Speed',
-        inputId: 'attack-speed-base',
-        isPercentage: true
-    },
-    'damage': {
-        displayName: 'Damage',
-        inputId: 'damage-base',
-        isPercentage: true,
-        companionKeys: ['AttackPower']
-    },
-    'damageAmp': {
-        displayName: 'Damage Amplification',
-        inputId: 'damage-amp-base',
-        isPercentage: false
-    },
-    'defPen': {
-        displayName: 'Defense Penetration',
-        inputId: 'def-pen-base',
-        isPercentage: true
-    },
-    'bossDamage': {
-        displayName: 'Boss Monster Damage',
-        inputId: 'boss-damage-base',
-        isPercentage: true,
-        companionKeys: ['AttackPowerToBoss']
-    },
-    'normalDamage': {
-        displayName: 'Normal Monster Damage',
-        inputId: 'normal-damage-base',
-        isPercentage: true,
-        companionKeys: ['AttackPowerExcludeBoss']
-    },
-    'minDamage': {
-        displayName: 'Min Damage Multiplier',
-        inputId: 'min-damage-base',
-        isPercentage: true,
-        companionKeys: ['MinDamageRatio']
-    },
-    'maxDamage': {
-        displayName: 'Max Damage Multiplier',
-        inputId: 'max-damage-base',
-        isPercentage: true,
-        companionKeys: ['MaxDamageRatio']
-    },
-    'finalDamage': {
-        displayName: 'Final Damage',
-        inputId: 'final-damage-base',
-        isPercentage: true
-    }
+  mainStat: {
+    displayName: "Main Stat",
+    inputId: "primary-main-stat-base",
+    isPercentage: false,
+    companionKeys: ["MainStat"],
+  },
+  attack: {
+    displayName: "Attack",
+    inputId: "attack-base",
+    isPercentage: false,
+    needsDivision: true,
+    companionKeys: ["Attack"],
+  },
+  defense: {
+    displayName: "Defense",
+    inputId: "defense-base",
+    isPercentage: false,
+  },
+  critRate: {
+    displayName: "Critical Rate",
+    inputId: "crit-rate-base",
+    isPercentage: true,
+  },
+  critDamage: {
+    displayName: "Critical Damage",
+    inputId: "crit-damage-base",
+    isPercentage: true,
+  },
+  attackSpeed: {
+    displayName: "Attack Speed",
+    inputId: "attack-speed-base",
+    isPercentage: true,
+  },
+  damage: {
+    displayName: "Damage",
+    inputId: "damage-base",
+    isPercentage: true,
+    companionKeys: ["AttackPower"],
+  },
+  damageAmp: {
+    displayName: "Damage Amplification",
+    inputId: "damage-amp-base",
+    isPercentage: false,
+  },
+  defPen: {
+    displayName: "Defense Penetration",
+    inputId: "def-pen-base",
+    isPercentage: true,
+  },
+  bossDamage: {
+    displayName: "Boss Monster Damage",
+    inputId: "boss-damage-base",
+    isPercentage: true,
+    companionKeys: ["AttackPowerToBoss"],
+  },
+  normalDamage: {
+    displayName: "Normal Monster Damage",
+    inputId: "normal-damage-base",
+    isPercentage: true,
+    companionKeys: ["AttackPowerExcludeBoss"],
+  },
+  minDamage: {
+    displayName: "Min Damage Multiplier",
+    inputId: "min-damage-base",
+    isPercentage: true,
+    companionKeys: ["MinDamageRatio"],
+  },
+  maxDamage: {
+    displayName: "Max Damage Multiplier",
+    inputId: "max-damage-base",
+    isPercentage: true,
+    companionKeys: ["MaxDamageRatio"],
+  },
+  finalDamage: {
+    displayName: "Final Damage",
+    inputId: "final-damage-base",
+    isPercentage: true,
+  },
 };
 
 const SLOT_DISPLAY_NAMES = {
-    'head': 'Head',
-    'cape': 'Cape',
-    'chest': 'Chest',
-    'shoulders': 'Shoulders',
-    'legs': 'Legs',
-    'belt': 'Belt',
-    'gloves': 'Gloves',
-    'boots': 'Boots',
-    'ring': 'Ring',
-    'neck': 'Neck',
-    'eye-accessory': 'Eye Accessory'
+  head: "Head",
+  cape: "Cape",
+  chest: "Chest",
+  shoulders: "Shoulders",
+  legs: "Legs",
+  belt: "Belt",
+  gloves: "Gloves",
+  boots: "Boots",
+  ring: "Ring",
+  neck: "Neck",
+  "eye-accessory": "Eye Accessory",
 };
 
 // ============================================================================
@@ -1140,8 +1151,8 @@ const SLOT_DISPLAY_NAMES = {
 // ============================================================================
 
 const ICONS = {
-    lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
-    unlock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+  unlock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>`,
 };
 
 // ============================================================================
@@ -1149,17 +1160,19 @@ const ICONS = {
 // ============================================================================
 
 function renderUnlockableStatCard(unlockableKey, config) {
-    const statData = getUnlockableStat(unlockableKey);
-    const isUnlocked = statData.unlocked;
-    const currentLevel = statData.level || 0;
-    const currentValue = config.base + (currentLevel * config.increment);
+  const statData = getUnlockableStat(unlockableKey);
+  const isUnlocked = statData.unlocked;
+  const currentLevel = statData.level || 0;
+  const currentValue = config.base + currentLevel * config.increment;
 
-    const cardClass = isUnlocked ? 'stat-card unlocked' : 'stat-card locked';
-    const valueClass = isUnlocked ? 'stat-card-value unlocked' : 'stat-card-value locked';
-    const lockIcon = isUnlocked ? ICONS.unlock : ICONS.lock;
-    const lockTitle = isUnlocked ? 'Lock this stat' : 'Unlock this stat';
+  const cardClass = isUnlocked ? "stat-card unlocked" : "stat-card locked";
+  const valueClass = isUnlocked
+    ? "stat-card-value unlocked"
+    : "stat-card-value locked";
+  const lockIcon = isUnlocked ? ICONS.unlock : ICONS.lock;
+  const lockTitle = isUnlocked ? "Lock this stat" : "Unlock this stat";
 
-    let html = `
+  let html = `
         <div class="${cardClass}" data-stat="${unlockableKey}">
             <div class="stat-card-header">
                 <span class="stat-card-title">${config.displayName}</span>
@@ -1179,8 +1192,8 @@ function renderUnlockableStatCard(unlockableKey, config) {
             </div>
     `;
 
-    if (isUnlocked) {
-        html += `
+  if (isUnlocked) {
+    html += `
             <div class="stat-slider-section">
                 <div class="stat-slider-header">
                     <span class="stat-slider-label">Level</span>
@@ -1199,32 +1212,33 @@ function renderUnlockableStatCard(unlockableKey, config) {
                 >
             </div>
         `;
-    }
+  }
 
-    html += '</div>';
-    return html;
+  html += "</div>";
+  return html;
 }
 
 function renderSpecialStatsContent() {
-    const configs = getUnlockableStatConfigs();
-    const configKeys = Object.keys(configs);
+  const configs = getUnlockableStatConfigs();
+  const configKeys = Object.keys(configs);
 
-    const column1 = configKeys.slice(0, 4);
-    const column2 = configKeys.slice(4, 8);
-    const column3 = configKeys.slice(8);
+  const column1 = configKeys.slice(0, 4);
+  const column2 = configKeys.slice(4, 8);
+  const column3 = configKeys.slice(8);
 
-    let html = '<div class="unlockable-stats-grid">';
+  let html = '<div class="unlockable-stats-grid">';
 
-    [column1, column2, column3].forEach(column => {
-        html += '<div style="display: flex; flex-direction: column; gap: var(--sb-space-md);">';
-        column.forEach(key => {
-            html += renderUnlockableStatCard(key, configs[key]);
-        });
-        html += '</div>';
+  [column1, column2, column3].forEach((column) => {
+    html +=
+      '<div style="display: flex; flex-direction: column; gap: var(--sb-space-md);">';
+    column.forEach((key) => {
+      html += renderUnlockableStatCard(key, configs[key]);
     });
+    html += "</div>";
+  });
 
-    html += '</div>';
-    return html;
+  html += "</div>";
+  return html;
 }
 
 // ============================================================================
@@ -1232,23 +1246,30 @@ function renderSpecialStatsContent() {
 // ============================================================================
 
 function renderGuildBonusCard(guildKey, config) {
-    const bonusData = getGuildBonus(guildKey);
-    const isUnlocked = bonusData.unlocked;
-    const currentLevel = bonusData.level || 0;
+  const bonusData = getGuildBonus(guildKey);
+  const isUnlocked = bonusData.unlocked;
+  const currentLevel = bonusData.level || 0;
 
-    let currentValue;
-    if (config.customValues) {
-        currentValue = isUnlocked && currentLevel > 0 ? (config.customValues[currentLevel - 1] || 0) : 0;
-    } else {
-        currentValue = config.base + (currentLevel * config.increment);
-    }
+  let currentValue;
+  if (config.customValues) {
+    currentValue =
+      isUnlocked && currentLevel > 0
+        ? config.customValues[currentLevel - 1] || 0
+        : 0;
+  } else {
+    currentValue = config.base + currentLevel * config.increment;
+  }
 
-    const cardClass = isUnlocked ? 'stat-card guild-card unlocked' : 'stat-card guild-card locked';
-    const valueClass = isUnlocked ? 'stat-card-value unlocked' : 'stat-card-value locked';
-    const lockIcon = isUnlocked ? ICONS.unlock : ICONS.lock;
-    const lockTitle = isUnlocked ? 'Lock this bonus' : 'Unlock this bonus';
+  const cardClass = isUnlocked
+    ? "stat-card guild-card unlocked"
+    : "stat-card guild-card locked";
+  const valueClass = isUnlocked
+    ? "stat-card-value unlocked"
+    : "stat-card-value locked";
+  const lockIcon = isUnlocked ? ICONS.unlock : ICONS.lock;
+  const lockTitle = isUnlocked ? "Lock this bonus" : "Unlock this bonus";
 
-    let html = `
+  let html = `
         <div class="${cardClass}" data-stat="${guildKey}">
             <div class="stat-card-header">
                 <span class="stat-card-title">${config.displayName}</span>
@@ -1268,8 +1289,8 @@ function renderGuildBonusCard(guildKey, config) {
             </div>
     `;
 
-    if (isUnlocked) {
-        html += `
+  if (isUnlocked) {
+    html += `
             <div class="stat-slider-section">
                 <div class="stat-slider-header">
                     <span class="stat-slider-label">Rank</span>
@@ -1288,23 +1309,23 @@ function renderGuildBonusCard(guildKey, config) {
                 >
             </div>
         `;
-    }
+  }
 
-    html += '</div>';
-    return html;
+  html += "</div>";
+  return html;
 }
 
 function renderGuildBonusesContent() {
-    const configs = getGuildBonusConfigs();
-    const configKeys = Object.keys(configs);
+  const configs = getGuildBonusConfigs();
+  const configKeys = Object.keys(configs);
 
-    let html = '<div class="guild-bonuses-grid">';
-    configKeys.forEach(key => {
-        html += renderGuildBonusCard(key, configs[key]);
-    });
-    html += '</div>';
+  let html = '<div class="guild-bonuses-grid">';
+  configKeys.forEach((key) => {
+    html += renderGuildBonusCard(key, configs[key]);
+  });
+  html += "</div>";
 
-    return html;
+  return html;
 }
 
 // ============================================================================
@@ -1312,7 +1333,7 @@ function renderGuildBonusesContent() {
 // ============================================================================
 
 function renderLevelStatsContent() {
-    return `
+  return `
         <div class="breakdown-empty" style="background: var(--sb-surface-tertiary); border: 1px solid var(--sb-border-medium); border-radius: 10px;">
             <div style="font-size: 2rem; margin-bottom: var(--sb-space-sm);">🚧</div>
             Level stats coming soon...
@@ -1325,7 +1346,7 @@ function renderLevelStatsContent() {
 // ============================================================================
 
 function createTabsStructure() {
-    return `
+  return `
         <div class="stat-breakdown-config-wrapper">
             <button class="stat-config-toggle" onclick="toggleConfigSection()" id="config-toggle-btn">
                 <span class="stat-config-toggle-text">
@@ -1360,31 +1381,38 @@ function createTabsStructure() {
     `;
 }
 
-window.toggleConfigSection = function() {
-    const content = document.getElementById('config-content');
-    const icon = document.getElementById('config-toggle-icon');
-    const toggle = document.getElementById('config-toggle-btn');
+window.toggleConfigSection = function () {
+  const content = document.getElementById("config-content");
+  const icon = document.getElementById("config-toggle-icon");
+  const toggle = document.getElementById("config-toggle-btn");
 
-    if (content.classList.contains('expanded')) {
-        content.classList.remove('expanded');
-        icon.style.transform = 'rotate(0deg)';
-        toggle.classList.remove('expanded');
-    } else {
-        content.classList.add('expanded');
-        icon.style.transform = 'rotate(180deg)';
-        toggle.classList.add('expanded');
-    }
+  if (content.classList.contains("expanded")) {
+    content.classList.remove("expanded");
+    icon.style.transform = "rotate(0deg)";
+    toggle.classList.remove("expanded");
+  } else {
+    content.classList.add("expanded");
+    icon.style.transform = "rotate(180deg)";
+    toggle.classList.add("expanded");
+  }
 };
 
 // ============================================================================
 // STAT BREAKDOWN GRID
 // ============================================================================
 
-function renderStatSection(statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus) {
-    const totalContributed = contributions.reduce((sum, c) => sum + c.value, 0);
-    const unaccounted = displayValue - totalContributed;
+function renderStatSection(
+  statKey,
+  statDef,
+  inputValue,
+  displayValue,
+  contributions,
+  weaponAttackBonus,
+) {
+  const totalContributed = contributions.reduce((sum, c) => sum + c.value, 0);
+  const unaccounted = displayValue - totalContributed;
 
-    let html = `
+  let html = `
         <div class="breakdown-card" data-stat="${statKey}">
             <div class="breakdown-header">
                 <span class="breakdown-title">${statDef.displayName}</span>
@@ -1392,23 +1420,26 @@ function renderStatSection(statKey, statDef, inputValue, displayValue, contribut
             </div>
     `;
 
-    if (statDef.needsDivision && weaponAttackBonus > 1) {
-        html += `
+  if (statDef.needsDivision && weaponAttackBonus > 1) {
+    html += `
             <div class="breakdown-weapon-note">
                 ÷${weaponAttackBonus.toFixed(3)} (${((weaponAttackBonus - 1) * 100).toFixed(1)}% bonus) = <strong>${formatValue(displayValue, false)}</strong> base
             </div>
         `;
-    }
+  }
 
-    if (contributions.length > 0 || unaccounted > 0.01) {
-        html += '<div class="contribution-list">';
+  if (contributions.length > 0 || unaccounted > 0.01) {
+    html += '<div class="contribution-list">';
 
-        contributions.forEach(contribution => {
-            const type = contribution.type;
-            const percentage = displayValue > 0 ? ((contribution.value / displayValue) * 100).toFixed(1) : 0;
-            const barWidth = Math.min(percentage, 100);
+    contributions.forEach((contribution) => {
+      const type = contribution.type;
+      const percentage =
+        displayValue > 0
+          ? ((contribution.value / displayValue) * 100).toFixed(1)
+          : 0;
+      const barWidth = Math.min(percentage, 100);
 
-            html += `
+      html += `
                 <div class="contribution-item" data-type="${type}">
                     <div class="contribution-content">
                         <span class="contribution-name">${contribution.name}</span>
@@ -1422,13 +1453,14 @@ function renderStatSection(statKey, statDef, inputValue, displayValue, contribut
                     </div>
                 </div>
             `;
-        });
+    });
 
-        if (unaccounted > 0.01) {
-            const unaccountedPercent = displayValue > 0 ? ((unaccounted / displayValue) * 100).toFixed(1) : 0;
-            const barWidth = Math.min(unaccountedPercent, 100);
+    if (unaccounted > 0.01) {
+      const unaccountedPercent =
+        displayValue > 0 ? ((unaccounted / displayValue) * 100).toFixed(1) : 0;
+      const barWidth = Math.min(unaccountedPercent, 100);
 
-            html += `
+      html += `
                 <div class="contribution-item" data-type="unaccounted">
                     <div class="contribution-content">
                         <span class="contribution-name">Unaccounted</span>
@@ -1442,15 +1474,15 @@ function renderStatSection(statKey, statDef, inputValue, displayValue, contribut
                     </div>
                 </div>
             `;
-        }
-
-        html += '</div>';
-    } else {
-        html += `<div class="breakdown-empty">No contributions</div>`;
     }
 
-    html += '</div>';
-    return html;
+    html += "</div>";
+  } else {
+    html += `<div class="breakdown-empty">No contributions</div>`;
+  }
+
+  html += "</div>";
+  return html;
 }
 
 // ============================================================================
@@ -1458,31 +1490,31 @@ function renderStatSection(statKey, statDef, inputValue, displayValue, contribut
 // ============================================================================
 
 function renderContributionLegend() {
-    const legendItems = [
-        { type: 'base', name: 'Base' },
-        { type: 'equipment', name: 'Equipment' },
-        { type: 'scrolling', name: 'Scrolling' },
-        { type: 'cube', name: 'Cube' },
-        { type: 'companion', name: 'Companion' },
-        { type: 'innerAbility', name: 'Inner Ability' },
-        { type: 'mainStat', name: 'Primary Stat' },
-        { type: 'unlockable', name: 'Special Stats' },
-        { type: 'guild', name: 'Guild Bonuses' },
-        { type: 'unaccounted', name: 'Unaccounted' }
-    ];
+  const legendItems = [
+    { type: "base", name: "Base" },
+    { type: "equipment", name: "Equipment" },
+    { type: "scrolling", name: "Scrolling" },
+    { type: "cube", name: "Cube" },
+    { type: "companion", name: "Companion" },
+    { type: "innerAbility", name: "Inner Ability" },
+    { type: "mainStat", name: "Primary Stat" },
+    { type: "unlockable", name: "Special Stats" },
+    { type: "guild", name: "Guild Bonuses" },
+    { type: "unaccounted", name: "Unaccounted" },
+  ];
 
-    let html = '<div class="contribution-legend">';
-    legendItems.forEach(item => {
-        html += `
+  let html = '<div class="contribution-legend">';
+  legendItems.forEach((item) => {
+    html += `
             <div class="legend-item" data-type="${item.type}">
                 <div class="legend-dot"></div>
                 <span>${item.name}</span>
             </div>
         `;
-    });
-    html += '</div>';
+  });
+  html += "</div>";
 
-    return html;
+  return html;
 }
 
 // ============================================================================
@@ -1490,150 +1522,217 @@ function renderContributionLegend() {
 // ============================================================================
 
 export function updateStatBreakdown() {
-    const container = document.getElementById('stat-breakdown-content');
-    if (!container) return;
+  const container = document.getElementById("stat-breakdown-content");
+  if (!container) return;
 
-    const contributedStats = getContributedStats();
-    const {
-        base = {},
-        equipment = {},
-        Companion = {},
-        CompanionInventory = {},
-        InnerAbility = {},
-        MainStat = {},
-        scrolling = {},
-        cubePotential = {},
-        UnlockableStats = {},
-        GuildBonuses = {}
-    } = contributedStats;
+  const contributedStats = getContributedStats();
+  const {
+    base = {},
+    equipment = {},
+    Companion = {},
+    CompanionInventory = {},
+    InnerAbility = {},
+    MainStat = {},
+    scrolling = {},
+    cubePotential = {},
+    UnlockableStats = {},
+    GuildBonuses = {},
+  } = contributedStats;
 
-    const tabsExist = document.querySelector('.stat-tab-button');
-    const gridExists = document.getElementById('stat-breakdown-grid');
+  const tabsExist = document.querySelector(".stat-tab-button");
+  const gridExists = document.getElementById("stat-breakdown-grid");
 
-    if (!tabsExist || !gridExists) {
-        // Full render
-        let html = '<div class="stat-breakdown-wrapper">' + createTabsStructure();
-
-        const statData = [];
-
-        Object.entries(STAT_DEFINITIONS).forEach(([statKey, statDef]) => {
-            const inputValue = getInputValue(statDef.inputId);
-            if (inputValue === null) return;
-
-            let displayValue = inputValue;
-            let weaponAttackBonus = 1;
-
-            if (statDef.needsDivision) {
-                const bonus = getWeaponAttackBonus();
-                weaponAttackBonus = (bonus.totalAttack / 100) + 1;
-                displayValue = inputValue / weaponAttackBonus;
-            }
-
-            const contributions = gatherContributions(
-                statKey, statDef, base, equipment, Companion, CompanionInventory,
-                InnerAbility, MainStat, scrolling, cubePotential, UnlockableStats, GuildBonuses,
-                displayValue
-            );
-
-            statData.push({ statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus });
-        });
-
-        if (statData.length === 0) {
-            html += '<div class="breakdown-empty">No stat data available</div>';
-        } else {
-            html += '<div id="stat-breakdown-grid" class="stat-breakdown-grid">';
-            statData.forEach(({ statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus }) => {
-                html += renderStatSection(statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus);
-            });
-            html += '</div>';
-            html += renderContributionLegend();
-        }
-
-        html += '</div>';
-        container.innerHTML = html;
-    } else {
-        updateActiveTabContent();
-        updateBreakdownGrid();
-    }
-}
-
-function updateActiveTabContent() {
-    const activeButton = document.querySelector('.stat-tab-button.active');
-    if (!activeButton) return;
-
-    const tabName = activeButton.getAttribute('data-tab');
-    const contentContainer = document.getElementById(`${tabName}-content`);
-    if (!contentContainer) return;
-
-    let newContent = '';
-    switch (tabName) {
-        case 'special-stats':
-            newContent = renderSpecialStatsContent();
-            break;
-        case 'guild-bonuses':
-            newContent = renderGuildBonusesContent();
-            break;
-        case 'level-stats':
-            newContent = renderLevelStatsContent();
-            break;
-    }
-
-    contentContainer.innerHTML = newContent;
-}
-
-function updateBreakdownGrid() {
-    const grid = document.getElementById('stat-breakdown-grid');
-    if (!grid) return;
-
-    const contributedStats = getContributedStats();
-    const {
-        base = {},
-        equipment = {},
-        Companion = {},
-        CompanionInventory = {},
-        InnerAbility = {},
-        MainStat = {},
-        scrolling = {},
-        cubePotential = {},
-        UnlockableStats = {},
-        GuildBonuses = {}
-    } = contributedStats;
+  if (!tabsExist || !gridExists) {
+    // Full render
+    let html = '<div class="stat-breakdown-wrapper">' + createTabsStructure();
 
     const statData = [];
 
     Object.entries(STAT_DEFINITIONS).forEach(([statKey, statDef]) => {
-        const inputValue = getInputValue(statDef.inputId);
-        if (inputValue === null) return;
+      const inputValue = getInputValue(statDef.inputId);
+      if (inputValue === null) return;
 
-        let displayValue = inputValue;
-        let weaponAttackBonus = 1;
+      let displayValue = inputValue;
+      let weaponAttackBonus = 1;
 
-        if (statDef.needsDivision) {
-            const bonus = getWeaponAttackBonus();
-            weaponAttackBonus = (bonus.totalAttack / 100) + 1;
-            displayValue = inputValue / weaponAttackBonus;
-        }
+      if (statDef.needsDivision) {
+        const bonus = getWeaponAttackBonus();
+        weaponAttackBonus = bonus.totalAttack / 100 + 1;
+        displayValue = inputValue / weaponAttackBonus;
+      }
 
-        const contributions = gatherContributions(
-            statKey, statDef, base, equipment, Companion, CompanionInventory,
-            InnerAbility, MainStat, scrolling, cubePotential, UnlockableStats, GuildBonuses,
-            displayValue
-        );
+      const contributions = gatherContributions(
+        statKey,
+        statDef,
+        base,
+        equipment,
+        Companion,
+        CompanionInventory,
+        InnerAbility,
+        MainStat,
+        scrolling,
+        cubePotential,
+        UnlockableStats,
+        GuildBonuses,
+        displayValue,
+      );
 
-        statData.push({ statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus });
+      statData.push({
+        statKey,
+        statDef,
+        inputValue,
+        displayValue,
+        contributions,
+        weaponAttackBonus,
+      });
     });
 
     if (statData.length === 0) {
-        grid.innerHTML = '<div class="breakdown-empty">No stat data available</div>';
-        return;
+      html += '<div class="breakdown-empty">No stat data available</div>';
+    } else {
+      html += '<div id="stat-breakdown-grid" class="stat-breakdown-grid">';
+      statData.forEach(
+        ({
+          statKey,
+          statDef,
+          inputValue,
+          displayValue,
+          contributions,
+          weaponAttackBonus,
+        }) => {
+          html += renderStatSection(
+            statKey,
+            statDef,
+            inputValue,
+            displayValue,
+            contributions,
+            weaponAttackBonus,
+          );
+        },
+      );
+      html += "</div>";
+      html += renderContributionLegend();
     }
 
-    let html = '';
-    statData.forEach(({ statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus }) => {
-        html += renderStatSection(statKey, statDef, inputValue, displayValue, contributions, weaponAttackBonus);
-    });
+    html += "</div>";
+    container.innerHTML = html;
+  } else {
+    updateActiveTabContent();
+    updateBreakdownGrid();
+  }
+}
 
-    grid.innerHTML = html;
+function updateActiveTabContent() {
+  const activeButton = document.querySelector(".stat-tab-button.active");
+  if (!activeButton) return;
+
+  const tabName = activeButton.getAttribute("data-tab");
+  const contentContainer = document.getElementById(`${tabName}-content`);
+  if (!contentContainer) return;
+
+  let newContent = "";
+  switch (tabName) {
+    case "special-stats":
+      newContent = renderSpecialStatsContent();
+      break;
+    case "guild-bonuses":
+      newContent = renderGuildBonusesContent();
+      break;
+    case "level-stats":
+      newContent = renderLevelStatsContent();
+      break;
+  }
+
+  contentContainer.innerHTML = newContent;
+}
+
+function updateBreakdownGrid() {
+  const grid = document.getElementById("stat-breakdown-grid");
+  if (!grid) return;
+
+  const contributedStats = getContributedStats();
+  const {
+    base = {},
+    equipment = {},
+    Companion = {},
+    CompanionInventory = {},
+    InnerAbility = {},
+    MainStat = {},
+    scrolling = {},
+    cubePotential = {},
+    UnlockableStats = {},
+    GuildBonuses = {},
+  } = contributedStats;
+
+  const statData = [];
+
+  Object.entries(STAT_DEFINITIONS).forEach(([statKey, statDef]) => {
+    const inputValue = getInputValue(statDef.inputId);
+    if (inputValue === null) return;
+
+    let displayValue = inputValue;
+    let weaponAttackBonus = 1;
+
+    if (statDef.needsDivision) {
+      const bonus = getWeaponAttackBonus();
+      weaponAttackBonus = bonus.totalAttack / 100 + 1;
+      displayValue = inputValue / weaponAttackBonus;
+    }
+
+    const contributions = gatherContributions(
+      statKey,
+      statDef,
+      base,
+      equipment,
+      Companion,
+      CompanionInventory,
+      InnerAbility,
+      MainStat,
+      scrolling,
+      cubePotential,
+      UnlockableStats,
+      GuildBonuses,
+      displayValue,
+    );
+
+    statData.push({
+      statKey,
+      statDef,
+      inputValue,
+      displayValue,
+      contributions,
+      weaponAttackBonus,
+    });
+  });
+
+  if (statData.length === 0) {
+    grid.innerHTML =
+      '<div class="breakdown-empty">No stat data available</div>';
+    return;
+  }
+
+  let html = "";
+  statData.forEach(
+    ({
+      statKey,
+      statDef,
+      inputValue,
+      displayValue,
+      contributions,
+      weaponAttackBonus,
+    }) => {
+      html += renderStatSection(
+        statKey,
+        statDef,
+        inputValue,
+        displayValue,
+        contributions,
+        weaponAttackBonus,
+      );
+    },
+  );
+
+  grid.innerHTML = html;
 }
 
 // ============================================================================
@@ -1641,144 +1740,183 @@ function updateBreakdownGrid() {
 // ============================================================================
 
 function getInputValue(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return null;
-    return parseFloat(input.value) || 0;
+  const input = document.getElementById(inputId);
+  if (!input) return null;
+  return parseFloat(input.value) || 0;
 }
 
-function gatherContributions(statKey, statDef, baseStats, equipmentStats, companionStats, companionInventoryStats, innerAbilityStats, mainStatStats, scrollingStats, cubePotentialStats, unlockableStats, guildBonuses, targetValue) {
-    const contributions = [];
+function gatherContributions(
+  statKey,
+  statDef,
+  baseStats,
+  equipmentStats,
+  companionStats,
+  companionInventoryStats,
+  innerAbilityStats,
+  mainStatStats,
+  scrollingStats,
+  cubePotentialStats,
+  unlockableStats,
+  guildBonuses,
+  targetValue,
+) {
+  const contributions = [];
 
-    const baseValue = baseStats[statKey];
-    if (baseValue && baseValue > 0) {
-        contributions.push({ type: 'base', name: 'Base', value: baseValue });
-    }
+  const baseValue = baseStats[statKey];
+  if (baseValue && baseValue > 0) {
+    contributions.push({ type: "base", name: "Base", value: baseValue });
+  }
 
-    const unlockableValue = unlockableStats[statKey];
-    if (unlockableValue && unlockableValue > 0) {
-        contributions.push({ type: 'unlockable', name: 'Special Stats', value: unlockableValue });
-    }
-
-    const guildValue = guildBonuses[statKey];
-    if (guildValue && guildValue > 0) {
-        contributions.push({ type: 'guild', name: 'Guild Bonuses', value: guildValue });
-    }
-
-    Object.entries(equipmentStats).forEach(([slotId, slotStats]) => {
-        const value = getEquipmentStatValue(slotStats, statKey, statDef);
-        if (value > 0) {
-            contributions.push({
-                type: 'equipment',
-                name: SLOT_DISPLAY_NAMES[slotId] || slotId,
-                value: value
-            });
-        }
+  const unlockableValue = unlockableStats[statKey];
+  if (unlockableValue && unlockableValue > 0) {
+    contributions.push({
+      type: "unlockable",
+      name: "Special Stats",
+      value: unlockableValue,
     });
+  }
 
-    const scrollingValue = scrollingStats[statKey];
-    if (scrollingValue && scrollingValue > 0) {
-        contributions.push({ type: 'scrolling', name: 'Scrolling', value: scrollingValue });
-    }
-
-    const cubeValue = cubePotentialStats[statKey];
-    if (cubeValue && cubeValue > 0) {
-        contributions.push({ type: 'cube', name: 'Cube Potential', value: cubeValue });
-    }
-
-    const companionKeys = statDef.companionKeys || [getCompanionKey(statKey)];
-    Object.entries(companionStats).forEach(([companionKey, value]) => {
-        if (companionKeys.includes(companionKey) && value > 0) {
-            contributions.push({
-                type: 'companion',
-                name: formatCompanionKey(companionKey, 'equipped'),
-                value: value
-            });
-        }
+  const guildValue = guildBonuses[statKey];
+  if (guildValue && guildValue > 0) {
+    contributions.push({
+      type: "guild",
+      name: "Guild Bonuses",
+      value: guildValue,
     });
+  }
 
-    Object.entries(companionInventoryStats).forEach(([companionKey, value]) => {
-        if (companionKeys.includes(companionKey) && value > 0) {
-            contributions.push({
-                type: 'companion',
-                name: formatCompanionKey(companionKey, 'inventory'),
-                value: value
-            });
-        }
+  Object.entries(equipmentStats).forEach(([slotId, slotStats]) => {
+    const value = getEquipmentStatValue(slotStats, statKey, statDef);
+    if (value > 0) {
+      contributions.push({
+        type: "equipment",
+        name: SLOT_DISPLAY_NAMES[slotId] || slotId,
+        value: value,
+      });
+    }
+  });
+
+  const scrollingValue = scrollingStats[statKey];
+  if (scrollingValue && scrollingValue > 0) {
+    contributions.push({
+      type: "scrolling",
+      name: "Scrolling",
+      value: scrollingValue,
     });
+  }
 
-    const innerAbilityValue = innerAbilityStats[statKey];
-    if (innerAbilityValue && innerAbilityValue > 0) {
-        contributions.push({ type: 'innerAbility', name: 'Inner Ability', value: innerAbilityValue });
+  const cubeValue = cubePotentialStats[statKey];
+  if (cubeValue && cubeValue > 0) {
+    contributions.push({
+      type: "cube",
+      name: "Cube Potential",
+      value: cubeValue,
+    });
+  }
+
+  const companionKeys = statDef.companionKeys || [getCompanionKey(statKey)];
+  Object.entries(companionStats).forEach(([companionKey, value]) => {
+    if (companionKeys.includes(companionKey) && value > 0) {
+      contributions.push({
+        type: "companion",
+        name: formatCompanionKey(companionKey, "equipped"),
+        value: value,
+      });
     }
+  });
 
-    if (statKey === 'attack' && mainStatStats.attack) {
-        contributions.push({ type: 'mainStat', name: 'Primary Stat (1:1)', value: mainStatStats.attack });
+  Object.entries(companionInventoryStats).forEach(([companionKey, value]) => {
+    if (companionKeys.includes(companionKey) && value > 0) {
+      contributions.push({
+        type: "companion",
+        name: formatCompanionKey(companionKey, "inventory"),
+        value: value,
+      });
     }
+  });
 
-    return contributions;
+  const innerAbilityValue = innerAbilityStats[statKey];
+  if (innerAbilityValue && innerAbilityValue > 0) {
+    contributions.push({
+      type: "innerAbility",
+      name: "Inner Ability",
+      value: innerAbilityValue,
+    });
+  }
+
+  if (statKey === "attack" && mainStatStats.attack) {
+    contributions.push({
+      type: "mainStat",
+      name: "Primary Stat (1:1)",
+      value: mainStatStats.attack,
+    });
+  }
+
+  return contributions;
 }
 
 function getEquipmentStatValue(slotStats, statKey, statDef) {
-    const statKeyMap = {
-        'attack': 'attack',
-        'mainStat': 'mainStat',
-        'critRate': 'critRate',
-        'critDamage': 'critDamage',
-        'statDamage': 'statDamage',
-        'damage': 'damage',
-        'finalDamage': 'finalDamage',
-        'bossDamage': 'bossDamage',
-        'normalDamage': 'normalDamage',
-        'minDamage': 'minDamage',
-        'maxDamage': 'maxDamage',
-        'attackSpeed': 'attackSpeed',
-        'defPen': 'defPen',
-        'damageAmp': 'damageAmp'
-    };
+  const statKeyMap = {
+    attack: "attack",
+    mainStat: "mainStat",
+    critRate: "critRate",
+    critDamage: "critDamage",
+    statDamage: "statDamage",
+    damage: "damage",
+    finalDamage: "finalDamage",
+    bossDamage: "bossDamage",
+    normalDamage: "normalDamage",
+    minDamage: "minDamage",
+    maxDamage: "maxDamage",
+    attackSpeed: "attackSpeed",
+    defPen: "defPen",
+    damageAmp: "damageAmp",
+  };
 
-    const mappedKey = statKeyMap[statKey];
-    if (mappedKey && slotStats[mappedKey]) {
-        return slotStats[mappedKey];
-    }
+  const mappedKey = statKeyMap[statKey];
+  if (mappedKey && slotStats[mappedKey]) {
+    return slotStats[mappedKey];
+  }
 
-    return 0;
+  return 0;
 }
 
 function getCompanionKey(statKey) {
-    const keyMap = {
-        'bossDamage': 'AttackPowerToBoss',
-        'normalDamage': 'AttackPowerExcludeBoss',
-        'minDamage': 'MinDamageRatio',
-        'maxDamage': 'MaxDamageRatio',
-        'critRate': 'CriticalChance',
-        'attackSpeed': 'AttackSpeed',
-        'attack': 'Attack',
-        'statDamage': 'MainStat'
-    };
-    return keyMap[statKey] || statKey;
+  const keyMap = {
+    bossDamage: "AttackPowerToBoss",
+    normalDamage: "AttackPowerExcludeBoss",
+    minDamage: "MinDamageRatio",
+    maxDamage: "MaxDamageRatio",
+    critRate: "CriticalChance",
+    attackSpeed: "AttackSpeed",
+    attack: "Attack",
+    statDamage: "MainStat",
+  };
+  return keyMap[statKey] || statKey;
 }
 
-function formatCompanionKey(companionKey, source = 'equipped') {
-    const sourceLabel = source === 'inventory' ? '(Companions Inventory)' : '(Companions Equipped)';
-    const displayNames = {
-        'AttackPower': `Damage ${sourceLabel}`,
-        'AttackPowerToBoss': `Boss Damage ${sourceLabel}`,
-        'AttackPowerExcludeBoss': `Normal Monster Damage ${sourceLabel}`,
-        'CriticalChance': `Critical Rate ${sourceLabel}`,
-        'AttackSpeed': `Attack Speed ${sourceLabel}`,
-        'MinDamageRatio': `Min Damage Multiplier ${sourceLabel}`,
-        'MaxDamageRatio': `Max Damage Multiplier ${sourceLabel}`,
-        'Attack': `Attack ${sourceLabel}`,
-        'MainStat': `Main Stat ${sourceLabel}`
-    };
-    return displayNames[companionKey] || `${companionKey} ${sourceLabel}`;
+function formatCompanionKey(companionKey, source = "equipped") {
+  const sourceLabel =
+    source === "inventory" ? "(Companions Inventory)" : "(Companions Equipped)";
+  const displayNames = {
+    AttackPower: `Damage ${sourceLabel}`,
+    AttackPowerToBoss: `Boss Damage ${sourceLabel}`,
+    AttackPowerExcludeBoss: `Normal Monster Damage ${sourceLabel}`,
+    CriticalChance: `Critical Rate ${sourceLabel}`,
+    AttackSpeed: `Attack Speed ${sourceLabel}`,
+    MinDamageRatio: `Min Damage Multiplier ${sourceLabel}`,
+    MaxDamageRatio: `Max Damage Multiplier ${sourceLabel}`,
+    Attack: `Attack ${sourceLabel}`,
+    MainStat: `Main Stat ${sourceLabel}`,
+  };
+  return displayNames[companionKey] || `${companionKey} ${sourceLabel}`;
 }
 
 function formatValue(value, isPercentage) {
-    if (isPercentage) {
-        return value.toFixed(1).replace(/\.0$/, '') + '%';
-    }
-    return value.toFixed(0);
+  if (isPercentage) {
+    return value.toFixed(1).replace(/\.0$/, "") + "%";
+  }
+  return value.toFixed(0);
 }
 
 // ============================================================================
@@ -1786,173 +1924,179 @@ function formatValue(value, isPercentage) {
 // ============================================================================
 
 export function initializeStatBreakdown() {
-    onContributedStatsChange((stats, source) => {
-        const statBreakdownTab = document.getElementById('analysis-stat-breakdown');
-        if (statBreakdownTab && statBreakdownTab.classList.contains('active')) {
-            if (source === 'unlockable-stats' || source === 'guild-bonuses') {
-                updateActiveTabContent();
-                updateBreakdownGrid();
-            } else {
-                updateStatBreakdown();
-            }
-        }
-    });
+  onContributedStatsChange((stats, source) => {
+    const statBreakdownTab = document.getElementById("analysis-stat-breakdown");
+    if (statBreakdownTab && statBreakdownTab.classList.contains("active")) {
+      if (source === "unlockable-stats" || source === "guild-bonuses") {
+        updateActiveTabContent();
+        updateBreakdownGrid();
+      } else {
+        updateStatBreakdown();
+      }
+    }
+  });
 
-    setTimeout(() => {
-        const statBreakdownTab = document.getElementById('analysis-stat-breakdown');
-        if (statBreakdownTab && statBreakdownTab.classList.contains('active')) {
-            updateStatBreakdown();
-        }
-    }, 0);
+  setTimeout(() => {
+    const statBreakdownTab = document.getElementById("analysis-stat-breakdown");
+    if (statBreakdownTab && statBreakdownTab.classList.contains("active")) {
+      updateStatBreakdown();
+    }
+  }, 0);
 }
 
 window.updateStatBreakdown = updateStatBreakdown;
 
-window.toggleUnlockableStat = function(unlockableKey) {
-    const current = getUnlockableStat(unlockableKey);
-    updateUnlockableStat(unlockableKey, {
-        unlocked: !current.unlocked,
-        level: current.level || 0
-    });
-    updateUnlockableStatsContributions();
-    saveToLocalStorage();
-    updateActiveTabContent();
-    updateBreakdownGrid();
+window.toggleUnlockableStat = function (unlockableKey) {
+  const current = getUnlockableStat(unlockableKey);
+  updateUnlockableStat(unlockableKey, {
+    unlocked: !current.unlocked,
+    level: current.level || 0,
+  });
+  updateUnlockableStatsContributions();
+  saveToLocalStorage();
+  updateActiveTabContent();
+  updateBreakdownGrid();
 };
 
-window.updateUnlockableStatLevel = function(unlockableKey) {
-    const slider = document.getElementById(`unlockable-slider-${unlockableKey}`);
-    if (!slider) return;
+window.updateUnlockableStatLevel = function (unlockableKey) {
+  const slider = document.getElementById(`unlockable-slider-${unlockableKey}`);
+  if (!slider) return;
 
-    const level = parseInt(slider.value) || 0;
-    const current = getUnlockableStat(unlockableKey);
+  const level = parseInt(slider.value) || 0;
+  const current = getUnlockableStat(unlockableKey);
 
-    updateUnlockableStat(unlockableKey, {
-        unlocked: current.unlocked,
-        level: level
-    });
+  updateUnlockableStat(unlockableKey, {
+    unlocked: current.unlocked,
+    level: level,
+  });
 
-    const configs = getUnlockableStatConfigs();
-    const config = configs[unlockableKey];
-    if (config) {
-        const valueSpan = document.getElementById(`unlockable-value-${unlockableKey}`);
-        if (valueSpan) {
-            const currentValue = config.base + (level * config.increment);
-            valueSpan.textContent = formatValue(currentValue, config.isPercentage);
-        }
+  const configs = getUnlockableStatConfigs();
+  const config = configs[unlockableKey];
+  if (config) {
+    const valueSpan = document.getElementById(
+      `unlockable-value-${unlockableKey}`,
+    );
+    if (valueSpan) {
+      const currentValue = config.base + level * config.increment;
+      valueSpan.textContent = formatValue(currentValue, config.isPercentage);
     }
+  }
 
-    updateUnlockableStatsContributions();
-    saveToLocalStorage();
+  updateUnlockableStatsContributions();
+  saveToLocalStorage();
 };
 
-window.updateUnlockableStatLevelPreview = function(unlockableKey) {
-    const slider = document.getElementById(`unlockable-slider-${unlockableKey}`);
-    const levelDisplay = document.getElementById(`unlockable-level-display-${unlockableKey}`);
+window.updateUnlockableStatLevelPreview = function (unlockableKey) {
+  const slider = document.getElementById(`unlockable-slider-${unlockableKey}`);
+  const levelDisplay = document.getElementById(
+    `unlockable-level-display-${unlockableKey}`,
+  );
 
-    if (!slider || !levelDisplay) return;
+  if (!slider || !levelDisplay) return;
 
-    const level = parseInt(slider.value) || 0;
-    levelDisplay.textContent = level;
+  const level = parseInt(slider.value) || 0;
+  levelDisplay.textContent = level;
 
-    const configs = getUnlockableStatConfigs();
-    const config = configs[unlockableKey];
-    if (config) {
-        const valueSpan = document.getElementById(`unlockable-value-${unlockableKey}`);
-        if (valueSpan) {
-            const currentValue = config.base + (level * config.increment);
-            valueSpan.textContent = formatValue(currentValue, config.isPercentage);
-        }
+  const configs = getUnlockableStatConfigs();
+  const config = configs[unlockableKey];
+  if (config) {
+    const valueSpan = document.getElementById(
+      `unlockable-value-${unlockableKey}`,
+    );
+    if (valueSpan) {
+      const currentValue = config.base + level * config.increment;
+      valueSpan.textContent = formatValue(currentValue, config.isPercentage);
     }
+  }
 };
 
-window.switchExtraStatsTab = function(tabName) {
-    const tabContents = document.querySelectorAll('.stat-tab-content');
-    tabContents.forEach(content => {
-        content.classList.remove('active');
-    });
+window.switchExtraStatsTab = function (tabName) {
+  const tabContents = document.querySelectorAll(".stat-tab-content");
+  tabContents.forEach((content) => {
+    content.classList.remove("active");
+  });
 
-    const buttons = document.querySelectorAll('.stat-tab-button');
-    buttons.forEach(button => {
-        button.classList.remove('active');
-    });
+  const buttons = document.querySelectorAll(".stat-tab-button");
+  buttons.forEach((button) => {
+    button.classList.remove("active");
+  });
 
-    const selectedTab = document.getElementById(`${tabName}-content`);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
+  const selectedTab = document.getElementById(`${tabName}-content`);
+  if (selectedTab) {
+    selectedTab.classList.add("active");
+  }
+
+  buttons.forEach((button) => {
+    if (button.getAttribute("onclick")?.includes(`'${tabName}'`)) {
+      button.classList.add("active");
     }
-
-    buttons.forEach(button => {
-        if (button.getAttribute('onclick')?.includes(`'${tabName}'`)) {
-            button.classList.add('active');
-        }
-    });
+  });
 };
 
-window.toggleGuildBonus = function(guildKey) {
-    const current = getGuildBonus(guildKey);
-    updateGuildBonus(guildKey, {
-        unlocked: !current.unlocked,
-        level: current.level || 0
-    });
-    updateGuildBonusesContributions();
-    saveToLocalStorage();
-    updateActiveTabContent();
-    updateBreakdownGrid();
+window.toggleGuildBonus = function (guildKey) {
+  const current = getGuildBonus(guildKey);
+  updateGuildBonus(guildKey, {
+    unlocked: !current.unlocked,
+    level: current.level || 0,
+  });
+  updateGuildBonusesContributions();
+  saveToLocalStorage();
+  updateActiveTabContent();
+  updateBreakdownGrid();
 };
 
-window.updateGuildBonusRank = function(guildKey) {
-    const slider = document.getElementById(`guild-slider-${guildKey}`);
-    if (!slider) return;
+window.updateGuildBonusRank = function (guildKey) {
+  const slider = document.getElementById(`guild-slider-${guildKey}`);
+  if (!slider) return;
 
-    const level = parseInt(slider.value) || 0;
-    const current = getGuildBonus(guildKey);
+  const level = parseInt(slider.value) || 0;
+  const current = getGuildBonus(guildKey);
 
-    updateGuildBonus(guildKey, {
-        unlocked: current.unlocked,
-        level: level
-    });
+  updateGuildBonus(guildKey, {
+    unlocked: current.unlocked,
+    level: level,
+  });
 
-    const configs = getGuildBonusConfigs();
-    const config = configs[guildKey];
-    if (config) {
-        const valueSpan = document.getElementById(`guild-value-${guildKey}`);
-        if (valueSpan) {
-            let currentValue;
-            if (config.customValues) {
-                currentValue = level > 0 ? (config.customValues[level - 1] || 0) : 0;
-            } else {
-                currentValue = config.base + (level * config.increment);
-            }
-            valueSpan.textContent = formatValue(currentValue, config.isPercentage);
-        }
+  const configs = getGuildBonusConfigs();
+  const config = configs[guildKey];
+  if (config) {
+    const valueSpan = document.getElementById(`guild-value-${guildKey}`);
+    if (valueSpan) {
+      let currentValue;
+      if (config.customValues) {
+        currentValue = level > 0 ? config.customValues[level - 1] || 0 : 0;
+      } else {
+        currentValue = config.base + level * config.increment;
+      }
+      valueSpan.textContent = formatValue(currentValue, config.isPercentage);
     }
+  }
 
-    updateGuildBonusesContributions();
-    saveToLocalStorage();
+  updateGuildBonusesContributions();
+  saveToLocalStorage();
 };
 
-window.updateGuildBonusRankPreview = function(guildKey) {
-    const slider = document.getElementById(`guild-slider-${guildKey}`);
-    const rankDisplay = document.getElementById(`guild-rank-display-${guildKey}`);
+window.updateGuildBonusRankPreview = function (guildKey) {
+  const slider = document.getElementById(`guild-slider-${guildKey}`);
+  const rankDisplay = document.getElementById(`guild-rank-display-${guildKey}`);
 
-    if (!slider || !rankDisplay) return;
+  if (!slider || !rankDisplay) return;
 
-    const rank = parseInt(slider.value) || 0;
-    rankDisplay.textContent = rank;
+  const rank = parseInt(slider.value) || 0;
+  rankDisplay.textContent = rank;
 
-    const configs = getGuildBonusConfigs();
-    const config = configs[guildKey];
-    if (config) {
-        const valueSpan = document.getElementById(`guild-value-${guildKey}`);
-        if (valueSpan) {
-            let currentValue;
-            if (config.customValues) {
-                currentValue = rank > 0 ? (config.customValues[rank - 1] || 0) : 0;
-            } else {
-                currentValue = config.base + (rank * config.increment);
-            }
-            valueSpan.textContent = formatValue(currentValue, config.isPercentage);
-        }
+  const configs = getGuildBonusConfigs();
+  const config = configs[guildKey];
+  if (config) {
+    const valueSpan = document.getElementById(`guild-value-${guildKey}`);
+    if (valueSpan) {
+      let currentValue;
+      if (config.customValues) {
+        currentValue = rank > 0 ? config.customValues[rank - 1] || 0 : 0;
+      } else {
+        currentValue = config.base + rank * config.increment;
+      }
+      valueSpan.textContent = formatValue(currentValue, config.isPercentage);
     }
+  }
 };

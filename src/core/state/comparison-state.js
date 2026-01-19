@@ -49,11 +49,11 @@ const pendingSaves = new Map(); // slotId -> { timeout, data, version }
  * @returns {Promise} Result of the operation
  */
 function queueOperation(operation) {
-    operationQueue = operationQueue.then(operation).catch(error => {
-        console.error('[ComparisonState] Operation failed:', error);
-        throw error;
-    });
-    return operationQueue;
+  operationQueue = operationQueue.then(operation).catch((error) => {
+    console.error("[ComparisonState] Operation failed:", error);
+    throw error;
+  });
+  return operationQueue;
 }
 
 /**
@@ -61,7 +61,7 @@ function queueOperation(operation) {
  * @returns {number} Current version
  */
 export function getStateVersion() {
-    return stateVersion;
+  return stateVersion;
 }
 
 /**
@@ -69,9 +69,9 @@ export function getStateVersion() {
  * @param {string} slotId - Equipment slot ID
  */
 function ensureSlotState(slotId) {
-    if (!comparisonState[slotId]) {
-        comparisonState[slotId] = {};
-    }
+  if (!comparisonState[slotId]) {
+    comparisonState[slotId] = {};
+  }
 }
 
 /**
@@ -80,8 +80,8 @@ function ensureSlotState(slotId) {
  * @returns {Object} Object mapping GUIDs to item data
  */
 export function getSlotItems(slotId) {
-    ensureSlotState(slotId);
-    return { ...comparisonState[slotId] }; // Return copy to prevent mutation
+  ensureSlotState(slotId);
+  return { ...comparisonState[slotId] }; // Return copy to prevent mutation
 }
 
 /**
@@ -91,9 +91,9 @@ export function getSlotItems(slotId) {
  * @returns {Object|null} Item data or null if not found
  */
 export function getItem(slotId, guid) {
-    ensureSlotState(slotId);
-    const item = comparisonState[slotId][guid];
-    return item ? { ...item } : null; // Return copy
+  ensureSlotState(slotId);
+  const item = comparisonState[slotId][guid];
+  return item ? { ...item } : null; // Return copy
 }
 
 /**
@@ -104,34 +104,33 @@ export function getItem(slotId, guid) {
  * @returns {Promise<boolean>} True if successful
  */
 export function updateItem(slotId, guid, data) {
-    return queueOperation(async () => {
-        try {
-            ensureSlotState(slotId);
+  return queueOperation(async () => {
+    try {
+      ensureSlotState(slotId);
 
-            const existingItem = comparisonState[slotId][guid];
-            const newVersion = Date.now();
+      const existingItem = comparisonState[slotId][guid];
+      const newVersion = Date.now();
 
-            // Create or update item
-            comparisonState[slotId][guid] = {
-                guid,
-                version: newVersion,
-                name: data.name || '',
-                attack: data.attack || 0,
-                stats: data.stats || []
-            };
+      // Create or update item
+      comparisonState[slotId][guid] = {
+        guid,
+        version: newVersion,
+        name: data.name || "",
+        attack: data.attack || 0,
+        stats: data.stats || [],
+      };
 
-            stateVersion++;
+      stateVersion++;
 
-            // Trigger debounced persist
-            schedulePersist(slotId);
+      // Trigger debounced persist
+      schedulePersist(slotId);
 
-            return true;
-
-        } catch (error) {
-            console.error(`[ComparisonState] Failed to update item ${guid}:`, error);
-            return false;
-        }
-    });
+      return true;
+    } catch (error) {
+      console.error(`[ComparisonState] Failed to update item ${guid}:`, error);
+      return false;
+    }
+  });
 }
 
 /**
@@ -141,28 +140,29 @@ export function updateItem(slotId, guid, data) {
  * @returns {Promise<boolean>} True if successful
  */
 export function removeItem(slotId, guid) {
-    return queueOperation(async () => {
-        try {
-            ensureSlotState(slotId);
+  return queueOperation(async () => {
+    try {
+      ensureSlotState(slotId);
 
-            if (!comparisonState[slotId][guid]) {
-                console.warn(`[ComparisonState] Item ${guid} not found in slot ${slotId}`);
-                return false;
-            }
+      if (!comparisonState[slotId][guid]) {
+        console.warn(
+          `[ComparisonState] Item ${guid} not found in slot ${slotId}`,
+        );
+        return false;
+      }
 
-            delete comparisonState[slotId][guid];
-            stateVersion++;
+      delete comparisonState[slotId][guid];
+      stateVersion++;
 
-            // Trigger immediate persist (no debounce for deletions)
-            await persistSlot(slotId);
+      // Trigger immediate persist (no debounce for deletions)
+      await persistSlot(slotId);
 
-            return true;
-
-        } catch (error) {
-            console.error(`[ComparisonState] Failed to remove item ${guid}:`, error);
-            return false;
-        }
-    });
+      return true;
+    } catch (error) {
+      console.error(`[ComparisonState] Failed to remove item ${guid}:`, error);
+      return false;
+    }
+  });
 }
 
 /**
@@ -171,20 +171,19 @@ export function removeItem(slotId, guid) {
  * @returns {Promise<boolean>} True if successful
  */
 export function clearSlot(slotId) {
-    return queueOperation(async () => {
-        try {
-            comparisonState[slotId] = {};
-            stateVersion++;
+  return queueOperation(async () => {
+    try {
+      comparisonState[slotId] = {};
+      stateVersion++;
 
-            await persistSlot(slotId);
+      await persistSlot(slotId);
 
-            return true;
-
-        } catch (error) {
-            console.error(`[ComparisonState] Failed to clear slot ${slotId}:`, error);
-            return false;
-        }
-    });
+      return true;
+    } catch (error) {
+      console.error(`[ComparisonState] Failed to clear slot ${slotId}:`, error);
+      return false;
+    }
+  });
 }
 
 // ============================================================================
@@ -198,23 +197,23 @@ const PERSIST_DEBOUNCE_MS = 500;
  * @param {string} slotId - Equipment slot ID
  */
 function schedulePersist(slotId) {
-    // Clear any existing pending save for this slot
-    if (pendingSaves.has(slotId)) {
-        clearTimeout(pendingSaves.get(slotId).timeout);
-    }
+  // Clear any existing pending save for this slot
+  if (pendingSaves.has(slotId)) {
+    clearTimeout(pendingSaves.get(slotId).timeout);
+  }
 
-    // Schedule new persist
-    const timeout = setTimeout(() => {
-        persistSlot(slotId);
-        pendingSaves.delete(slotId);
-    }, PERSIST_DEBOUNCE_MS);
+  // Schedule new persist
+  const timeout = setTimeout(() => {
+    persistSlot(slotId);
+    pendingSaves.delete(slotId);
+  }, PERSIST_DEBOUNCE_MS);
 
-    // Store the data to be saved (in case state changes before timeout)
-    pendingSaves.set(slotId, {
-        timeout,
-        data: JSON.stringify(getSlotItemsAsArray(slotId)),
-        version: stateVersion
-    });
+  // Store the data to be saved (in case state changes before timeout)
+  pendingSaves.set(slotId, {
+    timeout,
+    data: JSON.stringify(getSlotItemsAsArray(slotId)),
+    version: stateVersion,
+  });
 }
 
 /**
@@ -223,31 +222,31 @@ function schedulePersist(slotId) {
  * @returns {Promise<boolean>} True if successful
  */
 async function persistSlot(slotId) {
-    try {
-        const items = getSlotItemsAsArray(slotId);
-        const storageKey = `comparisonItems.${slotId}`;
-        const data = JSON.stringify(items);
+  try {
+    const items = getSlotItemsAsArray(slotId);
+    const storageKey = `comparisonItems.${slotId}`;
+    const data = JSON.stringify(items);
 
-        // Validate before writing
-        if (data.length > 5 * 1024 * 1024) { // 5MB safety limit
-            throw new Error(`Data too large: ${data.length} bytes`);
-        }
-
-        localStorage.setItem(storageKey, data);
-
-        return true;
-
-    } catch (error) {
-        console.error(`[ComparisonState] Failed to persist slot ${slotId}:`, error);
-
-        // Show user notification for quota errors
-        if (error.name === 'QuotaExceededError') {
-            console.error('[ComparisonState] localStorage quota exceeded!');
-            // Could trigger UI notification here
-        }
-
-        return false;
+    // Validate before writing
+    if (data.length > 5 * 1024 * 1024) {
+      // 5MB safety limit
+      throw new Error(`Data too large: ${data.length} bytes`);
     }
+
+    localStorage.setItem(storageKey, data);
+
+    return true;
+  } catch (error) {
+    console.error(`[ComparisonState] Failed to persist slot ${slotId}:`, error);
+
+    // Show user notification for quota errors
+    if (error.name === "QuotaExceededError") {
+      console.error("[ComparisonState] localStorage quota exceeded!");
+      // Could trigger UI notification here
+    }
+
+    return false;
+  }
 }
 
 /**
@@ -256,8 +255,8 @@ async function persistSlot(slotId) {
  * @returns {Array} Array of item objects
  */
 function getSlotItemsAsArray(slotId) {
-    const items = getSlotItems(slotId);
-    return Object.values(items).sort((a, b) => a.version - b.version);
+  const items = getSlotItems(slotId);
+  return Object.values(items).sort((a, b) => a.version - b.version);
 }
 
 /**
@@ -266,42 +265,41 @@ function getSlotItemsAsArray(slotId) {
  * @returns {Promise<Array>} Array of item objects
  */
 export async function loadSlot(slotId) {
-    try {
-        const storageKey = `comparisonItems.${slotId}`;
-        const stored = localStorage.getItem(storageKey);
+  try {
+    const storageKey = `comparisonItems.${slotId}`;
+    const stored = localStorage.getItem(storageKey);
 
-        if (!stored) {
-            return [];
-        }
-
-        const items = JSON.parse(stored);
-
-        // Validate data structure
-        if (!Array.isArray(items)) {
-            console.error(`[ComparisonState] Invalid data format for slot ${slotId}`);
-            return [];
-        }
-
-        // Load into state
-        ensureSlotState(slotId);
-        items.forEach(item => {
-            if (item.guid && typeof item.version === 'number') {
-                comparisonState[slotId][item.guid] = {
-                    guid: item.guid,
-                    version: item.version,
-                    name: item.name || '',
-                    attack: item.attack || 0,
-                    stats: Array.isArray(item.stats) ? item.stats : []
-                };
-            }
-        });
-
-        return items;
-
-    } catch (error) {
-        console.error(`[ComparisonState] Failed to load slot ${slotId}:`, error);
-        return [];
+    if (!stored) {
+      return [];
     }
+
+    const items = JSON.parse(stored);
+
+    // Validate data structure
+    if (!Array.isArray(items)) {
+      console.error(`[ComparisonState] Invalid data format for slot ${slotId}`);
+      return [];
+    }
+
+    // Load into state
+    ensureSlotState(slotId);
+    items.forEach((item) => {
+      if (item.guid && typeof item.version === "number") {
+        comparisonState[slotId][item.guid] = {
+          guid: item.guid,
+          version: item.version,
+          name: item.name || "",
+          attack: item.attack || 0,
+          stats: Array.isArray(item.stats) ? item.stats : [],
+        };
+      }
+    });
+
+    return items;
+  } catch (error) {
+    console.error(`[ComparisonState] Failed to load slot ${slotId}:`, error);
+    return [];
+  }
 }
 
 /**
@@ -309,15 +307,14 @@ export async function loadSlot(slotId) {
  * @returns {Promise<boolean>} True if all successful
  */
 export async function persistAll() {
+  const slotIds = Object.keys(comparisonState);
+  const results = await Promise.all(
+    slotIds.map((slotId) => persistSlot(slotId)),
+  );
 
-    const slotIds = Object.keys(comparisonState);
-    const results = await Promise.all(
-        slotIds.map(slotId => persistSlot(slotId))
-    );
+  const success = results.every((r) => r === true);
 
-    const success = results.every(r => r === true);
-
-    return success;
+  return success;
 }
 
 // ============================================================================
@@ -330,48 +327,47 @@ export async function persistAll() {
  * @returns {Object} Validation report
  */
 export function validateSlot(slotId) {
-    const report = {
-        valid: true,
-        issues: [],
-        repairs: []
-    };
+  const report = {
+    valid: true,
+    issues: [],
+    repairs: [],
+  };
 
-    try {
-        const items = getSlotItems(slotId);
+  try {
+    const items = getSlotItems(slotId);
 
-        Object.entries(items).forEach(([guid, item]) => {
-            // Check for required fields
-            if (!item.guid) {
-                report.valid = false;
-                report.issues.push(`Item missing GUID`);
-                return;
-            }
-
-            if (typeof item.version !== 'number') {
-                report.valid = false;
-                report.issues.push(`Item ${guid} has invalid version`);
-                report.repairs.push(`Repaired version for ${guid}`);
-                item.version = Date.now();
-            }
-
-            if (!Array.isArray(item.stats)) {
-                report.valid = false;
-                report.issues.push(`Item ${guid} has invalid stats`);
-                report.repairs.push(`Repaired stats for ${guid}`);
-                item.stats = [];
-            }
-        });
-
-        if (report.repairs.length > 0) {
-            persistSlot(slotId);
-        }
-
-    } catch (error) {
+    Object.entries(items).forEach(([guid, item]) => {
+      // Check for required fields
+      if (!item.guid) {
         report.valid = false;
-        report.issues.push(`Validation error: ${error.message}`);
-    }
+        report.issues.push(`Item missing GUID`);
+        return;
+      }
 
-    return report;
+      if (typeof item.version !== "number") {
+        report.valid = false;
+        report.issues.push(`Item ${guid} has invalid version`);
+        report.repairs.push(`Repaired version for ${guid}`);
+        item.version = Date.now();
+      }
+
+      if (!Array.isArray(item.stats)) {
+        report.valid = false;
+        report.issues.push(`Item ${guid} has invalid stats`);
+        report.repairs.push(`Repaired stats for ${guid}`);
+        item.stats = [];
+      }
+    });
+
+    if (report.repairs.length > 0) {
+      persistSlot(slotId);
+    }
+  } catch (error) {
+    report.valid = false;
+    report.issues.push(`Validation error: ${error.message}`);
+  }
+
+  return report;
 }
 
 /**
@@ -379,48 +375,47 @@ export function validateSlot(slotId) {
  * @returns {Promise<boolean>} True if migration succeeded
  */
 export async function migrateLegacyData() {
-    try {
-        // Check for old format keys
-        const oldKey = 'comparison-items';
-        const legacyData = localStorage.getItem(oldKey);
+  try {
+    // Check for old format keys
+    const oldKey = "comparison-items";
+    const legacyData = localStorage.getItem(oldKey);
 
-        if (!legacyData) {
-            return true; // Nothing to migrate
-        }
-
-        const items = JSON.parse(legacyData);
-
-        // Migration strategy: put legacy items in 'head' slot
-        // User can reorganize from there
-        ensureSlotState('head');
-
-        if (Array.isArray(items)) {
-            items.forEach(item => {
-                if (item.guid) {
-                    comparisonState.head[item.guid] = {
-                        guid: item.guid,
-                        version: Date.now(),
-                        name: item.name || '',
-                        attack: item.attack || 0,
-                        stats: Array.isArray(item.stats) ? item.stats : []
-                    };
-                }
-            });
-        }
-
-        // Persist migrated data
-        await persistSlot('head');
-
-        // Backup and remove old key
-        localStorage.setItem(`${oldKey}.backup`, legacyData);
-        localStorage.removeItem(oldKey);
-
-        return true;
-
-    } catch (error) {
-        console.error('[ComparisonState] Migration failed:', error);
-        return false;
+    if (!legacyData) {
+      return true; // Nothing to migrate
     }
+
+    const items = JSON.parse(legacyData);
+
+    // Migration strategy: put legacy items in 'head' slot
+    // User can reorganize from there
+    ensureSlotState("head");
+
+    if (Array.isArray(items)) {
+      items.forEach((item) => {
+        if (item.guid) {
+          comparisonState.head[item.guid] = {
+            guid: item.guid,
+            version: Date.now(),
+            name: item.name || "",
+            attack: item.attack || 0,
+            stats: Array.isArray(item.stats) ? item.stats : [],
+          };
+        }
+      });
+    }
+
+    // Persist migrated data
+    await persistSlot("head");
+
+    // Backup and remove old key
+    localStorage.setItem(`${oldKey}.backup`, legacyData);
+    localStorage.removeItem(oldKey);
+
+    return true;
+  } catch (error) {
+    console.error("[ComparisonState] Migration failed:", error);
+    return false;
+  }
 }
 
 // ============================================================================
@@ -433,39 +428,38 @@ export async function migrateLegacyData() {
  * @returns {Promise<boolean>} True if initialization succeeded
  */
 export async function initializeComparisonState() {
-    try {
-        // Run migration if needed
-        await migrateLegacyData();
+  try {
+    // Run migration if needed
+    await migrateLegacyData();
 
-        // Listen for page unload to persist all data
-        window.addEventListener('beforeunload', () => {
-            persistAll();
-        });
+    // Listen for page unload to persist all data
+    window.addEventListener("beforeunload", () => {
+      persistAll();
+    });
 
-        // Listen for visibility change to persist when tab becomes hidden
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                persistAll();
-            }
-        });
-        return true;
-
-    } catch (error) {
-        console.error('[ComparisonState] Initialization failed:', error);
-        return false;
-    }
+    // Listen for visibility change to persist when tab becomes hidden
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        persistAll();
+      }
+    });
+    return true;
+  } catch (error) {
+    console.error("[ComparisonState] Initialization failed:", error);
+    return false;
+  }
 }
 
 // ============================================================================
 // DEBUGGING EXPORTS
 // ============================================================================
 
-if (typeof window !== 'undefined') {
-    window.__comparisonStateDebug = {
-        getState: () => comparisonState,
-        getStateVersion: () => stateVersion,
-        getPendingSaves: () => Array.from(pendingSaves.keys()),
-        validateSlot: validateSlot,
-        persistAll: persistAll
-    };
+if (typeof window !== "undefined") {
+  window.__comparisonStateDebug = {
+    getState: () => comparisonState,
+    getStateVersion: () => stateVersion,
+    getPendingSaves: () => Array.from(pendingSaves.keys()),
+    validateSlot: validateSlot,
+    persistAll: persistAll,
+  };
 }

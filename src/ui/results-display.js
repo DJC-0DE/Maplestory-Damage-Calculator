@@ -1,112 +1,149 @@
 // Results display functionality
 
-import { formatNumber } from '@utils/formatters.js';
-import { StatCalculationService } from '@core/services/stat-calculation-service.js';
-import { getStats } from '@core/state/state.js';
+import { formatNumber } from "@utils/formatters.js";
+import { StatCalculationService } from "@core/services/stat-calculation-service.js";
+import { getStats } from "@core/state/state.js";
 
 window.calculateEquipmentSlotDPS = calculateEquipmentSlotDPS;
 window.toggleSubDetails = toggleSubDetails;
 window.toggleDetails = toggleDetails;
 
-export function displayResults(itemName, stats, uniqueId, isEquipped = false, equippedDamageValues = null) {
-    // Use StatCalculationService for consistent damage calculation
-    const service = new StatCalculationService(stats);
-    const bossResults = service.compute('boss');
-    const normalResults = service.compute('normal');
+export function displayResults(
+  itemName,
+  stats,
+  uniqueId,
+  isEquipped = false,
+  equippedDamageValues = null,
+) {
+  // Use StatCalculationService for consistent damage calculation
+  const service = new StatCalculationService(stats);
+  const bossResults = service.compute("boss");
+  const normalResults = service.compute("normal");
 
-    const itemClass = isEquipped ? 'equipped-item' : 'comparison-item';
+  const itemClass = isEquipped ? "equipped-item" : "comparison-item";
 
-    const getPercentChangeBadge = (currentValue, referenceValue) => {
-        if (!referenceValue || referenceValue === 0) return { badge: '', valueClass: '' };
-        const changePercentage = ((currentValue - referenceValue) / referenceValue) * 100;
-        const badgeClass = changePercentage >= 0 ? 'positive' : 'negative';
-        const valueClass = changePercentage >= 0 ? 'positive' : 'negative';
-        const changeSign = changePercentage >= 0 ? '+' : '';
-        const badge = `<span class="percent-change-badge ${badgeClass}">${changeSign}${changePercentage.toFixed(2)}%</span>`;
-        return { badge, valueClass };
+  const getPercentChangeBadge = (currentValue, referenceValue) => {
+    if (!referenceValue || referenceValue === 0)
+      return { badge: "", valueClass: "" };
+    const changePercentage =
+      ((currentValue - referenceValue) / referenceValue) * 100;
+    const badgeClass = changePercentage >= 0 ? "positive" : "negative";
+    const valueClass = changePercentage >= 0 ? "positive" : "negative";
+    const changeSign = changePercentage >= 0 ? "+" : "";
+    const badge = `<span class="percent-change-badge ${badgeClass}">${changeSign}${changePercentage.toFixed(2)}%</span>`;
+    return { badge, valueClass };
+  };
+
+  const bossDpsChange = equippedDamageValues
+    ? getPercentChangeBadge(bossResults.dps, equippedDamageValues.dpsBoss)
+    : { badge: "", valueClass: "" };
+  const normalDpsChange = equippedDamageValues
+    ? getPercentChangeBadge(normalResults.dps, equippedDamageValues.dpsNormal)
+    : { badge: "", valueClass: "" };
+  const expectedBossDamagePercentChange = equippedDamageValues
+    ? getPercentChangeBadge(
+        bossResults.expectedDamage,
+        equippedDamageValues.expectedDamageBoss,
+      ).badge
+    : "";
+  const expectedNormalDamagePercentChange = equippedDamageValues
+    ? getPercentChangeBadge(
+        normalResults.expectedDamage,
+        equippedDamageValues.expectedDamageNormal,
+      ).badge
+    : "";
+
+  // Generate passive gains breakdown HTML
+  let passiveGainsHTML = "";
+  if (stats.passiveGainsBreakdown && stats.passiveGainsBreakdown.comparison) {
+    const gains = stats.passiveGainsBreakdown.comparison;
+
+    // Mapping for friendly stat names
+    const statDisplayNames = {
+      attackSpeed: "Attack Speed",
+      minDamage: "Min Damage",
+      maxDamage: "Max Damage",
+      critRate: "Critical Rate",
+      critDamage: "Critical Damage",
+      statDamage: "Stat Damage",
+      skillDamage: "Skill Damage",
+      damage: "Damage",
+      bossDamage: "Boss Damage",
+      normalDamage: "Normal Damage",
+      attack: "Attack",
+      mainStat: "Main Stat",
+      basicAttackDamage: "Basic Attack Damage",
+      damageAmp: "Damage Amplification",
+      finalDamage: "Final Damage",
     };
 
-    const bossDpsChange = equippedDamageValues ? getPercentChangeBadge(bossResults.dps, equippedDamageValues.dpsBoss) : { badge: '', valueClass: '' };
-    const normalDpsChange = equippedDamageValues ? getPercentChangeBadge(normalResults.dps, equippedDamageValues.dpsNormal) : { badge: '', valueClass: '' };
-    const expectedBossDamagePercentChange = equippedDamageValues ? getPercentChangeBadge(bossResults.expectedDamage, equippedDamageValues.expectedDamageBoss).badge : '';
-    const expectedNormalDamagePercentChange = equippedDamageValues ? getPercentChangeBadge(normalResults.expectedDamage, equippedDamageValues.expectedDamageNormal).badge : '';
-
-    // Generate passive gains breakdown HTML
-    let passiveGainsHTML = '';
-    if (stats.passiveGainsBreakdown && stats.passiveGainsBreakdown.comparison) {
-        const gains = stats.passiveGainsBreakdown.comparison;
-
-        // Mapping for friendly stat names
-        const statDisplayNames = {
-            'attackSpeed': 'Attack Speed',
-            'minDamage': 'Min Damage',
-            'maxDamage': 'Max Damage',
-            'critRate': 'Critical Rate',
-            'critDamage': 'Critical Damage',
-            'statDamage': 'Stat Damage',
-            'skillDamage': 'Skill Damage',
-            'damage': 'Damage',
-            'bossDamage': 'Boss Damage',
-            'normalDamage': 'Normal Damage',
-            'attack': 'Attack',
-            'mainStat': 'Main Stat',
-            'basicAttackDamage': 'Basic Attack Damage',
-            'damageAmp': 'Damage Amplification',
-            'finalDamage': 'Final Damage'
-        };
-
-        if (gains.breakdown && gains.breakdown.length > 0) {
-            passiveGainsHTML = `
+    if (gains.breakdown && gains.breakdown.length > 0) {
+      passiveGainsHTML = `
                 <div class="damage-box">
                     <h3 onclick="toggleSubDetails('passive-gains-${uniqueId}')">Passive Skill Gains <span id="passive-gains-${uniqueId}-icon">▼</span></h3>
                     <div id="passive-gains-${uniqueId}" class="collapsible-section">
-                        ${gains.breakdown.map(item => {
-                            const statLabel = item.statDisplay || statDisplayNames[item.stat] || item.stat;
-                            const percentSign = item.isPercent ? '%' : '';
-                            const gainSign = item.gain >= 0 ? '+' : '';
+                        ${gains.breakdown
+                          .map((item) => {
+                            const statLabel =
+                              item.statDisplay ||
+                              statDisplayNames[item.stat] ||
+                              item.stat;
+                            const percentSign = item.isPercent ? "%" : "";
+                            const gainSign = item.gain >= 0 ? "+" : "";
                             const fromTo = `${item.baseValue.toFixed(2)}${percentSign} → ${item.bonusValue.toFixed(2)}${percentSign}`;
-                            const note = item.note ? ` <span style="color: var(--text-secondary); font-size: 0.85em;">(${item.note})</span>` : '';
+                            const note = item.note
+                              ? ` <span style="color: var(--text-secondary); font-size: 0.85em;">(${item.note})</span>`
+                              : "";
                             return `<div class="damage-row">
                                 <span class="damage-label">${item.passive}:</span>
                                 <span class="damage-value">${gainSign}${item.gain.toFixed(2)}${percentSign} ${statLabel} (${fromTo})${note}</span>
                             </div>`;
-                        }).join('')}
+                          })
+                          .join("")}
                     </div>
                 </div>
             `;
-        }
+    }
 
-        if (gains.complexPassives && gains.complexPassives.length > 0) {
-            passiveGainsHTML += `
+    if (gains.complexPassives && gains.complexPassives.length > 0) {
+      passiveGainsHTML += `
                 <div class="damage-box">
                     <h3 onclick="toggleSubDetails('complex-passives-${uniqueId}')">Complex Passives (Not in DPS) <span id="complex-passives-${uniqueId}-icon">▼</span></h3>
                     <div id="complex-passives-${uniqueId}" class="collapsible-section">
-                        ${gains.complexPassives.map(item => {
+                        ${gains.complexPassives
+                          .map((item) => {
                             // If we have gain data, format it with the stat changes
-                            if (item.stat && item.gain !== undefined && item.baseValue !== undefined && item.bonusValue !== undefined) {
-                                const statName = statDisplayNames[item.stat] || item.stat;
-                                const percentSign = item.isPercent ? '%' : '';
-                                const sign = item.gain >= 0 ? '+' : '';
-                                const fromTo = `${item.baseValue.toFixed(2)}${percentSign} → ${item.bonusValue.toFixed(2)}${percentSign}`;
-                                return `<div class="damage-row">
+                            if (
+                              item.stat &&
+                              item.gain !== undefined &&
+                              item.baseValue !== undefined &&
+                              item.bonusValue !== undefined
+                            ) {
+                              const statName =
+                                statDisplayNames[item.stat] || item.stat;
+                              const percentSign = item.isPercent ? "%" : "";
+                              const sign = item.gain >= 0 ? "+" : "";
+                              const fromTo = `${item.baseValue.toFixed(2)}${percentSign} → ${item.bonusValue.toFixed(2)}${percentSign}`;
+                              return `<div class="damage-row">
                                     <span class="damage-label">${item.passive}:</span>
                                     <span class="damage-value">${sign}${item.gain.toFixed(2)}${percentSign} ${statName} (${fromTo})</span>
                                 </div>`;
                             } else {
-                                // Otherwise just show the note
-                                return `<div class="damage-row">
+                              // Otherwise just show the note
+                              return `<div class="damage-row">
                                     <span class="damage-label">${item.passive}:</span>
-                                    <span class="damage-value">${item.note || ''}</span>
+                                    <span class="damage-value">${item.note || ""}</span>
                                 </div>`;
                             }
-                        }).join('')}
+                          })
+                          .join("")}
                     </div>
                 </div>
             `;
-        }
     }
+  }
 
-    const html = `
+  const html = `
         <div class="result-panel ${itemClass}">
             <h3>${itemName}</h3>
 
@@ -290,94 +327,108 @@ export function displayResults(itemName, stats, uniqueId, isEquipped = false, eq
     </div>
     `;
 
-    return html;
+  return html;
 }
 
 export function toggleSubDetails(id) {
-    const section = document.getElementById(id);
-    const icon = document.getElementById(`${id}-icon`);
-    const header = icon?.parentElement;
+  const section = document.getElementById(id);
+  const icon = document.getElementById(`${id}-icon`);
+  const header = icon?.parentElement;
 
-    if (section.classList.contains('expanded')) {
-        section.classList.remove('expanded');
-        if (header) header.classList.remove('expanded');
-    } else {
-        section.classList.add('expanded');
-        if (header) header.classList.add('expanded');
-    }
+  if (section.classList.contains("expanded")) {
+    section.classList.remove("expanded");
+    if (header) header.classList.remove("expanded");
+  } else {
+    section.classList.add("expanded");
+    if (header) header.classList.add("expanded");
+  }
 }
 
 export function toggleDetails(id) {
-    const detailsSection = document.getElementById(`details-${id}`);
-    const toggleButton = event.target;
+  const detailsSection = document.getElementById(`details-${id}`);
+  const toggleButton = event.target;
 
-    if (detailsSection.classList.contains('expanded')) {
-        detailsSection.classList.remove('expanded');
-        toggleButton.classList.remove('expanded');
-        toggleButton.textContent = 'Show Detailed Breakdown';
-    } else {
-        detailsSection.classList.add('expanded');
-        toggleButton.classList.add('expanded');
-        toggleButton.textContent = 'Hide Detailed Breakdown';
-    }
+  if (detailsSection.classList.contains("expanded")) {
+    detailsSection.classList.remove("expanded");
+    toggleButton.classList.remove("expanded");
+    toggleButton.textContent = "Show Detailed Breakdown";
+  } else {
+    detailsSection.classList.add("expanded");
+    toggleButton.classList.add("expanded");
+    toggleButton.textContent = "Hide Detailed Breakdown";
+  }
 }
 
 export function calculateEquipmentSlotDPS() {
-    const baseStats = getStats('base');
-    const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
+  const baseStats = getStats("base");
+  const slotNames = [
+    "head",
+    "cape",
+    "chest",
+    "shoulders",
+    "legs",
+    "belt",
+    "gloves",
+    "boots",
+    "ring",
+    "neck",
+    "eye-accessory",
+  ];
 
-    // Use StatCalculationService for consistent calculations (auto-fetches weaponAttackBonus from state)
-    const baseService = new StatCalculationService(baseStats);
-    const baselineDPS = baseService.computeDPS('boss');
+  // Use StatCalculationService for consistent calculations (auto-fetches weaponAttackBonus from state)
+  const baseService = new StatCalculationService(baseStats);
+  const baselineDPS = baseService.computeDPS("boss");
 
-    // Track total stats from all slots for total DPS calculation
-    let totalAttackFromSlots = 0;
-    let totalStatDamageFromSlots = 0;
-    let totalDamageAmpFromSlots = 0;
+  // Track total stats from all slots for total DPS calculation
+  let totalAttackFromSlots = 0;
+  let totalStatDamageFromSlots = 0;
+  let totalDamageAmpFromSlots = 0;
 
-    slotNames.forEach(slotId => {
-        const attackInput = document.getElementById(`slot-${slotId}-attack`);
-        const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
-        const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
+  slotNames.forEach((slotId) => {
+    const attackInput = document.getElementById(`slot-${slotId}-attack`);
+    const mainStatInput = document.getElementById(`slot-${slotId}-main-stat`);
+    const damageAmpInput = document.getElementById(`slot-${slotId}-damage-amp`);
 
-        const slotAttack = parseFloat(attackInput?.value) || 0;
-        const slotMainStat = parseFloat(mainStatInput?.value) || 0;
-        const slotDamageAmp = parseFloat(damageAmpInput?.value) || 0;
+    const slotAttack = parseFloat(attackInput?.value) || 0;
+    const slotMainStat = parseFloat(mainStatInput?.value) || 0;
+    const slotDamageAmp = parseFloat(damageAmpInput?.value) || 0;
 
-        // Convert main stat to stat damage (100:1 ratio)
-        const statDamageFromMainStat = slotMainStat / 100;
+    // Convert main stat to stat damage (100:1 ratio)
+    const statDamageFromMainStat = slotMainStat / 100;
 
-        // Add to totals
-        totalAttackFromSlots += slotAttack;
-        totalStatDamageFromSlots += statDamageFromMainStat;
-        totalDamageAmpFromSlots += slotDamageAmp;
+    // Add to totals
+    totalAttackFromSlots += slotAttack;
+    totalStatDamageFromSlots += statDamageFromMainStat;
+    totalDamageAmpFromSlots += slotDamageAmp;
 
-        // Use StatCalculationService chaining API to calculate DPS without this slot
-        // The service handles weapon attack bonus automatically
-        const withoutSlotDPS = new StatCalculationService(baseStats)
-            .subtractAttack(slotAttack, true)  // applyWeaponBonus = true
-            .subtractStat('statDamage', statDamageFromMainStat)
-            .subtractStat('damageAmp', slotDamageAmp)
-            .computeDPS('boss');
+    // Use StatCalculationService chaining API to calculate DPS without this slot
+    // The service handles weapon attack bonus automatically
+    const withoutSlotDPS = new StatCalculationService(baseStats)
+      .subtractAttack(slotAttack, true) // applyWeaponBonus = true
+      .subtractStat("statDamage", statDamageFromMainStat)
+      .subtractStat("damageAmp", slotDamageAmp)
+      .computeDPS("boss");
 
-        // Calculate percentage gain
-        const dpsGainPct = ((baselineDPS - withoutSlotDPS) / baselineDPS * 100);
+    // Calculate percentage gain
+    const dpsGainPct = ((baselineDPS - withoutSlotDPS) / baselineDPS) * 100;
 
-        // Display results
-        const dpsDisplay = document.getElementById(`slot-${slotId}-dps`);
-        if (dpsDisplay) dpsDisplay.textContent = `+${dpsGainPct.toFixed(2)}%`;
-    });
+    // Display results
+    const dpsDisplay = document.getElementById(`slot-${slotId}-dps`);
+    if (dpsDisplay) dpsDisplay.textContent = `+${dpsGainPct.toFixed(2)}%`;
+  });
 
-    // Calculate total DPS gain from all slots using chaining API
-    const withoutAllSlotsDPS = new StatCalculationService(baseStats)
-        .subtractAttack(totalAttackFromSlots, true)  // applyWeaponBonus = true
-        .subtractStat('statDamage', totalStatDamageFromSlots)
-        .subtractStat('damageAmp', totalDamageAmpFromSlots)
-        .computeDPS('boss');
+  // Calculate total DPS gain from all slots using chaining API
+  const withoutAllSlotsDPS = new StatCalculationService(baseStats)
+    .subtractAttack(totalAttackFromSlots, true) // applyWeaponBonus = true
+    .subtractStat("statDamage", totalStatDamageFromSlots)
+    .subtractStat("damageAmp", totalDamageAmpFromSlots)
+    .computeDPS("boss");
 
-    const totalDPSGainPct = ((baselineDPS - withoutAllSlotsDPS) / baselineDPS * 100);
+  const totalDPSGainPct =
+    ((baselineDPS - withoutAllSlotsDPS) / baselineDPS) * 100;
 
-    // Display total DPS gain
-    const totalDPSDisplay = document.getElementById('total-slots-dps');
-    if (totalDPSDisplay) totalDPSDisplay.textContent = `+${totalDPSGainPct.toFixed(2)}%`;
+  // Display total DPS gain
+  const totalDPSDisplay = document.getElementById("total-slots-dps");
+  if (totalDPSDisplay)
+    totalDPSDisplay.textContent = `+${totalDPSGainPct.toFixed(2)}%`;
 }

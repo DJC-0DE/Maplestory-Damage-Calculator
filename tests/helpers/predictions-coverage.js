@@ -5,35 +5,27 @@
 
 // Element Inventory Manifest - Stat Predictions Tabs
 export const PREDICTIONS_ELEMENTS = {
-  predictionsTabButtons: [
-    'stat-tables-tab',
-    'equivalency-tab'
-  ],
-  statTablesElements: [
-    'stat-weights-base-container'
-  ],
+  predictionsTabButtons: ["stat-tables-tab", "equivalency-tab"],
+  statTablesElements: ["stat-weights-base-container"],
   equivalencyInputs: [
-    'equiv-attack',
-    'equiv-main-stat',
-    'equiv-skill-coeff',
-    'equiv-skill-mastery',
-    'equiv-damage',
-    'equiv-final-damage',
-    'equiv-boss-damage',
-    'equiv-normal-damage',
-    'equiv-main-stat-pct',
-    'equiv-damage-amp',
-    'equiv-min-damage',
-    'equiv-max-damage',
-    'equiv-crit-rate',
-    'equiv-crit-damage',
-    'equiv-attack-speed',
-    'equiv-def-pen'
+    "equiv-attack",
+    "equiv-main-stat",
+    "equiv-skill-coeff",
+    "equiv-skill-mastery",
+    "equiv-damage",
+    "equiv-final-damage",
+    "equiv-boss-damage",
+    "equiv-normal-damage",
+    "equiv-main-stat-pct",
+    "equiv-damage-amp",
+    "equiv-min-damage",
+    "equiv-max-damage",
+    "equiv-crit-rate",
+    "equiv-crit-damage",
+    "equiv-attack-speed",
+    "equiv-def-pen",
   ],
-  graphElements: [
-    'damage-gain-graph',
-    'stat-weight-chart'
-  ]
+  graphElements: ["damage-gain-graph", "stat-weight-chart"],
 };
 
 // Coverage tracking state
@@ -41,7 +33,7 @@ const coverageState = {
   predictionsTabButtons: new Set(),
   statTablesElements: new Set(),
   equivalencyInputs: new Set(),
-  graphElements: new Set()
+  graphElements: new Set(),
 };
 
 /**
@@ -64,7 +56,7 @@ export function generatePredictionsCoverageReport() {
     totalElements: 0,
     testedElements: 0,
     categories: {},
-    untestedElements: []
+    untestedElements: [],
   };
 
   for (const [category, elements] of Object.entries(PREDICTIONS_ELEMENTS)) {
@@ -76,7 +68,7 @@ export function generatePredictionsCoverageReport() {
       total,
       tested,
       untested: total - tested,
-      percentage
+      percentage,
     };
 
     report.totalElements += total;
@@ -85,14 +77,17 @@ export function generatePredictionsCoverageReport() {
     // Track untested elements
     if (tested < total) {
       const testedSet = coverageState[category] || new Set();
-      const untested = elements.filter(el => !testedSet.has(el));
-      report.untestedElements.push(...untested.map(el => `${category}: ${el}`));
+      const untested = elements.filter((el) => !testedSet.has(el));
+      report.untestedElements.push(
+        ...untested.map((el) => `${category}: ${el}`),
+      );
     }
   }
 
-  report.overallPercentage = report.totalElements > 0
-    ? Math.round((report.testedElements / report.totalElements) * 100)
-    : 0;
+  report.overallPercentage =
+    report.totalElements > 0
+      ? Math.round((report.testedElements / report.totalElements) * 100)
+      : 0;
 
   return report;
 }
@@ -103,25 +98,37 @@ export function generatePredictionsCoverageReport() {
 export function logPredictionsCoverageReport() {
   const report = generatePredictionsCoverageReport();
 
-  console.log('\n╔════════════════════════════════════════════════════════════╗');
-  console.log('║     STAT PREDICTIONS ELEMENT COVERAGE REPORT             ║');
-  console.log('╚════════════════════════════════════════════════════════════╝\n');
+  console.log(
+    "\n╔════════════════════════════════════════════════════════════╗",
+  );
+  console.log("║     STAT PREDICTIONS ELEMENT COVERAGE REPORT             ║");
+  console.log(
+    "╚════════════════════════════════════════════════════════════╝\n",
+  );
 
-  console.log(`Overall Coverage: ${report.overallPercentage}% (${report.testedElements}/${report.totalElements} elements)\n`);
+  console.log(
+    `Overall Coverage: ${report.overallPercentage}% (${report.testedElements}/${report.totalElements} elements)\n`,
+  );
 
   for (const [category, stats] of Object.entries(report.categories)) {
-    const status = stats.percentage === 100 ? '✓' : '✗';
-    console.log(`${status} ${category}: ${stats.percentage}% (${stats.tested}/${stats.total})`);
+    const status = stats.percentage === 100 ? "✓" : "✗";
+    console.log(
+      `${status} ${category}: ${stats.percentage}% (${stats.tested}/${stats.total})`,
+    );
   }
 
   if (report.untestedElements.length > 0) {
-    console.log('\n════════════════════════════════════════════════════════════');
-    console.log('UNTESTED ELEMENTS:');
-    console.log('════════════════════════════════════════════════════════════');
-    report.untestedElements.forEach(el => console.log(`  - ${el}`));
+    console.log(
+      "\n════════════════════════════════════════════════════════════",
+    );
+    console.log("UNTESTED ELEMENTS:");
+    console.log("════════════════════════════════════════════════════════════");
+    report.untestedElements.forEach((el) => console.log(`  - ${el}`));
   }
 
-  console.log('\n════════════════════════════════════════════════════════════\n');
+  console.log(
+    "\n════════════════════════════════════════════════════════════\n",
+  );
 }
 
 /**

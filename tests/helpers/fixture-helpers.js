@@ -12,8 +12,8 @@ import {
   MASTERY_4TH_CHECKBOXES,
   CONTENT_TYPE_SELECTORS,
   TARGET_DROPDOWNS,
-  STORAGE_KEYS
-} from './selectors.js';
+  STORAGE_KEYS,
+} from "./selectors.js";
 
 /**
  * Clear all localStorage and sessionStorage
@@ -50,7 +50,7 @@ export async function applyBaseStatsFixture(page, fixture) {
 
   // Set character level
   if (fixture.level !== undefined) {
-    await page.fill('#character-level', String(fixture.level));
+    await page.fill("#character-level", String(fixture.level));
   }
 
   // Set stat inputs - only fill visible inputs
@@ -73,7 +73,7 @@ export async function applyBaseStatsFixture(page, fixture) {
     minDamage: fixture.minDamage,
     maxDamage: fixture.maxDamage,
     finalDamage: fixture.finalDamage,
-    mainStatPct: fixture.mainStatPct
+    mainStatPct: fixture.mainStatPct,
   };
 
   for (const [stat, value] of Object.entries(statMappings)) {
@@ -90,10 +90,10 @@ export async function applyBaseStatsFixture(page, fixture) {
   // Set skill levels
   if (fixture.skillLevels) {
     const skillMappings = {
-      '1st': fixture.skillLevels['1st'],
-      '2nd': fixture.skillLevels['2nd'],
-      '3rd': fixture.skillLevels['3rd'],
-      '4th': fixture.skillLevels['4th']
+      "1st": fixture.skillLevels["1st"],
+      "2nd": fixture.skillLevels["2nd"],
+      "3rd": fixture.skillLevels["3rd"],
+      "4th": fixture.skillLevels["4th"],
     };
 
     for (const [skill, value] of Object.entries(skillMappings)) {
@@ -107,32 +107,49 @@ export async function applyBaseStatsFixture(page, fixture) {
   if (fixture.mastery) {
     // 3rd job mastery
     for (const [key, value] of Object.entries(fixture.mastery)) {
-      if (key.startsWith('3rd') && value) {
-        const checkbox = MASTERY_3RD_CHECKBOXES[key.replace('mastery-', '').replace('-', '')];
+      if (key.startsWith("3rd") && value) {
+        const checkbox =
+          MASTERY_3RD_CHECKBOXES[key.replace("mastery-", "").replace("-", "")];
         // Handle the naming conversion
-        const checkboxKey = key.replace('mastery-', '');
-        if (checkboxKey === '3rd-all-64' && value) await page.check(MASTERY_3RD_CHECKBOXES.all64);
-        if (checkboxKey === '3rd-all-68' && value) await page.check(MASTERY_3RD_CHECKBOXES.all68);
-        if (checkboxKey === '3rd-boss-72' && value) await page.check(MASTERY_3RD_CHECKBOXES.boss72);
-        if (checkboxKey === '3rd-all-76' && value) await page.check(MASTERY_3RD_CHECKBOXES.all76);
-        if (checkboxKey === '3rd-all-80' && value) await page.check(MASTERY_3RD_CHECKBOXES.all80);
-        if (checkboxKey === '3rd-boss-84' && value) await page.check(MASTERY_3RD_CHECKBOXES.boss84);
-        if (checkboxKey === '3rd-all-88' && value) await page.check(MASTERY_3RD_CHECKBOXES.all88);
-        if (checkboxKey === '3rd-all-92' && value) await page.check(MASTERY_3RD_CHECKBOXES.all92);
+        const checkboxKey = key.replace("mastery-", "");
+        if (checkboxKey === "3rd-all-64" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all64);
+        if (checkboxKey === "3rd-all-68" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all68);
+        if (checkboxKey === "3rd-boss-72" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.boss72);
+        if (checkboxKey === "3rd-all-76" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all76);
+        if (checkboxKey === "3rd-all-80" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all80);
+        if (checkboxKey === "3rd-boss-84" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.boss84);
+        if (checkboxKey === "3rd-all-88" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all88);
+        if (checkboxKey === "3rd-all-92" && value)
+          await page.check(MASTERY_3RD_CHECKBOXES.all92);
       }
     }
 
     // 4th job mastery
     for (const [key, value] of Object.entries(fixture.mastery)) {
-      if (key.startsWith('4th') && value) {
-        if (key === '4th-all-102' && value) await page.check(MASTERY_4TH_CHECKBOXES.all102);
-        if (key === '4th-all-106' && value) await page.check(MASTERY_4TH_CHECKBOXES.all106);
-        if (key === '4th-boss-111' && value) await page.check(MASTERY_4TH_CHECKBOXES.boss111);
-        if (key === '4th-all-116' && value) await page.check(MASTERY_4TH_CHECKBOXES.all116);
-        if (key === '4th-all-120' && value) await page.check(MASTERY_4TH_CHECKBOXES.all120);
-        if (key === '4th-boss-124' && value) await page.check(MASTERY_4TH_CHECKBOXES.boss124);
-        if (key === '4th-all-128' && value) await page.check(MASTERY_4TH_CHECKBOXES.all128);
-        if (key === '4th-all-132' && value) await page.check(MASTERY_4TH_CHECKBOXES.all132);
+      if (key.startsWith("4th") && value) {
+        if (key === "4th-all-102" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all102);
+        if (key === "4th-all-106" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all106);
+        if (key === "4th-boss-111" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.boss111);
+        if (key === "4th-all-116" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all116);
+        if (key === "4th-all-120" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all120);
+        if (key === "4th-boss-124" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.boss124);
+        if (key === "4th-all-128" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all128);
+        if (key === "4th-all-132" && value)
+          await page.check(MASTERY_4TH_CHECKBOXES.all132);
       }
     }
   }
@@ -156,13 +173,14 @@ export async function applyBaseStatsFixture(page, fixture) {
  * @returns {boolean} True if all storage values match
  */
 export async function verifyStorageState(page, fixture) {
-  const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-  const selectedJobTier = await page.evaluate(() => localStorage.getItem('selectedJobTier'));
-
-  return (
-    selectedClass === fixture.class &&
-    selectedJobTier === fixture.jobTier
+  const selectedClass = await page.evaluate(() =>
+    localStorage.getItem("selectedClass"),
   );
+  const selectedJobTier = await page.evaluate(() =>
+    localStorage.getItem("selectedJobTier"),
+  );
+
+  return selectedClass === fixture.class && selectedJobTier === fixture.jobTier;
 }
 
 /**
@@ -178,18 +196,18 @@ export async function getCurrentStatValues(page) {
     };
 
     return {
-      attack: getInputValue('attack-base'),
-      defense: getInputValue('defense-base'),
-      critRate: getInputValue('crit-rate-base'),
-      critDamage: getInputValue('crit-damage-base'),
-      attackSpeed: getInputValue('attack-speed-base'),
-      str: getInputValue('str-base'),
-      dex: getInputValue('dex-base'),
-      int: getInputValue('int-base'),
-      luk: getInputValue('luk-base'),
-      damage: getInputValue('damage-base'),
-      bossDamage: getInputValue('boss-damage-base'),
-      level: getInputValue('character-level')
+      attack: getInputValue("attack-base"),
+      defense: getInputValue("defense-base"),
+      critRate: getInputValue("crit-rate-base"),
+      critDamage: getInputValue("crit-damage-base"),
+      attackSpeed: getInputValue("attack-speed-base"),
+      str: getInputValue("str-base"),
+      dex: getInputValue("dex-base"),
+      int: getInputValue("int-base"),
+      luk: getInputValue("luk-base"),
+      damage: getInputValue("damage-base"),
+      bossDamage: getInputValue("boss-damage-base"),
+      level: getInputValue("character-level"),
     };
   });
 }
@@ -199,9 +217,9 @@ export async function getCurrentStatValues(page) {
  * @param {Page} page - Playwright page object
  */
 export async function navigateToBaseStats(page) {
-  await page.goto('http://localhost:8000/#/setup/base-stats');
+  await page.goto("http://localhost:8000/#/setup/base-stats");
   await page.waitForTimeout(200);
-  await page.waitForSelector('#setup-base-stats', { state: 'visible' });
+  await page.waitForSelector("#setup-base-stats", { state: "visible" });
 }
 
 /**
@@ -209,9 +227,9 @@ export async function navigateToBaseStats(page) {
  * @param {Page} page - Playwright page object
  */
 export async function navigateToStatPredictions(page) {
-  await page.goto('http://localhost:8000/#/predictions/stat-tables');
+  await page.goto("http://localhost:8000/#/predictions/stat-tables");
   await page.waitForTimeout(200);
-  await page.waitForSelector('#predictions-stat-tables', { state: 'visible' });
+  await page.waitForSelector("#predictions-stat-tables", { state: "visible" });
 }
 
 /**
@@ -219,7 +237,7 @@ export async function navigateToStatPredictions(page) {
  * @param {Page} page - Playwright page object
  */
 export async function navigateToStatEquivalency(page) {
-  await page.goto('http://localhost:8000/#/predictions/equivalency');
+  await page.goto("http://localhost:8000/#/predictions/equivalency");
   await page.waitForTimeout(200);
-  await page.waitForSelector('#predictions-equivalency', { state: 'visible' });
+  await page.waitForSelector("#predictions-equivalency", { state: "visible" });
 }

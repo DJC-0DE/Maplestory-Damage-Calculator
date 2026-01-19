@@ -5,9 +5,9 @@ window.closeHelpSidebar = closeHelpSidebar;
 window.scrollToSection = scrollToSection;
 
 const helpContent = {
-    'skill-coeff': {
-        title: 'Skill Coefficient',
-        content: `
+  "skill-coeff": {
+    title: "Skill Coefficient",
+    content: `
             <h4>What is Skill Coefficient?</h4>
             <p>The Skill Coefficient is a percentage value that determines how much of your base attack damage is applied when using your Basic Attack skill.</p>
 
@@ -18,11 +18,11 @@ const helpContent = {
 
             <h4>Example</h4>
             <p>If your skill coefficient is 89.9% and you have 1000 base attack, your Basic Attack will deal 899 damage before other multipliers are applied.</p>
-        `
-    },
-    'def-pen': {
-        title: 'Defense Penetration',
-        content: `
+        `,
+  },
+  "def-pen": {
+    title: "Defense Penetration",
+    content: `
             <h4>What is Defense Penetration?</h4>
             <p>Defense Penetration reduces the target's defense value, allowing you to deal more damage. This is especially valuable against high-defense enemies.</p>
 
@@ -33,11 +33,11 @@ const helpContent = {
                 <li>Chapter Bosses (20-25% defense)</li>
                 <li>High-level stage hunts</li>
             </ul>
-        `
-    },
-    'skill-mastery': {
-        title: 'Skill Mastery Bonus',
-        content: `
+        `,
+  },
+  "skill-mastery": {
+    title: "Skill Mastery Bonus",
+    content: `
             <h4>Skill Mastery - All Monsters</h4>
             <p>Check the boxes for mastery bonuses that apply to all monsters you've unlocked.</p>
 
@@ -47,11 +47,11 @@ const helpContent = {
             <p>Check the boxes for mastery bonuses that only apply when fighting bosses.</p>
 
             <img src="media/tutorial/mastery-boss.png" alt="Skill Mastery - Boss Only Example" style="width: 100%; max-width: 300px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
-        `
-    },
-    'skill-mastery-boss': {
-        title: 'Skill Mastery Bonus - Boss Only',
-        content: `
+        `,
+  },
+  "skill-mastery-boss": {
+    title: "Skill Mastery Bonus - Boss Only",
+    content: `
             <h4>What is this?</h4>
             <p>This field is for Mastery skills that <strong>only apply when fighting bosses</strong>.</p>
 
@@ -62,11 +62,11 @@ const helpContent = {
 
             <h4>Important</h4>
             <p>Don't double-count! If a bonus applies to all enemies, put it in the regular Skill Mastery Bonus field, not here.</p>
-        `
-    },
-    'target-stage': {
-        title: 'Target Stage/Boss',
-        content: `
+        `,
+  },
+  "target-stage": {
+    title: "Target Stage/Boss",
+    content: `
             <h4>What is this?</h4>
             <p>Select the enemy or stage you're currently fighting to apply accurate defense and damage reduction values.</p>
 
@@ -81,11 +81,11 @@ const helpContent = {
 
             <h4>Tip</h4>
             <p>Select "Training Dummy" to see your maximum potential damage output without any enemy resistances.</p>
-        `
-    },
-    'defense': {
-        title: 'Defense (Dark Knight Only)',
-        content: `
+        `,
+  },
+  defense: {
+    title: "Defense (Dark Knight Only)",
+    content: `
             <h4>What is Defense?</h4>
             <p>This field is specifically for Dark Knight characters who have a passive skill that converts a percentage of their Defense stat into Main Stat.</p>
 
@@ -101,11 +101,11 @@ const helpContent = {
 
             <h4>Note</h4>
             <p>This field is only visible when you select Dark Knight as your class.</p>
-        `
-    },
-    'main-stat-pct': {
-        title: 'Current Main Stat %',
-        content: `
+        `,
+  },
+  "main-stat-pct": {
+    title: "Current Main Stat %",
+    content: `
             <h4>What is Main Stat %?</h4>
             <p>Main Stat % represents all percentage-based bonuses you currently have that increase your main stat (STR, DEX, INT, or LUK depending on your class).</p>
 
@@ -132,12 +132,11 @@ const helpContent = {
 
             <h4>Example</h4>
             <p>If you have +20% from equipment, +15% from artifacts, and +10% from skills, enter <strong>45</strong> in the "Current Main Stat %" field. Then enter your character sheet's total main stat value in the "Primary Main Stat" field.</p>
-        `
-    }
-    ,
-    'stats-autofill': {
-        title: 'Stats Auto-Fill',
-        content: `
+        `,
+  },
+  "stats-autofill": {
+    title: "Stats Auto-Fill",
+    content: `
             <p>Use optical character recognition to auto-fill stats from the Character page.</p>
 
             <h4>How to prepare the screenshot</h4>
@@ -156,62 +155,62 @@ const helpContent = {
             <h4> Example Acceptable Screenshots</h4>
             <img src="media/autofill/stats-autofill-ex1.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
             <img src="media/autofill/stats-autofill-ex2.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
-        `
-    }
+        `,
+  },
 };
 
 export function openHelpSidebar(helpKey) {
-    const sidebar = document.getElementById('help-sidebar');
-    const title = document.getElementById('help-sidebar-title');
-    const content = document.getElementById('help-sidebar-content');
-    const backdrop = document.getElementById('help-sidebar-backdrop');
+  const sidebar = document.getElementById("help-sidebar");
+  const title = document.getElementById("help-sidebar-title");
+  const content = document.getElementById("help-sidebar-content");
+  const backdrop = document.getElementById("help-sidebar-backdrop");
 
-    if (!sidebar || !title || !content) return;
+  if (!sidebar || !title || !content) return;
 
-    const helpData = helpContent[helpKey];
-    if (!helpData) return;
+  const helpData = helpContent[helpKey];
+  if (!helpData) return;
 
-    // Set content
-    title.textContent = helpData.title;
-    content.innerHTML = helpData.content;
+  // Set content
+  title.textContent = helpData.title;
+  content.innerHTML = helpData.content;
 
-    // Show sidebar
-    sidebar.style.display = 'flex';
+  // Show sidebar
+  sidebar.style.display = "flex";
 
-    // Only show backdrop and mobile-open class on mobile (< 1024px)
-    if (window.innerWidth < 1024) {
-        sidebar.classList.add('mobile-open');
-        if (backdrop) {
-            backdrop.classList.add('active');
-        }
+  // Only show backdrop and mobile-open class on mobile (< 1024px)
+  if (window.innerWidth < 1024) {
+    sidebar.classList.add("mobile-open");
+    if (backdrop) {
+      backdrop.classList.add("active");
     }
+  }
 }
 
 export function closeHelpSidebar() {
-    const sidebar = document.getElementById('help-sidebar');
-    const backdrop = document.getElementById('help-sidebar-backdrop');
+  const sidebar = document.getElementById("help-sidebar");
+  const backdrop = document.getElementById("help-sidebar-backdrop");
 
-    if (sidebar) {
-        sidebar.classList.remove('mobile-open');
-        // Use a timeout to allow the transform animation to complete before hiding
-        setTimeout(() => {
-            if (!sidebar.classList.contains('mobile-open')) {
-                sidebar.style.display = 'none';
-            }
-        }, 300);
-    }
-    if (backdrop) {
-        backdrop.classList.remove('active');
-    }
+  if (sidebar) {
+    sidebar.classList.remove("mobile-open");
+    // Use a timeout to allow the transform animation to complete before hiding
+    setTimeout(() => {
+      if (!sidebar.classList.contains("mobile-open")) {
+        sidebar.style.display = "none";
+      }
+    }, 300);
+  }
+  if (backdrop) {
+    backdrop.classList.remove("active");
+  }
 }
 
 // Left Navigation - Scroll to Section
 export function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-        section.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
+  const section = document.getElementById(sectionId);
+  if (section) {
+    section.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
 }

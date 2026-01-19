@@ -2,15 +2,15 @@
 // This module manages the scrolling optimizer tab functionality
 
 import {
-    runScrollSimulation,
-    updateScrollLevelInfo,
-    switchScrollStrategyTab
-} from './scroll-optimizer.js';
+  runScrollSimulation,
+  updateScrollLevelInfo,
+  switchScrollStrategyTab,
+} from "./scroll-optimizer.js";
 import {
-    initializeEquipmentSlots,
-    loadEquipmentSlots,
-} from '@ui/equipment-ui.js';
-import { calculateEquipmentSlotDPS } from '@ui/results-display.js';
+  initializeEquipmentSlots,
+  loadEquipmentSlots,
+} from "@ui/equipment-ui.js";
+import { calculateEquipmentSlotDPS } from "@ui/results-display.js";
 
 // Make functions available globally for onclick handlers
 window.switchScrollingSubTab = switchScrollingSubTab;
@@ -22,80 +22,80 @@ window.updateGuildSkillDisplay = updateGuildSkillDisplay;
 
 // Update Guild Skill display value
 export function updateGuildSkillDisplay() {
-    const slider = document.getElementById('scroll-guild-skill');
-    const display = document.getElementById('guild-skill-value');
-    if (slider && display) {
-        const value = slider.value;
-        display.textContent = value + '%';
+  const slider = document.getElementById("scroll-guild-skill");
+  const display = document.getElementById("guild-skill-value");
+  if (slider && display) {
+    const value = slider.value;
+    display.textContent = value + "%";
 
-        // Update styling based on value
-        if (value > 0) {
-            display.classList.add('boosted');
-        } else {
-            display.classList.remove('boosted');
-        }
-
-        // Update slider data attribute for CSS styling
-        slider.setAttribute('data-value', value);
-
-        // Update tick marks
-        const ticks = document.querySelectorAll('.scrolling-guild__tick');
-        ticks.forEach((tick, index) => {
-            if (index <= parseInt(value)) {
-                tick.classList.add('active');
-            } else {
-                tick.classList.remove('active');
-            }
-        });
+    // Update styling based on value
+    if (value > 0) {
+      display.classList.add("boosted");
+    } else {
+      display.classList.remove("boosted");
     }
+
+    // Update slider data attribute for CSS styling
+    slider.setAttribute("data-value", value);
+
+    // Update tick marks
+    const ticks = document.querySelectorAll(".scrolling-guild__tick");
+    ticks.forEach((tick, index) => {
+      if (index <= parseInt(value)) {
+        tick.classList.add("active");
+      } else {
+        tick.classList.remove("active");
+      }
+    });
+  }
 }
 
 // Switch scrolling sub-tabs (mirrors inner-ability.js pattern)
 export function switchScrollingSubTab(tabName) {
-    const allSubTabContent = document.querySelectorAll('.scrolling-subtab'); 
-    const allSubTabButtons = document.querySelectorAll('#scrolling-tab-button'); 
+  const allSubTabContent = document.querySelectorAll(".scrolling-subtab");
+  const allSubTabButtons = document.querySelectorAll("#scrolling-tab-button");
 
-    // Hide all subtabs
-    allSubTabContent.forEach(tab => {
-        tab.classList.remove('active');
-        tab.style.display = 'none';
-    });
-    
-    // Remove active from all buttons - update to use new tab-button class
-    allSubTabButtons.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show selected subtab
-    const selectedTab = document.getElementById(`scrolling-${tabName}`);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-        selectedTab.style.display = 'block';
+  // Hide all subtabs
+  allSubTabContent.forEach((tab) => {
+    tab.classList.remove("active");
+    tab.style.display = "none";
+  });
+
+  // Remove active from all buttons - update to use new tab-button class
+  allSubTabButtons.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+
+  // Show selected subtab
+  const selectedTab = document.getElementById(`scrolling-${tabName}`);
+  if (selectedTab) {
+    selectedTab.classList.add("active");
+    selectedTab.style.display = "block";
+  }
+
+  // Activate button - Find the button by matching the onclick attribute
+  // This works both when called from a click event and during initialization
+  allSubTabButtons.forEach((btn) => {
+    const onclickAttr = btn.getAttribute("onclick");
+    if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
+      btn.classList.add("active");
     }
-    
-    // Activate button - Find the button by matching the onclick attribute
-    // This works both when called from a click event and during initialization    
-    allSubTabButtons.forEach(btn => {
-        const onclickAttr = btn.getAttribute('onclick');
-        if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
-            btn.classList.add('active');
-        }
-    });
-    
-    // Render content
-    if (tabName === 'my-slot-performance') {
-        renderMySlotPerformance();
-    } else if (tabName === 'simulation') {
-        renderSimulation();
-    }
+  });
+
+  // Render content
+  if (tabName === "my-slot-performance") {
+    renderMySlotPerformance();
+  } else if (tabName === "simulation") {
+    renderSimulation();
+  }
 }
 
 // Render My Slot Performance tab
 export function renderMySlotPerformance() {
-    const container = document.getElementById('scrolling-my-slot-performance');
-    if (!container) return;
+  const container = document.getElementById("scrolling-my-slot-performance");
+  if (!container) return;
 
-    let html = `
+  let html = `
         <div class="optimization-info-banner">
             <span class="optimization-info-banner-icon">ℹ️</span>
             <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
@@ -116,21 +116,21 @@ export function renderMySlotPerformance() {
         </div>
     `;
 
-    container.innerHTML = html;
+  container.innerHTML = html;
 
-    // Initialize equipment slots after DOM is ready
-    setTimeout(() => {
-        initializeEquipmentSlots();
-        loadEquipmentSlots();
-    }, 0);
+  // Initialize equipment slots after DOM is ready
+  setTimeout(() => {
+    initializeEquipmentSlots();
+    loadEquipmentSlots();
+  }, 0);
 }
 
 // Render Simulation tab
 export function renderSimulation() {
-    const container = document.getElementById('scrolling-simulation');
-    if (!container) return;
+  const container = document.getElementById("scrolling-simulation");
+  if (!container) return;
 
-    let html = `
+  let html = `
         <div class="optimization-info-banner">
             <span class="optimization-info-banner-icon">⚡</span>
             <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
@@ -204,16 +204,16 @@ export function renderSimulation() {
         </div>
     `;
 
-    container.innerHTML = html;
+  container.innerHTML = html;
 
-    // Initialize scroll level info after DOM is ready
-    setTimeout(() => {
-        updateScrollLevelInfo();
-    }, 0);
+  // Initialize scroll level info after DOM is ready
+  setTimeout(() => {
+    updateScrollLevelInfo();
+  }, 0);
 }
 
 // Initialize Scrolling Analysis
 export function initializeScrollingAnalysis() {
-    renderMySlotPerformance();
-    renderSimulation();
+  renderMySlotPerformance();
+  renderSimulation();
 }

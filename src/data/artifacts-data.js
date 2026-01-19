@@ -1,267 +1,267 @@
 // Artifacts data
 export const artifactsData = [
-    {
-        name: "Charm of the undead",
-        imageName: "charm-of-the-undead.png",
-        descriptions: [
-            "Attack by 10% for 5 sec every 10 sec",
-            "Attack by 12% for 5 sec every 10 sec",
-            "Attack by 14% for 5 sec every 10 sec",
-            "Attack by 16% for 5 sec every 10 sec",
-            "Attack by 18% for 5 sec every 10 sec",
-            "Attack by 20% for 5 sec every 10 sec"
-        ]
-    },
-    {
-        name: "Contract of Darkness",
-        imageName: "contract-of-darkness.png",
-        descriptions: [
-            "When attacking a boss, increases criticial rate by 8%",
-            "When attacking a boss, increases criticial rate by 9.6%",
-            "When attacking a boss, increases criticial rate by 11.2%",
-            "When attacking a boss, increases criticial rate by 12.8%",
-            "When attacking a boss, increases criticial rate by 14.4%",
-            "When attacking a boss, increases criticial rate by 16%"
-        ]
-    },
-    {
-        name: "Rainbow-colored Snail Shell",
-        imageName: "rainbow-snail-shell.png",
-        descriptions: [
-            "At the start of battle, increases Critical Rate by 15% and Critical Damage by 20% for 15 sec",
-            "At the start of battle, increases Critical Rate by 18% and Critical Damage by 24% for 15 sec",
-            "At the start of battle, increases Critical Rate by 21% and Critical Damage by 28% for 15 sec",
-            "At the start of battle, increases Critical Rate by 24% and Critical Damage by 32% for 15 sec",
-            "At the start of battle, increases Critical Rate by 27% and Critical Damage by 36% for 15 sec",
-            "At the start of battle, increases Critical Rate by 30% and Critical Damage by 40% for 15 sec"
-        ]
-    },
-    {
-        name: "Hexagon Necklace",
-        imageName: "hexagon-necklace.png",
-        descriptions: [
-            "Increases damage by 15% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
-            "Increases damage by 18% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
-            "Increases damage by 21% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
-            "Increases damage by 24% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
-            "Increases damage by 27% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
-            "Increases damage by 30% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times."
-        ]
-    },
-    {
-        name: "Arwen's Glass Shoes",
-        imageName: "arwen-glass-shoe.png",
-        descriptions: [
-            "Increases the summoning duration of Companions by 20%",
-            "Increases the summoning duration of Companions by 24%",
-            "Increases the summoning duration of Companions by 28%",
-            "Increases the summoning duration of Companions by 32%",
-            "Increases the summoning duration of Companions by 36%",
-            "Increases the summoning duration of Companions by 40%"
-        ]
-    },
-    {
-        name: "Mushmom's Cap",
-        imageName: "mushmom-hat.png",
-        descriptions: [
-            "Increases accuracy by 5, and when attacking increases damage by 1% for each Accuracy exceeding the target's Evasion. This is applied up to 20%",
-            "Increases accuracy by 6, and when attacking increases damage by 1.2% for each Accuracy exceeding the target's Evasion. This is applied up to 24%",
-            "Increases accuracy by 7, and when attacking increases damage by 1.4% for each Accuracy exceeding the target's Evasion. This is applied up to 28%",
-            "Increases accuracy by 8, and when attacking increases damage by 1.6% for each Accuracy exceeding the target's Evasion. This is applied up to 32%",
-            "Increases accuracy by 9, and when attacking increases damage by 1.8% for each Accuracy exceeding the target's Evasion. This is applied up to 36%",
-            "Increases accuracy by 10, and when attacking increases damage by 2% for each Accuracy exceeding the target's Evasion. This is applied up to 40%"
-        ]
-    },
-    {
-        name: "Clear Spring Water",
-        imageName: "clear-spring-water.png",
-        descriptions: [
-            "[Growth Dungeon] Increases Final Damage in battle by 10%.",
-            "[Growth Dungeon] Increases Final Damage in battle by 12%.",
-            "[Growth Dungeon] Increases Final Damage in battle by 14%.",
-            "[Growth Dungeon] Increases Final Damage in battle by 16%.",
-            "[Growth Dungeon] Increases Final Damage in battle by 18%.",
-            "[Growth Dungeon] Increases Final Damage in battle by 20%."
-        ]
-    },
-    {
-        name: "Athena Pierce's Old Gloves",
-        imageName: "helena-glove.png",
-        descriptions: [
-            "Increases Attack Speed by 8% and Max Damage Multiplier by 25% of Attack Speed",
-            "Increases Attack Speed by 9.6% and Max Damage Multiplier by 30% of Attack Speed",
-            "Increases Attack Speed by 11.2% and Max Damage Multiplier by 35% of Attack Speed",
-            "Increases Attack Speed by 12.8% and Max Damage Multiplier by 40% of Attack Speed",
-            "Increases Attack Speed by 14.4% and Max Damage Multiplier by 45% of Attack Speed",
-            "Increases Attack Speed by 16% and Max Damage Multiplier by 50% of Attack Speed"
-        ]
-    },
-    {
-        name: "Chalice",
-        imageName: "holy-grail.png",
-        descriptions: [
-            "When defeating a target, increases Final Damage by 15% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
-            "When defeating a target, increases Final Damage by 18% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
-            "When defeating a target, increases Final Damage by 21% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
-            "When defeating a target, increases Final Damage by 24% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
-            "When defeating a target, increases Final Damage by 27% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
-            "When defeating a target, increases Final Damage by 30% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss."
-        ]
-    },
-    {
-        name: "Old Music Box",
-        imageName: "old-music-box.png",
-        descriptions: [
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 25% for 25 sec. Cooldown: 20 sec",
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 30% for 25 sec. Cooldown: 20 sec",
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 35% for 25 sec. Cooldown: 20 sec",
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 40% for 25 sec. Cooldown: 20 sec",
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 45% for 25 sec. Cooldown: 20 sec",
-            "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 50% for 25 sec. Cooldown: 20 sec"
-        ]
-    },
-    {
-        name: "Silver Pendant",
-        imageName: "silver-pendant.png",
-        descriptions: [
-            "When attacking, increases the target's damage taken by 10% for 5 sec and decreases their HP Recovery by 5% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
-            "When attacking, increases the target's damage taken by 12% for 5 sec and decreases their HP Recovery by 6% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
-            "When attacking, increases the target's damage taken by 14% for 5 sec and decreases their HP Recovery by 7% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
-            "When attacking, increases the target's damage taken by 16% for 5 sec and decreases their HP Recovery by 8% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
-            "When attacking, increases the target's damage taken by 18% for 5 sec and decreases their HP Recovery by 9% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
-            "When attacking, increases the target's damage taken by 20% for 5 sec and decreases their HP Recovery by 10% for 30 sec with a 15% chance. This is applied individually up to 5 times."
-        ]
-    },
-    {
-        name: "Star Rock",
-        imageName: "star-rock.png",
-        descriptions: [
-            "Increases damage taken by 20% and Boss Monster Damage by 50%.",
-            "Increases damage taken by 24% and Boss Monster Damage by 60%.",
-            "Increases damage taken by 28% and Boss Monster Damage by 70%.",
-            "Increases damage taken by 32% and Boss Monster Damage by 80%.",
-            "Increases damage taken by 36% and Boss Monster Damage by 90%.",
-            "Increases damage taken by 40% and Boss Monster Damage by 100%."
-        ]
-    },
-    {
-        name: "The Book of Ancient",
-        imageName: "ancient-book.png",
-        descriptions: [
-            "Increases Critical Rate by 10% and Critical Damage by 30% of Critical Rate.",
-            "Increases Critical Rate by 12% and Critical Damage by 36% of Critical Rate.",
-            "Increases Critical Rate by 14% and Critical Damage by 42% of Critical Rate.",
-            "Increases Critical Rate by 16% and Critical Damage by 48% of Critical Rate.",
-            "Increases Critical Rate by 18% and Critical Damage by 54% of Critical Rate.",
-            "Increases Critical Rate by 20% and Critical Damage by 60% of Critical Rate."
-        ]
-    },
-    {
-        name: "Lunar Dew",
-        imageName: "lunar-dew.png",
-        descriptions: [
-            "When taking damage, recovers 3% HP and becomes immune to damage for 1 sec with a 5% chance. Cooldown 5 sec",
-            "When taking damage, recovers 3.6% HP and becomes immune to damage for 1.2 sec with a 5% chance. Cooldown 5 sec",
-            "When taking damage, recovers 4.2% HP and becomes immune to damage for 1.4 sec with a 5% chance. Cooldown 5 sec",
-            "When taking damage, recovers 4.8% HP and becomes immune to damage for 1.6 sec with a 5% chance. Cooldown 5 sec",
-            "When taking damage, recovers 5.4% HP and becomes immune to damage for 1.8 sec with a 5% chance. Cooldown 5 sec",
-            "When taking damage, recovers 6% HP and becomes immune to damage for 2 sec with a 5% chance. Cooldown 5 sec"
-        ]
-    },
-    {
-        name: "Fire Flower",
-        imageName: "fire-herb.png",
-        descriptions: [
-            "For every every nearby target, increases Final Damage by 1%. This is applied up to 10 targets.",
-            "For every every nearby target, increases Final Damage by 1.2%. This is applied up to 10 targets.",
-            "For every every nearby target, increases Final Damage by 1.4%. This is applied up to 10 targets.",
-            "For every every nearby target, increases Final Damage by 1.6%. This is applied up to 10 targets.",
-            "For every every nearby target, increases Final Damage by 1.8%. This is applied up to 10 targets.",
-            "For every every nearby target, increases Final Damage by 2%. This is applied up to 10 targets."
-        ]
-    },
-    {
-        name: "Soul Contract",
-        imageName: "soul-contract.png",
-        descriptions: [
-            "[Chapter Hunt] Decreases skill cooldown in battle by 20%.",
-            "[Chapter Hunt] Decreases skill cooldown in battle by 24%.",
-            "[Chapter Hunt] Decreases skill cooldown in battle by 28%.",
-            "[Chapter Hunt] Decreases skill cooldown in battle by 32%.",
-            "[Chapter Hunt] Decreases skill cooldown in battle by 36%.",
-            "[Chapter Hunt] Decreases skill cooldown in battle by 40%."
-        ]
-    },
-    {
-        name: "Lit Lamp",
-        imageName: "lit-lamp.png",
-        descriptions: [
-            "[World Boss] Increases Final Damage in battle by 20%",
-            "[World Boss] Increases Final Damage in battle by 24%",
-            "[World Boss] Increases Final Damage in battle by 28%",
-            "[World Boss] Increases Final Damage in battle by 32%",
-            "[World Boss] Increases Final Damage in battle by 36%",
-            "[World Boss] Increases Final Damage in battle by 40%"
-        ]
-    },
-    {
-        name: "Soul Pouch",
-        imageName: "soul-pouch.png",
-        descriptions: [
-            "[Arena] Increases Final Damage in battle by 20%",
-            "[Arena] Increases Final Damage in battle by 24%",
-            "[Arena] Increases Final Damage in battle by 28%",
-            "[Arena] Increases Final Damage in battle by 32%",
-            "[Arena] Increases Final Damage in battle by 36%",
-            "[Arena] Increases Final Damage in battle by 40%"
-        ]
-    },
-    {
-        name: "Ancient Text Piece",
-        imageName: "ancient-text-piece.png",
-        descriptions: [
-            "[Guild Conquest] Increases Final Damage in battle by 20%",
-            "[Guild Conquest] Increases Final Damage in battle by 24%",
-            "[Guild Conquest] Increases Final Damage in battle by 28%",
-            "[Guild Conquest] Increases Final Damage in battle by 32%",
-            "[Guild Conquest] Increases Final Damage in battle by 36%",
-            "[Guild Conquest] Increases Final Damage in battle by 40%"
-        ]
-    },
-    {
-        name: "Icy Soul Rock",
-        imageName: "icy-soul-rock.png",
-        descriptions: [
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 20%, and when your MP is 75% or higher, the effect is doubled.",
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 24%, and when your MP is 75% or higher, the effect is doubled.",
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 28%, and when your MP is 75% or higher, the effect is doubled.",
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 32%, and when your MP is 75% or higher, the effect is doubled.",
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 36%, and when your MP is 75% or higher, the effect is doubled.",
-            "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 40%, and when your MP is 75% or higher, the effect is doubled."
-        ]
-    },
-    {
-        name: "Flaming Lava",
-        imageName: "flaming-lava.png",
-        descriptions: [
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 4%; if the target has a debuff, increases by 8%; if the target has a barrier, increases by 60%.",
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 4.8%; if the target has a debuff, increases by 9.6%; if the target has a barrier, increases by 72%.",
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 5.6%; if the target has a debuff, increases by 11.2%; if the target has a barrier, increases by 84%.",
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 6.4%; if the target has a debuff, increases by 12.8%; if the target has a barrier, increases by 96%.",
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 7.2%; if the target has a debuff, increases by 14.4%; if the target has a barrier, increases by 108%.",
-            "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 8%; if the target has a debuff, increases by 16%; if the target has a barrier, increases by 120%."
-        ]
-    },
-    {
-        name: "Sayram's Necklace",
-        imageName: "seyran-necklace.png",
-        descriptions: [
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 30%. When there is 1 target, increases Boss Monster Damage by 10%.",
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 36%. When there is 1 target, increases Boss Monster Damage by 12%.",
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 42%. When there is 1 target, increases Boss Monster Damage by 14%.",
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 48%. When there is 1 target, increases Boss Monster Damage by 16%.",
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 54%. When there is 1 target, increases Boss Monster Damage by 18%.",
-            "When there are 2 or more nearby targets, increases Normal Monster Damage by 60%. When there is 1 target, increases Boss Monster Damage by 20%."
-        ]
-    }
+  {
+    name: "Charm of the undead",
+    imageName: "charm-of-the-undead.png",
+    descriptions: [
+      "Attack by 10% for 5 sec every 10 sec",
+      "Attack by 12% for 5 sec every 10 sec",
+      "Attack by 14% for 5 sec every 10 sec",
+      "Attack by 16% for 5 sec every 10 sec",
+      "Attack by 18% for 5 sec every 10 sec",
+      "Attack by 20% for 5 sec every 10 sec",
+    ],
+  },
+  {
+    name: "Contract of Darkness",
+    imageName: "contract-of-darkness.png",
+    descriptions: [
+      "When attacking a boss, increases criticial rate by 8%",
+      "When attacking a boss, increases criticial rate by 9.6%",
+      "When attacking a boss, increases criticial rate by 11.2%",
+      "When attacking a boss, increases criticial rate by 12.8%",
+      "When attacking a boss, increases criticial rate by 14.4%",
+      "When attacking a boss, increases criticial rate by 16%",
+    ],
+  },
+  {
+    name: "Rainbow-colored Snail Shell",
+    imageName: "rainbow-snail-shell.png",
+    descriptions: [
+      "At the start of battle, increases Critical Rate by 15% and Critical Damage by 20% for 15 sec",
+      "At the start of battle, increases Critical Rate by 18% and Critical Damage by 24% for 15 sec",
+      "At the start of battle, increases Critical Rate by 21% and Critical Damage by 28% for 15 sec",
+      "At the start of battle, increases Critical Rate by 24% and Critical Damage by 32% for 15 sec",
+      "At the start of battle, increases Critical Rate by 27% and Critical Damage by 36% for 15 sec",
+      "At the start of battle, increases Critical Rate by 30% and Critical Damage by 40% for 15 sec",
+    ],
+  },
+  {
+    name: "Hexagon Necklace",
+    imageName: "hexagon-necklace.png",
+    descriptions: [
+      "Increases damage by 15% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+      "Increases damage by 18% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+      "Increases damage by 21% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+      "Increases damage by 24% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+      "Increases damage by 27% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+      "Increases damage by 30% of the current value for 30 sec every 20 sec. This effect stacks up to 3 times.",
+    ],
+  },
+  {
+    name: "Arwen's Glass Shoes",
+    imageName: "arwen-glass-shoe.png",
+    descriptions: [
+      "Increases the summoning duration of Companions by 20%",
+      "Increases the summoning duration of Companions by 24%",
+      "Increases the summoning duration of Companions by 28%",
+      "Increases the summoning duration of Companions by 32%",
+      "Increases the summoning duration of Companions by 36%",
+      "Increases the summoning duration of Companions by 40%",
+    ],
+  },
+  {
+    name: "Mushmom's Cap",
+    imageName: "mushmom-hat.png",
+    descriptions: [
+      "Increases accuracy by 5, and when attacking increases damage by 1% for each Accuracy exceeding the target's Evasion. This is applied up to 20%",
+      "Increases accuracy by 6, and when attacking increases damage by 1.2% for each Accuracy exceeding the target's Evasion. This is applied up to 24%",
+      "Increases accuracy by 7, and when attacking increases damage by 1.4% for each Accuracy exceeding the target's Evasion. This is applied up to 28%",
+      "Increases accuracy by 8, and when attacking increases damage by 1.6% for each Accuracy exceeding the target's Evasion. This is applied up to 32%",
+      "Increases accuracy by 9, and when attacking increases damage by 1.8% for each Accuracy exceeding the target's Evasion. This is applied up to 36%",
+      "Increases accuracy by 10, and when attacking increases damage by 2% for each Accuracy exceeding the target's Evasion. This is applied up to 40%",
+    ],
+  },
+  {
+    name: "Clear Spring Water",
+    imageName: "clear-spring-water.png",
+    descriptions: [
+      "[Growth Dungeon] Increases Final Damage in battle by 10%.",
+      "[Growth Dungeon] Increases Final Damage in battle by 12%.",
+      "[Growth Dungeon] Increases Final Damage in battle by 14%.",
+      "[Growth Dungeon] Increases Final Damage in battle by 16%.",
+      "[Growth Dungeon] Increases Final Damage in battle by 18%.",
+      "[Growth Dungeon] Increases Final Damage in battle by 20%.",
+    ],
+  },
+  {
+    name: "Athena Pierce's Old Gloves",
+    imageName: "helena-glove.png",
+    descriptions: [
+      "Increases Attack Speed by 8% and Max Damage Multiplier by 25% of Attack Speed",
+      "Increases Attack Speed by 9.6% and Max Damage Multiplier by 30% of Attack Speed",
+      "Increases Attack Speed by 11.2% and Max Damage Multiplier by 35% of Attack Speed",
+      "Increases Attack Speed by 12.8% and Max Damage Multiplier by 40% of Attack Speed",
+      "Increases Attack Speed by 14.4% and Max Damage Multiplier by 45% of Attack Speed",
+      "Increases Attack Speed by 16% and Max Damage Multiplier by 50% of Attack Speed",
+    ],
+  },
+  {
+    name: "Chalice",
+    imageName: "holy-grail.png",
+    descriptions: [
+      "When defeating a target, increases Final Damage by 15% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+      "When defeating a target, increases Final Damage by 18% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+      "When defeating a target, increases Final Damage by 21% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+      "When defeating a target, increases Final Damage by 24% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+      "When defeating a target, increases Final Damage by 27% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+      "When defeating a target, increases Final Damage by 30% for 30 sec with a 2% chance. Activates with a 100% chance if the defeeated target is a boss.",
+    ],
+  },
+  {
+    name: "Old Music Box",
+    imageName: "old-music-box.png",
+    descriptions: [
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 25% for 25 sec. Cooldown: 20 sec",
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 30% for 25 sec. Cooldown: 20 sec",
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 35% for 25 sec. Cooldown: 20 sec",
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 40% for 25 sec. Cooldown: 20 sec",
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 45% for 25 sec. Cooldown: 20 sec",
+      "When inflicted with debuffs, removes 1 debuff(s) and increases attack by 50% for 25 sec. Cooldown: 20 sec",
+    ],
+  },
+  {
+    name: "Silver Pendant",
+    imageName: "silver-pendant.png",
+    descriptions: [
+      "When attacking, increases the target's damage taken by 10% for 5 sec and decreases their HP Recovery by 5% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+      "When attacking, increases the target's damage taken by 12% for 5 sec and decreases their HP Recovery by 6% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+      "When attacking, increases the target's damage taken by 14% for 5 sec and decreases their HP Recovery by 7% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+      "When attacking, increases the target's damage taken by 16% for 5 sec and decreases their HP Recovery by 8% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+      "When attacking, increases the target's damage taken by 18% for 5 sec and decreases their HP Recovery by 9% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+      "When attacking, increases the target's damage taken by 20% for 5 sec and decreases their HP Recovery by 10% for 30 sec with a 15% chance. This is applied individually up to 5 times.",
+    ],
+  },
+  {
+    name: "Star Rock",
+    imageName: "star-rock.png",
+    descriptions: [
+      "Increases damage taken by 20% and Boss Monster Damage by 50%.",
+      "Increases damage taken by 24% and Boss Monster Damage by 60%.",
+      "Increases damage taken by 28% and Boss Monster Damage by 70%.",
+      "Increases damage taken by 32% and Boss Monster Damage by 80%.",
+      "Increases damage taken by 36% and Boss Monster Damage by 90%.",
+      "Increases damage taken by 40% and Boss Monster Damage by 100%.",
+    ],
+  },
+  {
+    name: "The Book of Ancient",
+    imageName: "ancient-book.png",
+    descriptions: [
+      "Increases Critical Rate by 10% and Critical Damage by 30% of Critical Rate.",
+      "Increases Critical Rate by 12% and Critical Damage by 36% of Critical Rate.",
+      "Increases Critical Rate by 14% and Critical Damage by 42% of Critical Rate.",
+      "Increases Critical Rate by 16% and Critical Damage by 48% of Critical Rate.",
+      "Increases Critical Rate by 18% and Critical Damage by 54% of Critical Rate.",
+      "Increases Critical Rate by 20% and Critical Damage by 60% of Critical Rate.",
+    ],
+  },
+  {
+    name: "Lunar Dew",
+    imageName: "lunar-dew.png",
+    descriptions: [
+      "When taking damage, recovers 3% HP and becomes immune to damage for 1 sec with a 5% chance. Cooldown 5 sec",
+      "When taking damage, recovers 3.6% HP and becomes immune to damage for 1.2 sec with a 5% chance. Cooldown 5 sec",
+      "When taking damage, recovers 4.2% HP and becomes immune to damage for 1.4 sec with a 5% chance. Cooldown 5 sec",
+      "When taking damage, recovers 4.8% HP and becomes immune to damage for 1.6 sec with a 5% chance. Cooldown 5 sec",
+      "When taking damage, recovers 5.4% HP and becomes immune to damage for 1.8 sec with a 5% chance. Cooldown 5 sec",
+      "When taking damage, recovers 6% HP and becomes immune to damage for 2 sec with a 5% chance. Cooldown 5 sec",
+    ],
+  },
+  {
+    name: "Fire Flower",
+    imageName: "fire-herb.png",
+    descriptions: [
+      "For every every nearby target, increases Final Damage by 1%. This is applied up to 10 targets.",
+      "For every every nearby target, increases Final Damage by 1.2%. This is applied up to 10 targets.",
+      "For every every nearby target, increases Final Damage by 1.4%. This is applied up to 10 targets.",
+      "For every every nearby target, increases Final Damage by 1.6%. This is applied up to 10 targets.",
+      "For every every nearby target, increases Final Damage by 1.8%. This is applied up to 10 targets.",
+      "For every every nearby target, increases Final Damage by 2%. This is applied up to 10 targets.",
+    ],
+  },
+  {
+    name: "Soul Contract",
+    imageName: "soul-contract.png",
+    descriptions: [
+      "[Chapter Hunt] Decreases skill cooldown in battle by 20%.",
+      "[Chapter Hunt] Decreases skill cooldown in battle by 24%.",
+      "[Chapter Hunt] Decreases skill cooldown in battle by 28%.",
+      "[Chapter Hunt] Decreases skill cooldown in battle by 32%.",
+      "[Chapter Hunt] Decreases skill cooldown in battle by 36%.",
+      "[Chapter Hunt] Decreases skill cooldown in battle by 40%.",
+    ],
+  },
+  {
+    name: "Lit Lamp",
+    imageName: "lit-lamp.png",
+    descriptions: [
+      "[World Boss] Increases Final Damage in battle by 20%",
+      "[World Boss] Increases Final Damage in battle by 24%",
+      "[World Boss] Increases Final Damage in battle by 28%",
+      "[World Boss] Increases Final Damage in battle by 32%",
+      "[World Boss] Increases Final Damage in battle by 36%",
+      "[World Boss] Increases Final Damage in battle by 40%",
+    ],
+  },
+  {
+    name: "Soul Pouch",
+    imageName: "soul-pouch.png",
+    descriptions: [
+      "[Arena] Increases Final Damage in battle by 20%",
+      "[Arena] Increases Final Damage in battle by 24%",
+      "[Arena] Increases Final Damage in battle by 28%",
+      "[Arena] Increases Final Damage in battle by 32%",
+      "[Arena] Increases Final Damage in battle by 36%",
+      "[Arena] Increases Final Damage in battle by 40%",
+    ],
+  },
+  {
+    name: "Ancient Text Piece",
+    imageName: "ancient-text-piece.png",
+    descriptions: [
+      "[Guild Conquest] Increases Final Damage in battle by 20%",
+      "[Guild Conquest] Increases Final Damage in battle by 24%",
+      "[Guild Conquest] Increases Final Damage in battle by 28%",
+      "[Guild Conquest] Increases Final Damage in battle by 32%",
+      "[Guild Conquest] Increases Final Damage in battle by 36%",
+      "[Guild Conquest] Increases Final Damage in battle by 40%",
+    ],
+  },
+  {
+    name: "Icy Soul Rock",
+    imageName: "icy-soul-rock.png",
+    descriptions: [
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 20%, and when your MP is 75% or higher, the effect is doubled.",
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 24%, and when your MP is 75% or higher, the effect is doubled.",
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 28%, and when your MP is 75% or higher, the effect is doubled.",
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 32%, and when your MP is 75% or higher, the effect is doubled.",
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 36%, and when your MP is 75% or higher, the effect is doubled.",
+      "Recovers 1% MP every 2 sec. When your MP is 50% or higher, increases Critical Damage by 40%, and when your MP is 75% or higher, the effect is doubled.",
+    ],
+  },
+  {
+    name: "Flaming Lava",
+    imageName: "flaming-lava.png",
+    descriptions: [
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 4%; if the target has a debuff, increases by 8%; if the target has a barrier, increases by 60%.",
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 4.8%; if the target has a debuff, increases by 9.6%; if the target has a barrier, increases by 72%.",
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 5.6%; if the target has a debuff, increases by 11.2%; if the target has a barrier, increases by 84%.",
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 6.4%; if the target has a debuff, increases by 12.8%; if the target has a barrier, increases by 96%.",
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 7.2%; if the target has a debuff, increases by 14.4%; if the target has a barrier, increases by 108%.",
+      "When attacking, if the target has a buff that is not a barrier, increases Final Damage by 8%; if the target has a debuff, increases by 16%; if the target has a barrier, increases by 120%.",
+    ],
+  },
+  {
+    name: "Sayram's Necklace",
+    imageName: "seyran-necklace.png",
+    descriptions: [
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 30%. When there is 1 target, increases Boss Monster Damage by 10%.",
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 36%. When there is 1 target, increases Boss Monster Damage by 12%.",
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 42%. When there is 1 target, increases Boss Monster Damage by 14%.",
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 48%. When there is 1 target, increases Boss Monster Damage by 16%.",
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 54%. When there is 1 target, increases Boss Monster Damage by 18%.",
+      "When there are 2 or more nearby targets, increases Normal Monster Damage by 60%. When there is 1 target, increases Boss Monster Damage by 20%.",
+    ],
+  },
 ];
