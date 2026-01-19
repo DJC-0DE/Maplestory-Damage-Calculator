@@ -5,7 +5,7 @@ import { getSelectedClass, getCubeSlotData } from '@core/state.js';
 import { displayRankings, displaySimulationResults, updateClassWarning } from '@core/cube/cube-ui.js';
 import { equipmentPotentialData, RARITY_UPGRADE_RATES, slotNames, slotSpecificPotentials } from '@core/cube/cube-potential-data.js';
 import { potentialStatToDamageStat } from '@core/cube/cube-logic.js';
-import { calculateDamage } from '@core/calculations/damage-calculations.js';
+import { StatCalculationService } from '@core/stat-calculation-service.js';
 import { getStats } from '@core/state.js';
 
 window.runCubeSimulation = runCubeSimulation;
@@ -19,7 +19,7 @@ let simCache = {
 // Initialize simulation cache
 export function initSimulationCache() {
     simCache.baseStats = getStats('base');
-    simCache.baseDPS = calculateDamage(simCache.baseStats, 'boss').dps;
+    simCache.baseDPS = new StatCalculationService(simCache.baseStats).computeDPS('boss');
     simCache.lineOptionsCache = {};
     simCache.weightCache = {};
 
@@ -98,30 +98,34 @@ export function rollPotentialLineCached(options, totalWeight) {
 
 // Calculate DPS gain for a single slot (optimized with cached base stats)
 export function calculateSlotDPSGainCached(slot) {
-    const slotStats = { ...simCache.baseStats };
+    const slotService = new StatCalculationService(simCache.baseStats);
     let accumulatedMainStatPct = 0;
+
     if (slot.lines) {
         for (let i = 0; i < slot.lines.length; i++) {
             const line = slot.lines[i];
             if (!line) continue;
             const mapped = potentialStatToDamageStat(line.stat, line.value, accumulatedMainStatPct);
             if (mapped.stat) {
-                slotStats[mapped.stat] = (slotStats[mapped.stat] || 0) + mapped.value;
                 if (mapped.isMainStatPct) {
+                    slotService.addPercentageStat('statDamage', mapped.value);
                     accumulatedMainStatPct += line.value;
+                } else {
+                    slotService.addPercentageStat(mapped.stat, mapped.value);
                 }
             }
         }
     }
 
-    const slotDPS = calculateDamage(slotStats, 'boss').dps;
+    const slotDPS = slotService.computeDPS('boss');
     return ((slotDPS - simCache.baseDPS) / simCache.baseDPS * 100);
 }
 
 // Calculate total DPS gain from all slots (optimized with cached base stats)
 export function calculateTotalDPSGain(slots) {
-    const totalStats = { ...simCache.baseStats };
+    const totalService = new StatCalculationService(simCache.baseStats);
     let accumulatedMainStatPct = 0;
+
     for (let i = 0; i < slots.length; i++) {
         const slot = slots[i];
         if (!slot.lines) continue;
@@ -131,15 +135,17 @@ export function calculateTotalDPSGain(slots) {
             if (!line) continue;
             const mapped = potentialStatToDamageStat(line.stat, line.value, accumulatedMainStatPct);
             if (mapped.stat) {
-                totalStats[mapped.stat] = (totalStats[mapped.stat] || 0) + mapped.value;
                 if (mapped.isMainStatPct) {
+                    totalService.addPercentageStat('statDamage', mapped.value);
                     accumulatedMainStatPct += line.value;
+                } else {
+                    totalService.addPercentageStat(mapped.stat, mapped.value);
                 }
             }
         }
     }
 
-    const totalDPS = calculateDamage(totalStats, 'boss').dps;
+    const totalDPS = totalService.computeDPS('boss');
     return ((totalDPS - simCache.baseDPS) / simCache.baseDPS * 100);
 }
 
@@ -216,7 +222,8 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
         const totalCombinations = line1Options.length * line2Options.length * line3Options.length;
         const rankings = [];
         const baseStats = getStats('base');
-        const baseDPS = calculateDamage(baseStats, 'boss').dps;
+        const baseService = new StatCalculationService(baseStats);
+        const baseDPS = baseService.computeDPS('boss');
 
         let processedCount = 0;
         const batchSize = 50; // Smaller batch for more frequent UI updates
@@ -231,21 +238,23 @@ export async function calculateRankingsForRarity(rarity, slotId = currentCubeSlo
                         line3: line3Options[k]
                     };
 
-                    // Calculate stats for this combination
-                    const comboStats = { ...baseStats };
+                    // Calculate stats for this combination using StatCalculationService
+                    const comboService = new StatCalculationService(baseStats);
                     let accumulatedMainStatPct = 0;
 
                     [combo.line1, combo.line2, combo.line3].forEach(line => {
                         const mapped = potentialStatToDamageStat(line.stat, line.value, accumulatedMainStatPct);
                         if (mapped.stat) {
-                            comboStats[mapped.stat] = (comboStats[mapped.stat] || 0) + mapped.value;
                             if (mapped.isMainStatPct) {
+                                comboService.addPercentageStat('statDamage', mapped.value);
                                 accumulatedMainStatPct += line.value;
+                            } else {
+                                comboService.addPercentageStat(mapped.stat, mapped.value);
                             }
                         }
                     });
 
-                    const comboDPS = calculateDamage(comboStats, 'boss').dps;
+                    const comboDPS = comboService.computeDPS('boss');
                     const gain = ((comboDPS - baseDPS) / baseDPS * 100);
 
                     rankings.push({

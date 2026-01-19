@@ -2,7 +2,7 @@
 // Pure business logic functions with no DOM manipulation
 
 import { classMainStatMap, slotSpecificPotentials, equipmentPotentialData } from '@core/cube/cube-potential-data.js';
-import { calculateDamage } from '@core/calculations/damage-calculations.js';
+import { StatCalculationService } from '@core/stat-calculation-service.js';
 import { getStats, updateCubePotentialContributions } from '@core/state.js';
 import { calculateMainStatPercentGain } from '@core/calculations/stat-calculations.js';
 import { getSelectedClass } from '@core/state.js';
@@ -109,7 +109,7 @@ export function potentialStatToDamageStat(potentialStat, value, accumulatedMainS
 // This properly handles the baseline by subtracting the set first, then adding it back
 export function calculateSlotSetGain(slotId, rarity, setData, currentStats) {
     // Step 1: Calculate baseline by removing this set's contribution from current stats
-    const baselineStats = { ...currentStats };
+    const baselineService = new StatCalculationService(currentStats);
     let accumulatedMainStatPct = 0;
 
     for (let lineNum = 1; lineNum <= 3; lineNum++) {
@@ -122,17 +122,19 @@ export function calculateSlotSetGain(slotId, rarity, setData, currentStats) {
         const mapped = potentialStatToDamageStat(line.stat, line.value, accumulatedMainStatPct);
         if (mapped.stat) {
             // Subtract to get baseline
-            baselineStats[mapped.stat] = (baselineStats[mapped.stat] || 0) - mapped.value;
             if (mapped.isMainStatPct) {
+                baselineService.subtractStat('statDamage', mapped.value);
                 accumulatedMainStatPct += line.value;
+            } else {
+                baselineService.subtractStat(mapped.stat, mapped.value);
             }
         }
     }
 
-    const baselineDPS = calculateDamage(baselineStats, 'boss').dps;
+    const baselineDPS = baselineService.computeDPS('boss');
 
     // Step 2: Calculate stats with this set applied to baseline
-    const setStats = { ...baselineStats };
+    const setService = new StatCalculationService(baselineService.getStats());
     accumulatedMainStatPct = 0;
 
     for (let lineNum = 1; lineNum <= 3; lineNum++) {
@@ -144,17 +146,19 @@ export function calculateSlotSetGain(slotId, rarity, setData, currentStats) {
         const mapped = potentialStatToDamageStat(line.stat, line.value, accumulatedMainStatPct);
         if (mapped.stat) {
             // Add to baseline
-            setStats[mapped.stat] = (setStats[mapped.stat] || 0) + mapped.value;
             if (mapped.isMainStatPct) {
+                setService.addPercentageStat('statDamage', mapped.value);
                 accumulatedMainStatPct += line.value;
+            } else {
+                setService.addPercentageStat(mapped.stat, mapped.value);
             }
         }
     }
 
-    const setDPS = calculateDamage(setStats, 'boss').dps;
+    const setDPS = setService.computeDPS('boss');
     const gain = ((setDPS - baselineDPS) / baselineDPS * 100);
 
-    return { gain, stats: setStats, baselineStats };
+    return { gain, stats: setService.getStats(), baselineStats: baselineService.getStats() };
 }
 
 
@@ -175,7 +179,7 @@ export function calculateComparison(cubeSlotData, currentCubeSlot, currentPotent
     const baselineStats = setAResult.baselineStats;
 
     // Calculate Set B using the same baseline
-    const setBStats = { ...baselineStats };
+    const setBService = new StatCalculationService(baselineStats);
     let setBAccumulatedMainStatPct = 0;
 
     for (let lineNum = 1; lineNum <= 3; lineNum++) {
@@ -187,15 +191,19 @@ export function calculateComparison(cubeSlotData, currentCubeSlot, currentPotent
 
         const mapped = potentialStatToDamageStat(line.stat, line.value, setBAccumulatedMainStatPct);
         if (mapped.stat) {
-            setBStats[mapped.stat] = (setBStats[mapped.stat] || 0) + mapped.value;
             if (mapped.isMainStatPct) {
+                setBService.addPercentageStat('statDamage', mapped.value);
                 setBAccumulatedMainStatPct += line.value;
+            } else {
+                setBService.addPercentageStat(mapped.stat, mapped.value);
             }
         }
     }
-    const setBDPS = calculateDamage(setBStats, 'boss').dps;
-    const baselineDPS = calculateDamage(baselineStats, 'boss').dps;
-    const setADPS = calculateDamage(setAStats, 'boss').dps;
+
+    const setBStats = setBService.getStats();
+    const baselineDPS = new StatCalculationService(baselineStats).computeDPS('boss');
+    const setADPS = new StatCalculationService(setAStats).computeDPS('boss');
+    const setBDPS = setBService.computeDPS('boss');
 
     // Calculate gains
     // Set B Absolute Gain: compared to baseline (for ranking comparison)

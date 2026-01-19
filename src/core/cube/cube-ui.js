@@ -1,5 +1,5 @@
 import { slotNames, rankingsPerPage, slotSpecificPotentials, equipmentPotentialData } from '@core/cube/cube-potential-data.js';
-import { calculateDamage } from '@core/calculations/damage-calculations.js';
+import { StatCalculationService } from '@core/stat-calculation-service.js';
 import { getStats } from '@core/main.js';
 import { getSelectedClass, getCubeSlotData } from '@core/state.js';
 import { lineExistsInRarity, potentialStatToDamageStat, getRarityColor, getPercentileForGain, calculateSlotSetGain } from '@core/cube/cube-logic.js';
@@ -1503,8 +1503,8 @@ export function displayAllSlotsSummary() {
         }
     });
 
-    const currentDPS = calculateDamage(currentStats, 'boss').dps;
-    const baselineDPS = calculateDamage(baselineStats, 'boss').dps;
+    const currentDPS = new StatCalculationService(currentStats).computeDPS('boss');
+    const baselineDPS = new StatCalculationService(baselineStats).computeDPS('boss');
     const totalGain = ((currentDPS - baselineDPS) / baselineDPS * 100);
 
     html += `
