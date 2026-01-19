@@ -457,12 +457,34 @@ export function calculateStatEquivalency(sourceStat) {
             },
             formatValue: (val) => formatNumber(val)
         },
-        'main-stat': {
+         'main-stat': {
             label: 'Main Stat',
             getValue: () => parseFloat(document.getElementById('equiv-main-stat').value) || 0,
             applyToStats: (stats, value) => {
-                const statDamageIncrease = value / 100;
-                return { ...stats, statDamage: stats.statDamage + statDamageIncrease };
+               const statDamageGain = value / 100;
+                return { ...stats, statDamage: stats.statDamage + statDamageGain };
+            },
+            formatValue: (val) => formatNumber(val)
+        },
+        'main-stat-pct': {
+            label: 'Main Stat %',
+            getValue: () => parseFloat(document.getElementById('equiv-main-stat-pct').value) || 0,
+            applyToStats: (stats, value) => {
+                const primaryMainStat = parseFloat(document.getElementById('primary-main-stat-base')?.value) || 0;
+                const baseMainStatPct = parseFloat(document.getElementById('main-stat-pct-base')?.value) || 0;
+                const defense = parseFloat(document.getElementById('defense-base')?.value) || 0;
+                const currentSelectedClass = typeof selectedClass !== 'undefined' ? getSelectedClass() : null;
+
+                // Use the shared function to calculate stat damage gain
+                const statDamageGain = calculateMainStatPercentGain(
+                    value,
+                    baseMainStatPct,
+                    primaryMainStat,
+                    defense,
+                    currentSelectedClass
+                );
+
+                return { ...stats, statDamage: stats.statDamage + statDamageGain };
             },
             formatValue: (val) => formatNumber(val)
         },

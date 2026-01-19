@@ -38,6 +38,7 @@ export function getStats(setup) {
         critRate: parseFloat(document.getElementById(`crit-rate-${setup}`).value) || 0,
         critDamage: parseFloat(document.getElementById(`crit-damage-${setup}`).value) || 0,
         statDamage: parseFloat(document.getElementById(`stat-damage-${setup}`).value) || 0,
+        mainStat: parseFloat(document.getElementById(`primary-main-stat-${setup}`).value) || 0,
         damage: parseFloat(document.getElementById(`damage-${setup}`).value) || 0,
         finalDamage: parseFloat(document.getElementById(`final-damage-${setup}`).value) || 0,
         damageAmp: parseFloat(document.getElementById(`damage-amp-${setup}`).value) || 0,
