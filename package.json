@@ -4,9 +4,16 @@
   "description": "Maplestory damage calculator with regression tests",
   "scripts": {
     "start": "python -m http.server 8000 || python3 -m http.server 8000 || npx http-server -p 8000",
+    "test": "playwright test",
     "test:nav": "playwright test navigation.spec.js",
     "test:nav:headed": "playwright test navigation.spec.js --headed",
     "test:nav:debug": "playwright test navigation.spec.js --debug",
+    "test:weapons": "playwright test weapon-levels-*.spec.js",
+    "test:weapons:main": "playwright test weapon-levels-main.spec.js",
+    "test:weapons:priority": "playwright test weapon-levels-priority.spec.js",
+    "test:weapons:coverage": "playwright test weapon-levels-coverage.spec.js",
+    "test:weapons:headed": "playwright test weapon-levels-*.spec.js --headed",
+    "test:weapons:debug": "playwright test weapon-levels-*.spec.js --debug",
     "lint": "eslint *.js",
     "lint:fix": "eslint *.js --fix"
   },
