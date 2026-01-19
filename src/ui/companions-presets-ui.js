@@ -1,7 +1,7 @@
-import { getPresets, getPreset, setPresetSlot, clearPresetSlot, getSelectedSlotInfo, setSelectedSlot, clearSelectedSlot, getCompanion, getEquippedPresetId, setEquippedPresetId, updateCompanionEquippedContributions, getShowPresetDpsComparison, setShowPresetDpsComparison, getLockedMainCompanion, setLockedMainCompanion } from '@core/state.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { getPresets, getPreset, setPresetSlot, clearPresetSlot, getSelectedSlotInfo, setSelectedSlot, clearSelectedSlot, getCompanion, getEquippedPresetId, setEquippedPresetId, updateCompanionEquippedContributions, getShowPresetDpsComparison, setShowPresetDpsComparison, getLockedMainCompanion, setLockedMainCompanion } from '@core/state/state.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import { getCompanionEffects, getMaxCompanionLevel } from '@core/companions/index.js';
-import { addStat, subtractStat, Stat } from '@core/stat-inputs-service.js';
+import { addStat, subtractStat, Stat } from '@core/services/stat-inputs-service.js';
 import { calculateBothDpsDifferences, presetHasAnyCompanion, generateOptimalPreset } from '@core/companions/companion-logic.js';
 
 // Rarity configurations - same as in companions-ui.js

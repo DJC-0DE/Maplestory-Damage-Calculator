@@ -11,7 +11,7 @@
  * - Reliable persistence across tab switches, refreshes, etc.
  */
 
-import { saveToLocalStorage } from '@core/storage.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import { availableStats } from '@core/constants.js';
 import { calculate } from '@core/main.js';
 import {
@@ -20,7 +20,7 @@ import {
     loadSlot,
     getSlotItems,
     getItem
-} from '@core/comparison-state.js';
+} from '@core/state/comparison-state.js';
 import { equipItemFromComparison, getCurrentSlot } from '@ui/comparison/slot-comparison.js';
 
 // Track active comparison item

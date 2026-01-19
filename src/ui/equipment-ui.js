@@ -1,9 +1,9 @@
 // Equipment UI functionality
 
-import { saveToLocalStorage } from '@core/storage.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import { calculate, getItemStats } from '@core/main.js';
 import { updateSkillCoefficient } from '@core/base-stats/base-stats.js';
-import { getSelectedClass } from '@core/state.js';
+import { getSelectedClass } from '@core/state/state.js';
 import { removeComparisonItem, addComparisonItem, addComparisonItemStat } from '@ui/comparison-ui.js';
 import { equippedStatCount, setEquippedStatCount, availableStats, allItemStatProperties } from '@core/constants.js';
 import { equipItemFromComparison, getCurrentSlot } from '@ui/comparison/slot-comparison.js';

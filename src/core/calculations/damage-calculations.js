@@ -1,6 +1,6 @@
-import { getSelectedStageDefense } from '@core/state.js';
+import { getSelectedStageDefense } from '@core/state/state.js';
 import { formatNumber } from '@utils/formatters.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 
 window.calculateStatEquivalency = calculateStatEquivalency;
 
@@ -120,18 +120,13 @@ export function calculateStatWeights(setup, stats) {
     };
 
     // ============================================
-    // ULTRA-COMPACT HORIZONTAL TABBED DASHBOARD
+    // VERTICAL STACKED STAT PREDICTIONS
     // ============================================
     let html = '';
 
-    // Tab navigation
-    html += '<div class="stat-predictions-tabs">';
-    html += `<button class="stat-pred-tab active" data-tab="flat" onclick="switchStatPredictionTab('${setup}', 'flat')">Flat Stats</button>`;
-    html += `<button class="stat-pred-tab" data-tab="percentage" onclick="switchStatPredictionTab('${setup}', 'percentage')">Percentage Stats</button>`;
-    html += '</div>';
-
-    // ========== FLAT STATS PANEL ==========
-    html += `<div id="stat-pred-panel-${setup}-flat" class="stat-pred-panel active">`;
+    // ========== FLAT STATS SECTION ==========
+    html += '<div class="stat-predictions-section">';
+    html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Flat Stats</h3>';
     html += '<div class="">';
     html += `<table class="table" id="stat-pred-table-${setup}-flat">`;
     html += '<thead><tr><th>Stat</th>';
@@ -184,8 +179,9 @@ export function calculateStatWeights(setup, stats) {
     html += '</div>';
     html += '</div>';
 
-    // ========== PERCENTAGE STATS PANEL ==========
-    html += `<div id="stat-pred-panel-${setup}-percentage" class="stat-pred-panel">`;
+    // ========== PERCENTAGE STATS SECTION ==========
+    html += '<div class="stat-predictions-section" style="margin-top: 24px;">';
+    html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Percentage Stats</h3>';
     html += '<div class="">';
     html += `<table class="table" id="stat-pred-table-${setup}-percentage">`;
     html += '<thead><tr><th style="padding: 8px 10px; font-size: 0.75rem;">Stat</th>';

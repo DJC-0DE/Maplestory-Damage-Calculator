@@ -1,10 +1,10 @@
 // Weapons UI functionality
 
 import { calculateWeaponAttacks, getMaxLevelForStars, getUpgradeCost, calculateUpgradeGain } from '@core/weapon-levels/weapon-calculations.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import { getStats, calculate } from '@core/main.js';
-import { getWeaponAttackBonus } from '@core/state.js';
+import { getWeaponAttackBonus } from '@core/state/state.js';
 import { rarities, tiers, rarityColors, weaponBaseAttackEquipped } from '@core/constants.js';
 
 window.setWeaponStars = setWeaponStars;

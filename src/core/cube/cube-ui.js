@@ -1,11 +1,11 @@
 import { slotNames, rankingsPerPage, slotSpecificPotentials, equipmentPotentialData } from '@core/cube/cube-potential-data.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { getStats } from '@core/main.js';
-import { getSelectedClass, getCubeSlotData } from '@core/state.js';
+import { getSelectedClass, getCubeSlotData } from '@core/state/state.js';
 import { lineExistsInRarity, potentialStatToDamageStat, getRarityColor, getPercentileForGain, calculateSlotSetGain } from '@core/cube/cube-logic.js';
 import { calculateRankingsForRarity, calculateRankings } from '@core/cube/cube-simulation.js';
 import { currentCubeSlot, currentPotentialType, rankingsCache, rankingsInProgress, calculateComparisonOrchestrator, selectCubeSlot } from '@core/cube/cube-potential.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 
 // Global state for summary sorting
 let summarySortColumn = 'regular'; // 'regular' or 'bonus'

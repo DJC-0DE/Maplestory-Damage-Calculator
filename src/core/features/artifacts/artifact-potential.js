@@ -3,7 +3,7 @@
 import { artifactPotentialData } from '@data/artifact-potential-data.js';
 import { formatNumber } from '@utils/formatters.js';
 import { getStats } from '@core/main.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 
 window.sortArtifactTable = sortArtifactTable;
 

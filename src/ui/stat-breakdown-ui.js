@@ -1,8 +1,8 @@
 // Stat Breakdown UI - Shows where base stats come from (equipment and companions)
 // REDESIGNED: Premium fintech-meets-gaming-HUD aesthetic with glassmorphism & data visualization
-import { getContributedStats, onContributedStatsChange, getUnlockableStatConfigs, getUnlockableStat, updateUnlockableStat, updateUnlockableStatsContributions, getGuildBonusConfigs, getGuildBonus, updateGuildBonus, updateGuildBonusesContributions } from '@core/state.js';
-import { getWeaponAttackBonus } from '@core/state.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { getContributedStats, onContributedStatsChange, getUnlockableStatConfigs, getUnlockableStat, updateUnlockableStat, updateUnlockableStatsContributions, getGuildBonusConfigs, getGuildBonus, updateGuildBonus, updateGuildBonusesContributions } from '@core/state/state.js';
+import { getWeaponAttackBonus } from '@core/state/state.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 
 // ============================================================================
 // CSS DESIGN SYSTEM - Premium Data-Driven Aesthetic

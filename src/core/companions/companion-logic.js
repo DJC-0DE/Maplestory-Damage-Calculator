@@ -2,8 +2,8 @@
 // Provides reusable functions for calculating companion preset DPS differences and optimizations
 // Used by: Companion Presets UI
 
-import { StatCalculationService } from '@core/stat-calculation-service.js';
-import { getStats } from '@core/state.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
+import { getStats } from '@core/state/state.js';
 
 /**
  * Smart routing helper to apply effects to a StatCalculationService

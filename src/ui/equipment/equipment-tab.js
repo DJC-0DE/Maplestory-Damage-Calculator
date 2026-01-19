@@ -1,11 +1,11 @@
 // Equipment Tab - Main equipment configuration UI
 import { createEquipmentSlot } from './equipment-slot.js';
 import { updateEquipmentSummary } from './equipment-summary.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import {
     updateEquipmentContributions,
     updateAllContributions
-} from '@core/state.js';
+} from '@core/state/state.js';
 import { navigateTo } from '@core/router.js';
 import { availableStats } from '@core/constants.js';
 

@@ -5,7 +5,7 @@ import {
     runScrollSimulation,
     updateScrollLevelInfo,
     switchScrollStrategyTab
-} from '@core/scroll-optimizer.js';
+} from './scroll-optimizer.js';
 import {
     initializeEquipmentSlots,
     loadEquipmentSlots,

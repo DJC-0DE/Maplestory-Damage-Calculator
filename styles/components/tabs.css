@@ -323,10 +323,16 @@
     border-bottom-color: var(--accent-primary);
 }
 
+/* Legacy tab panel styling - now all panels visible by default */
 .stat-pred-panel {
-    display: none;
+    display: block;
 }
 
 .stat-pred-panel.active {
+    display: block;
+}
+
+/* Section styling for vertical stat predictions layout */
+.stat-predictions-section {
     display: block;
 }

@@ -5,7 +5,7 @@ import {
     calculate3rdJobSkillCoefficient,
     calculate4thJobSkillCoefficient,
     calculateJobSkillPassiveGains
-} from '@core/skill-coefficient.js';
+} from '@core/features/skills/skill-coefficient.js';
 
 /**
  * SkillCoefficientService - Handles skill coefficient calculations

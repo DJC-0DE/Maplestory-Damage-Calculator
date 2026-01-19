@@ -1,5 +1,5 @@
-import { saveToLocalStorage, updateAnalysisTabs } from '@core/storage.js';
-import { getSelectedJobTier } from '@core/state.js';
+import { saveToLocalStorage, updateAnalysisTabs } from '@core/state/storage.js';
+import { getSelectedJobTier } from '@core/state/state.js';
 export function updateMasteryBonuses(skipSave = false) {
     // Get current job tier
     const currentTier = getSelectedJobTier();

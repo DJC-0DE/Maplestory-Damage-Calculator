@@ -1,9 +1,9 @@
 // Item Comparison Service
 // Provides item comparison functionality using StatCalculationService and skill services
 
-import { StatCalculationService } from '@core/stat-calculation-service.js';
-import { getWeaponAttackBonus } from '@core/state.js';
-import { SkillCoefficientService, SkillPassiveGainsService } from '@core/skill-service.js';
+import { StatCalculationService } from './stat-calculation-service.js';
+import { getWeaponAttackBonus } from '@core/state/state.js';
+import { SkillCoefficientService, SkillPassiveGainsService } from './skill-service.js';
 
 // Initialize skill services
 const skillCoefficientService = new SkillCoefficientService();

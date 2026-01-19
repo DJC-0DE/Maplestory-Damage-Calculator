@@ -2,10 +2,10 @@
 // Pure business logic functions with no DOM manipulation
 
 import { classMainStatMap, slotSpecificPotentials, equipmentPotentialData } from '@core/cube/cube-potential-data.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
-import { getStats, updateCubePotentialContributions } from '@core/state.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
+import { getStats, updateCubePotentialContributions } from '@core/state/state.js';
 import { calculateMainStatPercentGain } from '@core/calculations/stat-calculations.js';
-import { getSelectedClass } from '@core/state.js';
+import { getSelectedClass } from '@core/state/state.js';
 
 // Get rarity color for slot button borders
 export function getRarityColor(rarity) {

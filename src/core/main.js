@@ -7,24 +7,24 @@ import {
     getItemStats,
     getSelectedClass,
     getSelectedJobTier
-} from '@core/state.js';
-import { StatCalculationService } from '@core/stat-calculation-service.js';
+} from '@core/state/state.js';
+import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { showToast } from '@utils/notifications.js';
 import { formatDPS } from '@utils/formatters.js';
 import { calculateStatWeights } from '@core/calculations/damage-calculations.js';
-import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, getSavedContentTypeData, finalizeContributedStatsAfterInit } from '@core/storage.js';
+import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, getSavedContentTypeData, finalizeContributedStatsAfterInit } from '@core/state/storage.js';
 import {
     getAllDarkKnightSkills,
     DARK_KNIGHT_SKILLS
-} from '@core/skill-coefficient.js';
-import { initializeInnerAbilityAnalysis} from '@core/inner-ability.js';
-import { initializeScrollingAnalysis } from '@core/scrolling.js';
-import { initializeArtifactPotential } from '@core/artifact-potential.js';
-import { initializeArtifacts } from '@core/artifacts.js';
+} from '@core/features/skills/skill-coefficient.js';
+import { initializeInnerAbilityAnalysis} from '@core/features/inner-ability/inner-ability.js';
+import { initializeScrollingAnalysis } from '@core/features/scrolling/scrolling.js';
+import { initializeArtifactPotential } from '@core/features/artifacts/artifact-potential.js';
+import { initializeArtifacts } from '@core/features/artifacts/artifacts.js';
 import {
     initializeCubePotential
 } from '@core/cube/cube-potential.js';
-import { applyItemToStats } from '@core/item-comparison-service.js';
+import { applyItemToStats } from '@core/services/item-comparison-service.js';
 import {
     populateStageDropdown, selectContentType, updateStageDropdown
 } from '@core/base-stats/target-select.js';
@@ -34,7 +34,7 @@ import { initializeHeroPowerPresets, loadHeroPowerPresets} from '@ui/presets-ui.
 import { initializeWeapons, updateWeaponBonuses} from '@core/weapon-levels/weapons-ui.js';
 import { initializeEquipmentTab, migrateLegacyData } from '@ui/equipment/equipment-tab.js';
 import { initializeSlotComparison, getCurrentSlot } from '@ui/comparison/slot-comparison.js';
-import { initializeComparisonState } from '@core/comparison-state.js';
+import { initializeComparisonState } from '@core/state/comparison-state.js';
 import { displayResults } from '@ui/results-display.js';
 import { initializeCompanionsUI } from '@ui/companions-ui.js';
 import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
@@ -45,7 +45,7 @@ import { updateSkillCoefficient } from './base-stats/base-stats.js';
 import '@utils/tabs.js';
 import '@utils/stat-chart.js';
 import '@ui/help-sidebar.js';
-import '@core/scroll-optimizer.js';
+import '@core/features/scrolling/scroll-optimizer.js';
 
 // Data extraction functions
 // getStats and getItemStats moved to state.js

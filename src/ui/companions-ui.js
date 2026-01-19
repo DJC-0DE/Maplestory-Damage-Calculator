@@ -1,6 +1,6 @@
 import { getCompanionEffects, getMaxCompanionLevel } from '@core/companions/index.js';
-import { updateCompanion, getCompanionsState, getCompanion, getSelectedSlotInfo, clearSelectedSlot } from '@core/state.js';
-import { saveToLocalStorage } from '@core/storage.js';
+import { updateCompanion, getCompanionsState, getCompanion, getSelectedSlotInfo, clearSelectedSlot } from '@core/state/state.js';
+import { saveToLocalStorage } from '@core/state/storage.js';
 import { initializePresetsUI, assignCompanionToSlot, clearSelectionFeedback, refreshPresetsUI } from '@ui/companions-presets-ui.js';
 
 // Mapping of class names to display names
@@ -290,21 +290,27 @@ function formatEffects(effects) {
  */
 function formatStat(stat) {
     const stats = {
-        'MaxHpR': 'Max HP',
-        'MaxHp': 'Max HP',
-        'AttackPower': 'Damage',
-        'MaxDamageRatio': 'Max Damage Multiplier',
-        'HitChance': 'Accuracy',
-        'AttackPowerExcludeBoss': 'Normal Monster Damage',
-        'CriticalChance': 'Critical Rate',
-        'AttackSpeed': 'Attack Speed',
-        'AttackPowerInCc': 'Status Effect Damage',
-        'AttackPowerToBoss': 'Boss Monster Damage',
-        'MinDamageRatio': 'Min Damage Multiplier',
-        'MainStat': 'Main Stat',
-        'Attack': 'Attack'
+        'maxhpr': 'Max HP',
+        'maxhp': 'Max HP',
+        'damage': 'Damage',
+        'maxdamage': 'Max Damage Multiplier',
+        'hitchance': 'Accuracy',
+        'normaldamage': 'Normal Monster Damage',
+        'critrate': 'Critical Rate',
+        'attackspeed': 'Attack Speed',
+        'attack speed': 'Attack Speed',
+        'attackpowerincc': 'Status Effect Damage',
+        'bossdamage': 'Boss Monster Damage',
+        'mindamage': 'Min Damage Multiplier',
+        'mainstat': 'Main Stat',
+        'attack': 'Attack'
     };
-    return stats[stat];
+
+    if(stats[stat.toLowerCase()] == undefined)
+    {
+        console.log(stat);
+    }
+    return stats[stat.toLowerCase()];
 }
 
 /**

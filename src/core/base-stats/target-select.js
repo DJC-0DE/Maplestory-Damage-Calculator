@@ -1,5 +1,5 @@
-import { setCurrentContentType,getCurrentContentType, stageDefenses } from '@core/state.js';
-import { saveToLocalStorage, updateAnalysisTabs } from '@core/storage.js';
+import { setCurrentContentType,getCurrentContentType, stageDefenses } from '@core/state/state.js';
+import { saveToLocalStorage, updateAnalysisTabs } from '@core/state/storage.js';
 
 window.selectContentType = selectContentType;
 window.updateStageDropdown = updateStageDropdown;

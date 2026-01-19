@@ -1,4 +1,4 @@
-import { saveToLocalStorage, updateAnalysisTabs } from '@core/storage.js';
+import { saveToLocalStorage, updateAnalysisTabs } from '@core/state/storage.js';
 import { updateClassWarning } from '@core/cube/cube-ui.js';
 import { syncMainStatsToHidden, } from '../main.js';
 import { updateSkillCoefficient } from './base-stats.js';
@@ -6,7 +6,7 @@ import { updateMasteryBonuses } from './mastery-bonus.js';
 import {
     setSelectedClass,
     setSelectedJobTier
-} from '@core/state.js';
+} from '@core/state/state.js';
 
 export function loadSelectedJobTier() {
     try {

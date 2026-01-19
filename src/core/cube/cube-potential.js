@@ -2,7 +2,7 @@
 // Coordinates between UI and business logic components
 
 import { slotNames } from '@core/cube/cube-potential-data.js';
-import { getSelectedClass, updateCubePotentialContributions, getCubeSlotData, initializeCubeSlotData } from '@core/state.js';
+import { getSelectedClass, updateCubePotentialContributions, getCubeSlotData, initializeCubeSlotData } from '@core/state/state.js';
 import { calculateComparison, getRarityColor, potentialStatToDamageStat } from '@core/cube/cube-logic.js';
 import { setupCubeSlotSelector, updateSlotButtonColors, setupCubeTabs, updateCubePotentialUI, displayComparisonResults, displayOrCalculateRankings, updateClassWarning, displayAllSlotsSummary, loadRankingsInBackground } from '@core/cube/cube-ui.js';
 

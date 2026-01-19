@@ -1,12 +1,12 @@
 import { calculate } from '@core/main.js';
-import { renderTheoreticalBest, renderPresetComparison } from '@core/inner-ability.js';
-import { renderArtifactPotential } from '@core/artifact-potential.js';
+import { renderTheoreticalBest, renderPresetComparison } from '@core/features/inner-ability/inner-ability.js';
+import { renderArtifactPotential } from '@core/features/artifacts/artifact-potential.js';
 import { clearCubeRankingsCache } from '@core/cube/cube-potential.js';
 import { addComparisonItemStat, addComparisonItem } from '@ui/comparison-ui.js';
 import { addEquippedStat } from '@ui/equipment-ui.js';
 import { handleWeaponLevelChange, handleEquippedCheckboxChange, updateEquippedWeaponIndicator } from '@core/weapon-levels/weapons-ui.js';
 import { rarities, tiers, equippedStatCount } from '@core/constants.js';
-import { getCompanionsState, setCompanionsState, getPresets, setPresetsState, getEquippedPresetId, setEquippedPresetId, getContributedStats, setContributedStats, getShowPresetDpsComparison, setShowPresetDpsComparison, getLockedMainCompanion, setLockedMainCompanion, updateAllContributions, updateCompanionEquippedContributions, getUnlockableStatsState, setUnlockableStatsState, getGuildBonusesState, setGuildBonusesState, getCubeSlotData, setCubeSlotData } from '@core/state.js';
+import { getCompanionsState, setCompanionsState, getPresets, setPresetsState, getEquippedPresetId, setEquippedPresetId, getContributedStats, setContributedStats, getShowPresetDpsComparison, setShowPresetDpsComparison, getLockedMainCompanion, setLockedMainCompanion, updateAllContributions, updateCompanionEquippedContributions, getUnlockableStatsState, setUnlockableStatsState, getGuildBonusesState, setGuildBonusesState, getCubeSlotData, setCubeSlotData } from './state.js';
 import { refreshCompanionsUI } from '@ui/companions-ui.js';
 import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
 import { getCurrentSlot } from '@ui/comparison/slot-comparison.js';

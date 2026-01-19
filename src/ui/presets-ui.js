@@ -1,7 +1,7 @@
 // Hero Power Presets UI functionality
 
 import { innerAbilityStats } from '@data/inner-ability-data.js';
-import { renderTheoreticalBest, renderPresetComparison } from '@core/inner-ability.js';
+import { renderTheoreticalBest, renderPresetComparison } from '@core/features/inner-ability/inner-ability.js';
 
 window.switchPreset = switchPreset;
 window.handlePresetEquipped = handlePresetEquipped;

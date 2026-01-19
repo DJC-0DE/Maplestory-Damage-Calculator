@@ -1,5 +1,5 @@
-import { getStats, getWeaponAttackBonus } from '@core/state.js';
-import { CumulativeStatCalculator } from '@core/stat-calculation-service.js';
+import { getStats, getWeaponAttackBonus } from '@core/state/state.js';
+import { CumulativeStatCalculator } from '@core/services/stat-calculation-service.js';
 
 window.toggleStatChart = toggleStatChart;
 
