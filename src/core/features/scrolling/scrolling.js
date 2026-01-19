@@ -18,6 +18,37 @@ window.runScrollSimulation = runScrollSimulation;
 window.updateScrollLevelInfo = updateScrollLevelInfo;
 window.switchScrollStrategyTab = switchScrollStrategyTab;
 window.calculateEquipmentSlotDPS = calculateEquipmentSlotDPS;
+window.updateGuildSkillDisplay = updateGuildSkillDisplay;
+
+// Update Guild Skill display value
+export function updateGuildSkillDisplay() {
+    const slider = document.getElementById('scroll-guild-skill');
+    const display = document.getElementById('guild-skill-value');
+    if (slider && display) {
+        const value = slider.value;
+        display.textContent = value + '%';
+
+        // Update styling based on value
+        if (value > 0) {
+            display.classList.add('boosted');
+        } else {
+            display.classList.remove('boosted');
+        }
+
+        // Update slider data attribute for CSS styling
+        slider.setAttribute('data-value', value);
+
+        // Update tick marks
+        const ticks = document.querySelectorAll('.scrolling-guild__tick');
+        ticks.forEach((tick, index) => {
+            if (index <= parseInt(value)) {
+                tick.classList.add('active');
+            } else {
+                tick.classList.remove('active');
+            }
+        });
+    }
+}
 
 // Switch scrolling sub-tabs (mirrors inner-ability.js pattern)
 export function switchScrollingSubTab(tabName) {
@@ -115,6 +146,30 @@ export function renderSimulation() {
             <div class="input-group">
                 <label>Number of Simulations</label>
                 <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
+            </div>
+        </div>
+
+        <div class="scrolling-enhancements">
+            <div class="scrolling-enhancements__grid">
+                <label class="scrolling-premium__label">
+                    <input type="checkbox" id="scroll-premium-membership" class="scrolling-premium__checkbox" onchange="updateScrollLevelInfo()">
+                    <span class="scrolling-premium__text">
+                        Premium
+                        <span class="scrolling-premium__badge">+2%</span>
+                    </span>
+                    <span class="scrolling-premium__sparkles">✨</span>
+                </label>
+
+                <div class="scrolling-guild">
+                    <span class="scrolling-guild__icon">⚔️</span>
+                    <span class="scrolling-guild__label">Guild Skill</span>
+                    <div class="scrolling-guild__slider-container">
+                        <input type="range" id="scroll-guild-skill" class="scrolling-guild__slider" min="0" max="3" step="1" value="0"
+                               oninput="updateGuildSkillDisplay(); updateScrollLevelInfo();"
+                               data-value="0">
+                    </div>
+                    <span id="guild-skill-value" class="scrolling-guild__value">0%</span>
+                </div>
             </div>
         </div>
 

@@ -21,11 +21,27 @@ const SCROLLS_L85 = {
     'L85_15': { name: '15% Level 85', baseSuccess: 0.15, cost: 800, attack: 800, damageAmp: 0.8 }
 };
 
-const GLOBAL_SUCCESS_BONUS = 0.02;
 const BONUS_AT_SLOT_5 = 0.10;
 const BONUS_AT_SLOT_10 = 0.20;
 const RESET_COST = 50;
 const NUM_SLOTS = 10;
+
+// Get Premium Membership bonus from UI
+function getPremiumBonus() {
+    const checkbox = document.getElementById('scroll-premium-membership');
+    return checkbox && checkbox.checked ? 0.02 : 0;
+}
+
+// Get Guild Skill bonus from UI
+function getGuildBonus() {
+    const slider = document.getElementById('scroll-guild-skill');
+    return slider ? (parseInt(slider.value) / 100) : 0;
+}
+
+// Get total scrolling enhancement bonus
+function getEnhancementBonus() {
+    return getPremiumBonus() + getGuildBonus();
+}
 
 // Update scroll level info display
 export function updateScrollLevelInfo() {
@@ -34,25 +50,35 @@ export function updateScrollLevelInfo() {
 
     if (!infoDiv) return;
 
+    const enhancementBonus = getEnhancementBonus();
+    const bonusDisplay = enhancementBonus > 0 ? `<br><strong style="color: var(--accent-success);">Enhancement Bonus: +${(enhancementBonus * 100).toFixed(0)}% success rate</strong>` : '';
+
     if (level === '65') {
+        const l65_70_rate = ((SCROLLS_L65.L65_70.baseSuccess + enhancementBonus) * 100).toFixed(0);
+        const l65_30_rate = ((SCROLLS_L65.L65_30.baseSuccess + enhancementBonus) * 100).toFixed(0);
+
         infoDiv.innerHTML = `
-            <strong>Level 65 Scrolls:</strong><br>
-            • 70%: +100 ATK, 250 spell trace<br>
-            • 30%: +200 ATK, +0.1% Damage Amp, 300 spell trace
+            <strong>Level 65 Scrolls:</strong>${bonusDisplay}<br>
+            • 70%: <strong>${l65_70_rate}%</strong> effective rate (+100 ATK, 250 spell trace)<br>
+            • 30%: <strong>${l65_30_rate}%</strong> effective rate (+200 ATK, +0.1% Damage Amp, 300 spell trace)
         `;
     } else {
+        const l85_70_rate = ((SCROLLS_L85.L85_70.baseSuccess + enhancementBonus) * 100).toFixed(0);
+        const l85_30_rate = ((SCROLLS_L85.L85_30.baseSuccess + enhancementBonus) * 100).toFixed(0);
+        const l85_15_rate = ((SCROLLS_L85.L85_15.baseSuccess + enhancementBonus) * 100).toFixed(0);
+
         infoDiv.innerHTML = `
-            <strong>Level 85 Scrolls:</strong><br>
-            • 70%: +200 ATK, +0.2% Damage Amp, 500 spell trace<br>
-            • 30%: +400 ATK, +0.4% Damage Amp, 650 spell trace<br>
-            • 15%: +800 ATK, +0.8% Damage Amp, 800 spell trace
+            <strong>Level 85 Scrolls:</strong>${bonusDisplay}<br>
+            • 70%: <strong>${l85_70_rate}%</strong> effective rate (+200 ATK, +0.2% Damage Amp, 500 spell trace)<br>
+            • 30%: <strong>${l85_30_rate}%</strong> effective rate (+400 ATK, +0.4% Damage Amp, 650 spell trace)<br>
+            • 15%: <strong>${l85_15_rate}%</strong> effective rate (+800 ATK, +0.8% Damage Amp, 800 spell trace)
         `;
     }
 }
 
 // Calculate success rate for a scroll at a specific slot
 export function getScrollSuccessRate(scroll, slotNumber) {
-    let rate = scroll.baseSuccess + GLOBAL_SUCCESS_BONUS;
+    let rate = scroll.baseSuccess + getEnhancementBonus();
     if (slotNumber === 5) rate += BONUS_AT_SLOT_5;
     if (slotNumber === 10) rate += BONUS_AT_SLOT_10;
     return Math.min(rate, 1.0); // Cap at 100%
@@ -719,7 +745,6 @@ export function displayScrollResults(results, budget, numSimulations) {
 
     // Create summary table
     let tableHTML = `
-        <h3 style="color: var(--accent-primary); margin-bottom: 15px;">Strategy Comparison - Sorted by DPS Gain</h3>
         <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; background: var(--background); box-shadow: 0 2px 8px var(--shadow); border-radius: 8px; overflow: hidden;">
             <thead>
@@ -776,8 +801,7 @@ export function displayScrollResults(results, budget, numSimulations) {
 
     // Add tabbed breakdown for top 5 strategies
     tableHTML += `
-        <h3 style="color: var(--accent-primary); margin-top: 30px; margin-bottom: 15px;">Top 5 Strategies - Detailed Breakdown</h3>
-        <div style="border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px var(--shadow);">
+        <div style="border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px var(--shadow); margin-top:8px;">
             <!-- Tab Navigation with horizontal scroll -->
             <div style="overflow-x: auto; background: var(--background); border-bottom: 2px solid var(--border-color);">
                 <div id="scroll-strategy-tabs" style="display: flex; min-width: max-content;">
