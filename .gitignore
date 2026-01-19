@@ -33,3 +33,4 @@ scripts/
 tmpclaude*
 
 *.apng
+test-results/*

@@ -17,6 +17,14 @@ import {
   logCoverageReport
 } from './helpers/coverage-tracker.js';
 
+// Helper to get target content data from localStorage
+async function getTargetContentData(page) {
+  return await page.evaluate(() => {
+    const data = localStorage.getItem('damageCalculatorData');
+    return data ? JSON.parse(data) : { contentType: null, subcategory: null, selectedStage: null };
+  });
+}
+
 test.describe('Base Stats - Target Content Selection', () => {
   test.beforeEach(async ({ page }) => {
     await navigateToBaseStats(page);
@@ -35,8 +43,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     await expect(page.locator(TARGET_DROPDOWNS.stage)).toBeHidden();
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('none');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('none');
 
     markElementCovered('contentTypeSelectors', 'content-none');
   });
@@ -58,8 +66,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     expect(subcategoryOptions.some(opt => opt.includes('Chapter'))).toBe(true);
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('stageHunt');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('stageHunt');
 
     markElementCovered('contentTypeSelectors', 'content-stageHunt');
   });
@@ -84,8 +92,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     expect(stageOptions.some(opt => opt.includes('5-'))).toBe(true);
 
     // Assert - localStorage saved subcategory
-    const subcategory = await page.evaluate(() => localStorage.getItem('targetSubcategory'));
-    expect(subcategory).toBe('chapter-5');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.subcategory).toBe('chapter-5');
 
     markElementCovered('dropdowns', 'target-subcategory');
   });
@@ -106,8 +114,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     expect(selectedValue).toContain('stageHunt');
 
     // Assert - localStorage saved stage selection
-    const stage = await page.evaluate(() => localStorage.getItem('targetStage'));
-    expect(stage).toBeTruthy();
+    const savedData = await getTargetContentData(page);
+    expect(savedData.selectedStage).toBeTruthy();
 
     markElementCovered('dropdowns', 'target-stage-base');
   });
@@ -155,8 +163,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     expect(stageOptions.some(opt => opt.includes('Chapter'))).toBe(true);
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('chapterBoss');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('chapterBoss');
 
     markElementCovered('contentTypeSelectors', 'content-chapterBoss');
   });
@@ -182,8 +190,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     });
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('worldBoss');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('worldBoss');
 
     markElementCovered('contentTypeSelectors', 'content-worldBoss');
   });
@@ -207,8 +215,8 @@ test.describe('Base Stats - Target Content Selection', () => {
     expect(subcategoryOptions.some(opt => opt.includes('Equipment'))).toBe(true);
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('growthDungeon');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('growthDungeon');
 
     markElementCovered('contentTypeSelectors', 'content-growthDungeon');
   });
@@ -289,8 +297,8 @@ test.describe('Base Stats - Content Type Switching', () => {
     expect(stageOptions.some(opt => opt.includes('Def'))).toBe(true);
 
     // Assert - localStorage updated
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('worldBoss');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('worldBoss');
   });
 
   test('switching from Chapter Boss to Stage Hunt shows subcategory', async ({ page }) => {
@@ -310,8 +318,8 @@ test.describe('Base Stats - Content Type Switching', () => {
     await expect(page.locator(TARGET_DROPDOWNS.stage)).toBeHidden();
 
     // Assert - localStorage
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    expect(contentType).toBe('stageHunt');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('stageHunt');
   });
 
   test('switching from Stage Hunt to None hides all dropdowns', async ({ page }) => {
@@ -387,9 +395,9 @@ test.describe('Base Stats - Target Content with Class', () => {
 
     // Assert - Both localStorage values preserved
     const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
+    const savedData = await getTargetContentData(page);
     expect(selectedClass).toBe('hero');
-    expect(contentType).toBe('worldBoss');
+    expect(savedData.contentType).toBe('worldBoss');
   });
 
   test('target content selection works with mage class', async ({ page }) => {
@@ -426,10 +434,9 @@ test.describe('Base Stats - Target Content with Class', () => {
     await expect(page.locator(TARGET_DROPDOWNS.subcategory)).toHaveValue('chapter-10');
 
     // Assert - localStorage intact
-    const contentType = await page.evaluate(() => localStorage.getItem('currentContentType'));
-    const subcategory = await page.evaluate(() => localStorage.getItem('targetSubcategory'));
-    expect(contentType).toBe('stageHunt');
-    expect(subcategory).toBe('chapter-10');
+    const savedData = await getTargetContentData(page);
+    expect(savedData.contentType).toBe('stageHunt');
+    expect(savedData.subcategory).toBe('chapter-10');
   });
 });
 

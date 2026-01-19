@@ -6,7 +6,7 @@ export default defineConfig({
   fullyParallel: true, // Run tests in parallel
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: 4, // Run up to 4 tests in parallel (adjust based on your CPU)
+  workers: undefined, // Run up to 4 tests in parallel (adjust based on your CPU)
   reporter: 'line',
   timeout: 60000, // 60 second timeout per test
   use: {
