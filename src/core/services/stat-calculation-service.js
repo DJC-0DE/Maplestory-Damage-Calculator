@@ -99,6 +99,13 @@ export class StatCalculationService {
         return this;
     }
 
+    calculateMainStatIncreaseWithPct(value)
+    {
+        const mainStatPct = this.context.mainStatPct;
+        const mainStatWithPctIncrease = value * (1 + mainStatPct / 100);
+        return mainStatWithPctIncrease;
+    }
+
     /**
      * Add a percentage-based stat (additive)
      * @param {string} statKey - The stat key (e.g., 'bossDamage', 'critRate')

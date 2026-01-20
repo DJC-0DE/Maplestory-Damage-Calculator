@@ -164,9 +164,12 @@ export function calculateStatWeights(setup, stats) {
     html += `<tr><td><button onclick="toggleStatChart('${setup}', 'mainStat', 'Main Stat', true)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Main Stat</td>`;
     mainStatIncreases.forEach(increase => {
         const service = new StatCalculationService(stats);
-        const statDamageIncrease = increase / 100;
 
-        const newDPS = service.addMainStat(increase).computeDPS('boss');
+        const actualIncrase = service.calculateMainStatIncreaseWithPct(increase);
+
+        const statDamageIncrease = actualIncrase / 100;
+
+        const newDPS = service.addMainStat(actualIncrase).addAttack(actualIncrase).computeDPS('boss');
         const gain = ((newDPS - baseBossDPS) / baseBossDPS * 100).toFixed(2);
 
         const tooltip = `+${formatNumber(increase)} Main Stat\n+${statDamageIncrease.toFixed(2)}% Stat Damage\nGain: ${gain}%`;
@@ -369,6 +372,10 @@ export function calculateStatEquivalency(sourceStat) {
             applyToStats: (stats, value) => {
                 const service = new StatCalculationService(stats);
                 service.addMainStat(value);
+                service.addAttack(value);
+
+                debugger;
+
                 return service.getStats();
             },
             formatValue: (val) => formatNumber(val)

@@ -120,11 +120,12 @@ export const rankingsPerPage = 25;
 
 // Rarity upgrade probabilities
 export const RARITY_UPGRADE_RATES = {
-    'normal': { next: 'rare', rate: 0.06 },
-    'rare': { next: 'epic', rate: 0.03333 },
-    'epic': { next: 'unique', rate: 0.0167 },
-    'unique': { next: 'legendary', rate: 0.006 },
-    'legendary': { next: 'mystic', rate: 0.0021 }
+    'normal': { next: 'rare', rate: 0.06, max: 30},
+    'rare': { next: 'epic', rate: 0.03333, max: 60 },
+    'epic': { next: 'unique', rate: 0.0167, max: 120 },
+    'unique': { next: 'legendary', rate: 0.006, max: 333},
+    'legendary': { next: 'mystic', rate: 0.0021, max: 714 }
+    // 'mystic': can't upgrade any higher!
 };
 
 // Equipment Potential Data
