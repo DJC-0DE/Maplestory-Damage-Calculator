@@ -18,6 +18,13 @@ import type {
     WeaponKey
 } from '@ts/types';
 import { weaponBaseAttackEquipped, weaponUpgradeCosts, MAX_LEVELS_BY_STARS } from '@ts/types';
+import {
+    WEAPON_RARITY,
+    HIGH_TIER_RARITIES,
+    INVENTORY_DIVISOR_HIGH_TIER,
+    INVENTORY_DIVISOR_STANDARD,
+    MAX_WEAPON_UPGRADE_ITERATIONS
+} from '@ts/types/constants';
 
 /**
  * Get weapon level multiplier based on level
@@ -40,7 +47,7 @@ export function getWeaponLevelMultiplier(level: WeaponLevel): number {
  * @returns Divisor for inventory attack calculation
  */
 export function getInventoryDivisor(rarity: WeaponRarity): number {
-    return ['legendary', 'mystic', 'ancient'].includes(rarity) ? 4 : 3.5;
+    return HIGH_TIER_RARITIES.includes(rarity) ? INVENTORY_DIVISOR_HIGH_TIER : INVENTORY_DIVISOR_STANDARD;
 }
 
 /**
@@ -164,7 +171,7 @@ export function calculateUpgradeGain(
     let remainingResources = resources;
     let totalCost = 0;
     let iterations = 0;
-    const maxIterations = 300; // Prevent infinite loops
+    const maxIterations = MAX_WEAPON_UPGRADE_ITERATIONS;
 
     // Simulate upgrades until we run out of resources or hit max level
     while (level < maxLevel && remainingResources > 0 && iterations < maxIterations) {

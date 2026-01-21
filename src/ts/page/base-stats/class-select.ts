@@ -37,17 +37,17 @@ export function isLukMainStatClass(className: string): boolean {
  */
 export function getStatType(className: string, statId: string): StatType {
     if (isStrMainStatClass(className)) {
-        if (statId === 'str-base') return STAT_TYPE.PRIMARY;
-        if (statId === 'dex-base') return STAT_TYPE.SECONDARY;
+        if (statId === 'str') return STAT_TYPE.PRIMARY;
+        if (statId === 'dex') return STAT_TYPE.SECONDARY;
     } else if (isDexMainStatClass(className)) {
-        if (statId === 'dex-base') return STAT_TYPE.PRIMARY;
-        if (statId === 'str-base') return STAT_TYPE.SECONDARY;
+        if (statId === 'dex') return STAT_TYPE.PRIMARY;
+        if (statId === 'str') return STAT_TYPE.SECONDARY;
     } else if (isIntMainStatClass(className)) {
-        if (statId === 'int-base') return STAT_TYPE.PRIMARY;
-        if (statId === 'luk-base') return STAT_TYPE.SECONDARY;
+        if (statId === 'int') return STAT_TYPE.PRIMARY;
+        if (statId === 'luk') return STAT_TYPE.SECONDARY;
     } else if (isLukMainStatClass(className)) {
-        if (statId === 'luk-base') return STAT_TYPE.PRIMARY;
-        if (statId === 'dex-base') return STAT_TYPE.SECONDARY;
+        if (statId === 'luk') return STAT_TYPE.PRIMARY;
+        if (statId === 'dex') return STAT_TYPE.SECONDARY;
     }
     return null;
 }
@@ -57,13 +57,13 @@ export function getStatType(className: string, statId: string): StatType {
  */
 export function getMainStatIds(className: ClassName): { primary: string; secondary: string } | null {
     if (isStrMainStatClass(className)) {
-        return { primary: 'str-base', secondary: 'dex-base' };
+        return { primary: 'str', secondary: 'dex' };
     } else if (isDexMainStatClass(className)) {
-        return { primary: 'dex-base', secondary: 'str-base' };
+        return { primary: 'dex', secondary: 'str' };
     } else if (isIntMainStatClass(className)) {
-        return { primary: 'int-base', secondary: 'luk-base' };
+        return { primary: 'int', secondary: 'luk' };
     } else if (isLukMainStatClass(className)) {
-        return { primary: 'luk-base', secondary: 'dex-base' };
+        return { primary: 'luk', secondary: 'dex' };
     }
     return null;
 }

@@ -736,7 +736,7 @@
 
             <!-- Stat Predictions Tab -->
             <div id="predictions-stat-tables" class="predictions-tab-content optimization-tab-content active">
-                <div id="stat-weights-base"></div>
+                <div id="stat-weights"></div>
             </div>
 
             <!-- Stat Equivalency Tab -->
@@ -749,104 +749,7 @@
                         Enter a value for any stat below to see what that gain translates to for all other stats. Perfect for comparing upgrade paths and understanding relative stat values.
                     </p>
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Left Column: Input Fields -->
-                    <div>
-                        <!-- Flat Stats Section -->
-                        <div style="margin-bottom: 24px;">
-                            <h4 style="color: var(--accent-primary); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Flat Stats</h4>
-                            <div class="stats-list-column">
-                                <div class="stat-row">
-                                    <label>Attack</label>
-                                    <input type="number" id="equiv-attack" value="1000" min="0" step="100" oninput="calculateStatEquivalency('attack')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Main Stat (100 = 1% Stat Dmg)</label>
-                                    <input type="number" id="equiv-main-stat" value="500" min="0" step="50" oninput="calculateStatEquivalency('main-stat')">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Percentage Stats Section -->
-                        <div>
-                            <h4 style="color: var(--accent-primary); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Percentage Stats</h4>
-                            <div class="stats-list-column">
-                                <div class="stat-row">
-                                    <label>Skill Coefficient (%)</label>
-                                    <input type="number" id="equiv-skill-coeff" value="10" min="0" step="1" oninput="calculateStatEquivalency('skill-coeff')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Skill Mastery (%)</label>
-                                    <input type="number" id="equiv-skill-mastery" value="5" min="0" step="1" oninput="calculateStatEquivalency('skill-mastery')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Damage (%)</label>
-                                    <input type="number" id="equiv-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Final Damage (%) <span class="info-icon" role="img" aria-label="Info" title="Increases to this stat are multiplicative rather than additive.">ℹ️</span></label>
-                                    <input type="number" id="equiv-final-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('final-damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Boss Damage (%)</label>
-                                    <input type="number" id="equiv-boss-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('boss-damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Monster Damage (%)</label>
-                                    <input type="number" id="equiv-normal-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('normal-damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Main Stat %</label>
-                                    <input type="number" id="equiv-main-stat-pct" value="10" min="0" step="1" oninput="calculateStatEquivalency('main-stat-pct')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Damage Amplification (x)</label>
-                                    <input type="number" id="equiv-damage-amp" value="1" min="0" step="0.1" oninput="calculateStatEquivalency('damage-amp')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Min Damage Multiplier (%)</label>
-                                    <input type="number" id="equiv-min-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('min-damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Max Damage Multiplier (%)</label>
-                                    <input type="number" id="equiv-max-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('max-damage')">
-                                </div>
-
-                                <!-- Divider -->
-                                <div class="stat-divider"></div>
-
-                                <div class="stat-row">
-                                    <label>Critical Rate (%)</label>
-                                    <input type="number" id="equiv-crit-rate" value="10" min="0" step="1" oninput="calculateStatEquivalency('crit-rate')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Critical Damage (%)</label>
-                                    <input type="number" id="equiv-crit-damage" value="10" min="0" step="1" oninput="calculateStatEquivalency('crit-damage')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Attack Speed (%)</label>
-                                    <input type="number" id="equiv-attack-speed" value="10" min="0" step="1" oninput="calculateStatEquivalency('attack-speed')">
-                                </div>
-                                <div class="stat-row">
-                                    <label>Defense Penetration (%)</label>
-                                    <input type="number" id="equiv-def-pen" value="10" min="0" step="1" oninput="calculateStatEquivalency('def-pen')">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Results Display -->
-                    <div style="position: sticky; top: 20px;">
-                        <h4 style="color: var(--accent-success); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Results</h4>
-                        <div id="equivalency-results" style="border-radius: 12px; padding: 20px; min-height: 500px;">
-                            <div style="text-align: center; color: var(--text-secondary); padding: 60px 20px;">
-                                <div style="font-size: 4em; margin-bottom: 20px; opacity: 0.4;">📊</div>
-                                <p style="font-size: 1.1em;">Enter a value in any stat field to see the equivalent damage gain across all stats.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Content will be dynamically generated by TypeScript -->
             </div>
         </div>
         </div>

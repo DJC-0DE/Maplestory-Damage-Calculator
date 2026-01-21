@@ -3,17 +3,17 @@
  * Centralized data structure for loadout configuration
  */
 
-import type { ContentType } from './constants';
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, type ContentType, type JobTier, type MasteryTypeValue } from './constants';
 
 /**
  * Job tier types for mastery bonuses
  */
-export type MasteryTier = '3rd' | '4th';
+export type MasteryTier = JobTier;
 
 /**
  * Mastery bonus type (all monsters vs boss only)
  */
-export type MasteryType = 'all' | 'boss';
+export type MasteryType = MasteryTypeValue;
 
 /**
  * Loadout data structure - centralized state for all loadout-related data
@@ -26,7 +26,7 @@ export interface LoadoutData {
     character: {
         level: number;
         class: string | null;
-        jobTier: '3rd' | '4th';
+        jobTier: JobTier;
     };
 
     /** Weapon data indexed by rarity-tier key */
@@ -57,6 +57,11 @@ export interface LoadoutData {
     };
 }
 
+export interface BaseStats {
+    critDamage: number,
+    
+}
+
 /**
  * Legacy damageCalculatorData format (for migration/dual-write)
  */
@@ -64,8 +69,8 @@ export interface LegacyDamageCalculatorData {
     baseSetup?: Record<string, string | number>;
     weapons?: Record<string, { level: string | number; stars: string | number; equipped?: boolean }>;
     masteryBonuses?: {
-        '3rd'?: { all?: Record<string, boolean>; boss?: Record<string, boolean> };
-        '4th'?: { all?: Record<string, boolean>; boss?: Record<string, boolean> };
+        [JOB_TIER.THIRD]?: { [MASTERY_TYPE.ALL]?: Record<string, boolean>; [MASTERY_TYPE.BOSS]?: Record<string, boolean> };
+        [JOB_TIER.FOURTH]?: { [MASTERY_TYPE.ALL]?: Record<string, boolean>; [MASTERY_TYPE.BOSS]?: Record<string, boolean> };
     };
     contentType?: string;
     subcategory?: string;
@@ -80,15 +85,15 @@ export const DEFAULT_LOADOUT_DATA: LoadoutData = {
     character: {
         level: 0,
         class: null,
-        jobTier: '3rd'
+        jobTier: JOB_TIER.THIRD
     },
     weapons: {},
     mastery: {
-        '3rd': { all: {}, boss: {} },
-        '4th': { all: {}, boss: {} }
+        [JOB_TIER.THIRD]: { [MASTERY_TYPE.ALL]: {}, [MASTERY_TYPE.BOSS]: {} },
+        [JOB_TIER.FOURTH]: { [MASTERY_TYPE.ALL]: {}, [MASTERY_TYPE.BOSS]: {} }
     },
     target: {
-        contentType: 'none',
+        contentType: CONTENT_TYPE.NONE,
         subcategory: null,
         selectedStage: null
     },

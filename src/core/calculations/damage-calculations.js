@@ -3,6 +3,8 @@ import { formatNumber } from '@utils/formatters.js';
 import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { getStats } from '@core/state/state.js';
 
+// Note: calculateStatEquivalency has been migrated to TypeScript in src/ts/page/stat-hub/stat-equivalency.ts
+// This function is kept here for reference but should be removed after full migration is complete
 window.calculateStatEquivalency = calculateStatEquivalency;
 
 // Main damage calculation function
@@ -79,7 +81,9 @@ export function calculateDamage(stats, monsterType) {
 
 // Calculate stat weights - generates HTML for stat damage predictions
 // ULTRA-COMPACT REDESIGN: Horizontal tabbed dashboard with minimal vertical footprint
-export function calculateStatWeights(setup, stats) {
+// Note: This function has been migrated to TypeScript in src/ts/page/stat-hub/stat-predictions.ts
+// Kept here temporarily until Chart.js utilities (toggleStatChart, sortStatPredictions, switchStatPredictionTab) are migrated
+export function calculateStatWeights(stats) {
     // Create base service to get base DPS values (calculated once in constructor, auto-fetches weaponAttackBonus)
     const baseService = new StatCalculationService(stats);
     const baseBossDPS = baseService.baseBossDPS;
@@ -129,7 +133,7 @@ export function calculateStatWeights(setup, stats) {
     html += '<div class="stat-predictions-section">';
     html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Flat Stats</h3>';
     html += '<div class="">';
-    html += `<table class="table" id="stat-pred-table-${setup}-flat">`;
+    html += `<table class="table" id="stat-pred-table-flat">`;
     html += '<thead><tr><th>Stat</th>';
     attackIncreases.forEach((inc, idx) => {
         html += `<th>+${formatNumber(inc)} </th>`;
@@ -137,7 +141,7 @@ export function calculateStatWeights(setup, stats) {
     html += '</tr></thead><tbody>';
 
     // Attack row
-    html += `<tr><td><button onclick="toggleStatChart('${setup}', 'attack', 'Attack', true)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Attack</td>`;
+    html += `<tr><td><button onclick="toggleStatChart('attack', 'Attack', true)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Attack</td>`;
     attackIncreases.forEach(increase => {
         const service = new StatCalculationService(stats);
         const oldValue = stats.attack;
@@ -152,7 +156,7 @@ export function calculateStatWeights(setup, stats) {
         html += `<td title="${tooltip}">+${gain}%</span></td>`;
     });
     html += '</tr>';
-    html += `<tr id="chart-row-${setup}-attack" class="chart-row" style="display: none;"><td colspan="7"><canvas id="chart-${setup}-attack"></canvas></td></tr>`;
+    html += `<tr id="chart-row-attack" class="chart-row" style="display: none;"><td colspan="7"><canvas id="chart-attack"></canvas></td></tr>`;
 
     html += '<thead><tr><th>Stat</th>';
     mainStatIncreases.forEach((inc, idx) => {
@@ -161,7 +165,7 @@ export function calculateStatWeights(setup, stats) {
     html += '</tr></thead><tbody>';
 
     // Main Stat row
-    html += `<tr><td><button onclick="toggleStatChart('${setup}', 'mainStat', 'Main Stat', true)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Main Stat</td>`;
+    html += `<tr><td><button onclick="toggleStatChart('mainStat', 'Main Stat', true)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>Main Stat</td>`;
     mainStatIncreases.forEach(increase => {
         const service = new StatCalculationService(stats);  
         const actualMainStatGain = service.calculateMainStatIncreaseWithPct(increase);
@@ -174,7 +178,7 @@ export function calculateStatWeights(setup, stats) {
         html += `<td title="${tooltip}"><span style="color: var(--text-primary);">+${gain}%</span></td>`;
     });
     html += '</tr>';
-    html += `<tr id="chart-row-${setup}-mainStat" class="chart-row" style="display: none;"><td colspan="7" style="padding: 16px; background: var(--background); border-top: 1px solid var(--table-glass-border);"><canvas id="chart-${setup}-mainStat"></canvas></td></tr>`;
+    html += `<tr id="chart-row-mainStat" class="chart-row" style="display: none;"><td colspan="7" style="padding: 16px; background: var(--background); border-top: 1px solid var(--table-glass-border);"><canvas id="chart-mainStat"></canvas></td></tr>`;
 
     html += '</tbody></table>';
     html += '</div>';
@@ -184,10 +188,10 @@ export function calculateStatWeights(setup, stats) {
     html += '<div class="stat-predictions-section" style="margin-top: 24px;">';
     html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Percentage Stats</h3>';
     html += '<div class="">';
-    html += `<table class="table" id="stat-pred-table-${setup}-percentage">`;
+    html += `<table class="table" id="stat-pred-table-percentage">`;
     html += '<thead><tr><th style="padding: 8px 10px; font-size: 0.75rem;">Stat</th>';
     percentIncreases.forEach((inc, idx) => {
-        html += `<th onclick="sortStatPredictions('${setup}', 'percentage', ${idx + 1}, this)" onmouseover="this.style.background='var(--table-surface-subtle)'" onmouseout="this.style.background='transparent'">+${inc}% <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8em; margin-left: 4px;">⇅</span></th>`;
+        html += `<th onclick="sortStatPredictions('percentage', ${idx + 1}, this)" onmouseover="this.style.background='var(--table-surface-subtle)'" onmouseout="this.style.background='transparent'">+${inc}% <span class="sort-indicator" style="opacity: 0.3; font-size: 0.8em; margin-left: 4px;">⇅</span></th>`;
     });
     html += '</tr></thead><tbody>';
 
@@ -200,7 +204,7 @@ export function calculateStatWeights(setup, stats) {
             //labelContent += ` <span style="font-size: 0.7em; opacity: 0.5;" title="Diminishing returns">📉</span>`;
         }
 
-        html += `<tr><td><button onclick="toggleStatChart('${setup}', '${stat.key}', '${stat.label}', false)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>${labelContent}</td>`;
+        html += `<tr><td><button onclick="toggleStatChart('${stat.key}', '${stat.label}', false)" title="Toggle graph" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">📊</button>${labelContent}</td>`;
 
         percentIncreases.forEach(increase => {
             // Simple flat addition for table values
@@ -238,14 +242,14 @@ export function calculateStatWeights(setup, stats) {
         });
 
         html += '</tr>';
-        html += `<tr id="chart-row-${setup}-${stat.key}" class="chart-row" style="display: none;"><td colspan="7"><canvas id="chart-${setup}-${stat.key}"></canvas></td></tr>`;
+        html += `<tr id="chart-row-${stat.key}" class="chart-row" style="display: none;"><td colspan="7"><canvas id="chart-${stat.key}"></canvas></td></tr>`;
     });
 
     html += '</tbody></table>';
     html += '</div>';
     html += '</div>';
 
-    document.getElementById(`stat-weights-${setup}`).innerHTML = html;
+    document.getElementById(`stat-weights`).innerHTML = html;
 }
 
 // Tab switching function for stat predictions

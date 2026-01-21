@@ -5,6 +5,7 @@
 
 import { setCurrentContentType, getCurrentContentType } from '@core/state/state';
 import { updateAnalysisTabs } from '@core/state/storage';
+import { CONTENT_TYPE } from '@ts/types/constants';
 import type { ContentType } from '@ts/types';
 import type { ContentTypeConfig } from '@ts/types/page/base-stats/base-stats.types';
 import {
@@ -20,11 +21,11 @@ export type { ContentType };
 
 // Content type configuration for generating content selector HTML
 const CONTENT_TYPES: ContentTypeConfig[] = [
-    { id: 'none', name: 'None', icon: '🎯', title: 'Training Dummy' },
-    { id: 'stageHunt', name: 'Stage Hunt', icon: '🗺️', title: 'Stage Hunt' },
-    { id: 'chapterBoss', name: 'Chapter Boss', icon: '👑', title: 'Chapter Boss' },
-    { id: 'worldBoss', name: 'World Boss', icon: '🌍', title: 'World Boss' },
-    { id: 'growthDungeon', name: 'Growth Dungeon', icon: '📈', title: 'Growth Dungeon' }
+    { id: CONTENT_TYPE.NONE, name: 'None', icon: '🎯', title: 'Training Dummy' },
+    { id: CONTENT_TYPE.STAGE_HUNT, name: 'Stage Hunt', icon: '🗺️', title: 'Stage Hunt' },
+    { id: CONTENT_TYPE.CHAPTER_BOSS, name: 'Chapter Boss', icon: '👑', title: 'Chapter Boss' },
+    { id: CONTENT_TYPE.WORLD_BOSS, name: 'World Boss', icon: '🌍', title: 'World Boss' },
+    { id: CONTENT_TYPE.GROWTH_DUNGEON, name: 'Growth Dungeon', icon: '📈', title: 'Growth Dungeon' }
 ];
 
 // ============================================================================
@@ -32,8 +33,8 @@ const CONTENT_TYPES: ContentTypeConfig[] = [
 // ============================================================================
 
 if (typeof window !== 'undefined') {
-    (window as any).selectContentType = selectContentType;
-    (window as any).onSubcategoryChange = onSubcategoryChange;
+    window.selectContentType = selectContentType;
+    window.onSubcategoryChange = onSubcategoryChange;
 }
 
 // ============================================================================
@@ -64,11 +65,11 @@ export function onSubcategoryChange(): void {
     const subcategory = subcategorySelect.value;
     const currentContentType = getCurrentContentType() as ContentType;
 
-    if (currentContentType === 'stageHunt') {
+    if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
         const chapter = subcategory.replace('chapter-', '');
-        populateStageDropdownFiltered('stageHunt', chapter);
-    } else if (currentContentType === 'growthDungeon') {
-        populateStageDropdownFiltered('growthDungeon', subcategory);
+        populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
+    } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+        populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
     }
 
     stageSelect.style.display = 'block';
@@ -115,7 +116,7 @@ export function loadTargetSelectUI(): void {
 // ============================================================================
 
 function initializeWithDefaultState(): void {
-    setCurrentContentType('none' as ContentType);
+    setCurrentContentType(CONTENT_TYPE.NONE as ContentType);
 }
 
 function initializeWithSavedState(savedData: SavedContentTypeData): void {
@@ -128,11 +129,11 @@ function initializeWithSavedState(savedData: SavedContentTypeData): void {
 // ============================================================================
 
 function loadDefaultSelectionUI(): void {
-    updateContentTypeSelectionUI('none' as ContentType);
+    updateContentTypeSelectionUI(CONTENT_TYPE.NONE as ContentType);
 
     const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
     if (stageSelect) {
-        stageSelect.value = 'none';
+        stageSelect.value = CONTENT_TYPE.NONE;
     }
 }
 
@@ -148,11 +149,11 @@ function restoreSavedSelectionUI(savedData: SavedContentTypeData): void {
             subcategorySelect.value = subcategory;
 
             const currentContentType = getCurrentContentType() as ContentType;
-            if (currentContentType === 'stageHunt') {
+            if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
                 const chapter = subcategory.replace('chapter-', '');
-                populateStageDropdownFiltered('stageHunt', chapter);
-            } else if (currentContentType === 'growthDungeon') {
-                populateStageDropdownFiltered('growthDungeon', subcategory);
+                populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
+            } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+                populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
             }
 
             // Show the stage select after populating it
@@ -197,7 +198,7 @@ function configureDropdownsForContentType(contentType: ContentType): void {
     const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
     if (!stageSelect) return;
 
-    if (contentType === 'none') {
+    if (contentType === CONTENT_TYPE.NONE) {
         stageSelect.value = 'none';
         return;
     }

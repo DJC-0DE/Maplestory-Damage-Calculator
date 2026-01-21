@@ -11,19 +11,19 @@ import {
 } from '@core/state/state.js';
 import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { formatDPS } from '@utils/formatters.js';
-import { calculateStatWeights } from '@core/calculations/damage-calculations.js';
 import {
     getAllDarkKnightSkills,
     DARK_KNIGHT_SKILLS
 } from '@core/features/skills/skill-coefficient.js';
+import { refreshStatPredictions } from '@page/stat-hub-page.js';
 import { applyItemToStats } from '@core/services/item-comparison-service.js';
 import { loadTheme } from '@utils/theme.js';
 import { getCurrentSlot } from '@ui/comparison/slot-comparison.js';
 import { displayResults } from '@ui/results-display.js';
 import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
-//import { loadSelectedClass, loadSelectedJobTier, selectClass, selectJobTier, selectMasteryTab } from './base-stats/class-select-ui.js';
-//import { updateSkillCoefficient } from './base-stats/base-stats.js';
+
 import { initializeLoadoutPage } from '@page/loadout-page.js';
+import { initializeStatHubPage } from '@page/stat-hub-page.js';
 import '@utils/tabs.js';
 import '@utils/stat-chart.js';
 import '@ui/help-sidebar.js';
@@ -93,7 +93,7 @@ export function calculate() {
 
     document.getElementById('results-container').innerHTML = resultsHTML || '<p style="text-align: center; color: #b3d9ff;">Add comparison items to see results</p>';
 
-    calculateStatWeights('base', baseStats);
+    refreshStatPredictions();
 
     // Refresh preset DPS comparisons when base stats change
     refreshPresetsUI();
@@ -331,7 +331,9 @@ window.onload = async function () {
     loadTheme();
 
 
-   await initializeLoadoutPage(); // Initialize base stats UI (generates HTML and attaches listeners)
+    await initializeLoadoutPage();
+    await initializeStatHubPage();
+
 //   initializeHeroPowerPresets();
 //   enableGlobalNumberInputAutoSelect();
 // 

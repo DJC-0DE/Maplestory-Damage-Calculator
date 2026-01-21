@@ -10,40 +10,41 @@ import { extractText, parseBaseStatText } from "@utils/ocr.js";
 import { getSelectedClass } from "@core/state/state.js";
 import { showToast } from "@utils/notifications.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
+import { STAT_TYPE } from "@ts/types/constants.js";
 function getCalculateFunction() {
   return window.calculate;
 }
 const STAT_INPUTS = [
   // Core Combat Stats
-  { id: "attack-base", label: "Attack", type: "number", value: 500 },
-  { id: "defense-base", label: "Defense", type: "number", value: 0, info: "defense" },
-  { id: "crit-rate-base", label: "Critical Rate (%)", type: "number", step: "0.1", value: 15 },
-  { id: "crit-damage-base", label: "Critical Damage (%)", type: "number", step: "0.1", value: 15 },
-  { id: "attack-speed-base", label: "Attack Speed (%)", type: "number", step: "0.1", value: 0 },
+  { id: "attack", label: "Attack", type: "number", value: 500 },
+  { id: "defense", label: "Defense", type: "number", value: 0, info: "defense" },
+  { id: "critRate", label: "Critical Rate (%)", type: "number", step: "0.1", value: 15 },
+  { id: "critDamage", label: "Critical Damage (%)", type: "number", step: "0.1", value: 15 },
+  { id: "attackSpeed", label: "Attack Speed (%)", type: "number", step: "0.1", value: 0 },
   // Main Stats
-  { id: "str-base", label: "STR", type: "number", value: 1e3, rowId: "str-row" },
-  { id: "dex-base", label: "DEX", type: "number", value: 0, rowId: "dex-row" },
-  { id: "int-base", label: "INT", type: "number", value: 1e3, rowId: "int-row" },
-  { id: "luk-base", label: "LUK", type: "number", value: 0, rowId: "luk-row" },
+  { id: "str", label: "STR", type: "number", value: 1e3, rowId: "str-row" },
+  { id: "dex", label: "DEX", type: "number", value: 0, rowId: "dex-row" },
+  { id: "int", label: "INT", type: "number", value: 1e3, rowId: "int-row" },
+  { id: "luk", label: "LUK", type: "number", value: 0, rowId: "luk-row" },
   // Damage Modifiers
-  { id: "stat-damage-base", label: "Stat Prop. Damage (%)", type: "number", step: "0.1", value: 0 },
-  { id: "damage-base", label: "Damage (%)", type: "number", step: "0.1", value: 10 },
-  { id: "damage-amp-base", label: "Damage Amplification (x)", type: "number", step: "0.1", value: 0 },
-  { id: "basic-attack-damage-base", label: "Basic Attack Damage (%)", type: "number", step: "0.1", value: 0, hidden: true },
-  { id: "skill-damage-base", label: "Skill Damage (%)", type: "number", step: "0.1", value: 0, hidden: true },
-  { id: "def-pen-base", label: "Defense Penetration (%)", type: "number", step: "0.1", value: 0, info: "def-pen" },
-  { id: "boss-damage-base", label: "Boss Monster Damage (%)", type: "number", step: "0.1", value: 10 },
-  { id: "normal-damage-base", label: "Normal Monster Damage (%)", type: "number", step: "0.1", value: 0 },
-  { id: "min-damage-base", label: "Min Damage Multiplier (%)", type: "number", step: "0.1", value: 50 },
-  { id: "max-damage-base", label: "Max Damage Multiplier (%)", type: "number", step: "0.1", value: 100 },
-  { id: "final-damage-base", label: "Final Damage (%)", type: "number", step: "0.1", value: 0 },
+  { id: "statDamage", label: "Stat Prop. Damage (%)", type: "number", step: "0.1", value: 0 },
+  { id: "damage", label: "Damage (%)", type: "number", step: "0.1", value: 10 },
+  { id: "damageAmp", label: "Damage Amplification (x)", type: "number", step: "0.1", value: 0 },
+  { id: "basicAttackDamage", label: "Basic Attack Damage (%)", type: "number", step: "0.1", value: 0, hidden: true },
+  { id: "skillDamage", label: "Skill Damage (%)", type: "number", step: "0.1", value: 0, hidden: true },
+  { id: "defPen", label: "Defense Penetration (%)", type: "number", step: "0.1", value: 0, info: "def-pen" },
+  { id: "bossDamage", label: "Boss Monster Damage (%)", type: "number", step: "0.1", value: 10 },
+  { id: "normalDamage", label: "Normal Monster Damage (%)", type: "number", step: "0.1", value: 0 },
+  { id: "minDamage", label: "Min Damage Multiplier (%)", type: "number", step: "0.1", value: 50 },
+  { id: "maxDamage", label: "Max Damage Multiplier (%)", type: "number", step: "0.1", value: 100 },
+  { id: "finalDamage", label: "Final Damage (%)", type: "number", step: "0.1", value: 0 },
   // Skill Levels
-  { id: "skill-level-1st-base", label: "1st Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
-  { id: "skill-level-2nd-base", label: "2nd Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
-  { id: "skill-level-3rd-base", label: "3rd Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
-  { id: "skill-level-4th-base", label: "4th Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
+  { id: "skillLevel1st", label: "1st Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
+  { id: "skillLevel2nd", label: "2nd Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
+  { id: "skillLevel3rd", label: "3rd Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
+  { id: "skillLevel4th", label: "4th Job Skill Level", type: "number", value: 0, min: 0, onChange: true },
   // Main Stat %
-  { id: "main-stat-pct-base", label: "Current Main Stat %", type: "number", step: "0.1", value: 0, info: "main-stat-pct" }
+  { id: "mainStatPct", label: "Current Main Stat %", type: "number", step: "0.1", value: 0, info: "main-stat-pct" }
 ];
 function generateStatInputHTML(stat) {
   const infoIcon = stat.info ? `<span class="bgstats-info-inline" role="img" aria-label="Info" onclick="openHelpSidebar('${stat.info}')">?</span>` : "";
@@ -61,20 +62,20 @@ function generateStatInputHTML(stat) {
 }
 function generateStatInputsHTML() {
   let html = "";
-  html += STAT_INPUTS.filter((s) => ["attack-base", "defense-base", "crit-rate-base", "crit-damage-base", "attack-speed-base"].includes(s.id)).map(generateStatInputHTML).join("");
+  html += STAT_INPUTS.filter((s) => ["attack", "defense", "critRate", "critDamage", "attackSpeed"].includes(s.id)).map(generateStatInputHTML).join("");
   html += '<div class="bgstats-divider"></div>';
-  html += STAT_INPUTS.filter((s) => ["str-base", "dex-base", "int-base", "luk-base"].includes(s.id)).map(generateStatInputHTML).join("");
+  html += STAT_INPUTS.filter((s) => ["str", "dex", "int", "luk"].includes(s.id)).map(generateStatInputHTML).join("");
   html += '<div class="bgstats-divider"></div>';
-  html += STAT_INPUTS.filter((s) => ["stat-damage-base", "damage-base", "damage-amp-base", "basic-attack-damage-base", "skill-damage-base", "def-pen-base", "boss-damage-base", "normal-damage-base", "min-damage-base", "max-damage-base", "final-damage-base"].includes(s.id)).map(generateStatInputHTML).join("");
+  html += STAT_INPUTS.filter((s) => ["statDamage", "damage", "damageAmp", "basicAttackDamage", "skillDamage", "defPen", "bossDamage", "normalDamage", "minDamage", "maxDamage", "finalDamage"].includes(s.id)).map(generateStatInputHTML).join("");
   html += '<div class="bgstats-divider"></div>';
-  html += STAT_INPUTS.filter((s) => ["skill-level-1st-base", "skill-level-2nd-base", "skill-level-3rd-base", "skill-level-4th-base"].includes(s.id)).map(generateStatInputHTML).join("");
+  html += STAT_INPUTS.filter((s) => ["skillLevel1st", "skillLevel2nd", "skillLevel3rd", "skillLevel4th"].includes(s.id)).map(generateStatInputHTML).join("");
   html += '<div class="bgstats-divider"></div>';
-  html += STAT_INPUTS.filter((s) => ["main-stat-pct-base"].includes(s.id)).map(generateStatInputHTML).join("");
+  html += STAT_INPUTS.filter((s) => ["mainStatPct"].includes(s.id)).map(generateStatInputHTML).join("");
   html += `
-        <input type="hidden" id="primary-main-stat-base" value="1000">
-        <input type="hidden" id="secondary-main-stat-base" value="0">
+        <input type="hidden" id="primaryMainStat" value="1000">
+        <input type="hidden" id="secondaryMainStat" value="0">
         ${generateMasteryHiddenInputs()}
-        <input type="hidden" id="skill-coeff-base" value="0">
+        <input type="hidden" id="skillCoeff" value="0">
     `;
   return html;
 }
@@ -255,9 +256,9 @@ function attachPasteAreaListener() {
           const primaryInput = document.getElementById("primary-main-stat-base");
           const secondaryInput = document.getElementById("secondary-main-stat-base");
           const statType = getStatType(className, parsedStat[0]);
-          if (statType === "primary") {
+          if (statType === STAT_TYPE.PRIMARY) {
             primaryInput.value = parsedStat[1] || "1000";
-          } else if (statType === "secondary") {
+          } else if (statType === STAT_TYPE.SECONDARY) {
             secondaryInput.value = parsedStat[1] || "1000";
           }
         }
@@ -283,62 +284,60 @@ function attachPasteAreaListener() {
   });
 }
 function attachMainStatSyncListeners() {
-  const strInput = document.getElementById("str-base");
-  const dexInput = document.getElementById("dex-base");
-  const intInput = document.getElementById("int-base");
-  const lukInput = document.getElementById("luk-base");
+  const strInput = document.getElementById("str");
+  const dexInput = document.getElementById("dex");
+  const intInput = document.getElementById("int");
+  const lukInput = document.getElementById("luk");
   [strInput, dexInput, intInput, lukInput].forEach((input) => {
     if (input) {
       input.addEventListener("input", () => {
         syncMainStatsToHidden();
         const value = parseFloat(input.value) || 0;
-        const key = input.id.replace("-base", "");
-        loadoutStore.updateBaseStat(key, value);
+        loadoutStore.updateBaseStat(input.id, value);
       });
     }
   });
 }
 function attachStatInputListeners() {
   const statInputIds = [
-    "attack-base",
-    "defense-base",
-    "crit-rate-base",
-    "crit-damage-base",
-    "attack-speed-base",
-    "stat-damage-base",
-    "damage-base",
-    "damage-amp-base",
-    "def-pen-base",
-    "boss-damage-base",
-    "normal-damage-base",
-    "min-damage-base",
-    "max-damage-base",
-    "final-damage-base",
-    "skill-level-1st-base",
-    "skill-level-2nd-base",
-    "skill-level-3rd-base",
-    "skill-level-4th-base",
-    "main-stat-pct-base"
+    "attack",
+    "defense",
+    "critRate",
+    "critDamage",
+    "attackSpeed",
+    "statDamage",
+    "damage",
+    "damageAmp",
+    "defPen",
+    "bossDamage",
+    "normalDamage",
+    "minDamage",
+    "maxDamage",
+    "finalDamage",
+    "skillLevel1st",
+    "skillLevel2nd",
+    "skillLevel3rd",
+    "skillLevel4th",
+    "mainStatPct"
   ];
   statInputIds.forEach((id) => {
     const input = document.getElementById(id);
     if (input) {
       input.addEventListener("input", () => {
         const value = parseFloat(input.value) || 0;
-        const key = id.replace("-base", "");
-        loadoutStore.updateBaseStat(key, value);
+        loadoutStore.updateBaseStat(id, value);
       });
     }
   });
 }
 function syncMainStatsToHidden() {
   const className = getSelectedClass();
-  const strInput = document.getElementById("str-base");
-  const dexInput = document.getElementById("dex-base");
-  const intInput = document.getElementById("int-base");
-  const lukInput = document.getElementById("luk-base");
-  const primaryInput = document.getElementById("primary-main-stat-base");
-  const secondaryInput = document.getElementById("secondary-main-stat-base");
+  const strInput = document.getElementById("str");
+  const dexInput = document.getElementById("dex");
+  const intInput = document.getElementById("int");
+  const lukInput = document.getElementById("luk");
+  const primaryInput = document.getElementById("primaryMainStat");
+  const secondaryInput = document.getElementById("secondaryMainStat");
   if (!primaryInput || !secondaryInput) return;
   if (isStrMainStatClass(className)) {
     if (strInput) primaryInput.value = strInput.value || "1000";
@@ -417,11 +416,15 @@ function loadBaseStatsUI() {
     "skill-level-4th",
     "main-stat-pct"
   ];
-  statInputIds.forEach((key) => {
-    if (key in baseStats) {
-      const input = document.getElementById(`${key}-base`);
+  const toCamelCase = (key) => {
+    return key.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+  };
+  statInputIds.forEach((hyphenatedKey) => {
+    const camelCaseKey = toCamelCase(hyphenatedKey);
+    if (camelCaseKey in baseStats) {
+      const input = document.getElementById(`${hyphenatedKey}-base`);
       if (input) {
-        input.value = baseStats[key].toString();
+        input.value = baseStats[camelCaseKey].toString();
       }
     }
   });

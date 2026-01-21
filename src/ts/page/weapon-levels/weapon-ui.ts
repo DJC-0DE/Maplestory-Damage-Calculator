@@ -10,6 +10,7 @@ import {
 } from './weapons';
 import type { WeaponRarity, WeaponTier, StarRating } from '@ts/types';
 import { rarities, tiers, weaponBaseAttackEquipped } from '@ts/types';
+import { WEAPON_RARITY, WEAPON_TIER, HIGH_TIER_RARITIES } from '@ts/types/constants';
 
 // Re-import services from existing JS (will be converted to TS later)
 import { calculate } from '@core/main.js';
@@ -120,7 +121,7 @@ export function initializeWeaponsUI(): void {
             const rarityCapitalized = rarity.charAt(0).toUpperCase() + rarity.slice(1);
 
             // Ancient T4 is enabled, T3/T2/T1 are disabled
-            const isDisabled = rarity === 'ancient' && tier === 't1';
+            const isDisabled = rarity === WEAPON_RARITY.ANCIENT && tier === WEAPON_TIER.T1;
 
             if (baseAtk === null || baseAtk === undefined || isDisabled) {
                 html += `<div class="weapon-card weapon-card--disabled" data-rarity="${rarity}">
@@ -129,7 +130,7 @@ export function initializeWeaponsUI(): void {
                 </div>`;
             } else {
                 // Default stars: 5 for normal/rare/epic/unique, 1 for legendary/mystic/ancient
-                const defaultStars: StarRating = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
+                const defaultStars: StarRating = HIGH_TIER_RARITIES.includes(rarity) ? 1 : 5;
 
                 html += `<div class="weapon-card" id="weapon-${rarity}-${tier}" data-rarity="${rarity}">
                     <!-- Equipped Checkbox in top right -->

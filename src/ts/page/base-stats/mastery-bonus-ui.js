@@ -2,8 +2,9 @@ import { selectMasteryTab } from "./class-select-ui.js";
 import { updateMasteryBonuses, calculateMasteryTotals } from "./mastery-bonus.js";
 import { MASTERY_3RD, MASTERY_4TH } from "./mastery-constants.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
+import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS } from "@ts/types/constants.js";
 function generateMasteryTableRows(tier, type) {
-  const masteryData = tier === "3rd" ? MASTERY_3RD : MASTERY_4TH;
+  const masteryData = tier === JOB_TIER.THIRD ? MASTERY_3RD : MASTERY_4TH;
   const items = masteryData[type];
   let rows = "";
   const allLevels = /* @__PURE__ */ new Set();
@@ -40,7 +41,7 @@ function generateMasteryTableRows(tier, type) {
 }
 function generateMasteryTableHTML(tier) {
   return `
-        <div id="mastery-table-${tier}" class="bgstats-mastery-table" ${tier === "4th" ? 'style="display: none;"' : ""}>
+        <div id="mastery-table-${tier}" class="bgstats-mastery-table" ${tier === JOB_TIER.FOURTH ? 'style="display: none;"' : ""}>
             <table class="bgstats-table">
                 <thead>
                     <tr>
@@ -50,7 +51,7 @@ function generateMasteryTableHTML(tier) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${generateMasteryTableRows(tier, "all")}
+                    ${generateMasteryTableRows(tier, MASTERY_TYPE.ALL)}
                 </tbody>
             </table>
         </div>
@@ -68,15 +69,15 @@ function generateMasterySectionHTML() {
                 <button id="mastery-tab-4th" class="bgstats-mastery-tab">4th Job</button>
             </div>
 
-            ${generateMasteryTableHTML("3rd")}
-            ${generateMasteryTableHTML("4th")}
+            ${generateMasteryTableHTML(JOB_TIER.THIRD)}
+            ${generateMasteryTableHTML(JOB_TIER.FOURTH)}
         </div>
     `;
 }
 function generateMasteryHiddenInputs() {
   return `
-        <input type="hidden" id="skill-mastery-base" value="21">
-        <input type="hidden" id="skill-mastery-boss-base" value="0">
+        <input type="hidden" id="skillMastery" value="21">
+        <input type="hidden" id="skillMasteryBoss" value="0">
     `;
 }
 function loadMasteryBonusesUI() {
@@ -87,28 +88,28 @@ function loadMasteryBonusesUI() {
 }
 function loadMasteryCheckboxesFromStore(tier) {
   const mastery = loadoutStore.getMastery();
-  [64, 68, 76, 80, 88, 92].forEach((level) => {
-    const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
+  MASTERY_LEVELS.THIRD.ALL.forEach((level) => {
+    const checkbox = document.getElementById(`mastery-${JOB_TIER.THIRD}-all-${level}`);
     if (checkbox) {
-      checkbox.checked = mastery["3rd"].all[level.toString()] ?? false;
+      checkbox.checked = mastery[JOB_TIER.THIRD].all[level.toString()] ?? false;
     }
   });
-  [72, 84].forEach((level) => {
-    const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
+  MASTERY_LEVELS.THIRD.BOSS.forEach((level) => {
+    const checkbox = document.getElementById(`mastery-${JOB_TIER.THIRD}-boss-${level}`);
     if (checkbox) {
-      checkbox.checked = mastery["3rd"].boss[level.toString()] ?? false;
+      checkbox.checked = mastery[JOB_TIER.THIRD].boss[level.toString()] ?? false;
     }
   });
-  [102, 106, 116, 120, 128, 132].forEach((level) => {
-    const checkbox = document.getElementById(`mastery-4th-all-${level}`);
+  MASTERY_LEVELS.FOURTH.ALL.forEach((level) => {
+    const checkbox = document.getElementById(`mastery-${JOB_TIER.FOURTH}-all-${level}`);
     if (checkbox) {
-      checkbox.checked = mastery["4th"].all[level.toString()] ?? false;
+      checkbox.checked = mastery[JOB_TIER.FOURTH].all[level.toString()] ?? false;
     }
   });
-  [111, 124].forEach((level) => {
-    const checkbox = document.getElementById(`mastery-4th-boss-${level}`);
+  MASTERY_LEVELS.FOURTH.BOSS.forEach((level) => {
+    const checkbox = document.getElementById(`mastery-${JOB_TIER.FOURTH}-boss-${level}`);
     if (checkbox) {
-      checkbox.checked = mastery["4th"].boss[level.toString()] ?? false;
+      checkbox.checked = mastery[JOB_TIER.FOURTH].boss[level.toString()] ?? false;
     }
   });
 }
@@ -121,8 +122,8 @@ function updateMasteryDisplay(tier, allTotal, bossTotal) {
   if (bossTotalDisplay) {
     bossTotalDisplay.textContent = `${bossTotal}%`;
   }
-  const skillMasteryInput = document.getElementById("skill-mastery-base");
-  const skillMasteryBossInput = document.getElementById("skill-mastery-boss-base");
+  const skillMasteryInput = document.getElementById("skillMastery");
+  const skillMasteryBossInput = document.getElementById("skillMasteryBoss");
   if (skillMasteryInput) {
     skillMasteryInput.value = allTotal.toString();
   }
@@ -134,15 +135,15 @@ function attachMasteryTabListeners() {
   const tab3rd = document.getElementById("mastery-tab-3rd");
   const tab4th = document.getElementById("mastery-tab-4th");
   if (tab3rd) {
-    tab3rd.addEventListener("click", () => selectMasteryTab("3rd"));
+    tab3rd.addEventListener("click", () => selectMasteryTab(JOB_TIER.THIRD));
   }
   if (tab4th) {
-    tab4th.addEventListener("click", () => selectMasteryTab("4th"));
+    tab4th.addEventListener("click", () => selectMasteryTab(JOB_TIER.FOURTH));
   }
 }
 function attachMasteryCheckboxListeners() {
-  ["3rd", "4th"].forEach((tier) => {
-    const masteryData = tier === "3rd" ? MASTERY_3RD : MASTERY_4TH;
+  [JOB_TIER.THIRD, JOB_TIER.FOURTH].forEach((tier) => {
+    const masteryData = tier === JOB_TIER.THIRD ? MASTERY_3RD : MASTERY_4TH;
     masteryData.all.forEach((item) => {
       const checkbox = document.getElementById(`mastery-${tier}-all-${item.level}`);
       if (checkbox) {

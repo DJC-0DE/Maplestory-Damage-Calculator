@@ -6,6 +6,7 @@ import {
   getUpgradeCost
 } from "./weapons.js";
 import { rarities, tiers } from "@ts/types";
+import { MONSTER_TYPE, WEAPON_RARITY, WEAPON_TIER, EFFICIENCY_THRESHOLD } from "@ts/types/constants.js";
 import { getStats } from "@core/main.js";
 import { StatCalculationService } from "@core/services/stat-calculation-service.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
@@ -133,9 +134,9 @@ function updateWeaponUpgradeColors() {
         if (!isNaN(gainPer1k) && gainPer1k > 0) {
           const normalized = maxGain === minGain ? 1 : (gainPer1k - minGain) / (maxGain - minGain);
           upgradeGainDisplay.classList.remove("high", "medium", "low");
-          if (normalized > 0.66) {
+          if (normalized > EFFICIENCY_THRESHOLD.HIGH) {
             upgradeGainDisplay.classList.add("high");
-          } else if (normalized > 0.33) {
+          } else if (normalized > EFFICIENCY_THRESHOLD.MEDIUM) {
             upgradeGainDisplay.classList.add("medium");
           } else {
             upgradeGainDisplay.classList.add("low");
@@ -187,7 +188,7 @@ async function calculateCurrencyUpgradesUI(updateWeaponBonuses) {
   }
   const baseStats = getStats("base");
   const initialStatService = new StatCalculationService(baseStats);
-  const initialDPS = initialStatService.computeDPS("boss");
+  const initialDPS = initialStatService.computeDPS(MONSTER_TYPE.BOSS);
   const { calculateCurrencyUpgrades: calculateCurrencyUpgradesPure } = await import("./weapons.js");
   const result = calculateCurrencyUpgradesPure(weaponStates, currency);
   if (!result) {
@@ -203,7 +204,7 @@ async function calculateCurrencyUpgradesUI(updateWeaponBonuses) {
   const baseAttackWithoutWeaponBonus = baseStats.attack / (1 + initialStatService.weaponAttackBonus / 100);
   const newStats = { ...baseStats, attack: baseAttackWithoutWeaponBonus * (1 + newWeaponAttackBonus / 100) };
   const newStatService = new StatCalculationService(newStats, newWeaponAttackBonus);
-  const newDPS = newStatService.computeDPS("boss");
+  const newDPS = newStatService.computeDPS(MONSTER_TYPE.BOSS);
   const dpsGainPct = (newDPS - initialDPS) / initialDPS * 100;
   result.dpsGainPct = dpsGainPct;
   const upgradeCounts = {};
@@ -219,11 +220,24 @@ async function calculateCurrencyUpgradesUI(updateWeaponBonuses) {
   });
   const collatedUpgrades = Object.values(upgradeCounts).sort((a, b) => {
     if (b.count !== a.count) return b.count - a.count;
-    const rarityOrder = { normal: 0, rare: 1, epic: 2, unique: 3, legendary: 4, mystic: 5, ancient: 6 };
+    const rarityOrder = {
+      [WEAPON_RARITY.NORMAL]: 0,
+      [WEAPON_RARITY.RARE]: 1,
+      [WEAPON_RARITY.EPIC]: 2,
+      [WEAPON_RARITY.UNIQUE]: 3,
+      [WEAPON_RARITY.LEGENDARY]: 4,
+      [WEAPON_RARITY.MYSTIC]: 5,
+      [WEAPON_RARITY.ANCIENT]: 6
+    };
     if (rarityOrder[a.rarity] !== rarityOrder[b.rarity]) {
       return rarityOrder[a.rarity] - rarityOrder[b.rarity];
     }
-    const tierOrder = { t4: 0, t3: 1, t2: 2, t1: 3 };
+    const tierOrder = {
+      [WEAPON_TIER.T4]: 0,
+      [WEAPON_TIER.T3]: 1,
+      [WEAPON_TIER.T2]: 2,
+      [WEAPON_TIER.T1]: 3
+    };
     return tierOrder[a.tier] - tierOrder[b.tier];
   });
   let pathHTML = "";

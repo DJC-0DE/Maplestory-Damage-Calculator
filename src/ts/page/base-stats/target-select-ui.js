@@ -1,5 +1,6 @@
 import { setCurrentContentType, getCurrentContentType } from "@core/state/state.js";
 import { updateAnalysisTabs } from "@core/state/storage.js";
+import { CONTENT_TYPE } from "@ts/types/constants.js";
 import {
   getSubcategoryOptions,
   getFilteredStageEntries,
@@ -8,11 +9,11 @@ import {
 } from "./target-select.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
 const CONTENT_TYPES = [
-  { id: "none", name: "None", icon: "\u{1F3AF}", title: "Training Dummy" },
-  { id: "stageHunt", name: "Stage Hunt", icon: "\u{1F5FA}\uFE0F", title: "Stage Hunt" },
-  { id: "chapterBoss", name: "Chapter Boss", icon: "\u{1F451}", title: "Chapter Boss" },
-  { id: "worldBoss", name: "World Boss", icon: "\u{1F30D}", title: "World Boss" },
-  { id: "growthDungeon", name: "Growth Dungeon", icon: "\u{1F4C8}", title: "Growth Dungeon" }
+  { id: CONTENT_TYPE.NONE, name: "None", icon: "\u{1F3AF}", title: "Training Dummy" },
+  { id: CONTENT_TYPE.STAGE_HUNT, name: "Stage Hunt", icon: "\u{1F5FA}\uFE0F", title: "Stage Hunt" },
+  { id: CONTENT_TYPE.CHAPTER_BOSS, name: "Chapter Boss", icon: "\u{1F451}", title: "Chapter Boss" },
+  { id: CONTENT_TYPE.WORLD_BOSS, name: "World Boss", icon: "\u{1F30D}", title: "World Boss" },
+  { id: CONTENT_TYPE.GROWTH_DUNGEON, name: "Growth Dungeon", icon: "\u{1F4C8}", title: "Growth Dungeon" }
 ];
 if (typeof window !== "undefined") {
   window.selectContentType = selectContentType;
@@ -31,11 +32,11 @@ function onSubcategoryChange() {
   if (!subcategorySelect || !stageSelect) return;
   const subcategory = subcategorySelect.value;
   const currentContentType = getCurrentContentType();
-  if (currentContentType === "stageHunt") {
+  if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
     const chapter = subcategory.replace("chapter-", "");
-    populateStageDropdownFiltered("stageHunt", chapter);
-  } else if (currentContentType === "growthDungeon") {
-    populateStageDropdownFiltered("growthDungeon", subcategory);
+    populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
+  } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+    populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
   }
   stageSelect.style.display = "block";
   loadoutStore.updateTarget({ subcategory });
@@ -58,17 +59,17 @@ function loadTargetSelectUI() {
   restoreSavedSelectionUI({ contentType: target.contentType, subcategory: target.subcategory, selectedStage: target.selectedStage });
 }
 function initializeWithDefaultState() {
-  setCurrentContentType("none");
+  setCurrentContentType(CONTENT_TYPE.NONE);
 }
 function initializeWithSavedState(savedData) {
   const { contentType } = savedData;
   setCurrentContentType(contentType);
 }
 function loadDefaultSelectionUI() {
-  updateContentTypeSelectionUI("none");
+  updateContentTypeSelectionUI(CONTENT_TYPE.NONE);
   const stageSelect = document.getElementById("target-stage-base");
   if (stageSelect) {
-    stageSelect.value = "none";
+    stageSelect.value = CONTENT_TYPE.NONE;
   }
 }
 function restoreSavedSelectionUI(savedData) {
@@ -80,11 +81,11 @@ function restoreSavedSelectionUI(savedData) {
     if (subcategorySelect) {
       subcategorySelect.value = subcategory;
       const currentContentType = getCurrentContentType();
-      if (currentContentType === "stageHunt") {
+      if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
         const chapter = subcategory.replace("chapter-", "");
-        populateStageDropdownFiltered("stageHunt", chapter);
-      } else if (currentContentType === "growthDungeon") {
-        populateStageDropdownFiltered("growthDungeon", subcategory);
+        populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
+      } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+        populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
       }
       const stageSelect = document.getElementById("target-stage-base");
       if (stageSelect) {
@@ -116,7 +117,7 @@ function configureDropdownsForContentType(contentType) {
   const subcategorySelect = document.getElementById("target-subcategory");
   const stageSelect = document.getElementById("target-stage-base");
   if (!stageSelect) return;
-  if (contentType === "none") {
+  if (contentType === CONTENT_TYPE.NONE) {
     stageSelect.value = "none";
     return;
   }

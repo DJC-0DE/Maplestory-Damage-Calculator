@@ -4,6 +4,7 @@ import {
   calculateUpgradeGain
 } from "./weapons.js";
 import { rarities, tiers, weaponBaseAttackEquipped } from "@ts/types";
+import { WEAPON_RARITY, WEAPON_TIER, HIGH_TIER_RARITIES } from "@ts/types/constants.js";
 import { calculate } from "@core/main.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
 import {
@@ -79,14 +80,14 @@ function initializeWeaponsUI() {
     tiers.forEach((tier) => {
       const baseAtk = weaponBaseAttackEquipped[rarity]?.[tier];
       const rarityCapitalized = rarity.charAt(0).toUpperCase() + rarity.slice(1);
-      const isDisabled = rarity === "ancient" && tier === "t1";
+      const isDisabled = rarity === WEAPON_RARITY.ANCIENT && tier === WEAPON_TIER.T1;
       if (baseAtk === null || baseAtk === void 0 || isDisabled) {
         html += `<div class="weapon-card weapon-card--disabled" data-rarity="${rarity}">
                     <div class="weapon-header">${tier.toUpperCase()} ${rarityCapitalized}</div>
                     <div class="weapon-no-data">No data</div>
                 </div>`;
       } else {
-        const defaultStars = ["legendary", "mystic", "ancient"].includes(rarity) ? 1 : 5;
+        const defaultStars = HIGH_TIER_RARITIES.includes(rarity) ? 1 : 5;
         html += `<div class="weapon-card" id="weapon-${rarity}-${tier}" data-rarity="${rarity}">
                     <!-- Equipped Checkbox in top right -->
                     <div class="weapon-equipped-toggle">

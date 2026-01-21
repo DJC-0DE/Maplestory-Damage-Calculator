@@ -16,7 +16,8 @@ import type {
     LegacyDamageCalculatorData
 } from '@ts/types/loadout';
 import { DEFAULT_LOADOUT_DATA } from '@ts/types/loadout';
-import type { ContentType } from '@ts/types/constants';
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, type ContentType, type JobTier, type MasteryTypeValue } from '@ts/types/constants';
+import type { StatKey } from '@ts/types/types';
 
 export class LoadoutStore {
     private data: LoadoutData;
@@ -30,6 +31,43 @@ export class LoadoutStore {
         // Initialize with empty data - will be populated by initialize()
         this.data = JSON.parse(JSON.stringify(DEFAULT_LOADOUT_DATA));
     }
+
+    // ========================================================================
+    // PRIVATE MIGRATION MAP
+    // ========================================================================
+
+    /**
+     * Migration map: legacy hyphenated keys → new camelCase keys
+     * Used internally during data loading/migration
+     */
+    private static readonly STAT_KEY_MIGRATION: Record<string, string> = {
+        // Hyphenated → camelCase
+        'crit-rate': 'critRate',
+        'crit-damage': 'critDamage',
+        'stat-damage': 'statDamage',
+        'damage-amp': 'damageAmp',
+        'attack-speed': 'attackSpeed',
+        'def-pen': 'defPen',
+        'boss-damage': 'bossDamage',
+        'normal-damage': 'normalDamage',
+        'skill-coeff': 'skillCoeff',
+        'skill-mastery': 'skillMastery',
+        'skill-mastery-boss': 'skillMasteryBoss',
+        'min-damage': 'minDamage',
+        'max-damage': 'maxDamage',
+        'primary-main-stat': 'primaryMainStat',
+        'secondary-main-stat': 'secondaryMainStat',
+        'final-damage': 'finalDamage',
+        'target-stage': 'targetStage',
+        'main-stat-pct': 'mainStatPct',
+        'skill-level-1st': 'skillLevel1st',
+        'skill-level-2nd': 'skillLevel2nd',
+        'skill-level-3rd': 'skillLevel3rd',
+        'skill-level-4th': 'skillLevel4th',
+        'character-level': 'characterLevel',
+        'basic-attack-damage': 'basicAttackDamage',
+        'skill-damage': 'skillDamage'
+    };
 
     // ========================================================================
     // INITIALIZATION
@@ -116,8 +154,8 @@ export class LoadoutStore {
 
         // Migrate mastery bonuses
         if (legacy.masteryBonuses) {
-            const tiers: MasteryTier[] = ['3rd', '4th'];
-            const types: MasteryType[] = ['all', 'boss'];
+            const tiers: JobTier[] = [JOB_TIER.THIRD, JOB_TIER.FOURTH];
+            const types: MasteryTypeValue[] = [MASTERY_TYPE.ALL, MASTERY_TYPE.BOSS];
 
             tiers.forEach(tier => {
                 types.forEach(type => {
@@ -145,17 +183,48 @@ export class LoadoutStore {
             this.data.character.class = selectedClass;
         }
         if (selectedJobTier) {
-            this.data.character.jobTier = selectedJobTier as '3rd' | '4th';
+            this.data.character.jobTier = selectedJobTier as JobTier;
         }
 
+        // Note: migrateStatKeys() will be called in validateAndFillDefaults() after this method
         console.log('LoadoutStore: Migration complete, saving to new format...');
         this.saveDualWrite();
+    }
+
+    /**
+     * Migrate stat keys from legacy hyphenated format to camelCase
+     * Called during initialization - completely transparent to consumers
+     */
+    private migrateStatKeys(): void {
+        const migratedStats: Record<string, number> = {};
+        let hasMigrations = false;
+
+        // Check each key in baseStats
+        Object.entries(this.data.baseStats).forEach(([key, value]) => {
+            const newKey = LoadoutStore.STAT_KEY_MIGRATION[key];
+            if (newKey) {
+                // Legacy key found - migrate to new format
+                migratedStats[newKey] = value;
+                hasMigrations = true;
+            } else {
+                // Already camelCase or unmapped - keep as-is
+                migratedStats[key] = value;
+            }
+        });
+
+        if (hasMigrations) {
+            this.data.baseStats = migratedStats;
+            console.log('LoadoutStore: Migrated stat keys to camelCase format');
+        }
     }
 
     /**
      * Validate data structure and fill missing fields with defaults
      */
     private validateAndFillDefaults(): void {
+        // Migrate legacy stat keys to camelCase (transparent to consumers)
+        this.migrateStatKeys();
+
         const defaults = DEFAULT_LOADOUT_DATA;
 
         // Ensure baseStats exists
@@ -173,7 +242,7 @@ export class LoadoutStore {
         if (this.data.character.class === undefined) {
             this.data.character.class = defaults.character.class;
         }
-        if (!this.data.character.jobTier || !['3rd', '4th'].includes(this.data.character.jobTier)) {
+        if (!this.data.character.jobTier || ![JOB_TIER.THIRD, JOB_TIER.FOURTH].includes(this.data.character.jobTier as JobTier)) {
             this.data.character.jobTier = defaults.character.jobTier;
         }
 
@@ -186,11 +255,11 @@ export class LoadoutStore {
         if (!this.data.mastery) {
             this.data.mastery = { ...defaults.mastery };
         }
-        (['3rd', '4th'] as MasteryTier[]).forEach(tier => {
+        ([JOB_TIER.THIRD, JOB_TIER.FOURTH] as JobTier[]).forEach(tier => {
             if (!this.data.mastery[tier]) {
-                this.data.mastery[tier] = { all: {}, boss: {} };
+                this.data.mastery[tier] = { [MASTERY_TYPE.ALL]: {}, [MASTERY_TYPE.BOSS]: {} };
             }
-            (['all', 'boss'] as MasteryType[]).forEach(type => {
+            ([MASTERY_TYPE.ALL, MASTERY_TYPE.BOSS] as MasteryTypeValue[]).forEach(type => {
                 if (!this.data.mastery[tier][type]) {
                     this.data.mastery[tier][type] = {};
                 }
@@ -202,7 +271,7 @@ export class LoadoutStore {
             this.data.target = { ...defaults.target };
         }
         if (!this.data.target.contentType) {
-            this.data.target.contentType = 'none';
+            this.data.target.contentType = CONTENT_TYPE.NONE;
         }
 
         // Ensure weaponAttackBonus exists
@@ -336,20 +405,28 @@ export class LoadoutStore {
 
     /**
      * Update multiple base stats at once
-     * @param updates - Object mapping stat keys to values
+     * @param updates - Object mapping stat keys (camelCase or legacy format) to values
      */
     updateBaseStats(updates: Record<string, number>): void {
-        Object.assign(this.data.baseStats, updates);
+        const migratedUpdates: Record<string, number> = {};
+        Object.entries(updates).forEach(([key, value]) => {
+            // Migrate key if it's in legacy hyphenated format
+            const migratedKey = LoadoutStore.STAT_KEY_MIGRATION[key] ?? key;
+            migratedUpdates[migratedKey] = value;
+        });
+        Object.assign(this.data.baseStats, migratedUpdates);
         this.saveDualWrite();
     }
 
     /**
      * Update single base stat
-     * @param key - Stat key (e.g., "attack-base")
+     * @param key - Stat key in camelCase (e.g., "attack", "critRate")
      * @param value - New value
      */
-    updateBaseStat(key: string, value: number): void {
-        this.data.baseStats[key] = value;
+    updateBaseStat(key: StatKey | string, value: number): void {
+        // Migrate key if it's in legacy hyphenated format
+        const migratedKey = LoadoutStore.STAT_KEY_MIGRATION[key] ?? key;
+        this.data.baseStats[migratedKey] = value;
         this.saveDualWrite();
     }
 
@@ -468,16 +545,16 @@ export class LoadoutStore {
             baseSetup: { ...this.data.baseStats },
             weapons: {},
             masteryBonuses: {
-                '3rd': {
-                    all: { ...this.data.mastery['3rd'].all },
-                    boss: { ...this.data.mastery['3rd'].boss }
+                [JOB_TIER.THIRD]: {
+                    [MASTERY_TYPE.ALL]: { ...this.data.mastery[JOB_TIER.THIRD][MASTERY_TYPE.ALL] },
+                    [MASTERY_TYPE.BOSS]: { ...this.data.mastery[JOB_TIER.THIRD][MASTERY_TYPE.BOSS] }
                 },
-                '4th': {
-                    all: { ...this.data.mastery['4th'].all },
-                    boss: { ...this.data.mastery['4th'].boss }
+                [JOB_TIER.FOURTH]: {
+                    [MASTERY_TYPE.ALL]: { ...this.data.mastery[JOB_TIER.FOURTH][MASTERY_TYPE.ALL] },
+                    [MASTERY_TYPE.BOSS]: { ...this.data.mastery[JOB_TIER.FOURTH][MASTERY_TYPE.BOSS] }
                 }
             },
-            contentType: this.data.target.contentType === 'none' ? undefined : this.data.target.contentType,
+            contentType: this.data.target.contentType === CONTENT_TYPE.NONE ? undefined : this.data.target.contentType,
             subcategory: this.data.target.subcategory ?? undefined,
             selectedStage: this.data.target.selectedStage ?? undefined
         };

@@ -9,6 +9,8 @@ import { MASTERY_3RD, MASTERY_4TH } from './mastery-constants';
 import type { MasteryData } from '@ts/types/page/base-stats/base-stats.types';
 import type { JobTier } from '@ts/types/index';
 import { loadoutStore } from '@ts/store/loadout.store';
+import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS } from '@ts/types/constants';
+import type { MasteryTypeValue } from '@ts/types/constants';
 
 // ============================================================================
 // HTML GENERATION
@@ -17,8 +19,8 @@ import { loadoutStore } from '@ts/store/loadout.store';
 /**
  * Generate HTML for mastery table rows
  */
-function generateMasteryTableRows(tier: '3rd' | '4th', type: 'all' | 'boss'): string {
-    const masteryData = tier === '3rd' ? MASTERY_3RD : MASTERY_4TH;
+function generateMasteryTableRows(tier: JobTier, type: MasteryTypeValue): string {
+    const masteryData = tier === JOB_TIER.THIRD ? MASTERY_3RD : MASTERY_4TH;
     const items = masteryData[type];
 
     let rows = '';
@@ -73,9 +75,9 @@ function generateMasteryTableRows(tier: '3rd' | '4th', type: 'all' | 'boss'): st
 /**
  * Generate HTML for mastery table
  */
-function generateMasteryTableHTML(tier: '3rd' | '4th'): string {
+function generateMasteryTableHTML(tier: JobTier): string {
     return `
-        <div id="mastery-table-${tier}" class="bgstats-mastery-table" ${tier === '4th' ? 'style="display: none;"' : ''}>
+        <div id="mastery-table-${tier}" class="bgstats-mastery-table" ${tier === JOB_TIER.FOURTH ? 'style="display: none;"' : ''}>
             <table class="bgstats-table">
                 <thead>
                     <tr>
@@ -85,7 +87,7 @@ function generateMasteryTableHTML(tier: '3rd' | '4th'): string {
                     </tr>
                 </thead>
                 <tbody>
-                    ${generateMasteryTableRows(tier, 'all')}
+                    ${generateMasteryTableRows(tier, MASTERY_TYPE.ALL)}
                 </tbody>
             </table>
         </div>
@@ -107,8 +109,8 @@ export function generateMasterySectionHTML(): string {
                 <button id="mastery-tab-4th" class="bgstats-mastery-tab">4th Job</button>
             </div>
 
-            ${generateMasteryTableHTML('3rd')}
-            ${generateMasteryTableHTML('4th')}
+            ${generateMasteryTableHTML(JOB_TIER.THIRD)}
+            ${generateMasteryTableHTML(JOB_TIER.FOURTH)}
         </div>
     `;
 }
@@ -118,8 +120,8 @@ export function generateMasterySectionHTML(): string {
  */
 export function generateMasteryHiddenInputs(): string {
     return `
-        <input type="hidden" id="skill-mastery-base" value="21">
-        <input type="hidden" id="skill-mastery-boss-base" value="0">
+        <input type="hidden" id="skillMastery" value="21">
+        <input type="hidden" id="skillMasteryBoss" value="0">
     `;
 }
 
@@ -148,34 +150,34 @@ function loadMasteryCheckboxesFromStore(tier: JobTier): void {
     const mastery = loadoutStore.getMastery();
 
     // Load 3rd Job "All Monsters" checkboxes
-    [64, 68, 76, 80, 88, 92].forEach(level => {
-        const checkbox = document.getElementById(`mastery-3rd-all-${level}`) as HTMLInputElement;
+    MASTERY_LEVELS.THIRD.ALL.forEach(level => {
+        const checkbox = document.getElementById(`mastery-${JOB_TIER.THIRD}-all-${level}`) as HTMLInputElement;
         if (checkbox) {
-            checkbox.checked = mastery['3rd'].all[level.toString()] ?? false;
+            checkbox.checked = mastery[JOB_TIER.THIRD].all[level.toString()] ?? false;
         }
     });
 
     // Load 3rd Job "Boss Only" checkboxes
-    [72, 84].forEach(level => {
-        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`) as HTMLInputElement;
+    MASTERY_LEVELS.THIRD.BOSS.forEach(level => {
+        const checkbox = document.getElementById(`mastery-${JOB_TIER.THIRD}-boss-${level}`) as HTMLInputElement;
         if (checkbox) {
-            checkbox.checked = mastery['3rd'].boss[level.toString()] ?? false;
+            checkbox.checked = mastery[JOB_TIER.THIRD].boss[level.toString()] ?? false;
         }
     });
 
     // Load 4th Job "All Monsters" checkboxes
-    [102, 106, 116, 120, 128, 132].forEach(level => {
-        const checkbox = document.getElementById(`mastery-4th-all-${level}`) as HTMLInputElement;
+    MASTERY_LEVELS.FOURTH.ALL.forEach(level => {
+        const checkbox = document.getElementById(`mastery-${JOB_TIER.FOURTH}-all-${level}`) as HTMLInputElement;
         if (checkbox) {
-            checkbox.checked = mastery['4th'].all[level.toString()] ?? false;
+            checkbox.checked = mastery[JOB_TIER.FOURTH].all[level.toString()] ?? false;
         }
     });
 
     // Load 4th Job "Boss Only" checkboxes
-    [111, 124].forEach(level => {
-        const checkbox = document.getElementById(`mastery-4th-boss-${level}`) as HTMLInputElement;
+    MASTERY_LEVELS.FOURTH.BOSS.forEach(level => {
+        const checkbox = document.getElementById(`mastery-${JOB_TIER.FOURTH}-boss-${level}`) as HTMLInputElement;
         if (checkbox) {
-            checkbox.checked = mastery['4th'].boss[level.toString()] ?? false;
+            checkbox.checked = mastery[JOB_TIER.FOURTH].boss[level.toString()] ?? false;
         }
     });
 }
@@ -196,8 +198,8 @@ export function updateMasteryDisplay(tier: JobTier, allTotal: number, bossTotal:
     }
 
     // Update hidden inputs that are used by the calculation engine
-    const skillMasteryInput = document.getElementById('skill-mastery-base') as HTMLInputElement;
-    const skillMasteryBossInput = document.getElementById('skill-mastery-boss-base') as HTMLInputElement;
+    const skillMasteryInput = document.getElementById('skillMastery') as HTMLInputElement;
+    const skillMasteryBossInput = document.getElementById('skillMasteryBoss') as HTMLInputElement;
 
     if (skillMasteryInput) {
         skillMasteryInput.value = allTotal.toString();
@@ -219,10 +221,10 @@ export function attachMasteryTabListeners(): void {
     const tab4th = document.getElementById('mastery-tab-4th');
 
     if (tab3rd) {
-        tab3rd.addEventListener('click', () => selectMasteryTab('3rd'));
+        tab3rd.addEventListener('click', () => selectMasteryTab(JOB_TIER.THIRD));
     }
     if (tab4th) {
-        tab4th.addEventListener('click', () => selectMasteryTab('4th'));
+        tab4th.addEventListener('click', () => selectMasteryTab(JOB_TIER.FOURTH));
     }
 }
 
@@ -230,8 +232,8 @@ export function attachMasteryTabListeners(): void {
  * Attach event listeners to mastery checkboxes
  */
 export function attachMasteryCheckboxListeners(): void {
-    (['3rd', '4th'] as const).forEach(tier => {
-        const masteryData = tier === '3rd' ? MASTERY_3RD : MASTERY_4TH;
+    ([JOB_TIER.THIRD, JOB_TIER.FOURTH] as const).forEach(tier => {
+        const masteryData = tier === JOB_TIER.THIRD ? MASTERY_3RD : MASTERY_4TH;
 
         masteryData.all.forEach(item => {
             const checkbox = document.getElementById(`mastery-${tier}-all-${item.level}`);

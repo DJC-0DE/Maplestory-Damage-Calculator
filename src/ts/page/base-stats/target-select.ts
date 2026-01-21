@@ -4,7 +4,7 @@
  */
 
 import { stageDefenses } from '@core/state/state';
-import type { ContentType } from '@ts/types';
+import { CONTENT_TYPE, MAX_CHAPTER_NUMBER, type ContentType } from '@ts/types';
 
 export type { ContentType };
 
@@ -32,13 +32,13 @@ export interface SavedContentTypeData {
 
 export function getStageEntries(contentType: ContentType): StageEntry[] {
     switch (contentType) {
-        case 'chapterBoss':
+        case CONTENT_TYPE.CHAPTER_BOSS:
             return stageDefenses.chapterBosses;
-        case 'worldBoss':
+        case CONTENT_TYPE.WORLD_BOSS:
             return stageDefenses.worldBosses;
-        case 'stageHunt':
+        case CONTENT_TYPE.STAGE_HUNT:
             return stageDefenses.stageHunts;
-        case 'growthDungeon':
+        case CONTENT_TYPE.GROWTH_DUNGEON:
             return stageDefenses.growthDungeons;
         default:
             return [];
@@ -58,9 +58,9 @@ export function filterGrowthDungeonsByType(dungeonType: string): StageEntry[] {
 // ============================================================================
 
 export function getSubcategoryOptions(contentType: ContentType): Array<{ value: string; label: string }> {
-    if (contentType === 'stageHunt') {
+    if (contentType === CONTENT_TYPE.STAGE_HUNT) {
         const options: Array<{ value: string; label: string }> = [];
-        for (let ch = 1; ch <= 28; ch++) {
+        for (let ch = 1; ch <= MAX_CHAPTER_NUMBER; ch++) {
             options.push({
                 value: `chapter-${ch}`,
                 label: `Chapter ${ch}`
@@ -69,7 +69,7 @@ export function getSubcategoryOptions(contentType: ContentType): Array<{ value: 
         return options;
     }
 
-    if (contentType === 'growthDungeon') {
+    if (contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
         const types = ['Weapon', 'EXP', 'Equipment', 'Enhancement', 'Hero Training Ground'];
         return types.map(type => ({
             value: type,
@@ -87,17 +87,17 @@ export function getFilteredStageEntries(
     let entries: StageEntry[] = [];
     let prefix = '';
 
-    if (contentType === 'stageHunt') {
+    if (contentType === CONTENT_TYPE.STAGE_HUNT) {
         entries = filterStageHuntsByChapter(filter);
         prefix = 'stageHunt';
-    } else if (contentType === 'growthDungeon') {
+    } else if (contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
         entries = filterGrowthDungeonsByType(filter);
         prefix = 'growthDungeon';
-    } else if (contentType === 'chapterBoss') {
-        entries = getStageEntries('chapterBoss');
+    } else if (contentType === CONTENT_TYPE.CHAPTER_BOSS) {
+        entries = getStageEntries(CONTENT_TYPE.CHAPTER_BOSS);
         prefix = 'chapterBoss';
-    } else if (contentType === 'worldBoss') {
-        entries = getStageEntries('worldBoss');
+    } else if (contentType === CONTENT_TYPE.WORLD_BOSS) {
+        entries = getStageEntries(CONTENT_TYPE.WORLD_BOSS);
         prefix = 'worldBoss';
     }
 
@@ -116,11 +116,11 @@ export function formatStageLabel(
     const accuracy = entry.accuracy ? `, Acc: ${entry.accuracy}` : '';
     const defense = Math.floor(entry.defense * 100);
 
-    if (contentType === 'chapterBoss') {
+    if (contentType === CONTENT_TYPE.CHAPTER_BOSS) {
         return `Chapter ${identifier} (Def: ${defense}${accuracy})`;
     }
 
-    if (contentType === 'worldBoss') {
+    if (contentType === CONTENT_TYPE.WORLD_BOSS) {
         return `${identifier} (Def: ${defense}${accuracy})`;
     }
 
@@ -132,12 +132,12 @@ export function formatStageLabel(
 // ============================================================================
 
 export function requiresSubcategory(contentType: ContentType): boolean {
-    return contentType === 'stageHunt' || contentType === 'growthDungeon';
+    return contentType === CONTENT_TYPE.STAGE_HUNT || contentType === CONTENT_TYPE.GROWTH_DUNGEON;
 }
 
 export function requiresStageSelection(contentType: ContentType): boolean {
-    return contentType === 'chapterBoss' ||
-           contentType === 'worldBoss' ||
-           contentType === 'stageHunt' ||
-           contentType === 'growthDungeon';
+    return contentType === CONTENT_TYPE.CHAPTER_BOSS ||
+           contentType === CONTENT_TYPE.WORLD_BOSS ||
+           contentType === CONTENT_TYPE.STAGE_HUNT ||
+           contentType === CONTENT_TYPE.GROWTH_DUNGEON;
 }

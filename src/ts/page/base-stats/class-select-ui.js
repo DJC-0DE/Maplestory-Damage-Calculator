@@ -6,7 +6,7 @@ import {
   setSelectedClass,
   setSelectedJobTier
 } from "@core/state/state.js";
-import { CLASS, JOB_TIER } from "@ts/types";
+import { CLASS, JOB_TIER } from "@ts/types/constants.js";
 import {
   isStrMainStatClass,
   isDexMainStatClass,
@@ -16,14 +16,14 @@ import {
 import { syncMainStatsToHidden } from "./base-stats-ui.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
 const CLASSES = [
-  { id: "hero", name: "Hero", image: "media/classes/hero.png" },
-  { id: "dark-knight", name: "Dark Knight", image: "media/classes/dk.png" },
-  { id: "bowmaster", name: "Bowmaster", image: "media/classes/bowmaster.png" },
-  { id: "marksman", name: "Marksman", image: "media/classes/marksman.png" },
-  { id: "night-lord", name: "Night Lord", image: "media/classes/nl.png" },
-  { id: "shadower", name: "Shadower", image: "media/classes/shadower.png" },
-  { id: "arch-mage-il", name: "Arch Mage (I/L)", image: "media/classes/mage-il.png" },
-  { id: "arch-mage-fp", name: "Arch Mage (F/P)", image: "media/classes/mage-fp.png" }
+  { id: CLASS.HERO, name: "Hero", image: "media/classes/hero.png" },
+  { id: CLASS.DARK_KNIGHT, name: "Dark Knight", image: "media/classes/dk.png" },
+  { id: CLASS.BOWMASTER, name: "Bowmaster", image: "media/classes/bowmaster.png" },
+  { id: CLASS.MARKSMAN, name: "Marksman", image: "media/classes/marksman.png" },
+  { id: CLASS.NIGHT_LORD, name: "Night Lord", image: "media/classes/nl.png" },
+  { id: CLASS.SHADOWER, name: "Shadower", image: "media/classes/shadower.png" },
+  { id: CLASS.ARCH_MAGE_IL, name: "Arch Mage (I/L)", image: "media/classes/mage-il.png" },
+  { id: CLASS.ARCH_MAGE_FP, name: "Arch Mage (F/P)", image: "media/classes/mage-fp.png" }
 ];
 if (typeof window !== "undefined") {
   window.selectJobTier = selectJobTier;
@@ -165,10 +165,10 @@ function attachJobTierListeners() {
   const tier3rd = document.getElementById("job-tier-3rd");
   const tier4th = document.getElementById("job-tier-4th");
   if (tier3rd) {
-    tier3rd.addEventListener("click", () => selectJobTier("3rd"));
+    tier3rd.addEventListener("click", () => selectJobTier(JOB_TIER.THIRD));
   }
   if (tier4th) {
-    tier4th.addEventListener("click", () => selectJobTier("4th"));
+    tier4th.addEventListener("click", () => selectJobTier(JOB_TIER.FOURTH));
   }
 }
 function attachClassSelectEventListeners() {

@@ -4,6 +4,7 @@
  */
 
 import type { ClassName, ContentType } from '@ts/types';
+import { MASTERY_TYPE } from '@ts/types/constants';
 
 // Class Configuration Interface
 export interface ClassConfig {
@@ -29,14 +30,14 @@ export interface MasteryLevelBonus {
 
 // Mastery Data Interface
 export interface MasteryData {
-    all: MasteryLevelBonus[];
-    boss: MasteryLevelBonus[];
+    [MASTERY_TYPE.ALL]: MasteryLevelBonus[];
+    [MASTERY_TYPE.BOSS]: MasteryLevelBonus[];
 }
 
 // Mastery Bonus Entry Interface (for mastery-bonus.ts)
 export interface MasteryBonusEntry {
-    all: Record<string, number>;
-    boss: Record<string, number>;
+    [MASTERY_TYPE.ALL]: Record<string, number>;
+    [MASTERY_TYPE.BOSS]: Record<string, number>;
 }
 
 // Mastery Bonuses Interface (for mastery-bonus.ts)

@@ -8,9 +8,9 @@ window.toggleStatChart = toggleStatChart;
 const statWeightCharts = {};
 
 // Toggle stat weight chart visibility
-export function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
-    const chartId = `chart-${setup}-${statKey}`;
-    const rowId = `chart-row-${setup}-${statKey}`;
+export function toggleStatChart(statKey, statLabel, isFlat = false) {
+    const chartId = `chart-${statKey}`;
+    const rowId = `chart-row-${statKey}`;
     const chartRow = document.getElementById(rowId);
 
     if (!chartRow) return;
@@ -21,7 +21,7 @@ export function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
 
         // Create chart if it doesn't exist
         if (!statWeightCharts[chartId]) {
-            renderStatChart(setup, statKey, statLabel, isFlat);
+            renderStatChart(statKey, statLabel, isFlat);
         }
     } else {
         chartRow.style.display = 'none';
@@ -29,8 +29,8 @@ export function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
 }
 
 // Generate chart data for a stat
-export function generateStatChartData(setup, statKey, statLabel, isFlat) {
-    const stats = getStats(setup);
+export function generateStatChartData(statKey, statLabel, isFlat) {
+    const stats = getStats();
     const weaponAttackBonus = loadoutStore.getWeaponAttackBonus().totalAttack;
     const monsterType = statKey === 'bossDamage' ? 'boss' :
                        (statKey === 'normalDamage' ? 'normal' : 'boss');
@@ -64,13 +64,13 @@ export function generateStatChartData(setup, statKey, statLabel, isFlat) {
 }
 
 // Render stat weight chart
-export function renderStatChart(setup, statKey, statLabel, isFlat) {
-    const chartId = `chart-${setup}-${statKey}`;
+export function renderStatChart(statKey, statLabel, isFlat) {
+    const chartId = `chart-${statKey}`;
     const canvas = document.getElementById(chartId);
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const data = generateStatChartData(setup, statKey, statLabel, isFlat);
+    const data = generateStatChartData(statKey, statLabel, isFlat);
 
     // Destroy existing chart if it exists
     if (statWeightCharts[chartId]) {

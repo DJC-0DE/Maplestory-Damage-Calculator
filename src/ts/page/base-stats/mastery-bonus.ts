@@ -5,9 +5,10 @@ import { updateMasteryDisplay } from './mastery-bonus-ui';
 import type { JobTier } from '@ts/types/index';
 import type { MasteryBonuses } from '@ts/types/page/base-stats/base-stats.types';
 import { loadoutStore } from '@ts/store/loadout.store';
+import { MASTERY_TYPE } from '@ts/types/constants';
 
 if (typeof window !== 'undefined') {
-    (window as any).updateMasteryBonuses = updateMasteryBonuses;
+    window.updateMasteryBonuses = updateMasteryBonuses;
 }
 
 // ============================================================================
@@ -40,7 +41,7 @@ function saveMasteryCheckboxesToStore(tier: JobTier): void {
     for (const [level] of Object.entries(tierData.all)) {
         const checkbox = document.getElementById(`mastery-${tier}-all-${level}`) as HTMLInputElement;
         if (checkbox) {
-            loadoutStore.updateMasteryCheckbox(tier, 'all', level, checkbox.checked);
+            loadoutStore.updateMasteryCheckbox(tier, MASTERY_TYPE.ALL, level, checkbox.checked);
         }
     }
 
@@ -48,7 +49,7 @@ function saveMasteryCheckboxesToStore(tier: JobTier): void {
     for (const [level] of Object.entries(tierData.boss)) {
         const checkbox = document.getElementById(`mastery-${tier}-boss-${level}`) as HTMLInputElement;
         if (checkbox) {
-            loadoutStore.updateMasteryCheckbox(tier, 'boss', level, checkbox.checked);
+            loadoutStore.updateMasteryCheckbox(tier, MASTERY_TYPE.BOSS, level, checkbox.checked);
         }
     }
 }

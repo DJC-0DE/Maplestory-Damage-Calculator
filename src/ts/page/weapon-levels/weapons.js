@@ -1,4 +1,10 @@
 import { weaponBaseAttackEquipped, weaponUpgradeCosts, MAX_LEVELS_BY_STARS } from "@ts/types";
+import {
+  HIGH_TIER_RARITIES,
+  INVENTORY_DIVISOR_HIGH_TIER,
+  INVENTORY_DIVISOR_STANDARD,
+  MAX_WEAPON_UPGRADE_ITERATIONS
+} from "@ts/types/constants.js";
 function getWeaponLevelMultiplier(level) {
   if (!level || level <= 1) return 1;
   if (level <= 100) return 1 + 0.3 * (level - 1) / 100;
@@ -9,7 +15,7 @@ function getWeaponLevelMultiplier(level) {
   return 1 + 113.6 / 100;
 }
 function getInventoryDivisor(rarity) {
-  return ["legendary", "mystic", "ancient"].includes(rarity) ? 4 : 3.5;
+  return HIGH_TIER_RARITIES.includes(rarity) ? INVENTORY_DIVISOR_HIGH_TIER : INVENTORY_DIVISOR_STANDARD;
 }
 function calculateWeaponAttacks(rarity, tier, level) {
   const baseEquipped = weaponBaseAttackEquipped[rarity]?.[tier];
@@ -68,7 +74,7 @@ function calculateUpgradeGain(rarity, tier, currentLevel, stars, resources, isEq
   let remainingResources = resources;
   let totalCost = 0;
   let iterations = 0;
-  const maxIterations = 300;
+  const maxIterations = MAX_WEAPON_UPGRADE_ITERATIONS;
   while (level < maxLevel && remainingResources > 0 && iterations < maxIterations) {
     const cost = getUpgradeCost(rarity, tier, level);
     if (cost <= 0 || cost > remainingResources) break;

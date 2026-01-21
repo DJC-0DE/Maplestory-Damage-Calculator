@@ -1,17 +1,18 @@
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE } from "./constants.js";
 const DEFAULT_LOADOUT_DATA = {
   baseStats: {},
   character: {
     level: 0,
     class: null,
-    jobTier: "3rd"
+    jobTier: JOB_TIER.THIRD
   },
   weapons: {},
   mastery: {
-    "3rd": { all: {}, boss: {} },
-    "4th": { all: {}, boss: {} }
+    [JOB_TIER.THIRD]: { [MASTERY_TYPE.ALL]: {}, [MASTERY_TYPE.BOSS]: {} },
+    [JOB_TIER.FOURTH]: { [MASTERY_TYPE.ALL]: {}, [MASTERY_TYPE.BOSS]: {} }
   },
   target: {
-    contentType: "none",
+    contentType: CONTENT_TYPE.NONE,
     subcategory: null,
     selectedStage: null
   },
