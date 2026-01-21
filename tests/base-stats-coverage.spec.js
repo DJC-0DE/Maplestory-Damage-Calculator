@@ -16,19 +16,12 @@ import {
 } from './helpers/fixture-helpers.js';
 import {
   markElementCovered,
-  logCoverageReport,
   generateCoverageReport
 } from './helpers/coverage-tracker.js';
 import {
   HERO_LEVEL_60,
   HERO_LEVEL_120,
-  BOWMASTER_LEVEL_60,
-  ARCH_MAGE_IL_LEVEL_60,
-  NIGHT_LORD_LEVEL_60,
-  SHADOWER_LEVEL_60,
-  MARKSMAN_LEVEL_60,
-  ARCH_MAGE_FP_LEVEL_60,
-  DARK_KNIGHT_LEVEL_60
+  BOWMASTER_LEVEL_60
 } from './fixtures/base-stats.fixtures.js';
 
 test.describe('Base Stats - Element Inventory Validation', () => {
@@ -136,10 +129,6 @@ test.describe('Base Stats - Element Inventory Validation', () => {
     const report = generateCoverageReport();
     expect(report.categories.skillLevelInputs.tested).toBe(4);
     expect(report.categories.skillLevelInputs.percentage).toBe(100);
-  });
-
-  test.afterAll(async () => {
-    logCoverageReport();
   });
 });
 
@@ -366,23 +355,6 @@ test.describe('Base Stats - Edge Cases and Boundary Values', () => {
     await expect(page.locator(STAT_INPUTS.bossDamage)).toHaveValue('200');
     await expect(page.locator(STAT_INPUTS.damage)).toHaveValue('999');
   });
-
-  test('non-numeric input handling in stat fields', async ({ page }) => {
-    // Arrange
-    await page.click(CLASS_SELECTORS.archMageIL);
-    await page.waitForTimeout(100);
-
-    // Act - Input text/invalid characters
-    await page.fill(STAT_INPUTS.int, 'abc');
-    await page.fill(STAT_INPUTS.attack, '12.34.56');
-
-    // Assert - Inputs handle invalid input (may show empty or partial value)
-    const intValue = await page.locator(STAT_INPUTS.int).inputValue();
-    const attackValue = await page.locator(STAT_INPUTS.attack).inputValue();
-
-    // Either empty, partial, or original invalid value depending on browser
-    expect([intValue, 'abc', '']).toContain(intValue);
-  });
 });
 
 test.describe('Base Stats - State Validation and Persistence', () => {
@@ -569,8 +541,4 @@ test.describe('Base Stats - Integration with All Classes', () => {
     await expect(page.locator(STAT_ROWS.int)).toBeVisible();
     await expect(page.locator(STAT_ROWS.luk)).toBeVisible();
   });
-});
-
-test.afterAll(async () => {
-  logCoverageReport();
 });

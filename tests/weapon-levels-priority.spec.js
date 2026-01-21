@@ -19,10 +19,8 @@
 import { test, expect } from '@playwright/test';
 import {
     clearStorage,
-    verifySubTabActive,
     getPriorityChain,
     parsePriorityChain,
-    verifyCurrencyCalculator,
     switchToSubTab,
     setupWeapon,
     waitForCalculations,
@@ -30,10 +28,8 @@ import {
 } from './helpers/weapon-levels-helpers.js';
 import {
     applyWeaponLevelsFixture,
-    WEAPON_LEVELS_EMPTY,
     WEAPON_LEVELS_EARLY,
-    WEAPON_LEVELS_MID,
-    WEAPON_LEVELS_LATE
+    WEAPON_LEVELS_MID
 } from './fixtures/weapon-levels.fixtures.js';
 
 const BASE_URL = 'http://localhost:8000';
@@ -132,8 +128,8 @@ test.describe('Weapon Levels - Upgrade Priority Algorithm', () => {
 
             // Act - Change weapon level
             await switchToSubTab(page, 'weapons-grid');
-            await setWeaponLevel(page, 'normal', 't4', 50);
-            await waitForCalculations(page, 300);
+            await setWeaponLevel(page, 'normal', 't4', 120);
+            await waitForCalculations(page, 200);
 
             // Switch back to priority
             await switchToSubTab(page, 'upgrade-priority');
@@ -387,9 +383,6 @@ test.describe('Weapon Levels - Upgrade Priority Algorithm', () => {
 
             expect(normalMatch).not.toBeNull();
             expect(rareMatch).not.toBeNull();
-
-            const normalEfficiency = parseFloat(normalMatch[1]);
-            const rareEfficiency = parseFloat(rareMatch[1]);
 
             // Act - Check priority chain
             await page.locator('#weapon-levels-subtab-button').filter({ hasText: 'Upgrade Priority' }).click();

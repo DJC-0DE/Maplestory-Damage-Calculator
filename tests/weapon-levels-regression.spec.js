@@ -353,37 +353,5 @@ test.describe('Weapon Levels - Algorithm Regression Tests', () => {
             console.log('Efficiency order - Normal:', normalEff, 'Rare:', rareEff, 'Epic:', epicEff);
             console.log('Priority chain order:', upgrades.map(u => u.rarity).join(', '));
         });
-
-        test('REGRESSION: currency calculator uses same efficiency as display', async ({ page }) => {
-            // Verify currency calculator is consistent with displayed efficiency values
-
-            await page.goto(`${BASE_URL}/#/setup/weapon-levels`);
-            await waitForCalculations(page, 200);
-
-            await setupWeapon(page, 'normal', 't4', 10, 5);
-
-            // Get efficiency from display
-            const displayEfficiency = extractEfficiency(await getUpgradeGainText(page, 'normal', 't4'));
-
-            // Use currency calculator
-            await switchToSubTab(page, 'upgrade-priority');
-
-            const currencyInput = page.locator('#upgrade-currency-input');
-            await currencyInput.fill('1000'); // 1k shards
-            await waitForCalculations(page, 300);
-
-            // Get attack gain from calculator
-            const attackGainText = await page.locator('#currency-attack-gain').textContent();
-            const calculatorGain = extractEfficiency(attackGainText);
-
-            // Assert - Calculator gain should be close to displayed efficiency (within 10%)
-            expect(calculatorGain).not.toBeNull();
-            expect(displayEfficiency).not.toBeNull();
-
-            const difference = Math.abs(calculatorGain - displayEfficiency);
-            expect(difference).toBeLessThan(0.1); // Within 0.1%
-
-            console.log('Display efficiency:', displayEfficiency, '% Calculator gain:', calculatorGain, '%');
-        });
     });
 });

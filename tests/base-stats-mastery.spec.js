@@ -16,10 +16,8 @@ import {
   clearStorage
 } from './helpers/fixture-helpers.js';
 import {
-  markElementCovered,
-  logCoverageReport
+  markElementCovered
 } from './helpers/coverage-tracker.js';
-import { HERO_LEVEL_90 } from './fixtures/base-stats.fixtures.js';
 
 test.describe('Base Stats - Mastery Bonus Tables', () => {
   test.beforeEach(async ({ page }) => {
@@ -481,9 +479,5 @@ test.describe('Base Stats - Mastery Bonus Tables', () => {
       const skillMasteryBoss = await page.evaluate(() => document.getElementById('skill-mastery-boss-base').value);
       expect(skillMasteryBoss).toBe('10');
     });
-  });
-
-  test.afterAll(async () => {
-    logCoverageReport();
   });
 });

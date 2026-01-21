@@ -8,9 +8,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
     "baseUrl": "./src",
     "paths": {
-      "@ts/*": ["ts/*"]
+      "@ts/*": ["ts/*"],
+      "@core/*": ["core/*"],
+      "@utils/*": ["utils/*"],
+      "@data/*": ["data/*"],
+      "@ui/*": ["ui/*"],
+      "@types/*": ["ts/types/*"],
     }
   },
   "include": ["**/ts/**/*.ts"],

@@ -3,7 +3,8 @@
 
 import { calculateDamage } from '@core/calculations/damage-calculations.js';
 import { calculateMainStatPercentGain } from '@core/calculations/stat-calculations.js';
-import { getWeaponAttackBonus, getSelectedClass } from '@core/state/state.js';
+import { getSelectedClass } from '@core/state/state.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 import { calculateJobSkillPassiveGains } from './../features/skills/skill-coefficient.js';
 import { getCharacterLevel } from '../state/state.js';
 
@@ -33,11 +34,11 @@ export class StatCalculationService {
             // Explicit override provided
             this.weaponAttackBonus = weaponAttackBonus;
         } else {
-            // Auto-fetch from state
-            const result = getWeaponAttackBonus().totalAttack;
+            // Auto-fetch from loadout store
+            const result = loadoutStore.getWeaponAttackBonus().totalAttack;
 
             if (typeof result !== 'number' || isNaN(result) || result < 0) {
-                console.error('getWeaponAttackBonus returned unexpected value:', result, '- treating as 0');
+                console.error('loadoutStore.getWeaponAttackBonus returned unexpected value:', result, '- treating as 0');
                 this.weaponAttackBonus = 0;
             } else {
                 this.weaponAttackBonus = result;
@@ -66,7 +67,7 @@ export class StatCalculationService {
      */
     addAttack(value, applyWeaponBonus = true) {
         let finalAttackBonus = 0;
-
+  var classFinalAttackBonus = 0;
         const result = calculateJobSkillPassiveGains(this.context.selectedClass, getCharacterLevel(),
             {
                 firstJob: this.stats.firstJob,
@@ -74,7 +75,11 @@ export class StatCalculationService {
                 thirdJob: this.stats.thirdJob,
                 fourthJob: this.stats.fourthJob
             });
-        var classFinalAttackBonus = result.complexStatChanges['finalAttack'] ?? 0;
+
+            if(result.complexStatChanges)
+            {
+  classFinalAttackBonus = result.complexStatChanges['finalAttack'] ?? 0;
+            }   
 
         if (classFinalAttackBonus != 0) {
             finalAttackBonus = (1 + classFinalAttackBonus / 100);

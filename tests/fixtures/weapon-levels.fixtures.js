@@ -241,9 +241,11 @@ export async function applyWeaponLevelsFixture(page, fixture) {
             const isActive = i <= weaponData.stars;
             await starElement.evaluate((el, active) => {
                 if (active) {
-                    el.classList.add('active');
+                    el.click();
+                   // el.classList.add('active');
                 } else {
-                    el.classList.remove('active');
+                    el.click();
+                   // el.classList.remove('active');
                 }
             }, isActive);
         }
@@ -278,7 +280,6 @@ export async function clearWeaponLevels(page) {
             if (rarity === 'ancient' && tier === 't1') continue;
 
             const levelInput = page.locator(`#level-${rarity}-${tier}`);
-            const starsInput = page.locator(`#stars-${rarity}-${tier}`);
 
             try {
                 await levelInput.fill('0');

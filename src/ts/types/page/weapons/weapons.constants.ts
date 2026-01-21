@@ -1,8 +1,10 @@
+import type { WeaponUpgradeCosts, WeaponBaseAttackEquipped } from '@ts/types';
+
 // Weapon upgrade cost data generated from WeaponLevelCostTable.json
 // Tier mapping: T4 (data tier 1) -> tier 1, T3 (data tier 2) -> tier 2, etc.
 // Grade mapping: Grade1 -> normal, Grade2 -> rare, ..., Grade7 -> ancient
 
-export const weaponUpgradeCosts = {
+export const weaponUpgradeCosts: WeaponUpgradeCosts = {
     "normal": {
         "1": {
             "2": 18,
@@ -5445,3 +5447,41 @@ export const weaponUpgradeCosts = {
         }
     }
 };
+
+// Base attack % at level 1 for EQUIPPED weapons
+export const weaponBaseAttackEquipped: WeaponBaseAttackEquipped = {
+    'normal': { 't1': 25, 't2': 21, 't3': 18, 't4': 15 },
+    'rare': { 't1': 61.1, 't2': 48.9, 't3': 39.1, 't4': 31.3 },
+    'epic': { 't1': 149.3, 't2': 119.4, 't3': 95.5, 't4': 76.4 },
+    'unique': { 't1': 426.4, 't2': 328, 't3': 252.3, 't4': 194.1 },
+    'legendary': { 't1': 1217.8, 't2': 936.8, 't3': 720.6, 't4': 554.3 },
+    'mystic': { 't1': 3810.6, 't2': 2865.1, 't3': 2154.2, 't4': 1619.7 },
+    'ancient': { 't1': 0, 't2': 9375.5, 't3': 6944.8, 't4': 5144.3 }
+} as const;
+
+// Weapon tier array (highest to lowest)
+export const tiers = ['t4', 't3', 't2', 't1'] as const;
+
+// Weapon rarity array (lowest to highest)
+export const rarities = ['normal', 'rare', 'epic', 'unique', 'legendary', 'mystic', 'ancient'] as const;
+
+// Rarity colors for UI display
+export const rarityColors = {
+    'Legendary': '#33ce85',
+    'Unique': '#ffd26d',
+    'Epic': '#9966ff',
+    'Rare': '#88bbff',
+    'Normal': '#cccccc',
+    'Mystic': '#ff3f42',
+    'Ancient': '#2266cc'
+} as const;
+
+// Maximum weapon level for each star rating
+export const MAX_LEVELS_BY_STARS: Record<number, number> = {
+    0: 100,
+    1: 120,
+    2: 140,
+    3: 160,
+    4: 180,
+    5: 200
+} as const;

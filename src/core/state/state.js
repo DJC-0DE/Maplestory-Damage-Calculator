@@ -1,13 +1,10 @@
 // Pure state extraction - no UI, no calculations
 import { stageData } from '@data/stage-data.js';
-import { calculateWeaponAttacks } from '@core/weapon-levels/weapon-calculations.js';
-import { itemStatProperties, allItemStatProperties, rarities, tiers } from '@core/constants.js';
+import { itemStatProperties, allItemStatProperties } from '@core/constants.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 // Handles reading DOM state into structured data
 
 let currentContentType = 'none';
-let selectedClass = null;
-let selectedJobTier = '3rd';
-let characterLevel = 0;
 
 export function getCurrentContentType() {
     return currentContentType;
@@ -18,27 +15,27 @@ export function setCurrentContentType(type) {
 }
 
 export function getSelectedClass() {
-    return selectedClass;
+    return loadoutStore.getSelectedClass();
 }
 
 export function setSelectedClass(className) {
-    selectedClass = className;
+    loadoutStore.setSelectedClass(className);
 }
 
 export function setSelectedJobTier(jobTier) {
-    selectedJobTier = jobTier;
+    loadoutStore.setSelectedJobTier(jobTier);
 }
 
 export function getSelectedJobTier() {
-    return selectedJobTier;
+    return loadoutStore.getSelectedJobTier();
 }
 
 export function getCharacterLevel() {
-    return characterLevel;
+    return loadoutStore.getCharacterLevel();
 }
 
 export function setCharacterLevel(level) {
-    characterLevel = parseInt(level) || 0;
+    loadoutStore.setCharacterLevel(parseInt(level) || 0);
 }
 
 export function getStats(setup) {
@@ -732,34 +729,6 @@ export function setLockedMainCompanion(optimalType, companionKey) {
     }
 }
 
-
-export function getWeaponAttackBonus() {
-    let totalInventory = 0;
-    let equippedBonus = 0;
-
-    rarities.forEach(rarity => {
-        tiers.forEach(tier => {
-            const levelInput = document.getElementById(`level-${rarity}-${tier}`);
-            const equippedDisplay = document.getElementById(`equipped-display-${rarity}-${tier}`);
-            if (!levelInput) return;
-
-            const level = parseInt(levelInput.value) || 0;
-            if (level === 0) return;
-
-            const { inventoryAttack, equippedAttack } = calculateWeaponAttacks(rarity, tier, level);
-            totalInventory += inventoryAttack;
-
-            if (equippedDisplay && equippedDisplay.style.display !== 'none') {
-                equippedBonus = equippedAttack;
-            }
-        });
-    });
-
-    return {
-        totalAttack: totalInventory + equippedBonus,
-        equippedAttack: equippedBonus
-    };
-}
 
 /**
  * Calculate total scrolling contributions from all equipment slots

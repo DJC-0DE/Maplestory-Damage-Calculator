@@ -18,23 +18,15 @@
 import { test, expect } from '@playwright/test';
 import {
     clearStorage,
-    verifyWeaponStats,
-    verifySummaryStats,
     verifySubTabActive,
-    getWeaponLevelFromStorage,
-    getWeaponStarsFromStorage,
-    getEquippedWeaponFromStorage,
     markElementCovered,
     switchToSubTab,
     setupWeapon,
     testCrossTabPersistence,
-    waitForCalculations,
-    verifyUpgradeGainVisible,
-    verifyStarStates
+    waitForCalculations
 } from './helpers/weapon-levels-helpers.js';
 import {
     applyWeaponLevelsFixture,
-    WEAPON_LEVELS_EMPTY,
     WEAPON_LEVELS_EARLY,
     WEAPON_LEVELS_MID
 } from './fixtures/weapon-levels.fixtures.js';
@@ -62,9 +54,9 @@ test.describe('Weapon Levels - Main User Workflows', () => {
             await verifySubTabActive(page, 'weapons-grid');
 
             // Assert - Verify summary stats show 0
-            await expect(page.locator('#total-inventory-attack')).toHaveText('0%');
-            await expect(page.locator('#equipped-weapon-attack-pct')).toHaveText('0%');
-            await expect(page.locator('#total-weapon-attack')).toHaveText('0%');
+            await expect(page.locator('#total-inventory-attack')).toHaveText('0.0%');
+            await expect(page.locator('#equipped-weapon-attack-pct')).toHaveText('0.0%');
+            await expect(page.locator('#total-weapon-attack')).toHaveText('0.0%');
 
             // Assert - Verify all level inputs are 0
             const levelInputs = page.locator('input[id^="level-"]');
@@ -386,7 +378,6 @@ test.describe('Weapon Levels - Main User Workflows', () => {
             await applyWeaponLevelsFixture(page, WEAPON_LEVELS_EARLY);
 
             const originalLevel = '25';
-            const originalStars = '2';
             const originalTotal = await page.locator('#total-inventory-attack').textContent();
 
             // Act - Reload page
@@ -395,7 +386,11 @@ test.describe('Weapon Levels - Main User Workflows', () => {
 
             // Assert - All values restored
             await expect(page.locator('#level-normal-t4')).toHaveValue(originalLevel);
-            await expect(page.locator('#stars-normal-t4')).toHaveValue(originalStars);
+            await expect(page.locator('#star-normal-t4-1')).toHaveClass('star-individual active');
+            await expect(page.locator('#star-normal-t4-2')).toHaveClass('star-individual active');
+            await expect(page.locator('#star-normal-t4-3')).not.toHaveClass('star-individual');
+            await expect(page.locator('#star-normal-t4-4')).not.toHaveClass('star-individual');
+            await expect(page.locator('#star-normal-t4-5')).not.toHaveClass('star-individual');
             await expect(page.locator('#total-inventory-attack')).toHaveText(originalTotal);
 
             markElementCovered('reload-persistence');

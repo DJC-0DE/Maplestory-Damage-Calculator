@@ -1,76 +1,28 @@
 // Base Stats UI - HTML Generation and Event Handlers
 // This file handles all HTML generation and UI event handling for the base stats tab
 
-import { selectClass, selectJobTier, selectMasteryTab, getStatType } from './class-select.js';
-import { updateMasteryBonuses } from './mastery-bonus.js';
-import { updateSkillCoefficient } from './base-stats.js';
-import { saveToLocalStorage, updateAnalysisTabs } from '@core/state/storage.js';
-import { selectContentType, updateStageDropdown } from './target-select.js';
-import { extractText, parseBaseStatText } from '@utils/ocr.js';
-import { getSelectedClass } from '@core/state/state.js';
-import { showToast } from '@utils/notifications.js';
-import { syncMainStatsToHidden } from '../main.js';
+import { getStatType, isDexMainStatClass, isIntMainStatClass, isLukMainStatClass, isStrMainStatClass } from './class-select';
+import { generateClassSelectorHTML } from './class-select-ui';
+import { generateContentTypeSelectorHTML } from './target-select-ui';
+import {
+    generateMasterySectionHTML,
+    generateMasteryHiddenInputs
+} from './mastery-bonus-ui';
+import { updateSkillCoefficient } from './base-stats';
+import { updateAnalysisTabs } from '@core/state/storage';
+import { extractText, parseBaseStatText } from '@utils/ocr';
+import { getSelectedClass } from '@core/state/state';
+import { showToast } from '@utils/notifications';
+import type { StatInputConfig } from '@ts/types/page/base-stats/base-stats.types';
+import { loadoutStore } from '@ts/store/loadout.store';
 
 // Import calculate dynamically to avoid circular dependency
-function getCalculateFunction() {
-    return window.calculate;
+function getCalculateFunction(): (() => void) | undefined {
+    return (window as any).calculate;
 }
 
-// Classes configuration for generating class selector HTML
-export const CLASSES = [
-    { id: 'hero', name: 'Hero', image: 'media/classes/hero.png' },
-    { id: 'dark-knight', name: 'Dark Knight', image: 'media/classes/dk.png' },
-    { id: 'bowmaster', name: 'Bowmaster', image: 'media/classes/bowmaster.png' },
-    { id: 'marksman', name: 'Marksman', image: 'media/classes/marksman.png' },
-    { id: 'night-lord', name: 'Night Lord', image: 'media/classes/nl.png' },
-    { id: 'shadower', name: 'Shadower', image: 'media/classes/shadower.png' },
-    { id: 'arch-mage-il', name: 'Arch Mage (I/L)', image: 'media/classes/mage-il.png' },
-    { id: 'arch-mage-fp', name: 'Arch Mage (F/P)', image: 'media/classes/mage-fp.png' }
-];
-
-// Content type configuration for generating content selector HTML
-export const CONTENT_TYPES = [
-    { id: 'none', name: 'None', icon: '🎯', title: 'Training Dummy' },
-    { id: 'stageHunt', name: 'Stage Hunt', icon: '🗺️', title: 'Stage Hunt' },
-    { id: 'chapterBoss', name: 'Chapter Boss', icon: '👑', title: 'Chapter Boss' },
-    { id: 'worldBoss', name: 'World Boss', icon: '🌍', title: 'World Boss' },
-    { id: 'growthDungeon', name: 'Growth Dungeon', icon: '📈', title: 'Growth Dungeon' }
-];
-
-// Mastery bonus configuration for 3rd job
-const MASTERY_3RD = {
-    all: [
-        { level: 64, bonus: 10 },
-        { level: 68, bonus: 11 },
-        { level: 76, bonus: 12 },
-        { level: 80, bonus: 13 },
-        { level: 88, bonus: 14 },
-        { level: 92, bonus: 15 }
-    ],
-    boss: [
-        { level: 72, bonus: 10 },
-        { level: 84, bonus: 10 }
-    ]
-};
-
-// Mastery bonus configuration for 4th job
-const MASTERY_4TH = {
-    all: [
-        { level: 102, bonus: 10 },
-        { level: 106, bonus: 11 },
-        { level: 116, bonus: 12 },
-        { level: 120, bonus: 13 },
-        { level: 128, bonus: 14 },
-        { level: 132, bonus: 15 }
-    ],
-    boss: [
-        { level: 111, bonus: 10 },
-        { level: 124, bonus: 10 }
-    ]
-};
-
 // Stat input configuration for generating stat input HTML
-const STAT_INPUTS = [
+const STAT_INPUTS: StatInputConfig[] = [
     // Core Combat Stats
     { id: 'attack-base', label: 'Attack', type: 'number', value: 500 },
     { id: 'defense-base', label: 'Defense', type: 'number', value: 0, info: 'defense' },
@@ -104,41 +56,15 @@ const STAT_INPUTS = [
 ];
 
 /**
- * Generate HTML for class selector cards
- */
-function generateClassSelectorHTML() {
-    return CLASSES.map(cls => `
-        <div id="class-${cls.id}" class="class-selector bgstats-class-card" title="${cls.title || cls.name}">
-            <div class="bgstats-class-image-wrapper">
-                <img src="${cls.image}" alt="${cls.name}" class="bgstats-class-image">
-            </div>
-            <span class="bgstats-class-name">${cls.name}</span>
-        </div>
-    `).join('');
-}
-
-/**
- * Generate HTML for content type selector cards
- */
-function generateContentTypeSelectorHTML() {
-    return CONTENT_TYPES.map(content => `
-        <div id="content-${content.id}" class="content-type-selector bgstats-content-card" title="${content.title}">
-            <span class="bgstats-content-icon">${content.icon}</span>
-            <span class="bgstats-content-name">${content.name}</span>
-        </div>
-    `).join('');
-}
-
-/**
  * Generate HTML for a single stat input row
  */
-function generateStatInputHTML(stat) {
+function generateStatInputHTML(stat: StatInputConfig): string {
     const infoIcon = stat.info
         ? `<span class="bgstats-info-inline" role="img" aria-label="Info" onclick="openHelpSidebar('${stat.info}')">?</span>`
         : '';
 
     const onChangeAttr = stat.onChange
-        ? 'onchange="updateSkillCoefficient(); saveToLocalStorage()"'
+        ? 'onchange="updateSkillCoefficient()"'
         : '';
 
     const hiddenStyle = stat.hidden ? 'style="display: none;"' : '';
@@ -157,7 +83,7 @@ function generateStatInputHTML(stat) {
 /**
  * Generate HTML for stat inputs
  */
-function generateStatInputsHTML() {
+function generateStatInputsHTML(): string {
     let html = '';
 
     // Core Combat Stats
@@ -188,8 +114,7 @@ function generateStatInputsHTML() {
     html += `
         <input type="hidden" id="primary-main-stat-base" value="1000">
         <input type="hidden" id="secondary-main-stat-base" value="0">
-        <input type="hidden" id="skill-mastery-base" value="21">
-        <input type="hidden" id="skill-mastery-boss-base" value="0">
+        ${generateMasteryHiddenInputs()}
         <input type="hidden" id="skill-coeff-base" value="0">
     `;
 
@@ -197,87 +122,9 @@ function generateStatInputsHTML() {
 }
 
 /**
- * Generate HTML for mastery table rows
- */
-function generateMasteryTableRows(tier, type) {
-    const masteryData = tier === '3rd' ? MASTERY_3RD : MASTERY_4TH;
-    const items = masteryData[type];
-
-    let rows = '';
-    const allLevels = new Set();
-    const bossLevels = new Set();
-
-    // Collect all levels from both types
-    masteryData.all.forEach(item => allLevels.add(item.level));
-    masteryData.boss.forEach(item => bossLevels.add(item.level));
-
-    // Sort all unique levels
-    const sortedLevels = Array.from(allLevels).sort((a, b) => a - b);
-
-    // Add boss-only levels that aren't in all
-    bossLevels.forEach(level => {
-        if (!allLevels.has(level)) {
-            sortedLevels.push(level);
-        }
-    });
-    sortedLevels.sort((a, b) => a - b);
-
-    sortedLevels.forEach(level => {
-        const allItem = masteryData.all.find(item => item.level === level);
-        const bossItem = masteryData.boss.find(item => item.level === level);
-
-        const allCell = allItem
-            ? `<label class="bgstats-checkbox-label">
-                <input type="checkbox" id="mastery-${tier}-all-${level}" class="bgstats-checkbox">
-                <span class="bgstats-checkbox-text">${allItem.bonus}%</span>
-               </label>`
-            : '—';
-
-        const bossCell = bossItem
-            ? `<label class="bgstats-checkbox-label">
-                <input type="checkbox" id="mastery-${tier}-boss-${level}" class="bgstats-checkbox">
-                <span class="bgstats-checkbox-text">${bossItem.bonus}%</span>
-               </label>`
-            : '—';
-
-        rows += `
-            <tr class="bgstats-table-row">
-                <td class="bgstats-table-td level-cell">${level}</td>
-                <td class="bgstats-table-td">${allCell}</td>
-                <td class="bgstats-table-td ${!bossItem ? 'empty-cell' : ''}">${bossCell}</td>
-            </tr>
-        `;
-    });
-
-    return rows;
-}
-
-/**
- * Generate HTML for mastery table
- */
-function generateMasteryTableHTML(tier) {
-    return `
-        <div id="mastery-table-${tier}" class="bgstats-mastery-table" ${tier === '4th' ? 'style="display: none;"' : ''}>
-            <table class="bgstats-table">
-                <thead>
-                    <tr>
-                        <th class="bgstats-table-th">Level</th>
-                        <th class="bgstats-table-th">All Monsters</th>
-                        <th class="bgstats-table-th">Boss Only</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${generateMasteryTableRows(tier)}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
-/**
  * Generate the complete HTML for the base stats tab
  */
-export function generateBaseStatsHTML() {
+export function generateBaseStatsHTML(): string {
     return `
         <!-- Base Stats Container - Premium aesthetic with subtle depth -->
         <div class="bgstats-premium-container bg-transparent p-2">
@@ -332,19 +179,7 @@ export function generateBaseStatsHTML() {
 
                     <!-- Right Column: Skill Mastery and Target Content -->
                     <div class="right-column-stack">
-                        <!-- Skill Mastery Section - Premium redesign -->
-                        <div class="bgstats-mastery-section">
-                            <label class="bgstats-mastery-title">Skill Mastery Bonus <span class="bgstats-info-inline" role="img" aria-label="Info" onclick="openHelpSidebar('skill-mastery')">?</span></label>
-
-                            <!-- Mastery Job Tabs - Unified control -->
-                            <div class="bgstats-mastery-tabs">
-                                <button id="mastery-tab-3rd" class="bgstats-mastery-tab active">3rd Job</button>
-                                <button id="mastery-tab-4th" class="bgstats-mastery-tab">4th Job</button>
-                            </div>
-
-                            ${generateMasteryTableHTML('3rd')}
-                            ${generateMasteryTableHTML('4th')}
-                        </div>
+                        ${generateMasterySectionHTML()}
 
                         <!-- Target Content Type Section - Premium redesign -->
                         <div class="bgstats-target-section">
@@ -415,91 +250,16 @@ export function generateBaseStatsHTML() {
 }
 
 /**
- * Attach event listeners to class selector cards
- */
-function attachClassSelectorListeners() {
-    CLASSES.forEach(cls => {
-        const element = document.getElementById(`class-${cls.id}`);
-        if (element) {
-            element.addEventListener('click', () => selectClass(cls.id));
-        }
-    });
-}
-
-/**
- * Attach event listeners to content type selector cards
- */
-function attachContentTypeSelectorListeners() {
-    CONTENT_TYPES.forEach(content => {
-        const element = document.getElementById(`content-${content.id}`);
-        if (element) {
-            element.addEventListener('click', () => selectContentType(content.id));
-        }
-    });
-}
-
-/**
- * Attach event listeners to job tier buttons
- */
-function attachJobTierListeners() {
-    const tier3rd = document.getElementById('job-tier-3rd');
-    const tier4th = document.getElementById('job-tier-4th');
-
-    if (tier3rd) {
-        tier3rd.addEventListener('click', () => selectJobTier('3rd'));
-    }
-    if (tier4th) {
-        tier4th.addEventListener('click', () => selectJobTier('4th'));
-    }
-}
-
-/**
- * Attach event listeners to mastery tab buttons
- */
-function attachMasteryTabListeners() {
-    const tab3rd = document.getElementById('mastery-tab-3rd');
-    const tab4th = document.getElementById('mastery-tab-4th');
-
-    if (tab3rd) {
-        tab3rd.addEventListener('click', () => selectMasteryTab('3rd'));
-    }
-    if (tab4th) {
-        tab4th.addEventListener('click', () => selectMasteryTab('4th'));
-    }
-}
-
-/**
- * Attach event listeners to mastery checkboxes
- */
-function attachMasteryCheckboxListeners() {
-    ['3rd', '4th'].forEach(tier => {
-        const masteryData = tier === '3rd' ? MASTERY_3RD : MASTERY_4TH;
-
-        masteryData.all.forEach(item => {
-            const checkbox = document.getElementById(`mastery-${tier}-all-${item.level}`);
-            if (checkbox) {
-                checkbox.addEventListener('change', () => updateMasteryBonuses());
-            }
-        });
-
-        masteryData.boss.forEach(item => {
-            const checkbox = document.getElementById(`mastery-${tier}-boss-${item.level}`);
-            if (checkbox) {
-                checkbox.addEventListener('change', () => updateMasteryBonuses());
-            }
-        });
-    });
-}
-
-/**
  * Attach event listeners to character level input
  */
-function attachCharacterLevelListener() {
-    const levelInput = document.getElementById('character-level');
+function attachCharacterLevelListener(): void {
+    const levelInput = document.getElementById('character-level') as HTMLInputElement;
     if (levelInput) {
         levelInput.addEventListener('change', () => {
+            const level = parseInt(levelInput.value) || 0;
             updateSkillCoefficient();
-            saveToLocalStorage();
+            // Save via loadout store (auto dual-writes to localStorage)
+            loadoutStore.updateCharacter({ level });
         });
     }
 }
@@ -507,12 +267,12 @@ function attachCharacterLevelListener() {
 /**
  * Attach event listeners to sub-tab buttons
  */
-function attachSubTabListeners() {
+function attachSubTabListeners(): void {
     const subTabContainer = document.querySelector('.optimization-sub-tabs');
     if (!subTabContainer) return;
 
     const buttons = subTabContainer.querySelectorAll('.optimization-sub-tab-button');
-    const subTabs = {
+    const subTabs: Record<string, string> = {
         'Stats': 'character-stats',
         'Skill Mastery': 'skill-mastery',
         'Skill Details': 'skill-details'
@@ -520,7 +280,7 @@ function attachSubTabListeners() {
 
     buttons.forEach(button => {
         button.addEventListener('click', () => {
-            const tabName = subTabs[button.textContent];
+            const tabName = subTabs[button.textContent || ''];
             if (tabName) {
                 switchBaseStatsSubTab(tabName);
             }
@@ -529,43 +289,26 @@ function attachSubTabListeners() {
 }
 
 /**
- * Attach event listeners to target content dropdowns
- */
-function attachTargetContentListeners() {
-    const subcategorySelect = document.getElementById('target-subcategory');
-    const stageSelect = document.getElementById('target-stage-base');
-
-    if (subcategorySelect) {
-        subcategorySelect.addEventListener('change', () => updateStageDropdown());
-    }
-
-    if (stageSelect) {
-        stageSelect.addEventListener('change', () => {
-            saveToLocalStorage();
-            updateAnalysisTabs();
-        });
-    }
-}
-
-/**
  * Attach event listener for paste area (OCR stat extraction)
  */
-function attachPasteAreaListener() {
+function attachPasteAreaListener(): void {
     const pasteArea = document.getElementById('base-stats-paste-image-section');
     if (!pasteArea) return;
 
-    pasteArea.addEventListener('paste', async (event) => {
-        const items = Array.from(event.clipboardData.items);
+    pasteArea.addEventListener('paste', async (event: ClipboardEvent) => {
+        const items = Array.from(event.clipboardData?.items || []);
         const pastedImage = items.filter(x => x.type.startsWith("image/"))[0];
         if (!pastedImage) return;
 
         const file = pastedImage.getAsFile();
+        if (!file) return;
+
         const imageURL = URL.createObjectURL(file);
         const extractedText = await extractText(imageURL, false);
         try {
             const parsedStats = parseBaseStatText(extractedText);
             for (const parsedStat of parsedStats) {
-                const inputElement = document.getElementById(parsedStat[0]);
+                const inputElement = document.getElementById(parsedStat[0]) as HTMLInputElement;
                 if (inputElement) {
                     inputElement.value = parsedStat[1];
                     // Add a permanent outline until the input is changed again
@@ -575,14 +318,14 @@ function attachPasteAreaListener() {
                     }, { once: true });
 
                     const className = getSelectedClass();
-                    const primaryInput = document.getElementById('primary-main-stat-base');
-                    const secondaryInput = document.getElementById('secondary-main-stat-base');
+                    const primaryInput = document.getElementById('primary-main-stat-base') as HTMLInputElement;
+                    const secondaryInput = document.getElementById('secondary-main-stat-base') as HTMLInputElement;
 
                     const statType = getStatType(className, parsedStat[0]);
                     if (statType === 'primary') {
-                        primaryInput.value = parsedStat[1] || 1000;
+                        primaryInput.value = parsedStat[1] || '1000';
                     } else if (statType === 'secondary') {
-                        secondaryInput.value = parsedStat[1] || 1000;
+                        secondaryInput.value = parsedStat[1] || '1000';
                     }
                 }
             }
@@ -593,13 +336,21 @@ function attachPasteAreaListener() {
                 showToast("Parsing failed! Make sure you are ONLY screenshotting the stats rows from the Character page and nothing else", false);
             }
 
-            saveToLocalStorage();
+            // Save all parsed stats via loadout store (auto dual-writes to localStorage)
+            const baseStatUpdates: Record<string, number> = {};
+            for (const parsedStat of parsedStats) {
+                const key = parsedStat[0].replace('-base', '');
+                const value = parseFloat(parsedStat[1]) || 0;
+                baseStatUpdates[key] = value;
+            }
+            loadoutStore.updateBaseStats(baseStatUpdates);
+
             const calculate = getCalculateFunction();
             if (calculate) calculate();
         }
         catch (e) {
             console.error(e);
-            showToast(e, false);
+            showToast(String(e), false);
         }
     });
 }
@@ -607,30 +358,90 @@ function attachPasteAreaListener() {
 /**
  * Attach event listeners to main stat inputs for syncing with hidden fields
  */
-function attachMainStatSyncListeners() {
-    const strInput = document.getElementById('str-base');
-    const dexInput = document.getElementById('dex-base');
-    const intInput = document.getElementById('int-base');
-    const lukInput = document.getElementById('luk-base');
+function attachMainStatSyncListeners(): void {
+    const strInput = document.getElementById('str-base') as HTMLInputElement;
+    const dexInput = document.getElementById('dex-base') as HTMLInputElement;
+    const intInput = document.getElementById('int-base') as HTMLInputElement;
+    const lukInput = document.getElementById('luk-base') as HTMLInputElement;
 
     [strInput, dexInput, intInput, lukInput].forEach(input => {
         if (input) {
             input.addEventListener('input', () => {
                 syncMainStatsToHidden();
-                saveToLocalStorage();
+                // Save via loadout store (auto dual-writes to localStorage)
+                const value = parseFloat(input.value) || 0;
+                const key = input.id.replace('-base', '');
+                loadoutStore.updateBaseStat(key, value);
             });
         }
     });
 }
 
 /**
+ * Attach event listeners to all stat inputs for saving to loadout store
+ */
+function attachStatInputListeners(): void {
+    // All stat input IDs
+    const statInputIds = [
+        'attack-base', 'defense-base', 'crit-rate-base', 'crit-damage-base', 'attack-speed-base',
+        'stat-damage-base', 'damage-base', 'damage-amp-base', 'def-pen-base',
+        'boss-damage-base', 'normal-damage-base', 'min-damage-base', 'max-damage-base', 'final-damage-base',
+        'skill-level-1st-base', 'skill-level-2nd-base', 'skill-level-3rd-base', 'skill-level-4th-base',
+        'main-stat-pct-base'
+    ];
+
+    statInputIds.forEach(id => {
+        const input = document.getElementById(id) as HTMLInputElement;
+        if (input) {
+            input.addEventListener('input', () => {
+                const value = parseFloat(input.value) || 0;
+                const key = id.replace('-base', '');
+                loadoutStore.updateBaseStat(key, value);
+            });
+        }
+    });
+}
+
+// Sync main stat inputs (STR, DEX, INT, LUK) with hidden primary/secondary fields
+export function syncMainStatsToHidden() {
+    const className = getSelectedClass();
+    const strInput = document.getElementById('str-base') as HTMLInputElement;
+    const dexInput = document.getElementById('dex-base') as HTMLInputElement;
+    const intInput = document.getElementById('int-base') as HTMLInputElement;
+    const lukInput = document.getElementById('luk-base') as HTMLInputElement;
+    const primaryInput = document.getElementById('primary-main-stat-base') as HTMLInputElement;
+    const secondaryInput = document.getElementById('secondary-main-stat-base') as HTMLInputElement;
+
+    if (!primaryInput || !secondaryInput) return;
+
+    // Map class to primary/secondary stats
+    if (isStrMainStatClass(className)) {
+        // Warriors: STR (primary), DEX (secondary)
+        if (strInput) primaryInput.value = strInput.value || '1000';
+        if (dexInput) secondaryInput.value = dexInput.value || '0';
+    } else if (isDexMainStatClass(className)) {
+        // Archers: DEX (primary), STR (secondary)
+        if (dexInput) primaryInput.value = dexInput.value || '1000';
+        if (strInput) secondaryInput.value = strInput.value || '0';
+    } else if (isIntMainStatClass(className)) {
+        // Mages: INT (primary), LUK (secondary)
+        if (intInput) primaryInput.value = intInput.value || '1000';
+        if (lukInput) secondaryInput.value = lukInput.value || '0';
+    } else if (isLukMainStatClass(className)) {
+        // Thieves: LUK (primary), DEX (secondary)
+        if (lukInput) primaryInput.value = lukInput.value || '1000';
+        if (dexInput) secondaryInput.value = dexInput.value || '0';
+    }
+}
+
+/**
  * Switch between base stats sub-tabs
  */
-function switchBaseStatsSubTab(subTabName) {
+function switchBaseStatsSubTab(subTabName: string): void {
     // Hide all sub-tabs
     const subTabs = document.querySelectorAll('.base-stats-subtab');
     subTabs.forEach(tab => {
-        tab.style.display = 'none';
+        (tab as HTMLElement).style.display = 'none';
     });
 
     // Show the selected sub-tab
@@ -646,45 +457,82 @@ function switchBaseStatsSubTab(subTabName) {
     });
 
     // Activate button by index
-    const tabIndex = { 'character-stats': 0, 'skill-mastery': 1, 'skill-details': 2 }[subTabName];
-    if (tabIndex !== undefined && buttons[tabIndex]) {
-        buttons[tabIndex].classList.add('active');
+    const tabIndex: Record<string, number> = { 'character-stats': 0, 'skill-mastery': 1, 'skill-details': 2 };
+    if (tabIndex[subTabName] !== undefined && buttons[tabIndex[subTabName]]) {
+        buttons[tabIndex[subTabName]].classList.add('active');
     }
 
     // If switching to skill details, populate the skills (handled by main.js)
     if (subTabName === 'skill-details') {
         // Trigger populateSkillDetails from main.js via window
-        if (window.populateSkillDetails) {
-            window.populateSkillDetails();
+        if ((window as any).populateSkillDetails) {
+            (window as any).populateSkillDetails();
         }
     }
 }
 
 /**
- * Initialize the base stats UI
+ * Initialize the base stats UI - generates HTML only
  */
-export function initializeBaseStatsUI() {
+export function initializeBaseStatsUI(): void {
     const container = document.getElementById('setup-base-stats');
     if (!container) {
         console.error('Base stats container not found');
         return;
     }
 
-    // Generate HTML
+    // Generate HTML only - no event listeners attached here
     container.innerHTML = generateBaseStatsHTML();
+}
 
-    // Attach all event listeners
-    attachClassSelectorListeners();
-    attachContentTypeSelectorListeners();
-    attachJobTierListeners();
-    attachMasteryTabListeners();
-    attachMasteryCheckboxListeners();
+/**
+ * Load base stats UI from saved state
+ */
+export function loadBaseStatsUI(): void {
+    const character = loadoutStore.getCharacter();
+    const baseStats = loadoutStore.getBaseStats();
+
+    // Load character level
+    const levelInput = document.getElementById('character-level') as HTMLInputElement;
+    if (levelInput && character.level > 0) {
+        levelInput.value = character.level.toString();
+    }
+
+    // Load all stat inputs from store
+    const statInputIds = [
+        'attack', 'defense', 'crit-rate', 'crit-damage', 'attack-speed',
+        'str', 'dex', 'int', 'luk',
+        'stat-damage', 'damage', 'damage-amp', 'def-pen',
+        'boss-damage', 'normal-damage', 'min-damage', 'max-damage', 'final-damage',
+        'skill-level-1st', 'skill-level-2nd', 'skill-level-3rd', 'skill-level-4th',
+        'main-stat-pct'
+    ];
+
+    statInputIds.forEach(key => {
+        // Only set value if the key exists in baseStats (even if value is 0)
+        // If key doesn't exist, let the HTML default value be used
+        if (key in baseStats) {
+            const input = document.getElementById(`${key}-base`) as HTMLInputElement;
+            if (input) {
+                input.value = baseStats[key].toString();
+            }
+        }
+    });
+
+    // Sync main stats to hidden fields
+    syncMainStatsToHidden();
+}
+
+/**
+ * Attach all event listeners for the base stats UI
+ */
+export function attachBaseStatsEventListeners(): void {
     attachCharacterLevelListener();
     attachSubTabListeners();
-    attachTargetContentListeners();
     attachPasteAreaListener();
     attachMainStatSyncListeners();
+    attachStatInputListeners();
 }
 
 // Expose switchBaseStatsSubTab to window for global access
-window.switchBaseStatsSubTab = switchBaseStatsSubTab;
+(window as any).switchBaseStatsSubTab = switchBaseStatsSubTab;

@@ -2,7 +2,7 @@
 // Provides item comparison functionality using StatCalculationService and skill services
 
 import { StatCalculationService } from './stat-calculation-service.js';
-import { getWeaponAttackBonus } from '@core/state/state.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 import { SkillCoefficientService, SkillPassiveGainsService } from './skill-service.js';
 
 // Initialize skill services
@@ -28,7 +28,7 @@ const skillPassiveGainsService = new SkillPassiveGainsService();
  * @returns {Object} Modified stats copy with item comparison applied
  */
 export function applyItemToStats(baseStats, equippedItem, comparisonItem, context) {
-    const weaponAttackBonus = getWeaponAttackBonus().totalAttack;
+    const weaponAttackBonus = loadoutStore.getWeaponAttackBonus().totalAttack;
 
     // Create StatCalculationService with explicit weapon attack bonus
     const service = new StatCalculationService(baseStats, weaponAttackBonus);

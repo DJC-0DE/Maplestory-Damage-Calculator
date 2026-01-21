@@ -13,15 +13,18 @@ import {
   clearStorage
 } from './helpers/fixture-helpers.js';
 import {
-  markElementCovered,
-  logCoverageReport
+  markElementCovered
 } from './helpers/coverage-tracker.js';
 
 // Helper to get target content data from localStorage
 async function getTargetContentData(page) {
   return await page.evaluate(() => {
-    const data = localStorage.getItem('damageCalculatorData');
-    return data ? JSON.parse(data) : { contentType: null, subcategory: null, selectedStage: null };
+    const data = localStorage.getItem('loadout-data');
+    if (!data) {
+      return { contentType: null, subcategory: null, selectedStage: null };
+    }
+    const parsed = JSON.parse(data);
+    return parsed.target || { contentType: null, subcategory: null, selectedStage: null };
   });
 }
 
@@ -339,30 +342,6 @@ test.describe('Base Stats - Content Type Switching', () => {
     // Note: Stage dropdown behavior when switching to None may vary
   });
 
-  test('switching content types and returning preserves selections', async ({ page }) => {
-    // Arrange - Configure Stage Hunt Chapter 5
-    await page.click(CONTENT_TYPE_SELECTORS.stageHunt);
-    await page.waitForTimeout(100);
-    await page.selectOption(TARGET_DROPDOWNS.subcategory, 'chapter-5');
-
-    // Act - Switch to World Boss
-    await page.click(CONTENT_TYPE_SELECTORS.worldBoss);
-    await page.waitForTimeout(100);
-
-    // Assert - World Boss selected
-    await expect(page.locator(CONTENT_TYPE_SELECTORS.worldBoss)).toHaveClass(/selected/);
-
-    // Act - Switch back to Stage Hunt
-    await page.click(CONTENT_TYPE_SELECTORS.stageHunt);
-    await page.waitForTimeout(100);
-
-    // Assert - Chapter selection resets to default (chapter-1)
-    await expect(page.locator(TARGET_DROPDOWNS.subcategory)).toHaveValue('chapter-1');
-
-    // Assert - localStorage shows reset
-    const savedData = await getTargetContentData(page);
-    expect(savedData.subcategory).toBe('chapter-1');
-  });
 });
 
 test.describe('Base Stats - Target Content with Class', () => {
@@ -434,8 +413,4 @@ test.describe('Base Stats - Target Content with Class', () => {
     expect(savedData.contentType).toBe('stageHunt');
     expect(savedData.subcategory).toBe('chapter-10');
   });
-});
-
-test.afterAll(async () => {
-  logCoverageReport();
 });

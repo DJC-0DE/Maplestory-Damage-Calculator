@@ -1,7 +1,7 @@
 // Stat Breakdown UI - Shows where base stats come from (equipment and companions)
 // REDESIGNED: Premium fintech-meets-gaming-HUD aesthetic with glassmorphism & data visualization
 import { getContributedStats, onContributedStatsChange, getUnlockableStatConfigs, getUnlockableStat, updateUnlockableStat, updateUnlockableStatsContributions, getGuildBonusConfigs, getGuildBonus, updateGuildBonus, updateGuildBonusesContributions } from '@core/state/state.js';
-import { getWeaponAttackBonus } from '@core/state/state.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 import { saveToLocalStorage } from '@core/state/storage.js';
 
 // ============================================================================
@@ -1524,7 +1524,7 @@ export function updateStatBreakdown() {
             let weaponAttackBonus = 1;
 
             if (statDef.needsDivision) {
-                const bonus = getWeaponAttackBonus();
+                const bonus = loadoutStore.getWeaponAttackBonus();
                 weaponAttackBonus = (bonus.totalAttack / 100) + 1;
                 displayValue = inputValue / weaponAttackBonus;
             }
@@ -1609,7 +1609,7 @@ function updateBreakdownGrid() {
         let weaponAttackBonus = 1;
 
         if (statDef.needsDivision) {
-            const bonus = getWeaponAttackBonus();
+            const bonus = loadoutStore.getWeaponAttackBonus();
             weaponAttackBonus = (bonus.totalAttack / 100) + 1;
             displayValue = inputValue / weaponAttackBonus;
         }

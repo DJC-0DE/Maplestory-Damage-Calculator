@@ -9,8 +9,7 @@ import {
   STAT_INPUTS,
   STAT_ROWS,
   MASTERY_TABLES,
-  SETUP_TAB_BUTTONS,
-  STORAGE_KEYS
+  SETUP_TAB_BUTTONS
 } from './helpers/selectors.js';
 import {
   navigateToBaseStats,
@@ -19,16 +18,14 @@ import {
   verifyStorageState
 } from './helpers/fixture-helpers.js';
 import {
-  markElementCovered,
-  logCoverageReport
+  markElementCovered
 } from './helpers/coverage-tracker.js';
 import {
   HERO_LEVEL_60,
   HERO_LEVEL_100,
   BOWMASTER_LEVEL_80,
   ARCH_MAGE_IL_LEVEL_90,
-  DARK_KNIGHT_LEVEL_100,
-  NIGHT_LORD_LEVEL_90
+  DARK_KNIGHT_LEVEL_100
 } from './fixtures/base-stats.fixtures.js';
 
 test.describe('Base Stats - Character Setup Workflow', () => {
@@ -173,10 +170,6 @@ test.describe('Base Stats - Character Setup Workflow', () => {
     const storageValid = await verifyStorageState(page, HERO_LEVEL_60);
     expect(storageValid).toBe(true);
   });
-
-  test.afterAll(async () => {
-    logCoverageReport();
-  });
 });
 
 test.describe('Base Stats - Class Switching Workflow', () => {
@@ -276,10 +269,6 @@ test.describe('Base Stats - Class Switching Workflow', () => {
     // Assert - localStorage updated
     const jobTier = await page.evaluate(() => localStorage.getItem('selectedJobTier'));
     expect(jobTier).toBe('3rd');
-  });
-
-  test.afterAll(async () => {
-    logCoverageReport();
   });
 });
 
@@ -451,10 +440,6 @@ test.describe('Base Stats - Configuration Adjustment Workflow', () => {
     const selectedClass = await page.evaluate(() => localStorage.getItem('selectedClass'));
     expect(selectedClass).toBe('hero');
   });
-
-  test.afterAll(async () => {
-    logCoverageReport();
-  });
 });
 
 test.describe('Base Stats - Cross-Tab Integration', () => {
@@ -583,9 +568,5 @@ test.describe('Base Stats - Cross-Tab Integration', () => {
     expect(selectedClass).toBe('shadower');
 
     markElementCovered('classSelectors', 'class-shadower');
-  });
-
-  test.afterAll(async () => {
-    logCoverageReport();
   });
 });

@@ -1,4 +1,5 @@
-import { getStats, getWeaponAttackBonus } from '@core/state/state.js';
+import { getStats } from '@core/state/state.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 import { CumulativeStatCalculator } from '@core/services/stat-calculation-service.js';
 
 window.toggleStatChart = toggleStatChart;
@@ -30,7 +31,7 @@ export function toggleStatChart(setup, statKey, statLabel, isFlat = false) {
 // Generate chart data for a stat
 export function generateStatChartData(setup, statKey, statLabel, isFlat) {
     const stats = getStats(setup);
-    const weaponAttackBonus = getWeaponAttackBonus().totalAttack;
+    const weaponAttackBonus = loadoutStore.getWeaponAttackBonus().totalAttack;
     const monsterType = statKey === 'bossDamage' ? 'boss' :
                        (statKey === 'normalDamage' ? 'normal' : 'boss');
 

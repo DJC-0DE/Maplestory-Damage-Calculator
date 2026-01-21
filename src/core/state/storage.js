@@ -2,18 +2,13 @@ import { calculate } from '@core/main.js';
 import { renderTheoreticalBest, renderPresetComparison } from '@core/features/inner-ability/inner-ability.js';
 import { renderArtifactPotential } from '@core/features/artifacts/artifact-potential.js';
 import { clearCubeRankingsCache } from '@core/cube/cube-potential.js';
-import { addComparisonItemStat, addComparisonItem } from '@ui/comparison-ui.js';
 import { addEquippedStat } from '@ui/equipment-ui.js';
-import { handleWeaponLevelChange, handleWeaponLevelChangeBulk, handleEquippedCheckboxChange, setEquippedState, updateEquippedWeaponIndicator, updateWeaponBonuses, updateWeaponUpgradeColors } from '@core/weapon-levels/weapons-ui.js';
 import { rarities, tiers, equippedStatCount } from '@core/constants.js';
 import { getCompanionsState, setCompanionsState, getPresets, setPresetsState, getEquippedPresetId, setEquippedPresetId, getContributedStats, setContributedStats, getShowPresetDpsComparison, setShowPresetDpsComparison, getLockedMainCompanion, setLockedMainCompanion, updateAllContributions, updateCompanionEquippedContributions, getUnlockableStatsState, setUnlockableStatsState, getGuildBonusesState, setGuildBonusesState, getCubeSlotData, setCubeSlotData, setCharacterLevel } from './state.js';
 import { refreshCompanionsUI } from '@ui/companions-ui.js';
 import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
-import { getCurrentSlot } from '@ui/comparison/slot-comparison.js';
 
 // Equipment slots that have comparison items
-const EQUIPMENT_SLOTS = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
-
 window.saveToLocalStorage = saveToLocalStorage;
 window.updateAnalysisTabs = updateAnalysisTabs;
 window.exportData = exportData;
@@ -204,26 +199,6 @@ export function saveToLocalStorage() {
     localStorage.setItem('cubePotentialData', JSON.stringify(getCubeSlotData()));
 }
 
-// Get saved content type data (used by main.js to restore content type after initialization)
-export function getSavedContentTypeData() {
-    const savedData = localStorage.getItem('damageCalculatorData');
-    if (!savedData) {
-        return null;
-    }
-
-    try {
-        const data = JSON.parse(savedData);
-        return {
-            contentType: data.contentType || null,
-            subcategory: data.subcategory || null,
-            selectedStage: data.selectedStage || null
-        };
-    } catch (e) {
-        console.error('Error reading content type from localStorage:', e);
-        return null;
-    }
-}
-
 // Load data from localStorage
 export function loadFromLocalStorage() {
     const savedData = localStorage.getItem('damageCalculatorData');
@@ -237,24 +212,7 @@ export function loadFromLocalStorage() {
     try {
         const data = JSON.parse(savedData);
 
-        // Load Base Setup
-        if (data.baseSetup) {
-            BASE_SETUP_FIELDS.forEach(field => {
-                const element = document.getElementById(`${field}-base`);
-                if (element && data.baseSetup[field] !== undefined) {
-                    element.value = data.baseSetup[field];
-                }
-            });
-
-            // Load Character Level (does not have -base suffix)
-            const characterLevelElement = document.getElementById('character-level');
-            if (characterLevelElement && data.baseSetup['character-level'] !== undefined) {
-                characterLevelElement.value = data.baseSetup['character-level'];
-                setCharacterLevel(data.baseSetup['character-level']);
-            }
-        }
-
-         // Load Cube Potential Data from separate localStorage key
+              // Load Cube Potential Data from separate localStorage key
         const cubePotentialData = localStorage.getItem('cubePotentialData');
         if (cubePotentialData) {
             try {
@@ -282,60 +240,6 @@ export function loadFromLocalStorage() {
             }
         }
 
-        // Load Weapons
-        if (data.weapons) {
-            rarities.forEach(rarity => {
-                tiers.forEach(tier => {
-                    const key = `${rarity}-${tier}`;
-                    const weaponData = data.weapons[key];
-
-                    if (weaponData) {
-                        const levelInput = document.getElementById(`level-${rarity}-${tier}`);
-                        const starsInput = document.getElementById(`stars-${rarity}-${tier}`);
-                        const equippedCheckbox = document.getElementById(`equipped-checkbox-${rarity}-${tier}`);
-
-                        // Set stars first
-                        if (starsInput) {
-                            const defaultStars = ['legendary', 'mystic', 'ancient'].includes(rarity) ? 1 : 5;
-                            const stars = weaponData.stars !== undefined ? weaponData.stars : defaultStars;
-                            starsInput.value = stars.toString();
-
-                            // Update star display (1-5 stars) - use active class to match initialization
-                            for (let i = 1; i <= 5; i++) {
-                                const starElem = document.getElementById(`star-${rarity}-${tier}-${i}`);
-                                if (starElem) {
-                                    starElem.classList.toggle('active', i <= stars);
-                                }
-                            }
-                        }
-
-                        // Then set level
-                        if (levelInput) {
-                            levelInput.value = weaponData.level || '0';
-                        }
-
-                        // Restore equipped state (skip automatic update - will call once after loop)
-                        if (weaponData.equipped) {
-                            setEquippedState(rarity, tier);
-                        }
-
-                        // Trigger the BULK level change handler (skips updateWeaponBonuses during load)
-                        if (levelInput) {
-                            handleWeaponLevelChangeBulk(rarity, tier);
-                        }
-                    }
-                });
-            });
-
-            // Update totals once after all weapons are loaded (prevents 28 unnecessary cascading updates)
-            updateWeaponBonuses();
-            updateEquippedWeaponIndicator();
-            updateWeaponUpgradeColors();
-        } else {
-            // Update equipped weapon indicator after loading
-            updateEquippedWeaponIndicator();
-        }
-
         // Load Equipment Slots
         if (data.equipmentSlots) {
             const slotNames = ['head', 'cape', 'chest', 'shoulders', 'legs', 'belt', 'gloves', 'boots', 'ring', 'neck', 'eye-accessory'];
@@ -351,76 +255,6 @@ export function loadFromLocalStorage() {
                     if (damageAmpInput) damageAmpInput.value = data.equipmentSlots[slotId].damageAmp || 0;
                 }
             });
-        }
-
-        // Load Mastery Bonus Checkboxes
-        if (data.masteryBonuses) {
-            // Check if data is in new format (with 3rd/4th tier separation)
-            if (data.masteryBonuses['3rd'] && data.masteryBonuses['4th']) {
-                // Load 3rd Job "All Monsters" checkboxes
-                if (data.masteryBonuses['3rd'].all) {
-                    [64, 68, 76, 80, 88, 92].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
-                        if (checkbox && data.masteryBonuses['3rd'].all[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses['3rd'].all[level];
-                        }
-                    });
-                }
-
-                // Load 3rd Job "Boss Only" checkboxes
-                if (data.masteryBonuses['3rd'].boss) {
-                    [72, 84].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
-                        if (checkbox && data.masteryBonuses['3rd'].boss[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses['3rd'].boss[level];
-                        }
-                    });
-                }
-
-                // Load 4th Job "All Monsters" checkboxes
-                if (data.masteryBonuses['4th'].all) {
-                    [102, 106, 116, 120, 128, 132].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-4th-all-${level}`);
-                        if (checkbox && data.masteryBonuses['4th'].all[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses['4th'].all[level];
-                        }
-                    });
-                }
-
-                // Load 4th Job "Boss Only" checkboxes
-                if (data.masteryBonuses['4th'].boss) {
-                    [111, 124].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-4th-boss-${level}`);
-                        if (checkbox && data.masteryBonuses['4th'].boss[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses['4th'].boss[level];
-                        }
-                    });
-                }
-            } else {
-                // Legacy format - migrate old data to 3rd job tier
-                if (data.masteryBonuses.all) {
-                    [64, 68, 76, 80, 88, 92].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-3rd-all-${level}`);
-                        if (checkbox && data.masteryBonuses.all[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses.all[level];
-                        }
-                    });
-                }
-
-                if (data.masteryBonuses.boss) {
-                    [72, 84].forEach(level => {
-                        const checkbox = document.getElementById(`mastery-3rd-boss-${level}`);
-                        if (checkbox && data.masteryBonuses.boss[level] !== undefined) {
-                            checkbox.checked = data.masteryBonuses.boss[level];
-                        }
-                    });
-                }
-            }
-
-            // Update the mastery bonus totals and hidden inputs
-            if (typeof window.updateMasteryBonuses === 'function') {
-               // window.updateMasteryBonuses();
-            }
         }
 
         // Load Companions

@@ -2,11 +2,11 @@
 
 import { saveToLocalStorage } from '@core/state/storage.js';
 import { calculate, getItemStats } from '@core/main.js';
-import { updateSkillCoefficient } from '@core/base-stats/base-stats.js';
 import { getSelectedClass } from '@core/state/state.js';
-import { removeComparisonItem, addComparisonItem, addComparisonItemStat } from '@ui/comparison-ui.js';
+import { addComparisonItem, addComparisonItemStat } from '@ui/comparison-ui.js';
 import { equippedStatCount, setEquippedStatCount, availableStats, allItemStatProperties } from '@core/constants.js';
 import { equipItemFromComparison, getCurrentSlot } from '@ui/comparison/slot-comparison.js';
+import { updateSkillCoefficient } from './../ts/page/base-stats/base-stats.js';
 
 window.unequipItem = unequipItem;
 window.equipItem = equipItem;

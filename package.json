@@ -1,9 +1,11 @@
 {
   "name": "maplestory-damage-calculator",
   "version": "1.0.0",
+  "type": "module",
   "description": "Maplestory damage calculator with regression tests",
   "scripts": {
-    "start": "python -m http.server 8000 || python3 -m http.server 8000 || npx http-server -p 8000",
+    "build": "node build.js",
+    "start": "npm run build && python -m http.server 8000 || python3 -m http.server 8000 || npx http-server -p 8000",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
@@ -49,6 +51,7 @@
     "test:pred:equivalency": "playwright test predictions-equivalency.spec.js",
     "test:pred:equivalency:headed": "playwright test predictions-equivalency.spec.js --headed",
     "test:pred:equivalency:debug": "playwright test predictions-equivalency.spec.js --debug",
+	"test:lastFailed": "playwright test --last-failed",
     "lint": "eslint *.js",
     "lint:fix": "eslint *.js --fix"
   },
@@ -60,7 +63,9 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
+    "esbuild": "^0.27.2",
     "eslint": "^8.57.0",
+    "glob": "^13.0.0",
     "typescript": "^5.9.3"
   }
 }

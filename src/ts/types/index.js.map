@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["index.ts"],
+  "sourcesContent": ["/**\r\n * Barrel file for types module\r\n * Re-exports all types and constants from sibling files\r\n */\r\n\r\nexport * from './constants';\r\nexport * from './types';\r\nexport * from './loadout';\r\n\r\nexport * from './page/base-stats/base-stats.types';\r\n\r\nexport * from './page/weapons/weapons.types';\r\nexport * from './page/weapons/weapons.constants';\r\n"],
+  "mappings": "AAKA,cAAc;AACd,cAAc;AACd,cAAc;AAEd,cAAc;AAEd,cAAc;AACd,cAAc;",
+  "names": []
+}

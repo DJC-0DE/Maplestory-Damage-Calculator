@@ -97,32 +97,6 @@ export function generatePredictionsCoverageReport() {
   return report;
 }
 
-/**
- * Log coverage report to console
- */
-export function logPredictionsCoverageReport() {
-  const report = generatePredictionsCoverageReport();
-
-  console.log('\n╔════════════════════════════════════════════════════════════╗');
-  console.log('║     STAT PREDICTIONS ELEMENT COVERAGE REPORT             ║');
-  console.log('╚════════════════════════════════════════════════════════════╝\n');
-
-  console.log(`Overall Coverage: ${report.overallPercentage}% (${report.testedElements}/${report.totalElements} elements)\n`);
-
-  for (const [category, stats] of Object.entries(report.categories)) {
-    const status = stats.percentage === 100 ? '✓' : '✗';
-    console.log(`${status} ${category}: ${stats.percentage}% (${stats.tested}/${stats.total})`);
-  }
-
-  if (report.untestedElements.length > 0) {
-    console.log('\n════════════════════════════════════════════════════════════');
-    console.log('UNTESTED ELEMENTS:');
-    console.log('════════════════════════════════════════════════════════════');
-    report.untestedElements.forEach(el => console.log(`  - ${el}`));
-  }
-
-  console.log('\n════════════════════════════════════════════════════════════\n');
-}
 
 /**
  * Reset coverage state (useful between test runs)
