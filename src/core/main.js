@@ -11,7 +11,6 @@ import {
     setCharacterLevel
 } from '@core/state/state.js';
 import { StatCalculationService } from '@core/services/stat-calculation-service.js';
-import { showToast } from '@utils/notifications.js';
 import { formatDPS } from '@utils/formatters.js';
 import { calculateStatWeights } from '@core/calculations/damage-calculations.js';
 import { loadFromLocalStorage, attachSaveListeners, saveToLocalStorage, getSavedContentTypeData, finalizeContributedStatsAfterInit } from '@core/state/storage.js';
@@ -30,7 +29,6 @@ import { applyItemToStats } from '@core/services/item-comparison-service.js';
 import {
     populateStageDropdown, selectContentType, updateStageDropdown
 } from '@core/base-stats/target-select.js';
-import { extractText, parseBaseStatText } from '@utils/ocr.js';
 import { loadTheme } from '@utils/theme.js';
 import { initializeHeroPowerPresets, loadHeroPowerPresets} from '@ui/presets-ui.js';
 import { initializeWeapons, updateWeaponBonuses} from '@core/weapon-levels/weapons-ui.js';
@@ -42,8 +40,9 @@ import { initializeCompanionsUI } from '@ui/companions-ui.js';
 import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
 import { initializeStatBreakdown, updateStatBreakdown } from '@ui/stat-breakdown-ui.js';
 import { updateMasteryBonuses } from './base-stats/mastery-bonus.js';
-import { getStatType, isDexMainStatClass, isIntMainStatClass, isLukMainStatClass, isStrMainStatClass, loadSelectedClass, loadSelectedJobTier, selectClass, selectJobTier, selectMasteryTab } from './base-stats/class-select.js';
+import { isDexMainStatClass, isIntMainStatClass, isLukMainStatClass, isStrMainStatClass, loadSelectedClass, loadSelectedJobTier, selectClass, selectJobTier, selectMasteryTab } from './base-stats/class-select.js';
 import { updateSkillCoefficient } from './base-stats/base-stats.js';
+import { initializeBaseStatsUI } from './base-stats/base-stats-ui.js';
 import '@utils/tabs.js';
 import '@utils/stat-chart.js';
 import '@ui/help-sidebar.js';
@@ -52,8 +51,6 @@ import '@core/features/scrolling/scroll-optimizer.js';
 // Data extraction functions
 // getStats and getItemStats moved to state.js
 export { getStats, getItemStats };
-
-sayHello();
 
 // Main calculation orchestration
 export function calculate() {
@@ -199,40 +196,6 @@ export function syncMainStatsToHidden() {
         // Thieves: LUK (primary), DEX (secondary)
         if (lukInput) primaryInput.value = lukInput.value || 1000;
         if (dexInput) secondaryInput.value = dexInput.value || 0;
-    }
-}
-
-export function switchBaseStatsSubTab(subTabName) {
-    // Hide all sub-tabs
-    const subTabs = document.querySelectorAll('.base-stats-subtab');
-    subTabs.forEach(tab => {
-        tab.style.display = 'none';
-    });
-
-    // Show the selected sub-tab
-    const selectedTab = document.getElementById(`base-stats-${subTabName}`);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-
-    // Update button states - get the parent container's buttons
-    const buttons = document.querySelectorAll('#setup-base-stats .tab-button, #setup-base-stats .optimization-sub-tab-button');
-    buttons.forEach(button => {
-        button.classList.remove('active');
-    });
-
-    // Activate button - Find the button by matching the onclick attribute
-    // This works both when called from a click event and during initialization
-    buttons.forEach(btn => {
-        const onclickAttr = btn.getAttribute('onclick');
-        if (onclickAttr && onclickAttr.includes(`'${subTabName}'`)) {
-            btn.classList.add('active');
-        }
-    });
-
-    // If switching to skill details, populate the skills
-    if (subTabName === 'skill-details') {
-        populateSkillDetails();
     }
 }
 
@@ -417,6 +380,7 @@ export function showSkillDescription(skillKey, category, jobTier) {
 window.onload = function () {
     initializeRouter(); // Initialize routing system first
     loadTheme();
+    initializeBaseStatsUI(); // Initialize base stats UI (generates HTML and attaches listeners)
     loadSelectedClass();
     initializeHeroPowerPresets();
     initializeWeapons();
@@ -486,87 +450,13 @@ window.onload = function () {
     updateSkillCoefficient();
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const pasteArea = document.getElementById('base-stats-paste-image-section');
-
-    pasteArea.addEventListener('paste', async (event) => {
-        const items = Array.from(event.clipboardData.items);
-        const pastedImage = items.filter(x => x.type.startsWith("image/"))[0];
-        if (!pastedImage) return;
-
-        const file = pastedImage.getAsFile();
-        const imageURL = URL.createObjectURL(file);
-        const extractedText = await extractText(imageURL, false);
-        try {
-            const parsedStats = parseBaseStatText(extractedText);
-            for (const parsedStat of parsedStats) {
-                const inputElement = document.getElementById(parsedStat[0]);
-                if (inputElement) {
-                    inputElement.value = parsedStat[1];
-                    // Add a permanent outline until the input is changed again
-                    inputElement.style.outline = '2px solid #95b993'; // Outline color
-                    inputElement.addEventListener('input', () => {
-                        inputElement.style.outline = ''; // Reset to default on change
-                    }, { once: true });
-
-                    const className = getSelectedClass();
-                    const primaryInput = document.getElementById('primary-main-stat-base');
-                    const secondaryInput = document.getElementById('secondary-main-stat-base');
-
-                    const statType = getStatType(className, parsedStat[0]);
-                    if (statType === 'primary') {
-                        primaryInput.value = parsedStat[1] || 1000;
-                    } else if (statType === 'secondary') {
-                        secondaryInput.value = parsedStat[1] || 1000;
-                    }
-                }
-            }
-
-            if (parsedStats.length > 0) {
-                showToast(`Parsing successful! ${parsedStats.length} stats updated`, true);
-            } else {
-                showToast("Parsing failed! Make sure you are ONLY screenshotting the stats rows from the Character page and nothing else", false);
-            }
-
-            saveToLocalStorage();
-            calculate();
-        }
-        catch (e) {
-            console.error(e);
-            showToast(e, false);
-        }
-
-    });
-
-    // Add event listeners to main stat inputs to sync with hidden fields
-    const strInput = document.getElementById('str-base');
-    const dexInput = document.getElementById('dex-base');
-    const intInput = document.getElementById('int-base');
-    const lukInput = document.getElementById('luk-base');
-
-    [strInput, dexInput, intInput, lukInput].forEach(input => {
-        if (input) {
-            input.addEventListener('input', () => {
-                syncMainStatsToHidden();
-                saveToLocalStorage();
-            });
-        }
-    });
-
-    // Initialize main stat visibility on page load
-    const selectedClass = getSelectedClass();
-    if (selectedClass) {
-        selectClass(selectedClass);
-    }
-});
-
 // Expose functions to window for HTML onclick handlers
 window.showSkillDescription = showSkillDescription;
+window.populateSkillDetails = populateSkillDetails;
 window.selectClass = selectClass;
 window.selectJobTier = selectJobTier;
 window.selectMasteryTab = selectMasteryTab;
 window.updateMasteryBonuses = updateMasteryBonuses;
 window.updateSkillCoefficient = updateSkillCoefficient;
-window.switchBaseStatsSubTab = switchBaseStatsSubTab;
 window.dismissDonateNotification = dismissDonateNotification;
 window.calculate = calculate;
