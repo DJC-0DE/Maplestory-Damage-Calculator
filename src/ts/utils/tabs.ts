@@ -4,8 +4,8 @@ import { resetSubTabsToDefault, updateSubmenuActiveStates } from '@core/router.j
 
 declare global {
     interface Window {
-        switchTab: (group: string, tabName: string) => void;
-        switchTabAndUpdateURL: (group: string, tabName: string, clickEvent: MouseEvent) => void;
+        switchTab: (group: TabGroup, tabName: string) => void;
+        switchTabAndUpdateURL: (group: TabGroup, tabName: string, clickEvent: MouseEvent) => void;
     }
 }
 
@@ -22,18 +22,18 @@ window.switchTab = switchTab;
 window.switchTabAndUpdateURL = switchTabAndUpdateURL;
 
 // Tab switching function (for programmatic use only - does NOT update URL)
-export function switchTab(group: string, tabName: string): void {
+export function switchTab(group: TabGroup, tabName: string): void {
     _performTabSwitch(group, tabName);
 }
 
 // Tab switching function for user interactions (updates URL)
-export function switchTabAndUpdateURL(group: string, tabName: string, clickEvent: MouseEvent): void {
+export function switchTabAndUpdateURL(group: TabGroup, tabName: string, clickEvent: MouseEvent): void {
     _performTabSwitch(group, tabName, clickEvent);
 
     // Update URL hash to reflect the new tab state
     // Only update if this is a genuine user click (isTrusted event)
     if (clickEvent.isTrusted) {
-        const pageName = pageNameMap[group as TabGroup];
+        const pageName = pageNameMap[group];
         if (pageName) {
             // Update hash
             const currentHash = window.location.hash;
@@ -46,41 +46,47 @@ export function switchTabAndUpdateURL(group: string, tabName: string, clickEvent
 }
 
 // Internal tab switching logic (shared between both functions)
-function _performTabSwitch(group: string, tabName: string, clickEvent: MouseEvent | null = null): void {
+function _performTabSwitch(group: TabGroup, tabName: string, clickEvent?: MouseEvent): void {
     // Get all tab contents and buttons within the group
-    const tabContents: NodeListOf<HTMLElement> = document.querySelectorAll(`#${group}-${tabName}`).length > 0
-        ? document.querySelectorAll(`[id^="${group}-"]`)
+    const targetElement = document.getElementById(`${group}-${tabName}`);
+    const tabContents = targetElement
+        ? Array.from(document.querySelectorAll<HTMLElement>(`[id^="${group}-"]`))
         : [];
 
     // Find the button group more robustly - search in common container patterns
     let tabButtons: HTMLElement[] = [];
-    const clickedButton = clickEvent?.currentTarget as HTMLElement | null;
+    const clickedButton = clickEvent?.currentTarget instanceof HTMLElement
+        ? clickEvent.currentTarget
+        : null;
 
     if (clickedButton) {
         // If we have an event, get siblings from the same parent
         const parent = clickedButton.parentElement;
         if (parent) {
-            tabButtons = Array.from(parent.children).filter(child =>
-                child.classList.contains('tab-button') || child.classList.contains('optimization-tab-button')
-            ) as HTMLElement[];
+            tabButtons = Array.from(parent.children).filter((child): child is HTMLElement =>
+                child instanceof HTMLElement && (
+                    child.classList.contains('tab-button') ||
+                    child.classList.contains('optimization-tab-button')
+                )
+            );
         }
     } else {
         // Fallback: search all buttons in the page that match this group
-        tabButtons = Array.from(document.querySelectorAll('.tab-button, .optimization-tab-button')).filter(btn => {
+        tabButtons = Array.from(document.querySelectorAll('.tab-button, .optimization-tab-button')).filter((btn): btn is HTMLElement => {
             const onclickAttr = btn.getAttribute('onclick');
             return onclickAttr && onclickAttr.includes(`'${group}'`);
-        }) as HTMLElement[];
+        });
     }
 
     // Hide all tab contents in this group (support both old and new classes)
-    tabContents.forEach((content: HTMLElement) => {
+    tabContents.forEach((content) => {
         if (content.classList.contains('tab-content') || content.classList.contains('optimization-tab-content')) {
             content.classList.remove('active');
         }
     });
 
     // Remove active class from all buttons in this group
-    tabButtons.forEach((button: HTMLElement) => {
+    tabButtons.forEach((button) => {
         button.classList.remove('active');
     });
 
@@ -95,7 +101,7 @@ function _performTabSwitch(group: string, tabName: string, clickEvent: MouseEven
         clickedButton.classList.add('active');
     } else {
         // If no event, find and activate the button by matching onclick attribute
-        tabButtons.forEach((btn: HTMLElement) => {
+        tabButtons.forEach((btn) => {
             const onclickAttr = btn.getAttribute('onclick');
             if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
                 btn.classList.add('active');
@@ -103,13 +109,8 @@ function _performTabSwitch(group: string, tabName: string, clickEvent: MouseEven
         });
     }
 
-    // Render content for specific tabs
-    if (group === 'analysis' && tabName === 'artifact-potential') {
-       // renderArtifactPotential();
-    }
-
     // Reset sub-tabs to their default state
-    const pageName = pageNameMap[group as TabGroup];
+    const pageName = pageNameMap[group];
     if (pageName) {
         resetSubTabsToDefault(pageName, tabName);
         // Update sidebar to reflect the newly selected tab
