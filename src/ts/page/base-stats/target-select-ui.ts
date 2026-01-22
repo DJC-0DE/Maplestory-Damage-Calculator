@@ -50,7 +50,7 @@ export function selectContentType(contentType: ContentType): void {
     if (requiresSubcategory(contentType)) {
         const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
         if (subcategorySelect && subcategorySelect.options.length > 0) {
-            updateData.subcategory = subcategorySelect.value;
+            updateData.subcategory = subcategorySelect.options[0].value;
         }
     }
 
