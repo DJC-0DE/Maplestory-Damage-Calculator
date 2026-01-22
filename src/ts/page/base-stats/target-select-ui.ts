@@ -165,6 +165,7 @@ function configureDropdownsForContentType(contentType: ContentType): void {
 
     if (requiresSubcategory(contentType)) {
         populateSubcategoryDropdown(contentType);
+        if (subcategorySelect) subcategorySelect.style.display = 'block';
         stageSelect.style.display = 'block';
     } else {
         stageSelect.style.display = 'block';
