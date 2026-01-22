@@ -212,7 +212,12 @@ export function calculateTargetDPSGain(
     statConfig: Record<string, EquivalencyStatConfig>
 ): { baseDPS: number; targetDPSGain: number } {
     const baseService = new StatCalculationService(stats);
-    const baseDPS = baseService.baseBossDPS;
+
+    // Determine monster type based on source stat
+    const monsterType = STAT.NORMAL_DAMAGE.id === sourceStat ? MONSTER_TYPE.NORMAL : MONSTER_TYPE.BOSS;
+    let baseDPS = monsterType === MONSTER_TYPE.BOSS ?
+        baseService.baseBossDPS :
+        baseService.baseNormalDPS;
 
     if (sourceValue === 0) {
         return { baseDPS, targetDPSGain: 0 };
@@ -220,14 +225,14 @@ export function calculateTargetDPSGain(
 
     // For mainStatPct, we need to apply to a fresh service
     let newDPS: number;
-    if (sourceStat === 'mainStatPct') {
+    if (sourceStat === STAT.MAIN_STAT_PCT.id) {
         const modifiedService = new StatCalculationService(stats);
         modifiedService.addMainStatPct(sourceValue);
-        newDPS = modifiedService.computeDPS(MONSTER_TYPE.BOSS);
+        newDPS = modifiedService.computeDPS(monsterType);
     } else {
         const modifiedStats = statConfig[sourceStat].applyToStats(stats, sourceValue);
         const modifiedService = new StatCalculationService(modifiedStats);
-        newDPS = modifiedService.computeDPS(MONSTER_TYPE.BOSS);
+        newDPS = modifiedService.computeDPS(monsterType);
     }
 
     const targetDPSGain = ((newDPS - baseDPS) / baseDPS) * 100;
@@ -315,13 +320,12 @@ export function calculateEquivalency(
     Object.entries(statConfig).forEach(([statId, statConfigItem]) => {
         if (statId === sourceStat) return;
 
-        if(sourceStat === 'statDamage')
-        {
+        if (sourceStat === STAT.STAT_DAMAGE.id) {
             return;
         }
 
         // Handle cross-stat incompatibility
-        if (sourceStat === 'bossDamage' && statId === 'normalDamage') {
+        if (sourceStat === STAT.BOSS_DAMAGE.id && statId === STAT.NORMAL_DAMAGE.id) {
             equivalents[statId] = {
                 value: 0,
                 label: 'Ineffective (Boss DMG ≠ Monster target)'
@@ -329,7 +333,7 @@ export function calculateEquivalency(
             return;
         }
 
-        if (sourceStat === 'normalDamage' && statId === 'bossDamage') {
+        if (sourceStat === STAT.NORMAL_DAMAGE.id && statId === STAT.BOSS_DAMAGE.id) {
             equivalents[statId] = {
                 value: 0,
                 label: 'Ineffective (Monster DMG ≠ Boss target)'
@@ -340,7 +344,7 @@ export function calculateEquivalency(
         // Determine target type for this stat row
         let rowTargetType: MonsterType = MONSTER_TYPE.BOSS;
 
-        if (statId === 'normalDamage') {
+        if (statId === STAT.NORMAL_DAMAGE.id) {
             rowTargetType = MONSTER_TYPE.NORMAL;
         }
 
