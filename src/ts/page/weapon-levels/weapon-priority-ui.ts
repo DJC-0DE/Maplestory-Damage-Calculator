@@ -22,11 +22,8 @@ import type {
 } from '@ts/types';
 import { rarities, tiers } from '@ts/types';
 import { MONSTER_TYPE, WEAPON_RARITY, WEAPON_TIER, EFFICIENCY_THRESHOLD } from '@ts/types/constants';
-
-// Re-import services from existing JS (will be converted to TS later)
-import { getStats } from '@core/main.js';
-import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { loadoutStore } from '@ts/store/loadout.store';
+import { StatCalculationService } from '@ts/services/stat-calculation-service';
 
 // Type for the updateWeaponBonuses callback function
 type UpdateWeaponBonusesFn = (calculateDamage?: boolean) => void;
@@ -293,7 +290,7 @@ export async function calculateCurrencyUpgradesUI(updateWeaponBonuses: UpdateWea
     }
 
     // Calculate initial DPS using StatCalculationService
-    const baseStats = getStats('base');
+    const baseStats = loadoutStore.getBaseStats();
     const initialStatService = new StatCalculationService(baseStats);
     const initialDPS = initialStatService.computeDPS(MONSTER_TYPE.BOSS);
 
@@ -317,7 +314,7 @@ export async function calculateCurrencyUpgradesUI(updateWeaponBonuses: UpdateWea
     const newWeaponAttackBonus = calculateTotalWeaponAttackBonusFromLevels(result.weaponLevels);
 
     // Apply the weapon attack bonus difference to attack
-    const baseAttackWithoutWeaponBonus = baseStats.attack / (1 + initialStatService.weaponAttackBonus / 100);
+    const baseAttackWithoutWeaponBonus = baseStats.ATTACK / (1 + initialStatService.weaponAttackBonus / 100);
     const newStats = { ...baseStats, attack: baseAttackWithoutWeaponBonus * (1 + newWeaponAttackBonus / 100) };
 
     // Pass 0 for weaponAttackBonus since we've manually applied it to the attack stat

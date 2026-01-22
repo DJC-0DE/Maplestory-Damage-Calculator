@@ -1,13 +1,11 @@
 // StatCalculationService - Unified stat modification service
 // Provides a consistent, chainable API for modifying stats before calculating DPS
 
-import { calculateDamage } from '@core/calculations/damage-calculations.js';
-import { calculateMainStatPercentGain } from '@core/calculations/stat-calculations.js';
-import { getSelectedClass } from '@core/state/state.js';
 import { loadoutStore } from '@ts/store/loadout.store.js';
-import { calculateJobSkillPassiveGains } from './../features/skills/skill-coefficient.js';
-import { getCharacterLevel } from '../state/state.js';
-import { BaseStats } from '@ts/types/loadout.js';
+import { calculateJobSkillPassiveGains } from '@ts/services/skill-coefficient.service.js';
+import { BaseStats, type StatKey } from '@ts/types/loadout.js';
+import { STAT } from '@ts/types/constants';
+import { calculateDamage } from './damage-calculation.service';
 
 /**
  * Damage calculation result
@@ -36,7 +34,7 @@ export type MonsterType = 'boss' | 'normal';
 /**
  * Context object for stat calculations
  */
-interface StatContext {
+export interface StatContext {
     mainStatPct: number;
     primaryMainStat: number;
     defense: number;
@@ -47,7 +45,7 @@ interface StatContext {
  * Options for creating stat service
  */
 export interface CreateStatServiceOptions {
-    weaponAttackBonus?: number | null;
+    weaponAttackBonus?: number;
 }
 
 /**
@@ -98,6 +96,22 @@ export interface ChartPoint {
  *   const dpsGain = ((result.dps - baseDPS) / baseDPS * 100);
  */
 export class StatCalculationService {
+    private static readonly DARK_KNIGHT_DEFENSE_CONVERSION_RATE = 0.127;
+
+    /**
+     * Convert lowercase stat ID to StatKey (uppercase)
+     * Maps 'attack' -> 'ATTACK', 'critRate' -> 'CRIT_RATE', etc.
+     */
+    private static idToStatKey(id: string): StatKey {
+        // Find the STAT entry with matching ID
+        for (const key of Object.keys(STAT) as StatKey[]) {
+            if (STAT[key].id === id) {
+                return key;
+            }
+        }
+        throw new Error(`Unknown stat ID: ${id}`);
+    }
+
     stats: BaseStats;
     weaponAttackBonus: number;
     context: StatContext;
@@ -107,14 +121,14 @@ export class StatCalculationService {
 
     /**
      * @param baseStats - The base stats object to modify
-     * @param weaponAttackBonus - Weapon attack bonus percentage (null = auto-fetch from state)
+     * @param weaponAttackBonus - Weapon attack bonus percentage (undefined = auto-fetch from state)
      */
-    constructor(baseStats: BaseStats, weaponAttackBonus?: number | null) {
+    constructor(baseStats: BaseStats, weaponAttackBonus?: number) {
         // Clone the stats to avoid mutating the original
         this.stats = { ...baseStats };
 
         // Handle weaponAttackBonus: explicit value or auto-fetch from state
-        if (weaponAttackBonus !== null && weaponAttackBonus !== undefined) {
+        if (weaponAttackBonus !== undefined) {
             // Explicit override provided
             this.weaponAttackBonus = weaponAttackBonus;
         } else {
@@ -131,10 +145,10 @@ export class StatCalculationService {
 
         // Read context values from stats object or state
         this.context = {
-            mainStatPct: baseStats.mainStatPct || 0,
-            primaryMainStat: baseStats.mainStat || 0,
-            defense: baseStats.defense || 0,
-            selectedClass: getSelectedClass()
+            mainStatPct: baseStats.MAIN_STAT_PCT || 0,
+            primaryMainStat: baseStats.PRIMARY_MAIN_STAT || 0,
+            defense: baseStats.DEFENSE || 0,
+            selectedClass: loadoutStore.getSelectedClass()
         };
 
         // Calculate base DPS for both monster types
@@ -152,18 +166,17 @@ export class StatCalculationService {
     addAttack(value: number, applyWeaponBonus = true): this {
         let finalAttackBonus = 0;
         let classFinalAttackBonus = 0;
-        const result = calculateJobSkillPassiveGains(this.context.selectedClass, getCharacterLevel(),
+        const result = calculateJobSkillPassiveGains(this.context.selectedClass, loadoutStore.getCharacterLevel(),
             {
-                firstJob: this.stats.firstJob,
-                secondJob: this.stats.secondJob,
-                thirdJob: this.stats.thirdJob,
-                fourthJob: this.stats.fourthJob
+                firstJob: this.stats.SKILL_LEVEL_1ST,
+                secondJob: this.stats.SKILL_LEVEL_2ND,
+                thirdJob: this.stats.SKILL_LEVEL_3RD,
+                fourthJob: this.stats.SKILL_LEVEL_4TH
             });
 
-            if(result.complexStatChanges)
-            {
-  classFinalAttackBonus = result.complexStatChanges['finalAttack'] ?? 0;
-            }   
+        if (result.complexStatChanges) {
+            classFinalAttackBonus = result.complexStatChanges['finalAttack'] ?? 0;
+        }
 
         if (classFinalAttackBonus != 0) {
             finalAttackBonus = (1 + classFinalAttackBonus / 100);
@@ -172,7 +185,7 @@ export class StatCalculationService {
         const effective = applyWeaponBonus
             ? value * (1 + this.weaponAttackBonus / 100) * finalAttackBonus
             : value;
-        this.stats.attack += effective;
+        this.stats.ATTACK += effective;
         return this;
     }
 
@@ -186,11 +199,11 @@ export class StatCalculationService {
         const increaseWithMainstatPct = this.calculateMainStatIncreaseWithPct(value);
         const statDamageIncrease = increaseWithMainstatPct / 100;
 
-        this.stats.mainStat += increaseWithMainstatPct;
+        this.stats.PRIMARY_MAIN_STAT += increaseWithMainstatPct;
 
         this.addAttack(increaseWithMainstatPct);
 
-        this.stats.statDamage += statDamageIncrease;
+        this.stats.STAT_DAMAGE += statDamageIncrease;
         return this;
     }
 
@@ -200,7 +213,7 @@ export class StatCalculationService {
      * @returns Returns this for chaining
      */
     addMainStatPct(value: number): this {
-        const mainStatGain = calculateMainStatPercentGain(
+        const mainStatGain = this.calculateMainStatPercentGain(
             value,
             this.context.mainStatPct,
             this.context.primaryMainStat,
@@ -208,7 +221,11 @@ export class StatCalculationService {
             this.context.selectedClass
         );
 
-        this.addMainStat(mainStatGain);
+        const statDamageIncrease = mainStatGain / 100;
+        this.addAttack(mainStatGain);
+        this.stats.STAT_DAMAGE += statDamageIncrease;
+        this.stats.PRIMARY_MAIN_STAT += mainStatGain;
+
         this.context.mainStatPct += value;
         return this;
     }
@@ -221,11 +238,12 @@ export class StatCalculationService {
 
     /**
      * Add a percentage-based stat (additive)
-     * @param statKey - The stat key (e.g., 'bossDamage', 'critRate')
+     * @param statId - The stat ID (e.g., 'bossDamage', 'critRate')
      * @param value - Value to add
      * @returns Returns this for chaining
      */
-    addPercentageStat(statKey: keyof BaseStats, value: number): this {
+    addPercentageStat(statId: string, value: number): this {
+        const statKey = StatCalculationService.idToStatKey(statId);
         this.stats[statKey] = (this.stats[statKey] || 0) + value;
         return this;
     }
@@ -233,11 +251,12 @@ export class StatCalculationService {
     /**
      * Add a multiplicative stat (like Final Damage)
      * Uses formula: newValue = ((1 + old/100) * (1 + value/100) - 1) * 100
-     * @param statKey - The stat key
+     * @param statId - The stat ID
      * @param value - Value to add
      * @returns Returns this for chaining
      */
-    addMultiplicativeStat(statKey: keyof BaseStats, value: number): this {
+    addMultiplicativeStat(statId: string, value: number): this {
+        const statKey = StatCalculationService.idToStatKey(statId);
         const oldValue = this.stats[statKey] || 0;
         const newValue = (((1 + oldValue / 100) * (1 + value / 100)) - 1) * 100;
         this.stats[statKey] = newValue;
@@ -247,12 +266,13 @@ export class StatCalculationService {
     /**
      * Add a stat with diminishing returns (like Attack Speed)
      * Uses formula: newValue = (1 - (1 - old/factor) * (1 - value/factor)) * factor
-     * @param statKey - The stat key
+     * @param statId - The stat ID
      * @param value - Value to add
      * @param factor - Diminishing returns factor (e.g., 150 for attack speed)
      * @returns Returns this for chaining
      */
-    addDiminishingReturnStat(statKey: keyof BaseStats, value: number, factor: number): this {
+    addDiminishingReturnStat(statId: string, value: number, factor: number): this {
+        const statKey = StatCalculationService.idToStatKey(statId);
         const oldValue = this.stats[statKey] || 0;
         const newValue = (1 - (1 - oldValue / factor) * (1 - value / factor)) * factor;
         this.stats[statKey] = newValue;
@@ -261,11 +281,12 @@ export class StatCalculationService {
 
     /**
      * Subtract a flat stat value
-     * @param statKey - The stat key
+     * @param statId - The stat ID
      * @param value - Value to subtract
      * @returns Returns this for chaining
      */
-    subtractStat(statKey: keyof BaseStats, value: number): this {
+    subtractStat(statId: string, value: number): this {
+        const statKey = StatCalculationService.idToStatKey(statId);
         this.stats[statKey] -= value;
         return this;
     }
@@ -280,7 +301,7 @@ export class StatCalculationService {
         const effective = applyWeaponBonus
             ? value * (1 + this.weaponAttackBonus / 100)
             : value;
-        this.stats.attack -= effective;
+        this.stats.ATTACK -= effective;
         return this;
     }
 
@@ -309,13 +330,13 @@ export class StatCalculationService {
      */
     addDefense(value: number): this {
         // Add the defense value itself
-        this.stats.defense = (this.stats.defense || 0) + value;
+        this.stats.DEFENSE = (this.stats.DEFENSE || 0) + value;
 
         // For Dark Knight: convert defense to main stat, then to stat damage
         if (this.context.selectedClass === 'dark-knight') {
-            const mainStatFromDefense = value * 0.127;
+            const mainStatFromDefense = value * StatCalculationService.DARK_KNIGHT_DEFENSE_CONVERSION_RATE;
             const statDamageIncrease = mainStatFromDefense / 100;
-            this.stats.statDamage += statDamageIncrease;
+            this.stats.STAT_DAMAGE += statDamageIncrease;
         }
 
         return this;
@@ -331,13 +352,13 @@ export class StatCalculationService {
      */
     subtractDefense(value: number): this {
         // Subtract the defense value itself
-        this.stats.defense = (this.stats.defense || 0) - value;
+        this.stats.DEFENSE = (this.stats.DEFENSE || 0) - value;
 
         // For Dark Knight: convert defense to main stat, then to stat damage
         if (this.context.selectedClass === 'dark-knight') {
-            const mainStatFromDefense = value * 0.127;
+            const mainStatFromDefense = value * StatCalculationService.DARK_KNIGHT_DEFENSE_CONVERSION_RATE;
             const statDamageDecrease = mainStatFromDefense / 100;
-            this.stats.statDamage -= statDamageDecrease;
+            this.stats.STAT_DAMAGE -= statDamageDecrease;
         }
 
         return this;
@@ -403,6 +424,24 @@ export class StatCalculationService {
         this.stats = { ...this._originalStats };
         return this;
     }
+
+    calculateMainStatPercentGain(mainStatPctIncrease, currentMainStatPct, primaryMainStat, defense, selectedClass) {
+        let defenseToMainStat = 0;
+        if (selectedClass === 'dark-knight') {
+            defenseToMainStat = defense * 0.127;
+        }
+
+        const currentMultiplier = 1 + currentMainStatPct / 100;
+        const baseMainStat = (primaryMainStat - defenseToMainStat) / currentMultiplier;
+
+        // Now calculate the new total with the increased main stat %
+        const newMultiplier = 1 + (currentMainStatPct + mainStatPctIncrease) / 100;
+        const newTotalMainStat = (baseMainStat * newMultiplier) + defenseToMainStat;
+
+        // Calculate the gain in main stat
+        const mainStatGain = newTotalMainStat - primaryMainStat;
+        return mainStatGain;
+    }
 }
 
 
@@ -414,7 +453,7 @@ export class StatCalculationService {
  * @returns
  */
 export function createStatService(baseStats: BaseStats, options: CreateStatServiceOptions = {}): StatCalculationService {
-    const { weaponAttackBonus = null } = options;
+    const { weaponAttackBonus } = options;
     return new StatCalculationService(baseStats, weaponAttackBonus);
 }
 
@@ -460,10 +499,10 @@ export class CumulativeStatCalculator {
             weaponAttackBonus: weaponAttackBonus,
             monsterType: monsterType,
             numSteps: numSteps,
-            mainStatPct: baseStats.mainStatPct || 0,
-            primaryMainStat: baseStats.mainStat || 0,
-            defense: baseStats.defense || 0,
-            selectedClass: getSelectedClass(),
+            mainStatPct: baseStats.MAIN_STAT_PCT || 0,
+            primaryMainStat: baseStats.PRIMARY_MAIN_STAT || 0,
+            defense: baseStats.DEFENSE || 0,
+            selectedClass: loadoutStore.getSelectedClass(),
             previousCumulativeIncrease: 0
         };
     }
@@ -535,7 +574,7 @@ export class CumulativeStatCalculator {
     private _stepAttack(cumulativeIncrease: number, stepIncrease: number): number {
         const effectiveIncrease = stepIncrease * (1 + this.seriesState.weaponAttackBonus / 100);
         const modifiedStats = { ...this.seriesState.cumulativeStats };
-        modifiedStats.attack += effectiveIncrease;
+        modifiedStats.ATTACK += effectiveIncrease;
 
         this.seriesState.cumulativeStats = modifiedStats;
         return calculateDamage(modifiedStats, this.seriesState.monsterType).dps;
@@ -548,7 +587,7 @@ export class CumulativeStatCalculator {
     private _stepMainStat(cumulativeIncrease: number, stepIncrease: number): number {
         const statDamageIncrease = stepIncrease / 100;
         const modifiedStats = { ...this.seriesState.cumulativeStats };
-        modifiedStats.statDamage += statDamageIncrease;
+        modifiedStats.STAT_DAMAGE += statDamageIncrease;
 
         this.seriesState.cumulativeStats = modifiedStats;
         return calculateDamage(modifiedStats, this.seriesState.monsterType).dps;
@@ -560,7 +599,7 @@ export class CumulativeStatCalculator {
      */
     private _stepMainStatPct(cumulativeIncrease: number, stepIncrease: number): number {
         const prevCumulativeIncrease = this.seriesState.previousCumulativeIncrease;
-        const mainStatGain = calculateMainStatPercentGain(
+        const mainStatGain = this.calculateMainStatPercentGain(
             stepIncrease,
             this.seriesState.mainStatPct + prevCumulativeIncrease,
             this.seriesState.primaryMainStat,
@@ -568,13 +607,12 @@ export class CumulativeStatCalculator {
             this.seriesState.selectedClass
         );
 
-        this.addMainStat(mainStatGain);
+        this.seriesState.cumulativeStats.PRIMARY_MAIN_STAT += mainStatGain;
+        this.seriesState.cumulativeStats.ATTACK += mainStatGain;
+        this.seriesState.cumulativeStats.STAT_DAMAGE += mainStatGain / 100;
 
-        const modifiedStats = { ...this.seriesState.cumulativeStats };
-        modifiedStats.statDamage = (modifiedStats.statDamage || 0) + (mainStatGain/100);
-
-        this.seriesState.cumulativeStats = modifiedStats;
-        return calculateDamage(modifiedStats, this.seriesState.monsterType).dps;
+        this.seriesState.cumulativeStats = { ...this.seriesState.cumulativeStats };
+        return calculateDamage(this.seriesState.cumulativeStats, this.seriesState.monsterType).dps;
     }
 
     /**
@@ -630,17 +668,38 @@ export class CumulativeStatCalculator {
     }
 
     private addMainStat(mainStatGain: number): void {
-        const increaseWithMainstatPct = this.calculateMainStatIncreaseWithPctForCumulative(mainStatGain);
+        if (!this.seriesState) {
+            throw new Error('Series not initialized - must call startSeries() first');
+        }
+        const increaseWithMainstatPct = this.calculateMainStatIncreaseWithPct(mainStatGain);
         const statDamageIncrease = increaseWithMainstatPct / 100;
 
-        this.seriesState!.cumulativeStats.mainStat += increaseWithMainstatPct;
-        this.seriesState!.cumulativeStats.attack += increaseWithMainstatPct;
-        this.seriesState!.cumulativeStats.statDamage += statDamageIncrease;
+        this.seriesState.cumulativeStats.PRIMARY_MAIN_STAT += increaseWithMainstatPct;
+        this.seriesState.cumulativeStats.ATTACK += increaseWithMainstatPct;
+        this.seriesState.cumulativeStats.STAT_DAMAGE += statDamageIncrease;
     }
 
-    private calculateMainStatIncreaseWithPctForCumulative(value: number): number {
-        const mainStatPct = this.seriesState!.mainStatPct;
+    private calculateMainStatIncreaseWithPct(value: number): number {
+        const mainStatPct = this.seriesState.mainStatPct;
         const mainStatWithPctIncrease = value * (1 + mainStatPct / 100);
         return mainStatWithPctIncrease;
+    }
+
+    private calculateMainStatPercentGain(mainStatPctIncrease, currentMainStatPct, primaryMainStat, defense, selectedClass) {
+        let defenseToMainStat = 0;
+        if (selectedClass === 'dark-knight') {
+            defenseToMainStat = defense * 0.127;
+        }
+
+        const currentMultiplier = 1 + currentMainStatPct / 100;
+        const baseMainStat = (primaryMainStat - defenseToMainStat) / currentMultiplier;
+
+        // Now calculate the new total with the increased main stat %
+        const newMultiplier = 1 + (currentMainStatPct + mainStatPctIncrease) / 100;
+        const newTotalMainStat = (baseMainStat * newMultiplier) + defenseToMainStat;
+
+        // Calculate the gain in main stat
+        const mainStatGain = newTotalMainStat - primaryMainStat;
+        return mainStatGain;
     }
 }

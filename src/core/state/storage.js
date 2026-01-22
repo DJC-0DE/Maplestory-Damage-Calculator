@@ -382,38 +382,7 @@ function exportComparisonItems() {
     return comparisonItems;
 }
 
-// Export all local storage data to clipboard
-export function exportData() {
-    const allData = {
-        damageCalculatorData: localStorage.getItem('damageCalculatorData'),
-        heroPowerPresets: localStorage.getItem('heroPowerPresets'),
-        cubePotentialData: localStorage.getItem('cubePotentialData'),
-        comparisonItems: exportComparisonItems(),
-        selectedClass: localStorage.getItem('selectedClass'),
-        selectedJobTier: localStorage.getItem('selectedJobTier'),
-        theme: localStorage.getItem('theme')
-    };
 
-    // Parse JSON strings so they're not double-stringified
-    Object.keys(allData).forEach(key => {
-        if (allData[key]) {
-            try {
-                allData[key] = JSON.parse(allData[key]);
-            } catch (e) {
-                // If it's not JSON (like theme which is just a string), keep as is
-            }
-        }
-    });
-
-    const jsonString = JSON.stringify(allData, null, 2);
-
-    navigator.clipboard.writeText(jsonString).then(() => {
-        alert('✅ Data copied to clipboard! You can now paste it on another device.');
-    }).catch(err => {
-        console.error('Failed to copy data:', err);
-        alert('❌ Failed to copy data. Please check console for details.');
-    });
-}
 
 /**
  * Import comparison items for all equipment slots
@@ -460,65 +429,6 @@ function importComparisonItems(comparisonItems) {
     });
 }
 
-// Import data from clipboard to local storage
-export function importData() {
-    navigator.clipboard.readText().then(text => {
-        try {
-            const data = JSON.parse(text);
-
-            // Validate the data structure
-            if (!data.damageCalculatorData && !data.heroPowerPresets && !data.cubePotentialData && !data.comparisonItems) {
-                throw new Error('Invalid data format');
-            }
-
-            // Confirm before overwriting
-            if (!confirm('⚠️ This will overwrite your current data. Are you sure you want to continue?')) {
-                return;
-            }
-
-            // Import each piece of data (stringify if it's an object)
-            if (data.damageCalculatorData) {
-                const dataString = typeof data.damageCalculatorData === 'string'
-                    ? data.damageCalculatorData
-                    : JSON.stringify(data.damageCalculatorData);
-                localStorage.setItem('damageCalculatorData', dataString);
-            }
-            if (data.heroPowerPresets) {
-                const dataString = typeof data.heroPowerPresets === 'string'
-                    ? data.heroPowerPresets
-                    : JSON.stringify(data.heroPowerPresets);
-                localStorage.setItem('heroPowerPresets', dataString);
-            }
-            if (data.cubePotentialData) {
-                const dataString = typeof data.cubePotentialData === 'string'
-                    ? data.cubePotentialData
-                    : JSON.stringify(data.cubePotentialData);
-                localStorage.setItem('cubePotentialData', dataString);
-            }
-            if (data.comparisonItems) {
-                importComparisonItems(data.comparisonItems);
-            }
-            if (data.selectedClass) {
-                localStorage.setItem('selectedClass', data.selectedClass);
-            }
-            if (data.selectedJobTier) {
-                localStorage.setItem('selectedJobTier', data.selectedJobTier);
-            }
-            if (data.theme) {
-                localStorage.setItem('theme', data.theme);
-            }
-
-            alert('✅ Data imported successfully! Refreshing page...');
-            location.reload();
-        } catch (err) {
-            console.error('Failed to import data:', err);
-            alert('❌ Failed to import data. Please make sure you copied valid data.');
-        }
-    }).catch(err => {
-        console.error('Failed to read clipboard:', err);
-        alert('❌ Failed to read clipboard. Please make sure you have data copied.');
-    });
-}
 
 // Attach save listeners to base setup inputs
 export function attachSaveListeners() {

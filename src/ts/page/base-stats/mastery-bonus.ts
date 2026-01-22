@@ -1,5 +1,3 @@
-import { updateAnalysisTabs } from '@core/state/storage';
-import { getSelectedJobTier } from '@core/state/state';
 import { MASTERY_BONUSES } from './mastery-constants';
 import { updateMasteryDisplay } from './mastery-bonus-ui';
 import type { JobTier } from '@ts/types/index';
@@ -20,14 +18,14 @@ if (typeof window !== 'undefined') {
  * Call this when user interacts with mastery checkboxes
  */
 export function updateMasteryBonuses(): void {
-    const currentTier = getSelectedJobTier() as JobTier;
+    const currentTier = loadoutStore.getCharacter().jobTier as JobTier;
     const { allTotal, bossTotal } = calculateMasteryTotals(currentTier);
 
     updateMasteryDisplay(currentTier, allTotal, bossTotal);
 
     // Save mastery checkbox states via loadout store (auto dual-writes to localStorage)
     saveMasteryCheckboxesToStore(currentTier);
-    updateAnalysisTabs();
+   // updateAnalysisTabs();
 }
 
 /**

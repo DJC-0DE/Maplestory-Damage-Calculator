@@ -7,9 +7,8 @@ import {
 } from "./weapons.js";
 import { rarities, tiers } from "@ts/types";
 import { MONSTER_TYPE, WEAPON_RARITY, WEAPON_TIER, EFFICIENCY_THRESHOLD } from "@ts/types/constants.js";
-import { getStats } from "@core/main.js";
-import { StatCalculationService } from "@core/services/stat-calculation-service.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
+import { StatCalculationService } from "@ts/services/stat-calculation-service.js";
 Object.defineProperty(window, "calculateCurrencyUpgrades", {
   value: async () => {
     await calculateCurrencyUpgradesUI(window.updateWeaponBonuses);
@@ -186,7 +185,7 @@ async function calculateCurrencyUpgradesUI(updateWeaponBonuses) {
     resultsDiv.classList.remove("visible");
     return;
   }
-  const baseStats = getStats("base");
+  const baseStats = loadoutStore.getBaseStats();
   const initialStatService = new StatCalculationService(baseStats);
   const initialDPS = initialStatService.computeDPS(MONSTER_TYPE.BOSS);
   const { calculateCurrencyUpgrades: calculateCurrencyUpgradesPure } = await import("./weapons.js");
@@ -201,7 +200,7 @@ async function calculateCurrencyUpgradesUI(updateWeaponBonuses) {
     return;
   }
   const newWeaponAttackBonus = calculateTotalWeaponAttackBonusFromLevels(result.weaponLevels);
-  const baseAttackWithoutWeaponBonus = baseStats.attack / (1 + initialStatService.weaponAttackBonus / 100);
+  const baseAttackWithoutWeaponBonus = baseStats.ATTACK / (1 + initialStatService.weaponAttackBonus / 100);
   const newStats = { ...baseStats, attack: baseAttackWithoutWeaponBonus * (1 + newWeaponAttackBonus / 100) };
   const newStatService = new StatCalculationService(newStats, newWeaponAttackBonus);
   const newDPS = newStatService.computeDPS(MONSTER_TYPE.BOSS);

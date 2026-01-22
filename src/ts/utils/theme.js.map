@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["theme.ts"],
+  "sourcesContent": ["declare global {\r\n    interface Window {\r\n        toggleTheme: () => void;\r\n    }\r\n}\r\n\r\nwindow.toggleTheme = () => toggleTheme();\r\n\r\nexport function toggleTheme(): void {\r\n    // Dark mode only - light theme disabled\r\n    // Ensure dark mode is always active\r\n    const html = document.documentElement;\r\n    if (!html.classList.contains('dark')) {\r\n        html.classList.add('dark');\r\n    }\r\n    localStorage.setItem('theme', 'dark');\r\n}\r\n\r\nexport function loadTheme(): void {\r\n    // Dark mode only - ignore saved theme and force dark mode\r\n    const html = document.documentElement;\r\n    const themeToggle = document.getElementById('theme-toggle');\r\n    const themeToggleSidebar = document.getElementById('theme-icon-sidebar');\r\n\r\n    html.classList.add('dark');\r\n    localStorage.setItem('theme', 'dark');\r\n\r\n    if (themeToggle) themeToggle.textContent = '\u2600\uFE0F';\r\n    if (themeToggleSidebar) themeToggleSidebar.textContent = '\u2600\uFE0F';\r\n}\r\n"],
+  "mappings": "AAMA,OAAO,cAAc,MAAM,YAAY;AAEhC,SAAS,cAAoB;AAGhC,QAAM,OAAO,SAAS;AACtB,MAAI,CAAC,KAAK,UAAU,SAAS,MAAM,GAAG;AAClC,SAAK,UAAU,IAAI,MAAM;AAAA,EAC7B;AACA,eAAa,QAAQ,SAAS,MAAM;AACxC;AAEO,SAAS,YAAkB;AAE9B,QAAM,OAAO,SAAS;AACtB,QAAM,cAAc,SAAS,eAAe,cAAc;AAC1D,QAAM,qBAAqB,SAAS,eAAe,oBAAoB;AAEvE,OAAK,UAAU,IAAI,MAAM;AACzB,eAAa,QAAQ,SAAS,MAAM;AAEpC,MAAI,YAAa,aAAY,cAAc;AAC3C,MAAI,mBAAoB,oBAAmB,cAAc;AAC7D;",
+  "names": []
+}

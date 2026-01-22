@@ -1,5 +1,5 @@
 import { DEFAULT_LOADOUT_DATA } from "@ts/types/loadout.js";
-import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE } from "@ts/types/constants.js";
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, DEFAULT_BASE_STATS, STAT } from "@ts/types/constants.js";
 const _LoadoutStore = class _LoadoutStore {
   // ========================================================================
   // CONSTRUCTOR
@@ -7,6 +7,15 @@ const _LoadoutStore = class _LoadoutStore {
   constructor() {
     this.isInitialized = false;
     this.data = JSON.parse(JSON.stringify(DEFAULT_LOADOUT_DATA));
+  }
+  /**
+   * Helper: Get uppercase StatKey from camelCase id
+   */
+  static statKeyFromId(id) {
+    for (const [key, stat] of Object.entries(STAT)) {
+      if (stat.id === id) return key;
+    }
+    return id;
   }
   // ========================================================================
   // INITIALIZATION
@@ -53,6 +62,10 @@ const _LoadoutStore = class _LoadoutStore {
     const legacy = legacyDataStr ? JSON.parse(legacyDataStr) : {};
     if (legacy.baseSetup) {
       Object.entries(legacy.baseSetup).forEach(([key, value]) => {
+        if (key === "character-level" && typeof value === "string") {
+          this.data.character.level = parseFloat(value);
+          return;
+        }
         if (typeof value === "number") {
           this.data.baseStats[key] = value;
         } else if (typeof value === "string") {
@@ -103,16 +116,16 @@ const _LoadoutStore = class _LoadoutStore {
     this.saveDualWrite();
   }
   /**
-   * Migrate stat keys from legacy hyphenated format to camelCase
+   * Migrate stat keys from legacy hyphenated/camelCase format to uppercase StatKey
    * Called during initialization - completely transparent to consumers
    */
   migrateStatKeys() {
     const migratedStats = {};
     let hasMigrations = false;
     Object.entries(this.data.baseStats).forEach(([key, value]) => {
-      const newKey = _LoadoutStore.STAT_KEY_MIGRATION[key];
-      if (newKey) {
-        migratedStats[newKey] = value;
+      const migratedKey = _LoadoutStore.STAT_KEY_MIGRATION[key];
+      if (migratedKey) {
+        migratedStats[migratedKey] = value;
         hasMigrations = true;
       } else {
         migratedStats[key] = value;
@@ -120,7 +133,7 @@ const _LoadoutStore = class _LoadoutStore {
     });
     if (hasMigrations) {
       this.data.baseStats = migratedStats;
-      console.log("LoadoutStore: Migrated stat keys to camelCase format");
+      console.log("LoadoutStore: Migrated stat keys to uppercase StatKey format");
     }
   }
   /**
@@ -132,6 +145,19 @@ const _LoadoutStore = class _LoadoutStore {
     if (!this.data.baseStats) {
       this.data.baseStats = {};
     }
+    const cleanedStats = {};
+    Object.keys(STAT).forEach((statKey) => {
+      const statId = STAT[statKey].id;
+      let value = this.data.baseStats[statKey];
+      if (value === void 0) {
+        value = this.data.baseStats[statId];
+        if (value !== void 0) {
+          delete this.data.baseStats[statId];
+        }
+      }
+      cleanedStats[statKey] = value ?? DEFAULT_BASE_STATS[statId];
+    });
+    this.data.baseStats = cleanedStats;
     if (!this.data.character) {
       this.data.character = { ...defaults.character };
     }
@@ -181,14 +207,14 @@ const _LoadoutStore = class _LoadoutStore {
   // ========================================================================
   /**
    * Get all base stats as key-value object
-   * @returns Record of stat key → value (0 if not set)
+   * @returns All base stats with type safety
    */
   getBaseStats() {
     return { ...this.data.baseStats };
   }
   /**
    * Get a single base stat value
-   * @param key - Stat key (e.g., "attack-base", "crit-rate-base")
+   * @param key - Stat key (e.g., "attack", "crit-rate")
    * @returns Stat value (0 if not set)
    */
   getBaseStat(key) {
@@ -280,25 +306,41 @@ const _LoadoutStore = class _LoadoutStore {
   // ========================================================================
   /**
    * Update multiple base stats at once
-   * @param updates - Object mapping stat keys (camelCase or legacy format) to values
+   * @param updates - Object mapping stat keys (hyphenated, camelCase, or uppercase) to values
    */
   updateBaseStats(updates) {
-    const migratedUpdates = {};
+    const normalizedUpdates = {};
     Object.entries(updates).forEach(([key, value]) => {
-      const migratedKey = _LoadoutStore.STAT_KEY_MIGRATION[key] ?? key;
-      migratedUpdates[migratedKey] = value;
+      let normalizedKey = key;
+      const hyphenatedMigrated = _LoadoutStore.STAT_KEY_MIGRATION[key];
+      if (hyphenatedMigrated) {
+        normalizedKey = hyphenatedMigrated;
+      }
+      const uppercased = _LoadoutStore.CAMELCASE_TO_UPPERCASE[normalizedKey];
+      if (uppercased) {
+        normalizedKey = uppercased;
+      }
+      normalizedUpdates[normalizedKey] = value;
     });
-    Object.assign(this.data.baseStats, migratedUpdates);
+    Object.assign(this.data.baseStats, normalizedUpdates);
     this.saveDualWrite();
   }
   /**
    * Update single base stat
-   * @param key - Stat key in camelCase (e.g., "attack", "critRate")
+   * @param key - Stat key (accepts hyphenated, camelCase, or uppercase)
    * @param value - New value
    */
   updateBaseStat(key, value) {
-    const migratedKey = _LoadoutStore.STAT_KEY_MIGRATION[key] ?? key;
-    this.data.baseStats[migratedKey] = value;
+    let normalizedKey = key;
+    const hyphenatedMigrated = _LoadoutStore.STAT_KEY_MIGRATION[key];
+    if (hyphenatedMigrated) {
+      normalizedKey = hyphenatedMigrated;
+    }
+    const uppercased = _LoadoutStore.CAMELCASE_TO_UPPERCASE[normalizedKey];
+    if (uppercased) {
+      normalizedKey = uppercased;
+    }
+    this.data.baseStats[normalizedKey] = value;
     this.saveDualWrite();
   }
   /**
@@ -392,8 +434,17 @@ const _LoadoutStore = class _LoadoutStore {
    * Used for dual-write backward compatibility
    */
   convertToLegacyFormat() {
+    const reverseMigration = {};
+    Object.entries(_LoadoutStore.STAT_KEY_MIGRATION).forEach(([hyphenated, upper]) => {
+      reverseMigration[upper] = hyphenated;
+    });
+    const baseSetup = {};
+    Object.entries(this.data.baseStats).forEach(([key, value]) => {
+      const legacyKey = reverseMigration[key] ?? key;
+      baseSetup[legacyKey] = value;
+    });
     const legacy = {
-      baseSetup: { ...this.data.baseStats },
+      baseSetup,
       weapons: {},
       masteryBonuses: {
         [JOB_TIER.THIRD]: {
@@ -439,37 +490,51 @@ const _LoadoutStore = class _LoadoutStore {
 // PRIVATE MIGRATION MAP
 // ========================================================================
 /**
- * Migration map: legacy hyphenated keys → new camelCase keys
+ * Migration map: legacy hyphenated keys → uppercase StatKey enum values
  * Used internally during data loading/migration
  */
 _LoadoutStore.STAT_KEY_MIGRATION = {
-  // Hyphenated → camelCase
-  "crit-rate": "critRate",
-  "crit-damage": "critDamage",
-  "stat-damage": "statDamage",
-  "damage-amp": "damageAmp",
-  "attack-speed": "attackSpeed",
-  "def-pen": "defPen",
-  "boss-damage": "bossDamage",
-  "normal-damage": "normalDamage",
-  "skill-coeff": "skillCoeff",
-  "skill-mastery": "skillMastery",
-  "skill-mastery-boss": "skillMasteryBoss",
-  "min-damage": "minDamage",
-  "max-damage": "maxDamage",
-  "primary-main-stat": "primaryMainStat",
-  "secondary-main-stat": "secondaryMainStat",
-  "final-damage": "finalDamage",
-  "target-stage": "targetStage",
-  "main-stat-pct": "mainStatPct",
-  "skill-level-1st": "skillLevel1st",
-  "skill-level-2nd": "skillLevel2nd",
-  "skill-level-3rd": "skillLevel3rd",
-  "skill-level-4th": "skillLevel4th",
-  "character-level": "characterLevel",
-  "basic-attack-damage": "basicAttackDamage",
-  "skill-damage": "skillDamage"
+  // Hyphenated → Uppercase StatKey
+  "crit-rate": "CRIT_RATE",
+  "crit-damage": "CRIT_DAMAGE",
+  "stat-damage": "STAT_DAMAGE",
+  "damage-amp": "DAMAGE_AMP",
+  "damage": "DAMAGE",
+  "attack-speed": "ATTACK_SPEED",
+  "def-pen": "DEF_PEN",
+  "boss-damage": "BOSS_DAMAGE",
+  "normal-damage": "NORMAL_DAMAGE",
+  "skill-coeff": "SKILL_COEFFICIENT",
+  "skill-mastery": "MASTERY",
+  "skill-mastery-boss": "BOSS_MASTERY",
+  "min-damage": "MIN_DAMAGE",
+  "max-damage": "MAX_DAMAGE",
+  "primary-main-stat": "PRIMARY_MAIN_STAT",
+  "secondary-main-stat": "SECONDARY_MAIN_STAT",
+  "final-damage": "FINAL_DAMAGE",
+  "main-stat-pct": "MAIN_STAT_PCT",
+  "skill-level-1st": "SKILL_LEVEL_1ST",
+  "skill-level-2nd": "SKILL_LEVEL_2ND",
+  "skill-level-3rd": "SKILL_LEVEL_3RD",
+  "skill-level-4th": "SKILL_LEVEL_4TH",
+  "basic-attack-damage": "BASIC_ATTACK_DAMAGE",
+  "skill-damage": "SKILL_DAMAGE",
+  "final-attack": "FINAL_ATTACK",
+  "defense": "DEFENSE",
+  "attack": "ATTACK",
+  "str": "STR",
+  "dex": "DEX",
+  "int": "INT",
+  "luk": "LUK"
 };
+/**
+ * Reverse mapping: camelCase id → uppercase StatKey
+ * Computed from STAT constant for normalizing all keys to uppercase
+ */
+_LoadoutStore.CAMELCASE_TO_UPPERCASE = Object.values(STAT).reduce((acc, stat) => {
+  acc[stat.id] = _LoadoutStore.statKeyFromId(stat.id);
+  return acc;
+}, {});
 let LoadoutStore = _LoadoutStore;
 const loadoutStore = new LoadoutStore();
 export {

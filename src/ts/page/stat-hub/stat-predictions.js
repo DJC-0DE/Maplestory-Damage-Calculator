@@ -1,51 +1,49 @@
-import { StatCalculationService } from "@core/services/stat-calculation-service.js";
-import { MONSTER_TYPE } from "@ts/types/constants.js";
-const STAT_DAMAGE_KEY = "stat-damage";
-const NORMAL_DAMAGE_KEY = "normal-damage";
-const FINAL_DAMAGE_KEY = "final-damage";
-const ATTACK_SPEED_KEY = "attack-speed";
-const DEF_PEN_KEY = "def-pen";
-const STAT_DAMAGE_CAMEL = "statDamage";
-const NORMAL_DAMAGE_CAMEL = "normalDamage";
-const FINAL_DAMAGE_CAMEL = "finalDamage";
-const ATTACK_SPEED_CAMEL = "attackSpeed";
-const DEF_PEN_CAMEL = "defPen";
+import { StatCalculationService } from "@ts/services/stat-calculation-service.js";
+import { MONSTER_TYPE, STAT } from "@ts/types/constants.js";
+function idToStatKey(id) {
+  for (const key of Object.keys(STAT)) {
+    if (STAT[key].id === id) {
+      return key;
+    }
+  }
+  throw new Error(`Unknown stat ID: ${id}`);
+}
 const DEFAULT_STAT_INCREASES = {
   flat: [500, 1e3, 2500, 5e3, 1e4, 15e3],
   mainStat: [100, 500, 1e3, 2500, 5e3, 7500],
   percentage: [1, 5, 10, 25, 50, 75]
 };
 const PERCENTAGE_STATS = [
-  { key: "skillCoeff", label: "Skill Coeff" },
-  { key: "skillMastery", label: "Skill Mastery" },
-  { key: "damage", label: "Damage" },
-  { key: "finalDamage", label: "Final Dmg" },
-  { key: "bossDamage", label: "Boss Dmg" },
-  { key: "normalDamage", label: "Mob Dmg" },
-  { key: "statDamage", label: "Main Stat %" },
-  { key: "damageAmp", label: "Dmg Amp" },
-  { key: "minDamage", label: "Min Dmg" },
-  { key: "maxDamage", label: "Max Dmg" },
-  { key: "critRate", label: "Crit Rate" },
-  { key: "critDamage", label: "Crit Dmg" },
-  { key: "attackSpeed", label: "Atk Speed" },
-  { key: "defPen", label: "Def Pen" }
+  { key: STAT.SKILL_COEFFICIENT.id, label: "Skill Coeff" },
+  { key: STAT.MASTERY.id, label: "Skill Mastery" },
+  { key: STAT.DAMAGE.id, label: "Damage" },
+  { key: STAT.FINAL_DAMAGE.id, label: "Final Dmg" },
+  { key: STAT.BOSS_DAMAGE.id, label: "Boss Dmg" },
+  { key: STAT.NORMAL_DAMAGE.id, label: "Mob Dmg" },
+  { key: STAT.STAT_DAMAGE.id, label: "Main Stat %" },
+  { key: STAT.DAMAGE_AMP.id, label: "Dmg Amp" },
+  { key: STAT.MIN_DAMAGE.id, label: "Min Dmg" },
+  { key: STAT.MAX_DAMAGE.id, label: "Max Dmg" },
+  { key: STAT.CRIT_RATE.id, label: "Crit Rate" },
+  { key: STAT.CRIT_DAMAGE.id, label: "Crit Dmg" },
+  { key: STAT.ATTACK_SPEED.id, label: "Atk Speed" },
+  { key: STAT.DEF_PEN.id, label: "Def Pen" }
 ];
 const MULTIPLICATIVE_STATS = {
-  [FINAL_DAMAGE_CAMEL]: true
+  [STAT.FINAL_DAMAGE.id]: true
 };
 const DIMINISHING_RETURN_STATS = {
-  [ATTACK_SPEED_CAMEL]: { denominator: 150 },
-  [DEF_PEN_CAMEL]: { denominator: 100 }
+  [STAT.ATTACK_SPEED.id]: { denominator: 150 },
+  [STAT.DEF_PEN.id]: { denominator: 100 }
 };
 function calculateAttackWeights(stats, baseBossDPS, increases) {
   const results = [];
   increases.forEach((increase) => {
     const service = new StatCalculationService(stats);
-    const oldValue = stats.attack;
+    const oldValue = stats.ATTACK;
     const effectiveIncrease = increase * (1 + service.weaponAttackBonus / 100);
     const newDPS = service.addAttack(increase).computeDPS(MONSTER_TYPE.BOSS);
-    const newValue = service.getStats().attack;
+    const newValue = service.getStats().ATTACK;
     const gainPercentage = (newDPS - baseBossDPS) / baseBossDPS * 100;
     results.push({
       statLabel: "Attack",
@@ -80,11 +78,11 @@ function calculateMainStatWeights(stats, baseBossDPS, increases) {
 }
 function calculatePercentageStatWeight(stats, baseBossDPS, baseNormalDPS, statKey, increases) {
   const results = [];
-  const isNormalDamage = statKey === NORMAL_DAMAGE_CAMEL;
+  const isNormalDamage = statKey === STAT.NORMAL_DAMAGE.id;
   const baseDPS = isNormalDamage ? baseNormalDPS : baseBossDPS;
   increases.forEach((increase) => {
     const service = new StatCalculationService(stats);
-    if (statKey === STAT_DAMAGE_CAMEL) {
+    if (statKey === STAT.STAT_DAMAGE.id) {
       service.addMainStatPct(increase);
     } else if (MULTIPLICATIVE_STATS[statKey]) {
       service.addMultiplicativeStat(statKey, increase);
@@ -97,8 +95,9 @@ function calculatePercentageStatWeight(stats, baseBossDPS, baseNormalDPS, statKe
     const monsterType = isNormalDamage ? MONSTER_TYPE.NORMAL : MONSTER_TYPE.BOSS;
     const newDPS = service.computeDPS(monsterType);
     const gainPercentage = (newDPS - baseDPS) / baseDPS * 100;
-    const newValue = service.getStats()[statKey];
-    const oldValue = stats[statKey];
+    const actualStatKey = idToStatKey(statKey);
+    const newValue = service.getStats()[actualStatKey];
+    const oldValue = stats[actualStatKey];
     results.push({
       statLabel: statKey,
       increase,

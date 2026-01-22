@@ -5,12 +5,10 @@ import {
     attachBaseStatsEventListeners
 } from "./base-stats/base-stats-ui";
 import {
-    initializeClassSelectUI,
     loadClassSelectUI,
     attachClassSelectEventListeners
 } from "./base-stats/class-select-ui";
 import {
-    initializeTargetSelectUI,
     loadTargetSelectUI,
     attachTargetSelectEventListeners
 } from "./base-stats/target-select-ui";
@@ -64,8 +62,6 @@ class LoadoutPage extends BasePage {
 
         // Step 1: Initialize all UI elements (HTML generation)
         initializeBaseStatsUI();
-        initializeClassSelectUI();
-        initializeTargetSelectUI();
         initializeWeaponsUI(); // Handles tab HTML and weapon grid
         initializeWeaponPriorityUI(); // Initialize priority UI
 
@@ -94,11 +90,6 @@ export const loadoutPage = new LoadoutPage();
 
 // Expose switchToTab method to window for HTML onclick handlers
 window.loadoutSwitchToTab = (tabName: string) => loadoutPage.switchToTab(tabName);
-
-// Legacy export for compatibility (can be removed once router.js is updated)
-export async function initializeLoadoutPage(): Promise<void> {
-    await loadoutPage.initializeComponents();
-}
 
 // Declare the window function for TypeScript
 declare global {

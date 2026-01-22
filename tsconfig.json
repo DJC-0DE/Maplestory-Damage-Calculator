@@ -13,7 +13,7 @@
     "paths": {
       "@ts/*": ["ts/*"],
       "@core/*": ["core/*"],
-      "@utils/*": ["utils/*"],
+      "@utils/*": ["ts/utils/*"],
       "@data/*": ["data/*"],
       "@ui/*": ["ui/*"],
       "@types/*": ["ts/types/*"],

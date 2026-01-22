@@ -2,9 +2,6 @@
  * DOM manipulation layer for Target/Stage selection
  * All functions handle only DOM operations and delegate logic to target-select.ts
  */
-
-import { setCurrentContentType, getCurrentContentType } from '@core/state/state';
-import { updateAnalysisTabs } from '@core/state/storage';
 import { CONTENT_TYPE } from '@ts/types/constants';
 import type { ContentType } from '@ts/types';
 import type { ContentTypeConfig } from '@ts/types/page/base-stats/base-stats.types';
@@ -16,8 +13,6 @@ import {
     SavedContentTypeData
 } from './target-select';
 import { loadoutStore } from '@ts/store/loadout.store';
-
-export type { ContentType };
 
 // Content type configuration for generating content selector HTML
 const CONTENT_TYPES: ContentTypeConfig[] = [
@@ -45,13 +40,12 @@ if (typeof window !== 'undefined') {
  * Handle user clicking on a content type button
  */
 export function selectContentType(contentType: ContentType): void {
-    setCurrentContentType(contentType);
     updateContentTypeSelectionUI(contentType);
     configureDropdownsForContentType(contentType);
 
     // Save via loadout store (auto dual-writes to localStorage)
     loadoutStore.updateTarget({ contentType });
-    updateAnalysisTabs();
+    //updateAnalysisTabs();
 }
 
 /**
@@ -59,24 +53,24 @@ export function selectContentType(contentType: ContentType): void {
  */
 export function onSubcategoryChange(): void {
     const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
-    const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
     if (!subcategorySelect || !stageSelect) return;
 
     const subcategory = subcategorySelect.value;
-    const currentContentType = getCurrentContentType() as ContentType;
+    const target = loadoutStore.getTarget();
 
-    if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
+    if (target.contentType === CONTENT_TYPE.STAGE_HUNT) {
         const chapter = subcategory.replace('chapter-', '');
         populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
-    } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+    } else if (target.contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
         populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
     }
 
     stageSelect.style.display = 'block';
 
-    // Save via loadout store (auto dual-writes to localStorage)
+    // Save subcategory only - selectedStage is saved by the stage dropdown's own change event listener
     loadoutStore.updateTarget({ subcategory });
-    updateAnalysisTabs();
+    //updateAnalysisTabs();
 }
 
 // ============================================================================
@@ -84,29 +78,10 @@ export function onSubcategoryChange(): void {
 // ============================================================================
 
 /**
- * Initialize target select state from saved localStorage data
- */
-export function initializeTargetSelectUI(): void {
-    const target = loadoutStore.getTarget();
-
-    if (!target || !target.contentType) {
-        initializeWithDefaultState();
-        return;
-    }
-
-    initializeWithSavedState({ contentType: target.contentType, subcategory: target.subcategory, selectedStage: target.selectedStage });
-}
-
-/**
  * Load target select UI from saved state
  */
 export function loadTargetSelectUI(): void {
     const target = loadoutStore.getTarget();
-
-    if (!target || !target.contentType) {
-        loadDefaultSelectionUI();
-        return;
-    }
 
     restoreSavedSelectionUI({ contentType: target.contentType, subcategory: target.subcategory, selectedStage: target.selectedStage });
 }
@@ -116,26 +91,12 @@ export function loadTargetSelectUI(): void {
 // ============================================================================
 
 function initializeWithDefaultState(): void {
-    setCurrentContentType(CONTENT_TYPE.NONE as ContentType);
-}
-
-function initializeWithSavedState(savedData: SavedContentTypeData): void {
-    const { contentType } = savedData;
-    setCurrentContentType(contentType);
+    loadoutStore.updateTarget({ contentType: CONTENT_TYPE.NONE});
 }
 
 // ============================================================================
 // UI RESTORATION
 // ============================================================================
-
-function loadDefaultSelectionUI(): void {
-    updateContentTypeSelectionUI(CONTENT_TYPE.NONE as ContentType);
-
-    const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
-    if (stageSelect) {
-        stageSelect.value = CONTENT_TYPE.NONE;
-    }
-}
 
 function restoreSavedSelectionUI(savedData: SavedContentTypeData): void {
     const { contentType, subcategory, selectedStage } = savedData;
@@ -148,16 +109,15 @@ function restoreSavedSelectionUI(savedData: SavedContentTypeData): void {
         if (subcategorySelect) {
             subcategorySelect.value = subcategory;
 
-            const currentContentType = getCurrentContentType() as ContentType;
-            if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
+            if (contentType === CONTENT_TYPE.STAGE_HUNT) {
                 const chapter = subcategory.replace('chapter-', '');
                 populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
-            } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+            } else if (contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
                 populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
             }
 
             // Show the stage select after populating it
-            const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+            const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
             if (stageSelect) {
                 stageSelect.style.display = 'block';
             }
@@ -165,7 +125,7 @@ function restoreSavedSelectionUI(savedData: SavedContentTypeData): void {
     }
 
     if (selectedStage) {
-        const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+        const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
         if (stageSelect) {
             stageSelect.value = selectedStage;
         }
@@ -187,7 +147,7 @@ function updateContentTypeSelectionUI(contentType: ContentType): void {
     }
 
     const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
-    const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
 
     if (subcategorySelect) subcategorySelect.style.display = 'none';
     if (stageSelect) stageSelect.style.display = 'none';
@@ -195,7 +155,7 @@ function updateContentTypeSelectionUI(contentType: ContentType): void {
 
 function configureDropdownsForContentType(contentType: ContentType): void {
     const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
-    const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
     if (!stageSelect) return;
 
     if (contentType === CONTENT_TYPE.NONE) {
@@ -205,7 +165,7 @@ function configureDropdownsForContentType(contentType: ContentType): void {
 
     if (requiresSubcategory(contentType)) {
         populateSubcategoryDropdown(contentType);
-        if (subcategorySelect) subcategorySelect.style.display = 'block';
+        stageSelect.style.display = 'block';
     } else {
         stageSelect.style.display = 'block';
         populateStageDropdown(contentType);
@@ -228,7 +188,7 @@ function populateSubcategoryDropdown(contentType: ContentType): void {
 }
 
 function populateStageDropdown(contentType: ContentType): void {
-    const select = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const select = document.getElementById('target-stage') as HTMLSelectElement;
     if (!select) return;
 
     select.innerHTML = '';
@@ -244,7 +204,7 @@ function populateStageDropdown(contentType: ContentType): void {
 }
 
 function populateStageDropdownFiltered(contentType: ContentType, filter: string): void {
-    const select = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const select = document.getElementById('target-stage') as HTMLSelectElement;
     if (!select) return;
 
     select.innerHTML = '';
@@ -280,7 +240,7 @@ function attachContentTypeSelectorListeners(): void {
  */
 function attachTargetContentListeners(): void {
     const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
-    const stageSelect = document.getElementById('target-stage-base') as HTMLSelectElement;
+    const stageSelect = document.getElementById('target-stage') as HTMLSelectElement;
 
     if (subcategorySelect) {
         subcategorySelect.addEventListener('change', () => onSubcategoryChange());
@@ -291,7 +251,7 @@ function attachTargetContentListeners(): void {
             // Save via loadout store (auto dual-writes to localStorage)
             const stageValue = stageSelect.value;
             loadoutStore.updateTarget({ selectedStage: stageValue });
-            updateAnalysisTabs();
+           // updateAnalysisTabs();
         });
     }
 }

@@ -1,4 +1,4 @@
-import { stageDefenses } from "@core/state/state.js";
+import { stageDefenses } from "@ts/services/stage-defense.service.js";
 import { CONTENT_TYPE, MAX_CHAPTER_NUMBER } from "@ts/types";
 function getStageEntries(contentType) {
   switch (contentType) {

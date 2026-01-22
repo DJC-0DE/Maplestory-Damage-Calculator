@@ -1,18 +1,15 @@
-import {
-    calculate3rdJobSkillCoefficient,
-    calculate4thJobSkillCoefficient
-} from '@core/features/skills/skill-coefficient';
-import { getSelectedJobTier, getCharacterLevel } from '@core/state/state';
+
 import { JOB_TIER } from '@ts/types';
-import type { JobTier } from '@ts/types';
+import { loadoutStore } from '@ts/store/loadout.store';
+import { calculate3rdJobSkillCoefficient, calculate4thJobSkillCoefficient } from '@ts/services/skill-coefficient.service';
 
 export function updateSkillCoefficient(): void {
-    const coefficientInput = document.getElementById('skill-coeff-base') as HTMLInputElement;
+    const coefficientInput = document.getElementById('skillCoeff') as HTMLInputElement;
 
     if (!coefficientInput) return;
 
-    const characterLevel = getCharacterLevel();
-    const jobTier = getSelectedJobTier();
+    const characterLevel = loadoutStore.getCharacterLevel();
+    const jobTier = loadoutStore.getSelectedJobTier();
 
     // Get the skill level for the selected job tier
     let skillLevel = 0;

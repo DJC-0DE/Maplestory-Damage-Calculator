@@ -4,23 +4,23 @@
  * Separated from UI concerns
  */
 
-import { StatCalculationService } from '@core/services/stat-calculation-service';
-import { MONSTER_TYPE } from '@ts/types/constants';
-import type { StatWeightResult, StatIncrease, StatsObject } from '@ts/types/page/stat-hub/stat-hub.types';
+import { StatCalculationService } from '@ts/services/stat-calculation-service';
+import { BaseStats } from '@ts/types';
+import { MONSTER_TYPE, STAT, type StatKey } from '@ts/types/constants';
+import type { StatWeightResult, StatIncrease } from '@ts/types/page/stat-hub/stat-hub.types';
 
-// Stat key constants for comparisons
-const STAT_DAMAGE_KEY = 'stat-damage';
-const NORMAL_DAMAGE_KEY = 'normal-damage';
-const FINAL_DAMAGE_KEY = 'final-damage';
-const ATTACK_SPEED_KEY = 'attack-speed';
-const DEF_PEN_KEY = 'def-pen';
-
-// CamelCase versions for StatsObject access
-const STAT_DAMAGE_CAMEL = 'statDamage';
-const NORMAL_DAMAGE_CAMEL = 'normalDamage';
-const FINAL_DAMAGE_CAMEL = 'finalDamage';
-const ATTACK_SPEED_CAMEL = 'attackSpeed';
-const DEF_PEN_CAMEL = 'defPen';
+/**
+ * Convert lowercase stat ID to StatKey (uppercase)
+ * Maps 'attack' -> 'ATTACK', 'critRate' -> 'CRIT_RATE', etc.
+ */
+function idToStatKey(id: string): StatKey {
+    for (const key of Object.keys(STAT) as StatKey[]) {
+        if (STAT[key].id === id) {
+            return key;
+        }
+    }
+    throw new Error(`Unknown stat ID: ${id}`);
+}
 
 // Default stat increase values
 export const DEFAULT_STAT_INCREASES: StatIncrease = {
@@ -31,31 +31,31 @@ export const DEFAULT_STAT_INCREASES: StatIncrease = {
 
 // Percentage stat configuration
 export const PERCENTAGE_STATS = [
-    { key: 'skillCoeff', label: 'Skill Coeff' },
-    { key: 'skillMastery', label: 'Skill Mastery' },
-    { key: 'damage', label: 'Damage' },
-    { key: 'finalDamage', label: 'Final Dmg' },
-    { key: 'bossDamage', label: 'Boss Dmg' },
-    { key: 'normalDamage', label: 'Mob Dmg' },
-    { key: 'statDamage', label: 'Main Stat %' },
-    { key: 'damageAmp', label: 'Dmg Amp' },
-    { key: 'minDamage', label: 'Min Dmg' },
-    { key: 'maxDamage', label: 'Max Dmg' },
-    { key: 'critRate', label: 'Crit Rate' },
-    { key: 'critDamage', label: 'Crit Dmg' },
-    { key: 'attackSpeed', label: 'Atk Speed' },
-    { key: 'defPen', label: 'Def Pen' }
+    { key: STAT.SKILL_COEFFICIENT.id, label: 'Skill Coeff' },
+    { key: STAT.MASTERY.id, label: 'Skill Mastery' },
+    { key: STAT.DAMAGE.id, label: 'Damage' },
+    { key: STAT.FINAL_DAMAGE.id, label: 'Final Dmg' },
+    { key: STAT.BOSS_DAMAGE.id, label: 'Boss Dmg' },
+    { key: STAT.NORMAL_DAMAGE.id, label: 'Mob Dmg' },
+    { key: STAT.STAT_DAMAGE.id, label: 'Main Stat %' },
+    { key: STAT.DAMAGE_AMP.id, label: 'Dmg Amp' },
+    { key: STAT.MIN_DAMAGE.id, label: 'Min Dmg' },
+    { key: STAT.MAX_DAMAGE.id, label: 'Max Dmg' },
+    { key: STAT.CRIT_RATE.id, label: 'Crit Rate' },
+    { key: STAT.CRIT_DAMAGE.id, label: 'Crit Dmg' },
+    { key: STAT.ATTACK_SPEED.id, label: 'Atk Speed' },
+    { key: STAT.DEF_PEN.id, label: 'Def Pen' }
 ];
 
 // Multiplicative stats (applied multiplicatively)
 export const MULTIPLICATIVE_STATS: Record<string, boolean> = {
-    [FINAL_DAMAGE_CAMEL]: true
+    [STAT.FINAL_DAMAGE.id]: true
 };
 
 // Diminishing return stats with their denominator values
 export const DIMINISHING_RETURN_STATS: Record<string, { denominator: number }> = {
-    [ATTACK_SPEED_CAMEL]: { denominator: 150 },
-    [DEF_PEN_CAMEL]: { denominator: 100 }
+    [STAT.ATTACK_SPEED.id]: { denominator: 150 },
+    [STAT.DEF_PEN.id]: { denominator: 100 }
 };
 
 /**
@@ -63,7 +63,7 @@ export const DIMINISHING_RETURN_STATS: Record<string, { denominator: number }> =
  * Returns array of weight results for each increase value
  */
 export function calculateAttackWeights(
-    stats: StatsObject,
+    stats: BaseStats,
     baseBossDPS: number,
     increases: number[]
 ): StatWeightResult[] {
@@ -71,11 +71,11 @@ export function calculateAttackWeights(
 
     increases.forEach(increase => {
         const service = new StatCalculationService(stats);
-        const oldValue = stats.attack;
+        const oldValue = stats.ATTACK;
         const effectiveIncrease = increase * (1 + service.weaponAttackBonus / 100);
 
         const newDPS = service.addAttack(increase).computeDPS(MONSTER_TYPE.BOSS);
-        const newValue = service.getStats().attack;
+        const newValue = service.getStats().ATTACK;
         const gainPercentage = (newDPS - baseBossDPS) / baseBossDPS * 100;
 
         results.push({
@@ -98,7 +98,7 @@ export function calculateAttackWeights(
  * Returns array of weight results for each increase value
  */
 export function calculateMainStatWeights(
-    stats: StatsObject,
+    stats: BaseStats,
     baseBossDPS: number,
     increases: number[]
 ): StatWeightResult[] {
@@ -129,21 +129,21 @@ export function calculateMainStatWeights(
  * Returns array of weight results for each increase value
  */
 export function calculatePercentageStatWeight(
-    stats: StatsObject,
+    stats: BaseStats,
     baseBossDPS: number,
     baseNormalDPS: number,
     statKey: string,
     increases: number[]
 ): StatWeightResult[] {
     const results: StatWeightResult[] = [];
-    const isNormalDamage = statKey === NORMAL_DAMAGE_CAMEL;
+    const isNormalDamage = statKey === STAT.NORMAL_DAMAGE.id;
     const baseDPS = isNormalDamage ? baseNormalDPS : baseBossDPS;
 
     increases.forEach(increase => {
         const service = new StatCalculationService(stats);
 
         // Apply the stat increase based on type
-        if (statKey === STAT_DAMAGE_CAMEL) {
+        if (statKey === STAT.STAT_DAMAGE.id) {
             service.addMainStatPct(increase);
         } else if (MULTIPLICATIVE_STATS[statKey]) {
             service.addMultiplicativeStat(statKey, increase);
@@ -158,8 +158,9 @@ export function calculatePercentageStatWeight(
         const newDPS = service.computeDPS(monsterType);
         const gainPercentage = (newDPS - baseDPS) / baseDPS * 100;
 
-        const newValue = service.getStats()[statKey];
-        const oldValue = stats[statKey];
+        const actualStatKey = idToStatKey(statKey);
+        const newValue = service.getStats()[actualStatKey];
+        const oldValue = stats[actualStatKey];
 
         results.push({
             statLabel: statKey,
@@ -180,7 +181,7 @@ export function calculatePercentageStatWeight(
  * Returns structured data for both flat and percentage stats
  */
 export function calculateAllStatWeights(
-    stats: StatsObject
+    stats: BaseStats
 ): {
     baseBossDPS: number;
     baseNormalDPS: number;

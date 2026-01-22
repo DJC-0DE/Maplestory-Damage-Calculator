@@ -1,11 +1,5 @@
-import { updateAnalysisTabs } from "@core/state/storage.js";
-import { updateClassWarning } from "@core/cube/cube-ui.js";
 import { updateSkillCoefficient } from "./base-stats.js";
 import { updateMasteryBonuses } from "./mastery-bonus.js";
-import {
-  setSelectedClass,
-  setSelectedJobTier
-} from "@core/state/state.js";
 import { CLASS, JOB_TIER } from "@ts/types/constants.js";
 import {
   isStrMainStatClass,
@@ -31,20 +25,18 @@ if (typeof window !== "undefined") {
   window.selectMasteryTab = selectMasteryTab;
 }
 function selectJobTier(tier) {
-  setSelectedJobTier(tier);
+  loadoutStore.updateCharacter({ jobTier: tier });
   updateJobTierButtonUI(tier);
   updateMasteryTableVisibility(tier);
   updateMasteryTabUI(tier);
   updateSkillCoefficient();
   updateMasteryBonuses();
-  updateAnalysisTabs();
 }
 function selectClass(className) {
-  setSelectedClass(className);
+  loadoutStore.updateCharacter({ class: className });
   updateClassSelectionUI(className);
   updateClassUI(className);
   try {
-    updateClassWarning();
   } catch (error) {
   }
 }
@@ -71,10 +63,10 @@ function loadClassSelectUI() {
   }
 }
 function initializeJobTierState(tier) {
-  setSelectedJobTier(tier);
+  loadoutStore.updateCharacter({ jobTier: tier });
 }
 function initializeClassState(className) {
-  setSelectedClass(className);
+  loadoutStore.updateCharacter({ class: className });
 }
 function restoreJobTierSelection(tier) {
   updateJobTierButtonUI(tier);

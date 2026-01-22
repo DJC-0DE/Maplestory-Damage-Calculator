@@ -11,9 +11,6 @@ import {
 import type { WeaponRarity, WeaponTier, StarRating } from '@ts/types';
 import { rarities, tiers, weaponBaseAttackEquipped } from '@ts/types';
 import { WEAPON_RARITY, WEAPON_TIER, HIGH_TIER_RARITIES } from '@ts/types/constants';
-
-// Re-import services from existing JS (will be converted to TS later)
-import { calculate } from '@core/main.js';
 import { loadoutStore } from '@ts/store/loadout.store';
 
 // Import and re-export upgrade priority UI functions for external use
@@ -746,7 +743,7 @@ export function updateWeaponBonuses(calculateDamage: boolean = true): void {
     // Recalculate damage
     if(calculateDamage)
     {
-        calculate();
+       // calculate();
     }
 
     // Update upgrade priority chain

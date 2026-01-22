@@ -3,7 +3,11 @@
  * Centralized data structure for loadout configuration
  */
 
-import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, type ContentType, type JobTier, type MasteryTypeValue } from './constants';
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, DEFAULT_BASE_STATS, type ContentType, type JobTier, type MasteryTypeValue, type StatKey as StatKeyFromConstants, type BaseStats as BaseStatsFromConstants } from './constants';
+
+// Re-export for backward compatibility
+export type StatKey = StatKeyFromConstants;
+export type BaseStats = BaseStatsFromConstants;
 
 /**
  * Job tier types for mastery bonuses
@@ -19,8 +23,8 @@ export type MasteryType = MasteryTypeValue;
  * Loadout data structure - centralized state for all loadout-related data
  */
 export interface LoadoutData {
-    /** Base stat fields (flat key-value for all stat inputs) */
-    baseStats: Record<string, number>;
+    /** Base stat fields (typed with all stat keys from STAT constant) */
+    baseStats: BaseStats;
 
     /** Character metadata */
     character: {
@@ -57,11 +61,6 @@ export interface LoadoutData {
     };
 }
 
-export interface BaseStats {
-    critDamage: number,
-    
-}
-
 /**
  * Legacy damageCalculatorData format (for migration/dual-write)
  */
@@ -81,7 +80,7 @@ export interface LegacyDamageCalculatorData {
  * Default empty loadout data
  */
 export const DEFAULT_LOADOUT_DATA: LoadoutData = {
-    baseStats: {},
+    baseStats: DEFAULT_BASE_STATS as BaseStats,
     character: {
         level: 0,
         class: null,

@@ -1,83 +1,9 @@
-import { getSelectedStageDefense } from '@core/state/state.js';
 import { formatNumber } from '@utils/formatters.js';
 import { StatCalculationService } from '@core/services/stat-calculation-service.js';
-import { getStats } from '@core/state/state.js';
 
 // Note: calculateStatEquivalency has been migrated to TypeScript in src/ts/page/stat-hub/stat-equivalency.ts
 // This function is kept here for reference but should be removed after full migration is complete
 window.calculateStatEquivalency = calculateStatEquivalency;
-
-// Main damage calculation function
-export function calculateDamage(stats, monsterType) {
-    // Step 1: Calculate Base Damage
-    const totalSkillMastery = stats.skillMastery + (monsterType === 'boss' ? stats.skillMasteryBoss : 0);
-    const baseDamage = stats.attack * (stats.skillCoeff / 100) * (1 + totalSkillMastery / 100);
-
-    // Step 2: Calculate Base Hit Damage
-    const damageAmpMultiplier = 1 + stats.damageAmp / 100;
-
-    // Get selected stage's defense values
-    const stageDefense = getSelectedStageDefense();
-
-    // Defense Penetration: Reduce enemy's effective defense
-    const effectiveDefense = stageDefense.defense * (1 - stats.defPen / 100);
-
-    // Defense uses diminishing returns formula: damage dealt = 6000 / (6000 + defense)
-    // This ensures defense never reduces damage to zero, even at very high values
-    const damageReduction = 6000 / (6000 + effectiveDefense);
-
-    const monsterDamage = monsterType === 'boss' ? stats.bossDamage : stats.normalDamage;
-
-    const finalDamageMultiplier = 1 + (stats.finalDamage / 100);
-
-    const baseHitDamage = baseDamage *
-        (1 + stats.statDamage / 100) *
-        (1 + stats.damage / 100) *
-        (1 + monsterDamage / 100) *
-        damageAmpMultiplier *
-        damageReduction *
-        finalDamageMultiplier;
-
-    // Step 3: Calculate Non-Crit Damage Range
-    const nonCritMin = baseHitDamage * (Math.min(stats.minDamage, stats.maxDamage) / 100);
-    const nonCritMax = baseHitDamage * (stats.maxDamage / 100);
-    const nonCritAvg = (nonCritMin + nonCritMax) / 2;
-
-    // Step 4: Calculate Crit Damage
-    const critMultiplier = 1 + (stats.critDamage / 100);
-    const critMin = nonCritMin * critMultiplier;
-    const critMax = nonCritMax * critMultiplier;
-    const critAvg = nonCritAvg * critMultiplier;
-
-    // Step 5: Calculate Expected Damage
-    // Cap critical rate at 100%
-    const cappedCritRate = Math.min(stats.critRate, 100);
-    const critRate = cappedCritRate / 100;
-    const expectedDamage = nonCritAvg * (1 - critRate) + critAvg * critRate;
-
-    // Step 6: Calculate DPS
-    // Attack speed uses formula: AS = 150(1 - ∏(1 - s/150)) with hard cap at 150%
-    // Any attack speed over 150% is capped and ignored
-    const cappedAttackSpeed = Math.min(stats.attackSpeed, 150);
-    const attackSpeedMultiplier = 1 + (cappedAttackSpeed / 100);
-    const dps = expectedDamage * attackSpeedMultiplier;
-
-    return {
-        baseDamage,
-        baseHitDamage,
-        nonCritMin,
-        nonCritMax,
-        nonCritAvg,
-        critMin,
-        critMax,
-        critAvg,
-        expectedDamage,
-        dps,
-        damageAmpMultiplier,
-        attackSpeedMultiplier,
-        finalDamageMultiplier
-    };
-}
 
 // Calculate stat weights - generates HTML for stat damage predictions
 // ULTRA-COMPACT REDESIGN: Horizontal tabbed dashboard with minimal vertical footprint

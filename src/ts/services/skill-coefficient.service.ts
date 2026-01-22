@@ -1,11 +1,8 @@
 // Skill Coefficient Calculator
 // Calculates skill damage % based on character level for 3rd and 4th job skills
 
-// Import the complete factor table extracted from SkillLevelFactorTable.json
-// This table maps character level (1-300) to skill scaling factors
-import { SKILL_LEVEL_FACTOR_TABLE } from '@data/factor-table-data.js';
-
 // Import all class skill data
+import { SKILL_LEVEL_FACTOR_TABLE } from '@ts/data/factor-table-data.js';
 import {
     HERO_SKILLS,
     DARK_KNIGHT_SKILLS as DK_GENERATED_SKILLS,
@@ -15,10 +12,230 @@ import {
     MARKSMAN_SKILLS,
     NIGHT_LORD_SKILLS,
     SHADOWER_SKILLS
-} from './all-class-skills.js';
+} from '@ts/data/all-class-skills.js';
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Factor table type - maps level (as string key) to array of factors
+ */
+type FactorTable = Record<string, number[]>;
+
+/**
+ * Job tier values
+ */
+type JobTier = 1 | 2 | 3 | 4;
+
+/**
+ * Job tier string names
+ */
+type JobTierString = 'firstJob' | 'secondJob' | 'thirdJob' | 'fourthJob';
+
+/**
+ * Skill effect configuration
+ */
+interface SkillEffect {
+    stat: string;
+    baseValue: number;
+    factorIndex: number;
+    type: 'flat' | 'percent' | string;
+}
+
+/**
+ * Base skill data structure
+ */
+interface BaseSkillData {
+    name: string;
+    jobStep?: number;
+    skillIndex?: number;
+    effects?: SkillEffect[];
+    isComplex?: boolean;
+    note?: string;
+}
+
+/**
+ * Skill data from generated class skills (all-class-skills.ts)
+ */
+interface GeneratedSkillData extends BaseSkillData {
+    jobStep: number;
+    skillIndex: number;
+    effects: SkillEffect[];
+    isComplex?: boolean;
+    note?: string;
+}
+
+/**
+ * Class skills collection type
+ */
+interface ClassSkills {
+    [key: string]: GeneratedSkillData;
+}
+
+/**
+ * Skill configuration with base damage and factor index
+ */
+interface SkillConfig {
+    baseDamage: number;
+    factorIndex: number;
+    scalesWithLevel: boolean;
+}
+
+/**
+ * Skill configuration for stat bonuses
+ */
+interface SkillBonusConfig {
+    base: number;
+    factorIndex: number;
+    scalesWithLevel: boolean;
+    isFlat?: boolean;
+}
+
+/**
+ * Dark Knight skill structure
+ */
+interface DarkKnightSkill {
+    key: string;
+    name: string;
+    icon: string;
+    description: string;
+    effects: string[];
+    isPassive: boolean;
+    jobTier: JobTierString;
+    baseDamage?: number;
+    factorIndex?: number;
+    scalesWithLevel?: boolean;
+    attackBonus?: SkillBonusConfig;
+    defenseBonus?: SkillBonusConfig;
+    damageTakenIncrease?: SkillBonusConfig;
+    attackSpeed?: SkillBonusConfig;
+    strFromDefense?: SkillBonusConfig;
+    minDamageRatio?: SkillBonusConfig;
+    toughnessBonus?: SkillBonusConfig;
+    hpRecovery?: SkillBonusConfig;
+    criticalRate?: SkillBonusConfig;
+    criticalDamage?: SkillBonusConfig;
+    debuffTolerance?: SkillBonusConfig;
+    triggerChance?: number;
+}
+
+/**
+ * Dark Knight skills collection
+ */
+interface DarkKnightSkills {
+    [key: string]: DarkKnightSkill;
+}
+
+/**
+ * Skill coefficient breakdown
+ */
+interface SkillCoefficientBreakdown {
+    level: number;
+    jobTier: string;
+    baseDamage: number;
+    baseDamagePercent: number;
+    factorIndex: number;
+    factor: number;
+    multiplier: number;
+    finalDamagePercent: number;
+    formula: string;
+}
+
+/**
+ * Hyper Body calculation result
+ */
+interface HyperBodyResult {
+    attackBonus: number;
+    defenseBonus: number;
+}
+
+/**
+ * Lord of Darkness calculation result
+ */
+interface LordOfDarknessResult {
+    hpRecovery: number;
+    criticalRate: number;
+    criticalDamage: number;
+}
+
+/**
+ * All Dark Knight skills result
+ */
+interface AllDarkKnightSkills {
+    level: number;
+    secondJobSkills: {
+        spearSweep: { name: string; damage: string };
+        evilEye: { name: string; damageTakenIncrease: string };
+        evilEyeShock: { name: string; damage: string };
+        hyperBody: { name: string; attackBonus: string; defenseBonus: string };
+        weaponAcceleration: { name: string; attackSpeed: string };
+        ironWall: { name: string; strFromDefense: string };
+        weaponMastery: { name: string; minDamageRatio: string };
+        finalAttack: { name: string; damage: string; triggerChance: string };
+    };
+    thirdJobSkills: {
+        laManchaSpear: { name: string; damage: string };
+        evilEyeOfDominant: { name: string; damage: string };
+        rush: { name: string; damage: string };
+        crossOverChains: { name: string; attackBonus: string; toughnessBonus: string };
+        evilEyeShockEnhancement: { name: string; damage: string };
+        hexOfTheEvilEye: { name: string; attackBonus: string };
+        lordOfDarkness: { name: string; hpRecovery: string; criticalRate: string; criticalDamage: string };
+        endure: { name: string; debuffTolerance: string };
+    };
+}
+
+/**
+ * Passive skill entry for breakdown
+ */
+interface PassiveBreakdown {
+    passive: string;
+    stat: string;
+    statDisplay?: string;
+    baseValue: number;
+    bonusValue: number;
+    gain: number;
+    isPercent: boolean;
+    note?: string;
+}
+
+/**
+ * Complex passive entry
+ */
+interface ComplexPassive {
+    passive: string;
+    stat?: string;
+    baseValue?: number;
+    bonusValue?: number;
+    gain?: number;
+    isPercent?: boolean;
+    note?: string;
+}
+
+/**
+ * Result from calculateJobSkillPassiveGains
+ */
+interface JobSkillPassiveGainsResult {
+    statChanges: Record<string, number>;
+    breakdown: PassiveBreakdown[];
+    complexPassives: ComplexPassive[];
+    complexStatChanges: Record<string, number>;
+}
+
+/**
+ * Skill level bonuses object
+ */
+interface SkillLevelBonuses {
+    firstJob?: number;
+    secondJob?: number;
+    thirdJob?: number;
+    fourthJob?: number;
+    allSkills?: number;
+}
 
 // Map class names to their skill data
-const CLASS_TO_SKILLS_MAP = {
+const CLASS_TO_SKILLS_MAP: Record<string, ClassSkills> = {
     'hero': HERO_SKILLS,
     'dark-knight': DK_GENERATED_SKILLS,
     'arch-mage-il': ARCH_MAGE_IL_SKILLS,
@@ -33,28 +250,30 @@ const CLASS_TO_SKILLS_MAP = {
 // All main 3rd job attacking skills share these parameters:
 // - Base damage: 800 (represents 80%)
 // - Factor index: 21 (index into the Factor array for level scaling)
-const THIRD_JOB_SKILLS = {
+const THIRD_JOB_SKILLS: SkillConfig = {
     baseDamage: 800,      // Base damage value (divide by 10 to get %)
-    factorIndex: 21       // Index in the Factor array for level scaling
+    factorIndex: 21,      // Index in the Factor array for level scaling
+    scalesWithLevel: true
 };
 
 // 4th Job Skills Configuration
 // All main 4th job attacking skills share these parameters:
 // - Base damage: 2900 (represents 290%)
 // - Factor index: 22 (index into the Factor array for level scaling)
-const FOURTH_JOB_SKILLS = {
+const FOURTH_JOB_SKILLS: SkillConfig = {
     baseDamage: 2900,     // Base damage value (divide by 10 to get %)
-    factorIndex: 21       // Index in the Factor array for level scaling
+    factorIndex: 21,      // Index in the Factor array for level scaling
+    scalesWithLevel: true
 };
 
 /**
  * Gets the factor value for a given level
  * Interpolates between known level values if exact level is not in table
- * @param {number} level - Character level
- * @param {number} factorIndex - Index in the factor array to use
- * @returns {number} - Factor value (1000 = 1.0x multiplier)
+ * @param level - Character level
+ * @param factorIndex - Index in the factor array to use
+ * @returns Factor value (1000 = 1.0x multiplier)
  */
-function getFactorForLevel(level, factorIndex) {
+function getFactorForLevel(level: number, factorIndex: number): number {
     // If exact level exists in table, return it
     if (SKILL_LEVEL_FACTOR_TABLE[level]) {
         return SKILL_LEVEL_FACTOR_TABLE[level][factorIndex];
@@ -94,12 +313,12 @@ function getFactorForLevel(level, factorIndex) {
 /**
  * Calculate the input level for skills based on character level and job tier
  * This is used to look up the appropriate factor in the skill level factor table
- * @param {number} characterLevel - Current character level
- * @param {number} jobTier - Job tier (1, 2, 3, or 4)
- * @param {number} skillLevelBonus - Bonus to skill level from items (default 0)
- * @returns {number} - Input level for factor table lookup
+ * @param characterLevel - Current character level
+ * @param jobTier - Job tier (1, 2, 3, or 4)
+ * @param skillLevelBonus - Bonus to skill level from items (default 0)
+ * @returns Input level for factor table lookup
  */
-function calculateSkillInputLevel(characterLevel, jobTier, skillLevelBonus = 0) {
+function calculateSkillInputLevel(characterLevel: number, jobTier: JobTier, skillLevelBonus: number = 0): number {
     let baseInputLevel = 0;
 
     switch (jobTier) {
@@ -142,11 +361,11 @@ function calculateSkillInputLevel(characterLevel, jobTier, skillLevelBonus = 0) 
  * - Input level = min((characterLevel - 60) * 3, 120) + skillLevel
  * - Coefficient = Base damage (80%) * (factor at input level / 1000)
  *
- * @param {number} characterLevel - Character level (1-200)
- * @param {number} skillLevel - Skill level bonus (default 0)
- * @returns {number} - Skill damage percentage (e.g., 110.08 for 110.08%)
+ * @param characterLevel - Character level (1-200)
+ * @param skillLevel - Skill level bonus (default 0)
+ * @returns Skill damage percentage (e.g., 110.08 for 110.08%)
  */
-export function calculate3rdJobSkillCoefficient(characterLevel, skillLevel = 0) {
+export function calculate3rdJobSkillCoefficient(characterLevel: number, skillLevel: number = 0): number {
     const baseDamagePercent = THIRD_JOB_SKILLS.baseDamage / 10;
 
     // Calculate input level for factor table using shared helper
@@ -167,11 +386,11 @@ export function calculate3rdJobSkillCoefficient(characterLevel, skillLevel = 0) 
  * - Input level = (characterLevel - 100) * 3 + skillLevel
  * - Coefficient = Base damage (290%) * (factor at input level / 1000)
  *
- * @param {number} characterLevel - Character level (1-200)
- * @param {number} skillLevel - Skill level bonus (default 0)
- * @returns {number} - Skill damage percentage
+ * @param characterLevel - Character level (1-200)
+ * @param skillLevel - Skill level bonus (default 0)
+ * @returns Skill damage percentage
  */
-export function calculate4thJobSkillCoefficient(characterLevel, skillLevel = 0) {
+export function calculate4thJobSkillCoefficient(characterLevel: number, skillLevel: number = 0): number {
     const baseDamagePercent = FOURTH_JOB_SKILLS.baseDamage / 10;
 
     // Calculate input level for factor table using shared helper
@@ -186,11 +405,11 @@ export function calculate4thJobSkillCoefficient(characterLevel, skillLevel = 0) 
 
 /**
  * Gets detailed calculation breakdown for debugging
- * @param {number} level - Character level
- * @param {string} jobTier - '3rd' or '4th'
- * @returns {object} - Breakdown of calculation steps
+ * @param level - Character level
+ * @param jobTier - '3rd' or '4th'
+ * @returns Breakdown of calculation steps
  */
-export function getSkillCoefficientBreakdown(level, jobTier = '3rd') {
+export function getSkillCoefficientBreakdown(level: number, jobTier: '3rd' | '4th'): SkillCoefficientBreakdown {
     const config = jobTier === '4th' ? FOURTH_JOB_SKILLS : THIRD_JOB_SKILLS;
     const factor = getFactorForLevel(level, config.factorIndex);
     const baseDamagePercent = config.baseDamage / 10;
@@ -218,7 +437,7 @@ export function getSkillCoefficientBreakdown(level, jobTier = '3rd') {
  * Dark Knight skill configurations with UI data
  * Factor indices: 12, 21, 22
  */
-export const DARK_KNIGHT_SKILLS = {
+export const DARK_KNIGHT_SKILLS: DarkKnightSkills = {
     // 2nd Job Active Skills
     SPEAR_SWEEP: {
         key: 'spearSweep',
@@ -420,14 +639,14 @@ export const DARK_KNIGHT_SKILLS = {
 
 /**
  * Calculate skill effect value based on level
- * @param {number} baseValue - Base value from skill data
- * @param {number} factorIndex - Factor table index (12, 21, or 22)
- * @param {number} level - Character level
- * @param {boolean} scalesWithLevel - Whether the skill scales with level (default: true)
- * @param {boolean} isFlat - Whether the value is a flat number (not a percentage) (default: false)
- * @returns {number} - Calculated value
+ * @param baseValue - Base value from skill data
+ * @param factorIndex - Factor table index (12, 21, or 22)
+ * @param level - Character level
+ * @param scalesWithLevel - Whether the skill scales with level (default: true)
+ * @param isFlat - Whether the value is a flat number (not a percentage) (default: false)
+ * @returns Calculated value
  */
-function calculateSkillValue(baseValue, factorIndex, level, scalesWithLevel = true, isFlat = false) {
+function calculateSkillValue(baseValue: number, factorIndex: number, level: number, scalesWithLevel: boolean = true, isFlat: boolean = false): number {
     if (!scalesWithLevel) {
         return isFlat ? baseValue : baseValue / 10; // Convert to percentage unless it's a flat value
     }
@@ -445,85 +664,85 @@ function calculateSkillValue(baseValue, factorIndex, level, scalesWithLevel = tr
 
 /**
  * Calculate Spear Sweep damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateSpearSweep(level) {
+export function calculateSpearSweep(level: number): number {
     const config = DARK_KNIGHT_SKILLS.SPEAR_SWEEP;
     return calculateSkillValue(config.baseDamage, config.factorIndex, level);
 }
 
 /**
  * Calculate Evil Eye damage taken increase
- * @param {number} level - Character level
- * @returns {number} - Damage taken increase percentage
+ * @param level - Character level
+ * @returns Damage taken increase percentage
  */
-export function calculateEvilEye(level) {
+export function calculateEvilEye(level: number): number {
     const config = DARK_KNIGHT_SKILLS.EVIL_EYE.damageTakenIncrease;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Evil Eye Shock damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateEvilEyeShock(level) {
+export function calculateEvilEyeShock(level: number): number {
     const config = DARK_KNIGHT_SKILLS.EVIL_EYE_SHOCK;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level);
 }
 
 /**
  * Calculate Hyper Body bonuses
- * @param {number} level - Character level
- * @returns {object} - Attack and Defense bonuses
+ * @param level - Character level
+ * @returns Attack and Defense bonuses
  */
-export function calculateHyperBody(level) {
+export function calculateHyperBody(level: number): HyperBodyResult {
     const config = DARK_KNIGHT_SKILLS.HYPER_BODY;
     return {
-        attackBonus: calculateSkillValue(config.attackBonus.base, config.attackBonus.factorIndex, level),
-        defenseBonus: calculateSkillValue(config.defenseBonus.base, config.defenseBonus.factorIndex, level)
+        attackBonus: calculateSkillValue(config.attackBonus!.base, config.attackBonus!.factorIndex, level),
+        defenseBonus: calculateSkillValue(config.defenseBonus!.base, config.defenseBonus!.factorIndex, level)
     };
 }
 
 /**
  * Calculate Weapon Acceleration attack speed bonus
- * @param {number} level - Character level
- * @returns {number} - Attack speed percentage
+ * @param level - Character level
+ * @returns Attack speed percentage
  */
-export function calculateWeaponAcceleration(level) {
-    const config = DARK_KNIGHT_SKILLS.WEAPON_ACCELERATION.attackSpeed;
+export function calculateWeaponAcceleration(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.WEAPON_ACCELERATION.attackSpeed!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Iron Wall STR bonus from Defense
- * @param {number} level - Character level
- * @returns {number} - Percentage of Defense converted to STR
+ * @param level - Character level
+ * @returns Percentage of Defense converted to STR
  */
-export function calculateIronWall(level) {
-    const config = DARK_KNIGHT_SKILLS.IRON_WALL.strFromDefense;
+export function calculateIronWall(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.IRON_WALL.strFromDefense!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Weapon Mastery min damage ratio bonus
- * @param {number} level - Character level
- * @returns {number} - Min damage ratio percentage
+ * @param level - Character level
+ * @returns Min damage ratio percentage
  */
-export function calculateWeaponMastery(level) {
-    const config = DARK_KNIGHT_SKILLS.WEAPON_MASTERY.minDamageRatio;
+export function calculateWeaponMastery(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.WEAPON_MASTERY.minDamageRatio!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Final Attack damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateFinalAttack(level) {
+export function calculateFinalAttack(level: number): number {
     const config = DARK_KNIGHT_SKILLS.FINAL_ATTACK;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level, config.scalesWithLevel);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level, config.scalesWithLevel!);
 }
 
 // ============================================================================
@@ -532,97 +751,97 @@ export function calculateFinalAttack(level) {
 
 /**
  * Calculate Dark Knight La Mancha Spear damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateLaManchaSpear(level) {
+export function calculateLaManchaSpear(level: number): number {
     const config = DARK_KNIGHT_SKILLS.LA_MANCHA_SPEAR;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level, config.scalesWithLevel);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level, config.scalesWithLevel!);
 }
 
 /**
  * Calculate Evil Eye of Dominant damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateEvilEyeOfDominant(level) {
+export function calculateEvilEyeOfDominant(level: number): number {
     const config = DARK_KNIGHT_SKILLS.EVIL_EYE_OF_DOMINANT;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level, config.scalesWithLevel);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level, config.scalesWithLevel!);
 }
 
 /**
  * Calculate Dark Knight Rush damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateRush(level) {
+export function calculateRush(level: number): number {
     const config = DARK_KNIGHT_SKILLS.RUSH;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level, config.scalesWithLevel);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level, config.scalesWithLevel!);
 }
 
 /**
  * Calculate Cross Over Chains attack bonus
- * @param {number} level - Character level
- * @returns {number} - Attack bonus percentage
+ * @param level - Character level
+ * @returns Attack bonus percentage
  */
-export function calculateCrossOverChainsAttack(level) {
-    const config = DARK_KNIGHT_SKILLS.CROSS_OVER_CHAINS.attackBonus;
+export function calculateCrossOverChainsAttack(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.CROSS_OVER_CHAINS.attackBonus!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Cross Over Chains toughness bonus
- * @param {number} level - Character level
- * @returns {number} - Toughness bonus percentage
+ * @param level - Character level
+ * @returns Toughness bonus percentage
  */
-export function calculateCrossOverChainsToughness(level) {
-    const config = DARK_KNIGHT_SKILLS.CROSS_OVER_CHAINS.toughnessBonus;
+export function calculateCrossOverChainsToughness(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.CROSS_OVER_CHAINS.toughnessBonus!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Evil Eye Shock Enhancement damage
- * @param {number} level - Character level
- * @returns {number} - Damage percentage
+ * @param level - Character level
+ * @returns Damage percentage
  */
-export function calculateEvilEyeShockEnhancement(level) {
+export function calculateEvilEyeShockEnhancement(level: number): number {
     const config = DARK_KNIGHT_SKILLS.EVIL_EYE_SHOCK_ENHANCEMENT;
-    return calculateSkillValue(config.baseDamage, config.factorIndex, level, config.scalesWithLevel);
+    return calculateSkillValue(config.baseDamage!, config.factorIndex!, level, config.scalesWithLevel!);
 }
 
 /**
  * Calculate Hex of the Evil Eye attack bonus
- * @param {number} level - Character level
- * @returns {number} - Attack bonus percentage
+ * @param level - Character level
+ * @returns Attack bonus percentage
  */
-export function calculateHexOfTheEvilEye(level) {
-    const config = DARK_KNIGHT_SKILLS.HEX_OF_THE_EVIL_EYE.attackBonus;
+export function calculateHexOfTheEvilEye(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.HEX_OF_THE_EVIL_EYE.attackBonus!;
     return calculateSkillValue(config.base, config.factorIndex, level);
 }
 
 /**
  * Calculate Lord of Darkness effects
- * @param {number} level - Character level
- * @returns {object} - Object with HP recovery, crit rate, and crit damage
+ * @param level - Character level
+ * @returns Object with HP recovery, crit rate, and crit damage
  */
-export function calculateLordOfDarkness(level) {
+export function calculateLordOfDarkness(level: number): LordOfDarknessResult {
     const config = DARK_KNIGHT_SKILLS.LORD_OF_DARKNESS;
 
     return {
         hpRecovery: calculateSkillValue(
-            config.hpRecovery.base,
-            config.hpRecovery.factorIndex,
+            config.hpRecovery!.base,
+            config.hpRecovery!.factorIndex,
             level,
-            config.hpRecovery.scalesWithLevel
+            config.hpRecovery!.scalesWithLevel
         ),
         criticalRate: calculateSkillValue(
-            config.criticalRate.base,
-            config.criticalRate.factorIndex,
+            config.criticalRate!.base,
+            config.criticalRate!.factorIndex,
             level
         ),
         criticalDamage: calculateSkillValue(
-            config.criticalDamage.base,
-            config.criticalDamage.factorIndex,
+            config.criticalDamage!.base,
+            config.criticalDamage!.factorIndex,
             level
         )
     };
@@ -630,20 +849,20 @@ export function calculateLordOfDarkness(level) {
 
 /**
  * Calculate Endure debuff tolerance
- * @param {number} level - Character level
- * @returns {number} - Debuff tolerance
+ * @param level - Character level
+ * @returns Debuff tolerance
  */
-export function calculateEndure(level) {
-    const config = DARK_KNIGHT_SKILLS.ENDURE.debuffTolerance;
-    return calculateSkillValue(config.base, config.factorIndex, level, config.scalesWithLevel, config.isFlat);
+export function calculateEndure(level: number): number {
+    const config = DARK_KNIGHT_SKILLS.ENDURE.debuffTolerance!;
+    return calculateSkillValue(config.base, config.factorIndex, level, config.scalesWithLevel, config.isFlat!);
 }
 
 /**
  * Get all Dark Knight skill values at a specific level
- * @param {number} level - Character level
- * @returns {object} - All Dark Knight skill values
+ * @param level - Character level
+ * @returns All Dark Knight skill values
  */
-export function getAllDarkKnightSkills(level) {
+export function getAllDarkKnightSkills(level: number): AllDarkKnightSkills {
     const lordOfDarkness = calculateLordOfDarkness(level);
     const hyperBody = calculateHyperBody(level);
 
@@ -732,12 +951,12 @@ export function getAllDarkKnightSkills(level) {
 /**
  * Get DPS-relevant passives from generated class skills by job tier
  * Works with the new format from all-class-skills.js
- * @param {object} classSkills - The skill data object for a class (e.g., HERO_SKILLS)
- * @param {number} jobTier - Numeric job tier (1, 2, 3, or 4)
- * @returns {Array} - Array of passive skill objects with DPS-relevant effects
+ * @param classSkills - The skill data object for a class (e.g., HERO_SKILLS)
+ * @param jobTier - Numeric job tier (1, 2, 3, or 4)
+ * @returns Array of passive skill objects with DPS-relevant effects
  */
-function getPassivesByTier(classSkills, jobTier) {
-    const passives = [];
+function getPassivesByTier(classSkills: ClassSkills, jobTier: JobTier): Array<{ skillKey: string; name: string; skillData: GeneratedSkillData }> {
+    const passives: Array<{ skillKey: string; name: string; skillData: GeneratedSkillData }> = [];
 
     for (const [skillKey, skillData] of Object.entries(classSkills)) {
         // Only include skills from the specified job tier that are DPS relevant
@@ -755,12 +974,12 @@ function getPassivesByTier(classSkills, jobTier) {
 
 /**
  * Get DPS-relevant complex passives from generated class skills by job tier
- * @param {object} classSkills - The skill data object for a class (e.g., HERO_SKILLS)
- * @param {number} jobTier - Numeric job tier (1, 2, 3, or 4)
- * @returns {Array} - Array of complex passive skill objects
+ * @param classSkills - The skill data object for a class (e.g., HERO_SKILLS)
+ * @param jobTier - Numeric job tier (1, 2, 3, or 4)
+ * @returns Array of complex passive skill objects
  */
-function getComplexPassivesByTier(classSkills, jobTier) {
-    const passives = [];
+function getComplexPassivesByTier(classSkills: ClassSkills, jobTier: JobTier): Array<{ skillKey: string; name: string; skillData: GeneratedSkillData }> {
+    const passives: Array<{ skillKey: string; name: string; skillData: GeneratedSkillData }> = [];
 
     for (const [skillKey, skillData] of Object.entries(classSkills)) {
         // Only include complex skills from the specified job tier
@@ -777,72 +996,45 @@ function getComplexPassivesByTier(classSkills, jobTier) {
 }
 
 /**
- * Get DPS-relevant passives from DARK_KNIGHT_SKILLS by job tier
- * @param {string} jobTier - 'firstJob', 'secondJob', 'thirdJob', or 'fourthJob'
- * @returns {Array} - Array of passive skill objects with DPS-relevant effects
- */
-function getDarkKnightPassivesByTier(jobTier) {
-    const passives = [];
-
-    for (const [skillKey, skillData] of Object.entries(DARK_KNIGHT_SKILLS)) {
-        // Only include passives from the specified job tier
-        if (skillData.isPassive && skillData.jobTier === jobTier) {
-            passives.push({
-                skillKey,
-                name: skillData.name,
-                skillData
-            });
-        }
-    }
-
-    return passives;
-}
-
-/**
- * Convert string job tier name to numeric tier
- * @param {string} jobTierStr - 'firstJob', 'secondJob', 'thirdJob', or 'fourthJob'
- * @returns {number} - Numeric job tier (1, 2, 3, or 4)
- */
-function jobTierStringToNumber(jobTierStr) {
-    const mapping = {
-        'firstJob': 1,
-        'secondJob': 2,
-        'thirdJob': 3,
-        'fourthJob': 4
-    };
-    return mapping[jobTierStr] || 1;
-}
-
-/**
  * Calculate passive stat gains from job skill level bonuses
- * @param {string} className - Class name (e.g., 'dark-knight')
- * @param {number} characterLevel - Current character level
- * @param {object} skillLevelBonuses - Object with jobTier keys and skill level bonus values
+ * @param className - Class name (e.g., 'dark-knight')
+ * @param characterLevel - Current character level
+ * @param skillLevelBonuses - Object with jobTier keys and skill level bonus values
  *   Example: { firstJob: 0, secondJob: 1, thirdJob: 2, fourthJob: 0, allSkills: 1 }
- * @param {object} currentStats - Current character stats (needed for Iron Wall defense → STR conversion)
- * @returns {object} - Object with stat changes and breakdown
+ * @param currentStats - Current character stats (needed for Iron Wall defense → STR conversion)
+ * @returns Object with stat changes and breakdown
  *   Example: {
  *     statChanges: { attackSpeed: 6.5, minDamage: 19.5, critRate: 10.4, critDamage: 39 },
  *     breakdown: [{ passive: "Weapon Acceleration", stat: "attackSpeed", gain: 6.5 }],
  *     complexPassives: [{ passive: "Final Attack", note: "25% chance to proc 45.5% damage" }]
  *   }
  */
-export function calculateJobSkillPassiveGains(className, characterLevel, skillLevelBonuses, currentStats = {}) {
+export function calculateJobSkillPassiveGains(
+    className: string,
+    characterLevel: number,
+    skillLevelBonuses: SkillLevelBonuses,
+    currentStats: Partial<Record<string, number>> = {}
+): JobSkillPassiveGainsResult {
     // Get the class skills data
     const classSkills = CLASS_TO_SKILLS_MAP[className];
 
     if (!classSkills) {
-        return { statChanges: {}, breakdown: [], complexPassives: [] };
+        return {
+            statChanges: {},
+            breakdown: [],
+            complexPassives: [],
+            complexStatChanges: {}
+        };
     }
 
-    const statChanges = {};
-    const breakdown = [];
-    const complexPassives = [];
-    const complexStatChanges = [];
+    const statChanges: Record<string, number> = {};
+    const breakdown: PassiveBreakdown[] = [];
+    const complexPassives: ComplexPassive[] = [];
+    const complexStatChanges: Record<string, number> = {};
     complexStatChanges['finalAttack'] = 0;
 
-    const jobTiers = [1, 2, 3, 4];
-    const jobTierNames = ['firstJob', 'secondJob', 'thirdJob', 'fourthJob'];
+    const jobTiers: JobTier[] = [1, 2, 3, 4];
+    const jobTierNames: JobTierString[] = ['firstJob', 'secondJob', 'thirdJob', 'fourthJob'];
     const allSkillsBonus = skillLevelBonuses.allSkills || 0;
 
     for (let i = 0; i < jobTiers.length; i++) {
@@ -850,15 +1042,13 @@ export function calculateJobSkillPassiveGains(className, characterLevel, skillLe
         const tierName = jobTierNames[i];
         const tierBonus = (skillLevelBonuses[tierName] || 0) + allSkillsBonus;
 
-        //if (tierBonus === 0) continue;  // Skip if no bonus for this tier
-
         // Get regular passives for this tier
-        const passives = getPassivesByTier(classSkills, tierNumber);
+        const passives = getPassivesByTier(classSkills, tierNumber as JobTier);
 
         for (const { name, skillData } of passives) {
             // Calculate input levels for factor table lookup using shared helper
-            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, 0);
-            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, tierBonus);
+            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber as JobTier, 0);
+            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber as JobTier, tierBonus);
 
             // Process each effect in the skill's effects array
             for (const effect of skillData.effects) {
@@ -931,11 +1121,11 @@ export function calculateJobSkillPassiveGains(className, characterLevel, skillLe
         }
 
         // Get complex passives for this tier (these have notes/conditions and are shown separately)
-        const complexPassivesForTier = getComplexPassivesByTier(classSkills, tierNumber);
+        const complexPassivesForTier = getComplexPassivesByTier(classSkills, tierNumber as JobTier);
 
         for (const { name, skillData } of complexPassivesForTier) {
-            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, 0);
-            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber, tierBonus);
+            const baseInputLevel = calculateSkillInputLevel(characterLevel, tierNumber as JobTier, 0);
+            const bonusInputLevel = calculateSkillInputLevel(characterLevel, tierNumber as JobTier, tierBonus);
 
             // Complex passives are just shown with their note
             // If they have effects, we calculate the difference to show the gain
@@ -962,7 +1152,7 @@ export function calculateJobSkillPassiveGains(className, characterLevel, skillLe
                     const gain = bonusValue - baseValue;
                     const calculatorStat = effect.stat;
 
-                    if(calculatorStat.toLowerCase() == 'finalattack')
+                    if (calculatorStat.toLowerCase() === 'finalattack')
                     {
                         complexStatChanges['finalAttack'] += bonusValue;
                     }

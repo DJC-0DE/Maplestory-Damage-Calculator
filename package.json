@@ -51,7 +51,7 @@
     "test:pred:equivalency": "playwright test predictions-equivalency.spec.js",
     "test:pred:equivalency:headed": "playwright test predictions-equivalency.spec.js --headed",
     "test:pred:equivalency:debug": "playwright test predictions-equivalency.spec.js --debug",
-	"test:lastFailed": "playwright test --last-failed",
+    "test:lastFailed": "playwright test --last-failed",
     "lint": "eslint *.js",
     "lint:fix": "eslint *.js --fix"
   },
@@ -67,5 +67,8 @@
     "eslint": "^8.57.0",
     "glob": "^13.0.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1"
   }
 }

@@ -1,7 +1,7 @@
-import { formatNumber } from "@utils/formatters.js";
+import { formatNumber } from "@ts/utils/formatters.js";
 import { calculateAllStatWeights } from "./stat-predictions.js";
 import { PERCENTAGE_STATS, MULTIPLICATIVE_STATS, DEFAULT_STAT_INCREASES } from "./stat-predictions.js";
-import { getStats } from "@core/state/state.js";
+import { loadoutStore } from "@ts/store/loadout.store.js";
 function formatStatValue(value, statKey) {
   if (statKey === "damageAmp") {
     return `+${value.toFixed(1)}x`;
@@ -106,7 +106,7 @@ function generatePercentageStatsSection(weights) {
   return html;
 }
 function generateStatPredictionsHTML() {
-  const stats = getStats("base");
+  const stats = loadoutStore.getBaseStats();
   const weights = calculateAllStatWeights(stats);
   let html = "";
   html += generateFlatStatsSection(weights);

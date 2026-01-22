@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["formatters.ts"],
+  "sourcesContent": ["// Number formatting utility\r\nexport function formatNumber(num) {\r\n    return Math.round(num).toLocaleString();\r\n}\r\n\r\n// Format DPS with K/M/B suffixes\r\nexport function formatDPS(dps) {\r\n    if (dps === null || dps === undefined || isNaN(dps)) {\r\n        return '-';\r\n    }\r\n\r\n    const abs = Math.abs(dps);\r\n\r\n    if (abs >= 1_000_000_000) {\r\n        return (dps / 1_000_000_000).toFixed(2) + 'B';\r\n    } else if (abs >= 1_000_000) {\r\n        return (dps / 1_000_000).toFixed(2) + 'M';\r\n    } else if (abs >= 1_000) {\r\n        return (dps / 1_000).toFixed(1) + 'K';\r\n    } else {\r\n        return Math.round(dps).toString();\r\n    }\r\n}\r\n"],
+  "mappings": "AACO,SAAS,aAAa,KAAK;AAC9B,SAAO,KAAK,MAAM,GAAG,EAAE,eAAe;AAC1C;AAGO,SAAS,UAAU,KAAK;AAC3B,MAAI,QAAQ,QAAQ,QAAQ,UAAa,MAAM,GAAG,GAAG;AACjD,WAAO;AAAA,EACX;AAEA,QAAM,MAAM,KAAK,IAAI,GAAG;AAExB,MAAI,OAAO,KAAe;AACtB,YAAQ,MAAM,KAAe,QAAQ,CAAC,IAAI;AAAA,EAC9C,WAAW,OAAO,KAAW;AACzB,YAAQ,MAAM,KAAW,QAAQ,CAAC,IAAI;AAAA,EAC1C,WAAW,OAAO,KAAO;AACrB,YAAQ,MAAM,KAAO,QAAQ,CAAC,IAAI;AAAA,EACtC,OAAO;AACH,WAAO,KAAK,MAAM,GAAG,EAAE,SAAS;AAAA,EACpC;AACJ;",
+  "names": []
+}

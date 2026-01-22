@@ -1,4 +1,4 @@
-export function preprocessImage(imageURL, applyGrayscale = false, applySharpen = false, applyThreshold = false) {
+export function preprocessImage(imageURL: string, applyGrayscale = false, applySharpen = false, applyThreshold = false): Promise<string> {
     return new Promise((resolve) => {
         const img = new Image();
         img.src = imageURL;
@@ -78,8 +78,8 @@ export function preprocessImage(imageURL, applyGrayscale = false, applySharpen =
     });
 }
 
-export async function extractText(imageURL, debug = false) {
-    const preprocessedImageURL = await preprocessImage(imageURL, true, true, true, true);
+export async function extractText(imageURL: string, debug = false): Promise<string | undefined> {
+    const preprocessedImageURL = await preprocessImage(imageURL, true, true, true);
     const output = document.getElementById('debug-ocr');
 
     if (debug) {
@@ -103,7 +103,8 @@ export async function extractText(imageURL, debug = false) {
     }
 
     try {
-        const worker = await Tesseract.createWorker('eng');
+        // @ts-ignore - Tesseract is loaded via CDN
+        const worker = await (window as any).Tesseract.createWorker('eng');
 
         worker.setParameters({
             tessedit_pageseg_mode: 6,
@@ -162,7 +163,7 @@ function applyConvolution(imageData, kernel, width, height) {
     return result;
 }
 
-export function parseBaseStatText(text) {
+export function parseBaseStatText(text: string): [string, string][] {
     const displayNamesToInput = {
         "Attack": "attack-base",
         "Defense": "defense-base",
@@ -190,12 +191,12 @@ export function parseBaseStatText(text) {
 
     const cleanData = text.split("\n")
         .map(x => x.trim())
-        .map(x => x.replaceAll(" i ", " ")) // information hover icon
-        .map(x => x.replaceAll(" ; ", " ")) // information hover icon
+        .map(x => x.split(" i ").join(" ")) // information hover icon - replaceAll polyfill
+        .map(x => x.split(" ; ").join(" ")) // information hover icon - replaceAll polyfill
         .filter((x, idx) => !(idx === 0 && !/\d/.test(x)))
         .filter(x => x)
         .map((x) => { // split into [stat, value]
-            if (/^\d/.test(x)) { // starts with digit, i.e: 1st Job Skill 
+            if (/^\d/.test(x)) { // starts with digit, i.e: 1st Job Skill
                 const matches = x.match(/^(\d\D*)(.*)$/);
                 return [matches[1].trim(), matches[2].trim()];
             }
@@ -207,11 +208,12 @@ export function parseBaseStatText(text) {
         // i.e:
         // Min Damage 147%
         // Multiplier
-        .reduce((acc, [label, value]) => {
+        .reduce((acc: [string, string][], [label, value]: [string, string]) => {
             if (value === "") {
                 // merge label into previous element
                 if (acc.length > 1) {
-                    acc[acc.length - 1][0] += ` ${label}`;
+                    const prev = acc[acc.length - 1];
+                    prev[0] += ` ${label}`;
                 }
             } else {
                 acc.push([label, value]);
@@ -232,12 +234,12 @@ export function parseBaseStatText(text) {
                     .toString();
             }
             else {
-                value = value.replaceAll(",", "").replaceAll("%", "")
+                value = value.split(",").join("").split("%").join("")
             }
             return [x[0], value]
         })
 
-    let matchedData = cleanData.flatMap(x => {
+    let matchedData: [string, string][] = cleanData.flatMap(x => {
         const displayName = x[0];
         const value = x[1];
 

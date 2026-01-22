@@ -9,57 +9,40 @@ import {
     generateMasteryHiddenInputs
 } from './mastery-bonus-ui';
 import { updateSkillCoefficient } from './base-stats';
-import { updateAnalysisTabs } from '@core/state/storage';
-import { extractText, parseBaseStatText } from '@utils/ocr';
-import { getSelectedClass } from '@core/state/state';
-import { showToast } from '@utils/notifications';
-import type { StatInputConfig } from '@ts/types/page/base-stats/base-stats.types';
+import { extractText, parseBaseStatText } from '@ts/utils/ocr';
+import { showToast } from '@ts/utils/notifications';
 import { loadoutStore } from '@ts/store/loadout.store';
-import { STAT_TYPE } from '@ts/types/constants';
+import { STAT_TYPE, STAT, type StatConfig, type StatKey } from '@ts/types/constants';
 
 // Import calculate dynamically to avoid circular dependency
 function getCalculateFunction(): (() => void) | undefined {
     return window.calculate;
 }
 
-// Stat input configuration for generating stat input HTML
-const STAT_INPUTS: StatInputConfig[] = [
-    // Core Combat Stats
-    { id: 'attack', label: 'Attack', type: 'number', value: 500 },
-    { id: 'defense', label: 'Defense', type: 'number', value: 0, info: 'defense' },
-    { id: 'critRate', label: 'Critical Rate (%)', type: 'number', step: '0.1', value: 15 },
-    { id: 'critDamage', label: 'Critical Damage (%)', type: 'number', step: '0.1', value: 15 },
-    { id: 'attackSpeed', label: 'Attack Speed (%)', type: 'number', step: '0.1', value: 0 },
-    // Main Stats
-    { id: 'str', label: 'STR', type: 'number', value: 1000, rowId: 'str-row' },
-    { id: 'dex', label: 'DEX', type: 'number', value: 0, rowId: 'dex-row' },
-    { id: 'int', label: 'INT', type: 'number', value: 1000, rowId: 'int-row' },
-    { id: 'luk', label: 'LUK', type: 'number', value: 0, rowId: 'luk-row' },
-    // Damage Modifiers
-    { id: 'statDamage', label: 'Stat Prop. Damage (%)', type: 'number', step: '0.1', value: 0 },
-    { id: 'damage', label: 'Damage (%)', type: 'number', step: '0.1', value: 10 },
-    { id: 'damageAmp', label: 'Damage Amplification (x)', type: 'number', step: '0.1', value: 0 },
-    { id: 'basicAttackDamage', label: 'Basic Attack Damage (%)', type: 'number', step: '0.1', value: 0, hidden: true },
-    { id: 'skillDamage', label: 'Skill Damage (%)', type: 'number', step: '0.1', value: 0, hidden: true },
-    { id: 'defPen', label: 'Defense Penetration (%)', type: 'number', step: '0.1', value: 0, info: 'def-pen' },
-    { id: 'bossDamage', label: 'Boss Monster Damage (%)', type: 'number', step: '0.1', value: 10 },
-    { id: 'normalDamage', label: 'Normal Monster Damage (%)', type: 'number', step: '0.1', value: 0 },
-    { id: 'minDamage', label: 'Min Damage Multiplier (%)', type: 'number', step: '0.1', value: 50 },
-    { id: 'maxDamage', label: 'Max Damage Multiplier (%)', type: 'number', step: '0.1', value: 100 },
-    { id: 'finalDamage', label: 'Final Damage (%)', type: 'number', step: '0.1', value: 0 },
-    // Skill Levels
-    { id: 'skillLevel1st', label: '1st Job Skill Level', type: 'number', value: 0, min: 0, onChange: true },
-    { id: 'skillLevel2nd', label: '2nd Job Skill Level', type: 'number', value: 0, min: 0, onChange: true },
-    { id: 'skillLevel3rd', label: '3rd Job Skill Level', type: 'number', value: 0, min: 0, onChange: true },
-    { id: 'skillLevel4th', label: '4th Job Skill Level', type: 'number', value: 0, min: 0, onChange: true },
-    // Main Stat %
-    { id: 'mainStatPct', label: 'Current Main Stat %', type: 'number', step: '0.1', value: 0, info: 'main-stat-pct' }
+// Stat categories for organizing the UI
+const CORE_COMBAT_STATS: StatKey[] = ['ATTACK', 'DEFENSE', 'CRIT_RATE', 'CRIT_DAMAGE', 'ATTACK_SPEED'];
+const MAIN_STATS: StatKey[] = ['STR', 'DEX', 'INT', 'LUK'];
+const DAMAGE_MODIFIERS: StatKey[] = [
+    'STAT_DAMAGE', 'DAMAGE', 'DAMAGE_AMP', 'BASIC_ATTACK_DAMAGE', 'SKILL_DAMAGE',
+    'DEF_PEN', 'BOSS_DAMAGE', 'NORMAL_DAMAGE', 'MIN_DAMAGE', 'MAX_DAMAGE', 'FINAL_DAMAGE'
+];
+const SKILL_LEVELS: StatKey[] = ['SKILL_LEVEL_1ST', 'SKILL_LEVEL_2ND', 'SKILL_LEVEL_3RD', 'SKILL_LEVEL_4TH'];
+const MAIN_STAT_PCT: StatKey[] = ['MAIN_STAT_PCT'];
+
+// All visible stat categories combined (for event listeners)
+const ALL_VISIBLE_STATS: StatKey[] = [
+    ...CORE_COMBAT_STATS,
+    ...MAIN_STATS,
+    ...DAMAGE_MODIFIERS,
+    ...SKILL_LEVELS,
+    ...MAIN_STAT_PCT
 ];
 
 /**
  * Generate HTML for a single stat input row
  */
-function generateStatInputHTML(stat: StatInputConfig): string {
+function generateStatInputHTML(statKey: StatKey): string {
+    const stat = STAT[statKey] as StatConfig;  // Cast to access all optional properties
     const infoIcon = stat.info
         ? `<span class="bgstats-info-inline" role="img" aria-label="Info" onclick="openHelpSidebar('${stat.info}')">?</span>`
         : '';
@@ -76,7 +59,7 @@ function generateStatInputHTML(stat: StatInputConfig): string {
     return `
         <div class="bgstats-stat-row" ${rowId} ${hiddenStyle}>
             <label class="bgstats-stat-label">${stat.label} ${infoIcon}</label>
-            <input type="${stat.type}" id="${stat.id}" value="${stat.value}" ${minAttr} ${stepAttr} ${onChangeAttr} class="bgstats-stat-input">
+            <input type="${stat.type}" id="${stat.id}" value="${stat.defaultValue}" ${minAttr} ${stepAttr} ${onChangeAttr} class="bgstats-stat-input">
         </div>
     `;
 }
@@ -88,33 +71,28 @@ function generateStatInputsHTML(): string {
     let html = '';
 
     // Core Combat Stats
-    html += STAT_INPUTS.filter(s => ['attack', 'defense', 'critRate', 'critDamage', 'attackSpeed'].includes(s.id))
-        .map(generateStatInputHTML).join('');
+    html += CORE_COMBAT_STATS.map(generateStatInputHTML).join('');
     html += '<div class="bgstats-divider"></div>';
 
     // Main Stats
-    html += STAT_INPUTS.filter(s => ['str', 'dex', 'int', 'luk'].includes(s.id))
-        .map(generateStatInputHTML).join('');
+    html += MAIN_STATS.map(generateStatInputHTML).join('');
     html += '<div class="bgstats-divider"></div>';
 
     // Damage Modifiers
-    html += STAT_INPUTS.filter(s => ['statDamage', 'damage', 'damageAmp', 'basicAttackDamage', 'skillDamage', 'defPen', 'bossDamage', 'normalDamage', 'minDamage', 'maxDamage', 'finalDamage'].includes(s.id))
-        .map(generateStatInputHTML).join('');
+    html += DAMAGE_MODIFIERS.map(generateStatInputHTML).join('');
     html += '<div class="bgstats-divider"></div>';
 
     // Skill Levels
-    html += STAT_INPUTS.filter(s => ['skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th'].includes(s.id))
-        .map(generateStatInputHTML).join('');
+    html += SKILL_LEVELS.map(generateStatInputHTML).join('');
     html += '<div class="bgstats-divider"></div>';
 
     // Main Stat %
-    html += STAT_INPUTS.filter(s => ['mainStatPct'].includes(s.id))
-        .map(generateStatInputHTML).join('');
+    html += MAIN_STAT_PCT.map(generateStatInputHTML).join('');
 
     // Hidden fields
     html += `
-        <input type="hidden" id="primaryMainStat" value="1000">
-        <input type="hidden" id="secondaryMainStat" value="0">
+        <input type="hidden" id="primaryMainStat" value="${STAT.PRIMARY_MAIN_STAT.defaultValue}">
+        <input type="hidden" id="secondaryMainStat" value="${STAT.SECONDARY_MAIN_STAT.defaultValue}">
         ${generateMasteryHiddenInputs()}
         <input type="hidden" id="skillCoeff" value="0">
     `;
@@ -155,7 +133,7 @@ export function generateBaseStatsHTML(): string {
                             </button>
                         </div>
                     </div>
-                    <section class="paste-image-section bgstats-paste-section" id="base-stats-paste-image-section" style="width: 100%;height: 42px; min-height: 42px;">
+                    <section class="paste-image-section bgstats-paste-section" id="stats-paste-image-section" style="width: 100%;height: 42px; min-height: 42px;">
                         <div class="paste-icon bgstats-paste-btn" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"><strong>Auto-fill Stats</strong> 📋</div>
                         <span class="info-icon bgstats-info-icon" role="img" aria-label="Info" onclick="openHelpSidebar('stats-autofill')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.75rem; width: 18px; height: 18px;">?</span>
                     </section>
@@ -170,7 +148,7 @@ export function generateBaseStatsHTML(): string {
             </div>
 
             <!-- Character Stats Sub-tab -->
-            <div id="base-stats-character-stats" class="base-stats-subtab active">
+            <div id="stats-character-stats" class="stats-subtab active">
                 <!-- Two-column container: Stats on left, Target Content on right -->
                 <div class="stats-two-column-container">
                     <!-- Left Column: Stats List -->
@@ -193,7 +171,7 @@ export function generateBaseStatsHTML(): string {
                                 <!-- Populated by JavaScript based on content type -->
                             </select>
                             <!-- Final stage selection -->
-                            <select id="target-stage-base" class="bgstats-select" style="display: none;">
+                            <select id="target-stage" class="bgstats-select" style="display: none;">
                                 <!-- Populated by JavaScript based on content type/subcategory selection -->
                             </select>
                         </div>
@@ -204,7 +182,7 @@ export function generateBaseStatsHTML(): string {
             <!-- End Character Stats Sub-tab -->
 
             <!-- Skill Details Sub-tab - Consistent premium styling -->
-            <div id="base-stats-skill-details" class="base-stats-subtab" style="display: none;">
+            <div id="stats-skill-details" class="base-stats-subtab" style="display: none;">
                 <div class="bgstats-info-banner">
                     <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
                         <strong style="color: var(--accent-primary);">Instructions:</strong> Click on a skill to view its description with calculated values based on your character level.
@@ -268,32 +246,32 @@ function attachCharacterLevelListener(): void {
 /**
  * Attach event listeners to sub-tab buttons
  */
-function attachSubTabListeners(): void {
-    const subTabContainer = document.querySelector('.optimization-sub-tabs');
-    if (!subTabContainer) return;
-
-    const buttons = subTabContainer.querySelectorAll('.optimization-sub-tab-button');
-    const subTabs: Record<string, string> = {
-        'Stats': 'character-stats',
-        'Skill Mastery': 'skill-mastery',
-        'Skill Details': 'skill-details'
-    };
-
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabName = subTabs[button.textContent || ''];
-            if (tabName) {
-                switchBaseStatsSubTab(tabName);
-            }
-        });
-    });
-}
+//function attachSubTabListeners(): void {
+//    const subTabContainer = document.querySelector('.optimization-sub-tabs');
+//    if (!subTabContainer) return;
+//
+//    const buttons = subTabContainer.querySelectorAll('.optimization-sub-tab-button');
+//    const subTabs: Record<string, string> = {
+//        'Stats': 'character-stats',
+//        'Skill Mastery': 'skill-mastery',
+//        'Skill Details': 'skill-details'
+//    };
+//
+//    buttons.forEach(button => {
+//        button.addEventListener('click', () => {
+//            const tabName = subTabs[button.textContent || ''];
+//            if (tabName) {
+//                switchBaseStatsSubTab(tabName);
+//            }
+//        });
+//    });
+//}
 
 /**
  * Attach event listener for paste area (OCR stat extraction)
  */
 function attachPasteAreaListener(): void {
-    const pasteArea = document.getElementById('base-stats-paste-image-section');
+    const pasteArea = document.getElementById('stats-paste-image-section');
     if (!pasteArea) return;
 
     pasteArea.addEventListener('paste', async (event: ClipboardEvent) => {
@@ -318,9 +296,9 @@ function attachPasteAreaListener(): void {
                         inputElement.style.outline = ''; // Reset to default on change
                     }, { once: true });
 
-                    const className = getSelectedClass();
-                    const primaryInput = document.getElementById('primary-main-stat-base') as HTMLInputElement;
-                    const secondaryInput = document.getElementById('secondary-main-stat-base') as HTMLInputElement;
+                    const className = loadoutStore.getCharacter().class;
+                    const primaryInput = document.getElementById('primary-main-stat') as HTMLInputElement;
+                    const secondaryInput = document.getElementById('secondary-main-stat') as HTMLInputElement;
 
                     const statType = getStatType(className, parsedStat[0]);
                     if (statType === STAT_TYPE.PRIMARY) {
@@ -381,21 +359,14 @@ function attachMainStatSyncListeners(): void {
  * Attach event listeners to all stat inputs for saving to loadout store
  */
 function attachStatInputListeners(): void {
-    // All stat input IDs (in camelCase)
-    const statInputIds = [
-        'attack', 'defense', 'critRate', 'critDamage', 'attackSpeed',
-        'statDamage', 'damage', 'damageAmp', 'defPen',
-        'bossDamage', 'normalDamage', 'minDamage', 'maxDamage', 'finalDamage',
-        'skillLevel1st', 'skillLevel2nd', 'skillLevel3rd', 'skillLevel4th',
-        'mainStatPct'
-    ];
-
-    statInputIds.forEach(id => {
-        const input = document.getElementById(id) as HTMLInputElement;
+    // Use the centralized ALL_VISIBLE_STATS array
+    ALL_VISIBLE_STATS.forEach(statKey => {
+        const statId = STAT[statKey].id;
+        const input = document.getElementById(statId) as HTMLInputElement;
         if (input) {
             input.addEventListener('input', () => {
                 const value = parseFloat(input.value) || 0;
-                loadoutStore.updateBaseStat(id, value);
+                loadoutStore.updateBaseStat(statId, value);
             });
         }
     });
@@ -403,7 +374,7 @@ function attachStatInputListeners(): void {
 
 // Sync main stat inputs (STR, DEX, INT, LUK) with hidden primary/secondary fields
 export function syncMainStatsToHidden() {
-    const className = getSelectedClass();
+    const className = loadoutStore.getCharacter().class;
     const strInput = document.getElementById('str') as HTMLInputElement;
     const dexInput = document.getElementById('dex') as HTMLInputElement;
     const intInput = document.getElementById('int') as HTMLInputElement;
@@ -436,39 +407,39 @@ export function syncMainStatsToHidden() {
 /**
  * Switch between base stats sub-tabs
  */
-function switchBaseStatsSubTab(subTabName: string): void {
-    // Hide all sub-tabs
-    const subTabs = document.querySelectorAll('.base-stats-subtab');
-    subTabs.forEach(tab => {
-        (tab as HTMLElement).style.display = 'none';
-    });
-
-    // Show the selected sub-tab
-    const selectedTab = document.getElementById(`base-stats-${subTabName}`);
-    if (selectedTab) {
-        selectedTab.style.display = 'block';
-    }
-
-    // Update button states - get the parent container's buttons
-    const buttons = document.querySelectorAll('#setup-base-stats .optimization-sub-tab-button');
-    buttons.forEach(button => {
-        button.classList.remove('active');
-    });
-
-    // Activate button by index
-    const tabIndex: Record<string, number> = { 'character-stats': 0, 'skill-mastery': 1, 'skill-details': 2 };
-    if (tabIndex[subTabName] !== undefined && buttons[tabIndex[subTabName]]) {
-        buttons[tabIndex[subTabName]].classList.add('active');
-    }
-
-    // If switching to skill details, populate the skills (handled by main.js)
-    if (subTabName === 'skill-details') {
+//function switchBaseStatsSubTab(subTabName: string): void {
+//    // Hide all sub-tabs
+//    const subTabs = document.querySelectorAll('.stats-subtab');
+//    subTabs.forEach(tab => {
+    //    (tab as HTMLElement).style.display = 'none';
+//    });
+//
+//    // Show the selected sub-tab
+//    const selectedTab = document.getElementById(`stats-${subTabName}`);
+//    if (selectedTab) {
+   //     selectedTab.style.display = 'block';
+//    }
+//
+//    // Update button states - get the parent container's buttons
+//    const buttons = document.querySelectorAll('#setup-stats .optimization-tab-button');
+//    buttons.forEach(button => {
+     //   button.classList.remove('active');
+//    });
+//
+//    // Activate button by index
+//    const tabIndex: Record<string, number> = { 'character-stats': 0, 'skill-mastery': 1, 'skill-details': 2 };
+//    if (tabIndex[subTabName] !== undefined && buttons[tabIndex[subTabName]]) {
+      //  buttons[tabIndex[subTabName]].classList.add('active');
+//    }
+//
+//    // If switching to skill details, populate the skills (handled by main.js)
+//    if (subTabName === 'skill-details') {
         // Trigger populateSkillDetails from main.js via window
         if (window.populateSkillDetails) {
             window.populateSkillDetails();
         }
-    }
-}
+//    }
+//}
 
 /**
  * Initialize the base stats UI - generates HTML only
@@ -497,32 +468,12 @@ export function loadBaseStatsUI(): void {
         levelInput.value = character.level.toString();
     }
 
-    // Load all stat inputs from store
-    const statInputIds = [
-        'attack', 'defense', 'crit-rate', 'crit-damage', 'attack-speed',
-        'str', 'dex', 'int', 'luk',
-        'stat-damage', 'damage', 'damage-amp', 'def-pen',
-        'boss-damage', 'normal-damage', 'min-damage', 'max-damage', 'final-damage',
-        'skill-level-1st', 'skill-level-2nd', 'skill-level-3rd', 'skill-level-4th',
-        'main-stat-pct'
-    ];
-
-    // Helper to convert hyphenated keys to camelCase
-    const toCamelCase = (key: string): string => {
-        return key.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
-    };
-
-    statInputIds.forEach(hyphenatedKey => {
-        // Convert key to camelCase for store lookup (store only contains camelCase keys)
-        const camelCaseKey = toCamelCase(hyphenatedKey);
-
-        // Only set value if the key exists in baseStats (even if value is 0)
-        // If key doesn't exist, let the HTML default value be used
-        if (camelCaseKey in baseStats) {
-            const input = document.getElementById(`${hyphenatedKey}-base`) as HTMLInputElement;
-            if (input) {
-                input.value = baseStats[camelCaseKey].toString();
-            }
+    // Load all stat inputs from store using STAT constant as source of truth
+    Object.entries(STAT).forEach(([statKey, stat]) => {
+        const value = baseStats[statKey as StatKey];
+        const input = document.getElementById(stat.id) as HTMLInputElement;
+        if (input) {
+            input.value = value.toString();
         }
     });
 
@@ -535,11 +486,8 @@ export function loadBaseStatsUI(): void {
  */
 export function attachBaseStatsEventListeners(): void {
     attachCharacterLevelListener();
-    attachSubTabListeners();
+   // attachSubTabListeners();
     attachPasteAreaListener();
     attachMainStatSyncListeners();
     attachStatInputListeners();
 }
-
-// Expose switchBaseStatsSubTab to window for global access
-window.switchBaseStatsSubTab = switchBaseStatsSubTab;

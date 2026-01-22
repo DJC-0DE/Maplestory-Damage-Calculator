@@ -1,14 +1,12 @@
-import { getStats } from '@core/state/state.js';
+import { CumulativeStatCalculator, ChartPoint } from '@ts/services/stat-calculation-service';
 import { loadoutStore } from '@ts/store/loadout.store.js';
-import { CumulativeStatCalculator } from '@core/services/stat-calculation-service.js';
+import { Chart, ChartType, ChartData, ChartOptions } from 'chart.js/auto';
 
-window.toggleStatChart = toggleStatChart;
-
-// Store chart instances
-const statWeightCharts = {};
+// Store chart instances with proper typing
+const statWeightCharts: Record<string, Chart> = {};
 
 // Toggle stat weight chart visibility
-export function toggleStatChart(statKey, statLabel, isFlat = false) {
+export function toggleStatChart(statKey: string, statLabel: string, isFlat: boolean = false): void {
     const chartId = `chart-${statKey}`;
     const rowId = `chart-row-${statKey}`;
     const chartRow = document.getElementById(rowId);
@@ -29,10 +27,10 @@ export function toggleStatChart(statKey, statLabel, isFlat = false) {
 }
 
 // Generate chart data for a stat
-export function generateStatChartData(statKey, statLabel, isFlat) {
-    const stats = getStats();
+export function generateStatChartData(statKey: string, statLabel: string, isFlat: boolean): ChartPoint[] {
+    const stats = loadoutStore.getBaseStats();
     const weaponAttackBonus = loadoutStore.getWeaponAttackBonus().totalAttack;
-    const monsterType = statKey === 'bossDamage' ? 'boss' :
+    const monsterType: 'boss' | 'normal' = statKey === 'bossDamage' ? 'boss' :
                        (statKey === 'normalDamage' ? 'normal' : 'boss');
 
     const calculator = new CumulativeStatCalculator();
@@ -40,9 +38,9 @@ export function generateStatChartData(statKey, statLabel, isFlat) {
     const minIncrease = isFlat ? (statKey === 'attack' ? 500 : 100) : 1;
     const maxIncrease = isFlat ? (statKey === 'attack' ? 15000 : 7500) : 75;
 
-    calculator.startSeries(stats, { weaponAttackBonus, monsterType, numPoints });
+    calculator.startSeries(stats, { weaponAttackBonus, monsterType, numSteps: numPoints });
 
-    const dataPoints = [];
+    const dataPoints: ChartPoint[] = [];
     let cumulativeIncrease = 0;
 
     for (let i = 0; i <= numPoints; i++) {
@@ -64,12 +62,14 @@ export function generateStatChartData(statKey, statLabel, isFlat) {
 }
 
 // Render stat weight chart
-export function renderStatChart(statKey, statLabel, isFlat) {
+export function renderStatChart(statKey: string, statLabel: string, isFlat: boolean): void {
     const chartId = `chart-${statKey}`;
-    const canvas = document.getElementById(chartId);
+    const canvas = document.getElementById(chartId) as HTMLCanvasElement | null;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     const data = generateStatChartData(statKey, statLabel, isFlat);
 
     // Destroy existing chart if it exists
@@ -87,7 +87,7 @@ export function renderStatChart(statKey, statLabel, isFlat) {
 
     // Create new chart
     statWeightCharts[chartId] = new Chart(ctx, {
-        type: 'line',
+        type: 'line' as ChartType,
         data: {
             datasets: [{
                 label: `${statLabel} → DPS Gain per ${perUnitLabel}`,
@@ -99,7 +99,7 @@ export function renderStatChart(statKey, statLabel, isFlat) {
                 tension: 0.1,
                 pointRadius: 0
             }]
-        },
+        } as ChartData<'line'>,
         options: {
             responsive: true,
             maintainAspectRatio: true,
@@ -148,6 +148,6 @@ export function renderStatChart(statKey, statLabel, isFlat) {
                     }
                 }
             }
-        }
+        } as ChartOptions<'line'>
     });
 }

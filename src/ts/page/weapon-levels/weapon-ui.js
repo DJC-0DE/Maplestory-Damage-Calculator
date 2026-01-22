@@ -5,7 +5,6 @@ import {
 } from "./weapons.js";
 import { rarities, tiers, weaponBaseAttackEquipped } from "@ts/types";
 import { WEAPON_RARITY, WEAPON_TIER, HIGH_TIER_RARITIES } from "@ts/types/constants.js";
-import { calculate } from "@core/main.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
 import {
   updateUpgradePriorityChain,
@@ -482,7 +481,6 @@ function updateWeaponBonuses(calculateDamage = true) {
     equippedAttack: equippedBonus
   });
   if (calculateDamage) {
-    calculate();
   }
   updateUpgradePriorityChain();
 }

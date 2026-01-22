@@ -3,14 +3,8 @@
  * All functions handle only DOM operations and delegate logic to class-select.ts
  */
 
-import { updateAnalysisTabs } from '@core/state/storage';
-import { updateClassWarning } from '@core/cube/cube-ui';
 import { updateSkillCoefficient } from './base-stats';
 import { updateMasteryBonuses } from './mastery-bonus';
-import {
-    setSelectedClass,
-    setSelectedJobTier
-} from '@core/state/state';
 import type { JobTier, ClassName } from '@ts/types';
 import { CLASS, JOB_TIER } from '@ts/types/constants';
 import {
@@ -57,25 +51,25 @@ if (typeof window !== 'undefined') {
  * Handle user clicking on a job tier button
  */
 export function selectJobTier(tier: JobTier): void {
-    setSelectedJobTier(tier);  // Already saves via loadoutStore (state.js delegates to store)
+    loadoutStore.updateCharacter({ jobTier: tier });
     updateJobTierButtonUI(tier);
     updateMasteryTableVisibility(tier);
     updateMasteryTabUI(tier);
     updateSkillCoefficient();
     updateMasteryBonuses();
-    updateAnalysisTabs();
+    //updateAnalysisTabs();
 }
 
 /**
  * Handle user clicking on a class card
  */
 export function selectClass(className: ClassName): void {
-    setSelectedClass(className);  // Already saves via loadoutStore (state.js delegates to store)
+    loadoutStore.updateCharacter({ class: className });
     updateClassSelectionUI(className);
     updateClassUI(className);
 
     try {
-        updateClassWarning();
+        //updateClassWarning();
     } catch (error) {
         // Cube module may not be initialized yet
     }
@@ -132,14 +126,14 @@ export function loadClassSelectUI(): void {
  * Initialize job tier state only - does NOT update UI
  */
 function initializeJobTierState(tier: JobTier): void {
-    setSelectedJobTier(tier);
+    loadoutStore.updateCharacter({ jobTier: tier });
 }
 
 /**
  * Initialize class state only - does NOT update UI
  */
 function initializeClassState(className: ClassName): void {
-    setSelectedClass(className);
+    loadoutStore.updateCharacter({ class: className });
 }
 
 // ============================================================================

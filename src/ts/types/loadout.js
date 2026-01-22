@@ -1,6 +1,6 @@
-import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE } from "./constants.js";
+import { CONTENT_TYPE, JOB_TIER, MASTERY_TYPE, DEFAULT_BASE_STATS } from "./constants.js";
 const DEFAULT_LOADOUT_DATA = {
-  baseStats: {},
+  baseStats: DEFAULT_BASE_STATS,
   character: {
     level: 0,
     class: null,

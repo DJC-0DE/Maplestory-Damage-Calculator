@@ -1,5 +1,3 @@
-import { updateAnalysisTabs } from "@core/state/storage.js";
-import { getSelectedJobTier } from "@core/state/state.js";
 import { MASTERY_BONUSES } from "./mastery-constants.js";
 import { updateMasteryDisplay } from "./mastery-bonus-ui.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
@@ -8,11 +6,10 @@ if (typeof window !== "undefined") {
   window.updateMasteryBonuses = updateMasteryBonuses;
 }
 function updateMasteryBonuses() {
-  const currentTier = getSelectedJobTier();
+  const currentTier = loadoutStore.getCharacter().jobTier;
   const { allTotal, bossTotal } = calculateMasteryTotals(currentTier);
   updateMasteryDisplay(currentTier, allTotal, bossTotal);
   saveMasteryCheckboxesToStore(currentTier);
-  updateAnalysisTabs();
 }
 function saveMasteryCheckboxesToStore(tier) {
   const tierData = MASTERY_BONUSES[tier];

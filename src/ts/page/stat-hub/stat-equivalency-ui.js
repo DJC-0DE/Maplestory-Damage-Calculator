@@ -1,7 +1,6 @@
 import { calculateEquivalency, createStatConfig, calculateTargetDPSGain } from "./stat-equivalency.js";
-import { getStats } from "@core/state/state.js";
+import { loadoutStore } from "@ts/store/loadout.store.js";
 const EQUIV_PREFIX = "equiv";
-const BASE_SETUP_TYPE = "base";
 const EQUIVALENCY_INPUTS = {
   flat: [
     { id: `${EQUIV_PREFIX}Attack`, label: "Attack", default: 1e3, step: 100, min: 0 },
@@ -156,7 +155,7 @@ function generateEquivalencyResultsHTML(sourceStat, sourceValue, statConfig, tar
   return html;
 }
 function updateStatEquivalency(sourceStat) {
-  const stats = getStats(BASE_SETUP_TYPE);
+  const stats = loadoutStore.getBaseStats();
   const sourceValue = getStatValueFromDOM(sourceStat);
   if (sourceValue === 0) {
     const resultsContainer2 = document.getElementById("equivalency-results");

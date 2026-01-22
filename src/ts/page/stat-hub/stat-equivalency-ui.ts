@@ -5,11 +5,10 @@
 
 import { calculateEquivalency, createStatConfig, calculateTargetDPSGain } from './stat-equivalency';
 import type { EquivalencyStatConfig } from '@ts/types/page/stat-hub/stat-hub.types';
-import { getStats } from '@core/state/state';
+import { loadoutStore } from '@ts/store/loadout.store';
 
 // Constants for equivalency UI
 const EQUIV_PREFIX = 'equiv';
-const BASE_SETUP_TYPE = 'base';
 
 // Stat input configuration for UI generation
 interface StatInputConfig {
@@ -251,7 +250,7 @@ function generateEquivalencyResultsHTML(
  * Update stat equivalency display
  */
 export function updateStatEquivalency(sourceStat: string): void {
-    const stats = getStats(BASE_SETUP_TYPE);
+    const stats = loadoutStore.getBaseStats();
     const sourceValue = getStatValueFromDOM(sourceStat);
 
     if (sourceValue === 0) {

@@ -1,5 +1,3 @@
-import { setCurrentContentType, getCurrentContentType } from "@core/state/state.js";
-import { updateAnalysisTabs } from "@core/state/storage.js";
 import { CONTENT_TYPE } from "@ts/types/constants.js";
 import {
   getSubcategoryOptions,
@@ -20,57 +18,31 @@ if (typeof window !== "undefined") {
   window.onSubcategoryChange = onSubcategoryChange;
 }
 function selectContentType(contentType) {
-  setCurrentContentType(contentType);
   updateContentTypeSelectionUI(contentType);
   configureDropdownsForContentType(contentType);
   loadoutStore.updateTarget({ contentType });
-  updateAnalysisTabs();
 }
 function onSubcategoryChange() {
   const subcategorySelect = document.getElementById("target-subcategory");
-  const stageSelect = document.getElementById("target-stage-base");
+  const stageSelect = document.getElementById("target-stage");
   if (!subcategorySelect || !stageSelect) return;
   const subcategory = subcategorySelect.value;
-  const currentContentType = getCurrentContentType();
-  if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
+  const target = loadoutStore.getTarget();
+  if (target.contentType === CONTENT_TYPE.STAGE_HUNT) {
     const chapter = subcategory.replace("chapter-", "");
     populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
-  } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+  } else if (target.contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
     populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
   }
   stageSelect.style.display = "block";
   loadoutStore.updateTarget({ subcategory });
-  updateAnalysisTabs();
-}
-function initializeTargetSelectUI() {
-  const target = loadoutStore.getTarget();
-  if (!target || !target.contentType) {
-    initializeWithDefaultState();
-    return;
-  }
-  initializeWithSavedState({ contentType: target.contentType, subcategory: target.subcategory, selectedStage: target.selectedStage });
 }
 function loadTargetSelectUI() {
   const target = loadoutStore.getTarget();
-  if (!target || !target.contentType) {
-    loadDefaultSelectionUI();
-    return;
-  }
   restoreSavedSelectionUI({ contentType: target.contentType, subcategory: target.subcategory, selectedStage: target.selectedStage });
 }
 function initializeWithDefaultState() {
-  setCurrentContentType(CONTENT_TYPE.NONE);
-}
-function initializeWithSavedState(savedData) {
-  const { contentType } = savedData;
-  setCurrentContentType(contentType);
-}
-function loadDefaultSelectionUI() {
-  updateContentTypeSelectionUI(CONTENT_TYPE.NONE);
-  const stageSelect = document.getElementById("target-stage-base");
-  if (stageSelect) {
-    stageSelect.value = CONTENT_TYPE.NONE;
-  }
+  loadoutStore.updateTarget({ contentType: CONTENT_TYPE.NONE });
 }
 function restoreSavedSelectionUI(savedData) {
   const { contentType, subcategory, selectedStage } = savedData;
@@ -80,21 +52,20 @@ function restoreSavedSelectionUI(savedData) {
     const subcategorySelect = document.getElementById("target-subcategory");
     if (subcategorySelect) {
       subcategorySelect.value = subcategory;
-      const currentContentType = getCurrentContentType();
-      if (currentContentType === CONTENT_TYPE.STAGE_HUNT) {
+      if (contentType === CONTENT_TYPE.STAGE_HUNT) {
         const chapter = subcategory.replace("chapter-", "");
         populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
-      } else if (currentContentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+      } else if (contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
         populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, subcategory);
       }
-      const stageSelect = document.getElementById("target-stage-base");
+      const stageSelect = document.getElementById("target-stage");
       if (stageSelect) {
         stageSelect.style.display = "block";
       }
     }
   }
   if (selectedStage) {
-    const stageSelect = document.getElementById("target-stage-base");
+    const stageSelect = document.getElementById("target-stage");
     if (stageSelect) {
       stageSelect.value = selectedStage;
     }
@@ -109,13 +80,13 @@ function updateContentTypeSelectionUI(contentType) {
     selectedEl.classList.add("selected");
   }
   const subcategorySelect = document.getElementById("target-subcategory");
-  const stageSelect = document.getElementById("target-stage-base");
+  const stageSelect = document.getElementById("target-stage");
   if (subcategorySelect) subcategorySelect.style.display = "none";
   if (stageSelect) stageSelect.style.display = "none";
 }
 function configureDropdownsForContentType(contentType) {
   const subcategorySelect = document.getElementById("target-subcategory");
-  const stageSelect = document.getElementById("target-stage-base");
+  const stageSelect = document.getElementById("target-stage");
   if (!stageSelect) return;
   if (contentType === CONTENT_TYPE.NONE) {
     stageSelect.value = "none";
@@ -123,7 +94,7 @@ function configureDropdownsForContentType(contentType) {
   }
   if (requiresSubcategory(contentType)) {
     populateSubcategoryDropdown(contentType);
-    if (subcategorySelect) subcategorySelect.style.display = "block";
+    stageSelect.style.display = "block";
   } else {
     stageSelect.style.display = "block";
     populateStageDropdown(contentType);
@@ -142,7 +113,7 @@ function populateSubcategoryDropdown(contentType) {
   });
 }
 function populateStageDropdown(contentType) {
-  const select = document.getElementById("target-stage-base");
+  const select = document.getElementById("target-stage");
   if (!select) return;
   select.innerHTML = "";
   const entries = getFilteredStageEntries(contentType, contentType);
@@ -154,7 +125,7 @@ function populateStageDropdown(contentType) {
   });
 }
 function populateStageDropdownFiltered(contentType, filter) {
-  const select = document.getElementById("target-stage-base");
+  const select = document.getElementById("target-stage");
   if (!select) return;
   select.innerHTML = "";
   const entries = getFilteredStageEntries(contentType, filter);
@@ -175,7 +146,7 @@ function attachContentTypeSelectorListeners() {
 }
 function attachTargetContentListeners() {
   const subcategorySelect = document.getElementById("target-subcategory");
-  const stageSelect = document.getElementById("target-stage-base");
+  const stageSelect = document.getElementById("target-stage");
   if (subcategorySelect) {
     subcategorySelect.addEventListener("change", () => onSubcategoryChange());
   }
@@ -183,7 +154,6 @@ function attachTargetContentListeners() {
     stageSelect.addEventListener("change", () => {
       const stageValue = stageSelect.value;
       loadoutStore.updateTarget({ selectedStage: stageValue });
-      updateAnalysisTabs();
     });
   }
 }
@@ -202,7 +172,6 @@ function generateContentTypeSelectorHTML() {
 export {
   attachTargetSelectEventListeners,
   generateContentTypeSelectorHTML,
-  initializeTargetSelectUI,
   loadTargetSelectUI,
   onSubcategoryChange,
   selectContentType

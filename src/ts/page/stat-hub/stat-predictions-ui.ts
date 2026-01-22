@@ -3,11 +3,11 @@
  * HTML generation and event handling for stat predictions table
  */
 
-import { formatNumber } from '@utils/formatters';
+import { formatNumber } from '@ts/utils/formatters';
 import { calculateAllStatWeights } from './stat-predictions';
 import { PERCENTAGE_STATS, MULTIPLICATIVE_STATS, DEFAULT_STAT_INCREASES } from './stat-predictions';
 import type { StatWeightResult } from '@ts/types/page/stat-hub/stat-hub.types';
-import { getStats } from '@core/state/state';
+import { loadoutStore } from '@ts/store/loadout.store';
 
 /**
  * Format a stat increase value with appropriate units
@@ -177,7 +177,7 @@ function generatePercentageStatsSection(weights: ReturnType<typeof calculateAllS
  * Generate complete HTML for stat predictions table
  */
 export function generateStatPredictionsHTML(): string {
-    const stats = getStats('base');
+    const stats = loadoutStore.getBaseStats();
     const weights = calculateAllStatWeights(stats);
 
     let html = '';

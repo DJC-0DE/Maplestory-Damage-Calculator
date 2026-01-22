@@ -3,35 +3,7 @@
  * Shared types for the stat-hub module (stat predictions and equivalency)
  */
 
-/**
- * Stats object returned by getStats() and used by StatCalculationService
- * All numeric values representing character stats
- */
-export interface StatsObject {
-    attack: number;
-    critRate: number;
-    critDamage: number;
-    statDamage: number;
-    mainStat: number;
-    damage: number;
-    finalDamage: number;
-    damageAmp: number;
-    attackSpeed: number;
-    defPen: number;
-    bossDamage: number;
-    normalDamage: number;
-    skillCoeff: number;
-    skillMastery: number;
-    skillMasteryBoss: number;
-    minDamage: number;
-    maxDamage: number;
-    defense: number;
-    mainStatPct: number;
-    firstJob: number;
-    secondJob: number;
-    thirdJob: number;
-    fourthJob: number;
-}
+import { BaseStats } from "@ts/types/loadout";
 
 // Stat increase values for predictions table
 export interface StatIncrease {
@@ -44,7 +16,7 @@ export interface StatIncrease {
 export interface EquivalencyStatConfig {
     label: string;
     getValue: () => number;
-    applyToStats: (stats: StatsObject, value: number) => StatsObject;
+    applyToStats: (stats: BaseStats, value: number) => BaseStats;
     formatValue: (val: number) => string;
 }
 

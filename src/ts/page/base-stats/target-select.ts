@@ -2,8 +2,7 @@
  * Pure logic layer for Target/Stage selection
  * Data retrieval and filtering functions without DOM dependencies
  */
-
-import { stageDefenses } from '@core/state/state';
+import { stageDefenses } from '@ts/services/stage-defense.service';
 import { CONTENT_TYPE, MAX_CHAPTER_NUMBER, type ContentType } from '@ts/types';
 
 export type { ContentType };

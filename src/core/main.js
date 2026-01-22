@@ -2,36 +2,33 @@
 // This is the single entry point that orchestrates the entire application
 
 import { initializeRouter, registerPage } from '@core/router.js';
-import {
-    getStats,
-    getItemStats,
-    getSelectedClass,
-    getSelectedJobTier,
-    getCharacterLevel
-} from '@core/state/state.js';
-import { StatCalculationService } from '@core/services/stat-calculation-service.js';
+//import {
+//    getStats,
+//    getItemStats,
+//    getSelectedClass,
+//    getSelectedJobTier,
+//    getCharacterLevel
+//} from '@core/state/state.js';
+//import { StatCalculationService } from '@core/services/stat-calculation-service.js';
 import { formatDPS } from '@utils/formatters.js';
-import {
-    getAllDarkKnightSkills,
-    DARK_KNIGHT_SKILLS
-} from '@core/features/skills/skill-coefficient.js';
-import { refreshStatPredictions } from '@page/stat-hub-page.js';
-import { applyItemToStats } from '@core/services/item-comparison-service.js';
+//import {
+//    getAllDarkKnightSkills,
+//    DARK_KNIGHT_SKILLS
+//} from '@core/features/skills/skill-coefficient.js';
+//import { refreshStatPredictions } from '@page/stat-hub-page.js';
+//import { applyItemToStats } from '@core/services/item-comparison-service.js';
 import { loadTheme } from '@utils/theme.js';
-import { getCurrentSlot } from '@ui/comparison/slot-comparison.js';
-import { displayResults } from '@ui/results-display.js';
-import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
+//import { getCurrentSlot } from '@ui/comparison/slot-comparison.js';
+//import { displayResults } from '@ui/results-display.js';
+//import { refreshPresetsUI } from '@ui/companions-presets-ui.js';
 
 import { loadoutPage } from '@page/loadout-page.js';
-import { initializeStatHubPage } from '@page/stat-hub-page.js';
+import { statHubPage } from '@page/stat-hub-page.js';
 import '@utils/tabs.js';
-import '@utils/stat-chart.js';
-import '@ui/help-sidebar.js';
-import '@core/features/scrolling/scroll-optimizer.js';
-
-// Data extraction functions
-// getStats and getItemStats moved to state.js
-export { getStats, getItemStats };
+import '@utils/data-management.js';
+//import '@ui/help-sidebar.js';
+//import '@core/features/scrolling/scroll-optimizer.js';
+import { loadoutStore } from '@ts/store/loadout.store.js';
 
 // Main calculation orchestration
 export function calculate() {
@@ -149,20 +146,20 @@ function enableGlobalNumberInputAutoSelect() {
 }
 
 // Generate SKILL_DATA from DARK_KNIGHT_SKILLS (consolidated in skill-coefficient.js)
-const SKILL_DATA = (() => {
-    const allSkills = Object.values(DARK_KNIGHT_SKILLS);
-
-    return {
-        skills: {
-            secondJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'secondJob'),
-            thirdJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'thirdJob')
-        },
-        passives: {
-            secondJob: allSkills.filter(s => s.isPassive && s.jobTier === 'secondJob'),
-            thirdJob: allSkills.filter(s => s.isPassive && s.jobTier === 'thirdJob')
-        }
-    };
-})();
+//onst SKILL_DATA = (() => {
+//   const allSkills = Object.values(DARK_KNIGHT_SKILLS);
+//
+//   return {
+//       skills: {
+//           secondJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'secondJob'),
+//           thirdJob: allSkills.filter(s => !s.isPassive && s.jobTier === 'thirdJob')
+//       },
+//       passives: {
+//           secondJob: allSkills.filter(s => s.isPassive && s.jobTier === 'secondJob'),
+//           thirdJob: allSkills.filter(s => s.isPassive && s.jobTier === 'thirdJob')
+//       }
+//   };
+//)();
 
 function populateSkillDetails() {
     const characterLevel = getCharacterLevel();
@@ -328,7 +325,9 @@ export function showSkillDescription(skillKey, category, jobTier) {
 // Initialize application
 window.onload = async function () {
     // Register page instances with router
+    await loadoutStore.initialize();
     registerPage('setup', loadoutPage);
+    registerPage('predictions', statHubPage);
     // Register other pages here as they migrate to BasePage pattern
     // registerPage('optimization', optimizationPage);
     // registerPage('predictions', predictionsPage);
