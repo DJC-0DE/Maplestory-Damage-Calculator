@@ -44,7 +44,17 @@ export function selectContentType(contentType: ContentType): void {
     configureDropdownsForContentType(contentType);
 
     // Save via loadout store (auto dual-writes to localStorage)
-    loadoutStore.updateTarget({ contentType });
+    const updateData: { contentType: ContentType; subcategory?: string } = { contentType };
+
+    // If content type requires subcategory, save the default first option
+    if (requiresSubcategory(contentType)) {
+        const subcategorySelect = document.getElementById('target-subcategory') as HTMLSelectElement;
+        if (subcategorySelect && subcategorySelect.options.length > 0) {
+            updateData.subcategory = subcategorySelect.value;
+        }
+    }
+
+    loadoutStore.updateTarget(updateData);
     //updateAnalysisTabs();
 }
 
@@ -165,9 +175,20 @@ function configureDropdownsForContentType(contentType: ContentType): void {
 
     if (requiresSubcategory(contentType)) {
         populateSubcategoryDropdown(contentType);
-        if (subcategorySelect) subcategorySelect.style.display = 'block';
-        // Hide stage dropdown until user selects a subcategory
-        stageSelect.style.display = 'none';
+        if (subcategorySelect) {
+            subcategorySelect.style.display = 'block';
+            // Auto-select first option and populate stage dropdown
+            subcategorySelect.selectedIndex = 0;
+            const firstSubcategory = subcategorySelect.value;
+
+            if (contentType === CONTENT_TYPE.STAGE_HUNT) {
+                const chapter = firstSubcategory.replace('chapter-', '');
+                populateStageDropdownFiltered(CONTENT_TYPE.STAGE_HUNT, chapter);
+            } else if (contentType === CONTENT_TYPE.GROWTH_DUNGEON) {
+                populateStageDropdownFiltered(CONTENT_TYPE.GROWTH_DUNGEON, firstSubcategory);
+            }
+        }
+        stageSelect.style.display = 'block';
     } else {
         stageSelect.style.display = 'block';
         populateStageDropdown(contentType);
