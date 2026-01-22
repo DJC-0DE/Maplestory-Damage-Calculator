@@ -47,7 +47,7 @@ export function createStatConfig(
                 service.addAttack(value);
                 return service.getStats();
             },
-            formatValue: (val: number) => val.toLocaleString()
+            formatValue: (val: number) => val.toFixed(1)
         },
         'mainStat': {
             label: 'Main Stat',
@@ -57,7 +57,7 @@ export function createStatConfig(
                 service.addMainStat(value);
                 return service.getStats();
             },
-            formatValue: (val: number) => val.toLocaleString()
+            formatValue: (val: number) => val.toFixed(1)
         },
         'mainStatPct': {
             label: 'Main Stat %',
@@ -67,7 +67,7 @@ export function createStatConfig(
                 service.addMainStatPct(value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'skillCoeff': {
             label: 'Skill Coefficient',
@@ -77,7 +77,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.SKILL_COEFFICIENT.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'skillMastery': {
             label: 'Skill Mastery',
@@ -87,7 +87,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.MASTERY.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'damage': {
             label: 'Damage',
@@ -97,7 +97,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'finalDamage': {
             label: 'Final Damage',
@@ -107,7 +107,7 @@ export function createStatConfig(
                 service.addMultiplicativeStat(STAT.FINAL_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'bossDamage': {
             label: 'Boss Damage',
@@ -117,7 +117,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.BOSS_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'normalDamage': {
             label: 'Monster Damage',
@@ -127,7 +127,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.NORMAL_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'damageAmp': {
             label: 'Damage Amplification',
@@ -137,7 +137,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.DAMAGE_AMP.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}x`
+            formatValue: (val: number) => `${val.toFixed(1)}x`
         },
         'minDamage': {
             label: 'Min Damage Multiplier',
@@ -147,7 +147,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.MIN_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'maxDamage': {
             label: 'Max Damage Multiplier',
@@ -157,7 +157,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.MAX_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'critRate': {
             label: 'Critical Rate',
@@ -167,7 +167,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.CRIT_RATE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'critDamage': {
             label: 'Critical Damage',
@@ -177,7 +177,7 @@ export function createStatConfig(
                 service.addPercentageStat(STAT.CRIT_DAMAGE.id, value);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'attackSpeed': {
             label: 'Attack Speed',
@@ -187,7 +187,7 @@ export function createStatConfig(
                 service.addDiminishingReturnStat(STAT.ATTACK_SPEED.id, value, 150);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         },
         'defPen': {
             label: 'Defense Penetration',
@@ -197,7 +197,7 @@ export function createStatConfig(
                 service.addDiminishingReturnStat(STAT.DEF_PEN.id, value, 100);
                 return service.getStats();
             },
-            formatValue: (val: number) => `${val.toFixed(2)}%`
+            formatValue: (val: number) => `${val.toFixed(1)}%`
         }
     };
 }
