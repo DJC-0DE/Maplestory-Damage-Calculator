@@ -1,9 +1,5 @@
 import { COMPANION_DATA, type CompanionLevelData } from './companion-data.js';
-import type { CompanionEffects, CompanionKey } from '@ts/types/page/companions/companions.types';
-import type { ClassName } from '@ts/types';
-
-// Expose getCompanionEffects globally for use in state.js
-(window as any).getCompanionEffects = null; // Will be set after function definition
+import type { CompanionKey, CompanionClass } from '@ts/types/page/companions/companions.types';
 
 /**
  * Get companion effects for a given class, rarity, and level
@@ -59,8 +55,8 @@ export function getCompanionEffects(
  * Get all available companion classes
  * @returns Array of class names
  */
-export function getCompanionClasses(): ClassName[] {
-    return [...COMPANION_DATA.classes] as ClassName[];
+export function getCompanionClasses(): CompanionClass[] {
+    return [...COMPANION_DATA.classes] as CompanionClass[];
 }
 
 /**

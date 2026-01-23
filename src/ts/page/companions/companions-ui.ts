@@ -15,14 +15,12 @@ import type {
     CompanionData,
     CompanionEffects,
     CompanionRarity,
-    RarityConfig,
     ProcessedEffect,
     DpsComparisonResult,
     BothDpsResults,
-    CLASS_DISPLAY_NAMES,
-    RARITY_CONFIG
+    CompanionClass
 } from '@ts/types/page/companions/companions.types';
-import type { ClassName } from '@ts/types';
+import { CLASS_DISPLAY_NAMES, RARITY_CONFIG } from '@ts/types/page/companions/companions.types';
 
 // ============================================================================
 // STATE TRACKING
@@ -31,7 +29,7 @@ import type { ClassName } from '@ts/types';
 // Track currently selected companion for re-opening detail panel after updates
 interface CurrentCompanion {
     companionKey: CompanionKey;
-    className: ClassName;
+    className: CompanionClass;
     rarity: CompanionRarity;
     borderColor: string;
     color: string;
@@ -551,7 +549,9 @@ function renderPresetRow(
     const borderColor = isSpecialPreset ? '#fbbf24' : (isEquipped ? '#10b981' : 'var(--border-color)');
 
     // For optimal presets, check if main is locked
-    const isLocked = isSpecialPreset && loadoutStore.getLockedMainCompanion(presetId) !== null;
+    const isLocked = isSpecialPreset &&
+        (presetId === 'optimal-boss' || presetId === 'optimal-normal') &&
+        loadoutStore.getLockedMainCompanion(presetId) !== null;
 
     // Build the preset row HTML
     let html = `
@@ -1169,10 +1169,13 @@ function handleSlotClick(slot: HTMLElement): void {
 
     // For optimal slots, toggle the lock instead of selecting for assignment
     if (isOptimalSlot) {
-        const currentLock = loadoutStore.getLockedMainCompanion(presetId);
-        if (currentLock) {
-            // Currently locked - clicking the slot should just show that it's locked
-            return;
+        // Only optimal-boss and optimal-normal have locked companions
+        if (presetId === 'optimal-boss' || presetId === 'optimal-normal') {
+            const currentLock = loadoutStore.getLockedMainCompanion(presetId);
+            if (currentLock) {
+                // Currently locked - clicking the slot should just show that it's locked
+                return;
+            }
         }
         // Not locked - proceed with selection
     }
@@ -1282,7 +1285,7 @@ function setCurrentCompanion(
 /**
  * Get png icon representation for class
  */
-function getClassPngName(className: ClassName): string {
+function getClassPngName(className: CompanionClass): string {
     const names: Record<ClassName, string> = {
         'Hero': 'hero',
         'DarkKnight': 'dk',
@@ -1299,7 +1302,7 @@ function getClassPngName(className: ClassName): string {
 /**
  * Get webp representation for class
  */
-function getClassWebpName(className: ClassName): string {
+function getClassWebpName(className: CompanionClass): string {
     const names: Record<ClassName, string> = {
         'Hero': 'hero',
         'DarkKnight': 'dk',

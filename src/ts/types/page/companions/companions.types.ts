@@ -3,14 +3,19 @@
  * Shared types for the companions module
  */
 
-import type { ClassName, MonsterType } from '@ts/types';
+import type { MonsterType } from '@ts/types';
 
 // ============================================================================
 // CORE TYPES
 // ============================================================================
 
+// Companion-specific class names (PascalCase, different from kebab-case ClassName)
+export type CompanionClass =
+    | 'Hero' | 'DarkKnight' | 'ArchMageIL' | 'ArchMageFP'
+    | 'BowMaster' | 'Marksman' | 'NightLord' | 'Shadower';
+
 export type CompanionRarity = 'Normal' | 'Rare' | 'Epic' | 'Unique' | 'Legendary';
-export type CompanionKey = `${ClassName}-${CompanionRarity}`;
+export type CompanionKey = `${CompanionClass}-${CompanionRarity}`;
 
 export type CompanionPresetId =
     | 'preset1' | 'preset2' | 'preset3' | 'preset4' | 'preset5'
@@ -80,7 +85,7 @@ export interface RarityConfig {
     color: string;
     borderColor: string;
     count: number;
-    classes: ClassName[];
+    classes: CompanionClass[];
 }
 
 // Processed effect for display
@@ -102,7 +107,7 @@ export interface SelectedSlotInfo {
 // CONSTANTS
 // ============================================================================
 
-export const COMPANION_CLASSES: ClassName[] = [
+export const COMPANION_CLASSES: CompanionClass[] = [
     'Hero',
     'DarkKnight',
     'ArchMageIL',
@@ -121,7 +126,7 @@ export const COMPANION_RARITIES: CompanionRarity[] = [
     'Legendary'
 ];
 
-export const CLASS_DISPLAY_NAMES: Record<ClassName, string> = {
+export const CLASS_DISPLAY_NAMES: Record<CompanionClass, string> = {
     'Hero': 'Hero',
     'DarkKnight': 'Dark Knight',
     'ArchMageIL': 'I/L Mage',
@@ -132,7 +137,7 @@ export const CLASS_DISPLAY_NAMES: Record<ClassName, string> = {
     'Shadower': 'Shadower'
 };
 
-export const CLASS_ORDER: ClassName[] = [
+export const CLASS_ORDER: CompanionClass[] = [
     'Hero',
     'DarkKnight',
     'ArchMageIL',

@@ -5,9 +5,17 @@
  */
 
 import { StatCalculationService } from '@core/services/stat-calculation-service.js';
-import type { CompanionEffects, CompanionKey, CompanionPreset, CompanionPresetId, DpsComparisonResult, BothDpsResults } from '@ts/types/page/companions/companions.types';
+import type {
+    CompanionEffects,
+    CompanionKey,
+    CompanionPreset,
+    CompanionPresetId,
+    DpsComparisonResult,
+    BothDpsResults,
+    CompanionClass,
+    CompanionData
+} from '@ts/types/page/companions/companions.types';
 import type { MonsterType } from '@ts/types';
-import type { CompanionData } from '@ts/types/page/companions/companions.types';
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -186,7 +194,7 @@ export function presetHasAnyCompanion(preset: CompanionPreset): boolean {
 export function calculatePresetStatValue(
     preset: CompanionPreset,
     targetStat: string,
-    getCompanionEffects: (className: string, rarity: string, level: number) => CompanionEffects | null,
+    getCompanionEffects: (className: CompanionClass, rarity: string, level: number) => CompanionEffects | null,
     getCompanion: (key: CompanionKey) => CompanionData
 ): number {
     if (!preset) return 0;
@@ -224,7 +232,7 @@ export function calculatePresetStatValue(
  */
 export function generateOptimalPreset(
     targetStat: 'bossDamage' | 'normalDamage',
-    getCompanionEffects: (className: string, rarity: string, level: number) => CompanionEffects | null,
+    getCompanionEffects: (className: CompanionClass, rarity: string, level: number) => CompanionEffects | null,
     getCompanion: (key: CompanionKey) => CompanionData,
     getMaxCompanionLevel: () => number,
     lockedMainCompanion: CompanionKey | null = null
@@ -340,7 +348,14 @@ export function generateOptimalPreset(
                 bestDps = dps;
                 bestPreset = {
                     main: lockedMainCompanion,
-                    subs: subCombination.map(c => c.companionKey)
+                    subs: subCombination.map(c => c.companionKey) as [
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null
+                    ]
                 };
             }
         }
@@ -390,7 +405,14 @@ export function generateOptimalPreset(
                 bestDps = dps;
                 bestPreset = {
                     main: mainCompanion.companionKey,
-                    subs: subCompanions.map(c => c.companionKey)
+                    subs: subCompanions.map(c => c.companionKey) as [
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null,
+                        CompanionKey | null
+                    ]
                 };
             }
         }
