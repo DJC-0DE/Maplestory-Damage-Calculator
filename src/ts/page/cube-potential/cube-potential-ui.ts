@@ -305,10 +305,58 @@ function generateSummaryTabHTML(): string {
 function generateSimulationTabHTML(): string {
     return `
         <div class="cube-simulation-header">
-            <h3 class="cube-simulation-title">Cube Strategy Simulation</h3>
-            <p class="cube-simulation-description">Compare different cubing strategies to find the most efficient approach</p>
+            <h3 class="cube-simulation-title">Cube Potential Optimization Simulator</h3>
+            <p class="cube-simulation-description">Simulates different cubing strategies to find the most efficient approach for maximizing damage across all equipment slots. Uses fictional slots that are all set to normal with 0 tries attempted. This does not account for your current slots or their rarities!</p>
         </div>
 
+        <!-- Simulation Controls -->
+        <div class="cube-simulation-controls">
+            <!-- Simulation Configuration -->
+            <div class="sim-config-row" style="display: flex; gap: 20px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+                <div class="sim-potential-type" style="display: flex; align-items: center; gap: 10px;">
+                    <label style="color: var(--text-secondary);">Potential Type:</label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="radio" name="sim-potential-type" value="regular" checked>
+                        <span>Regular</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin-left: 10px;">
+                        <input type="radio" name="sim-potential-type" value="bonus">
+                        <span>Bonus</span>
+                    </label>
+                </div>
+                <div class="sim-use-data" style="display: flex; align-items: center; gap: 6px;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="checkbox" id="sim-use-my-data">
+                        <span style="color: var(--text-secondary);">Use my current equipment data</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="cube-simulation-inputs">
+                <div class="cube-sim-input-group">
+                    <label for="simulation-cube-budget" class="cube-sim-label">Cube Budget</label>
+                    <input type="number" id="simulation-cube-budget" value="1000" min="100" max="50000" step="100" class="cube-sim-input">
+                </div>
+                <div class="cube-sim-input-group">
+                    <label for="simulation-count" class="cube-sim-label">Number of Simulations</label>
+                    <input type="number" id="simulation-count" value="1000" min="100" max="10000" step="100" class="cube-sim-input">
+                </div>
+            </div>
+            <button class="cube-sim-run-btn" id="cube-simulation-run-btn">
+                <span class="cube-sim-btn-icon">▶</span>
+                <span>Run Simulation</span>
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="cube-simulation-progress" class="cube-progress-bar" style="display: none;">
+            <div class="cube-progress-track">
+                <div id="cube-simulation-progress-fill" class="cube-progress-fill"></div>
+            </div>
+            <p id="cube-simulation-progress-text" class="cube-progress-text">Running simulations...</p>
+        </div>
+
+        <!-- Results -->
         <div id="cube-simulation-results" class="cube-simulation-results"></div>
     `;
 }
@@ -318,12 +366,27 @@ function generateSimulationTabHTML(): string {
  */
 function generateOptimalTabHTML(): string {
     return `
-        <div class="cube-optimal-header">
-            <h3 class="cube-optimal-title">Optimal Strategy Guidance</h3>
-            <p class="cube-optimal-description">Get recommendations on which slots to cube first for maximum DPS gain</p>
+        <div class="optimal-config" style="display: flex; gap: 20px; margin-bottom: 20px; align-items: center;">
+            <div>
+                <label style="color: var(--text-secondary);">Potential Type:</label>
+                <select id="optimal-potential-type" style="margin-left: 8px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+                    <option value="regular">Regular</option>
+                    <option value="bonus">Bonus</option>
+                </select>
+            </div>
+            <div>
+                <label style="color: var(--text-secondary);">Cube Budget:</label>
+                <input type="number" id="optimal-cube-budget" min="1" max="9999" value="100" style="margin-left: 8px; width: 100px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+            </div>
         </div>
 
-        <div id="cube-optimal-content-inner" class="cube-optimal-content-inner"></div>
+        <div id="optimal-recommendation" class="optimal-recommendation-panel">
+            <!-- Populated dynamically -->
+        </div>
+
+        <div id="optimal-sequence" class="optimal-sequence-table">
+            <!-- Full optimal sequence table -->
+        </div>
     `;
 }
 
@@ -355,6 +418,7 @@ export async function initializeCubePotentialUI(): Promise<void> {
     setupPotentialLineDropdowns();
     setupTabNavigation();
     setupRankingsControls();
+    setupSimulationButton();
 
     // Load data from store
     loadCubeDataFromStore();
@@ -571,6 +635,23 @@ function setupRankingsControls(): void {
     raritySelector.addEventListener('change', () => {
         currentRankingsPage = 1;
         // Rankings will be calculated on demand when tab is visible
+    });
+}
+
+/**
+ * Setup simulation button
+ */
+function setupSimulationButton(): void {
+    const simulationButton = document.getElementById('cube-simulation-run-btn');
+    if (!simulationButton) return;
+
+    simulationButton.addEventListener('click', () => {
+        // Check if runCubeSimulation function exists on window
+        if (typeof (window as any).runCubeSimulation === 'function') {
+            (window as any).runCubeSimulation();
+        } else {
+            console.error('runCubeSimulation function not found');
+        }
     });
 }
 
