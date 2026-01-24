@@ -1,10 +1,29 @@
 // Help sidebar functionality
 
-window.openHelpSidebar = openHelpSidebar;
-window.closeHelpSidebar = closeHelpSidebar;
-window.scrollToSection = scrollToSection;
+type HelpKey =
+    | 'skill-coeff'
+    | 'def-pen'
+    | 'skill-mastery'
+    | 'skill-mastery-boss'
+    | 'target-stage'
+    | 'defense'
+    | 'main-stat-pct'
+    | 'stats-autofill';
 
-const helpContent = {
+interface HelpContent {
+    title: string;
+    content: string;
+}
+
+declare global {
+    interface Window {
+        openHelpSidebar: (helpKey: HelpKey) => void;
+        closeHelpSidebar: () => void;
+        scrollToSection: (sectionId: string) => void;
+    }
+}
+
+const helpContent: Record<HelpKey, HelpContent> = {
     'skill-coeff': {
         title: 'Skill Coefficient',
         content: `
@@ -133,8 +152,7 @@ const helpContent = {
             <h4>Example</h4>
             <p>If you have +20% from equipment, +15% from artifacts, and +10% from skills, enter <strong>45</strong> in the "Current Main Stat %" field. Then enter your character sheet's total main stat value in the "Primary Main Stat" field.</p>
         `
-    }
-    ,
+    },
     'stats-autofill': {
         title: 'Stats Auto-Fill',
         content: `
@@ -146,13 +164,13 @@ const helpContent = {
                 <li>Paste the image from your clipboard while mouse is hovering over the paste area</li>
                 <li>If Auto-Fill misses fields, you can edit them manually</li>
             </ul>
-            
+
             <h4>Notes</h4>
               <ul>
                 <li>"Min Damage Multiplier" may not get autofilled correctly</li>
                 <li>Ensure that all primary stats (STR, DEX, INT, LUK) are visible in the <strong>same</strong> screenshot for accurate calculation of primary/secondary stats</li>
             </ul>
-            
+
             <h4> Example Acceptable Screenshots</h4>
             <img src="media/autofill/stats-autofill-ex1.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
             <img src="media/autofill/stats-autofill-ex2.png" style="width: 100%; max-width: 360px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 8px;">
@@ -160,7 +178,11 @@ const helpContent = {
     }
 };
 
-export function openHelpSidebar(helpKey) {
+window.openHelpSidebar = openHelpSidebar;
+window.closeHelpSidebar = closeHelpSidebar;
+window.scrollToSection = scrollToSection;
+
+export function openHelpSidebar(helpKey: HelpKey): void {
     const sidebar = document.getElementById('help-sidebar');
     const title = document.getElementById('help-sidebar-title');
     const content = document.getElementById('help-sidebar-content');
@@ -187,7 +209,7 @@ export function openHelpSidebar(helpKey) {
     }
 }
 
-export function closeHelpSidebar() {
+export function closeHelpSidebar(): void {
     const sidebar = document.getElementById('help-sidebar');
     const backdrop = document.getElementById('help-sidebar-backdrop');
 
@@ -206,7 +228,7 @@ export function closeHelpSidebar() {
 }
 
 // Left Navigation - Scroll to Section
-export function scrollToSection(sectionId) {
+export function scrollToSection(sectionId: string): void {
     const section = document.getElementById(sectionId);
     if (section) {
         section.scrollIntoView({

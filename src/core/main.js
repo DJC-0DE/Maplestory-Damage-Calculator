@@ -25,10 +25,13 @@ import { loadTheme } from '@utils/theme.js';
 import { loadoutPage } from '@page/loadout-page.js';
 import { statHubPage } from '@page/stat-hub-page.js';
 import '@utils/tabs.js';
+import '@utils/ocr.js';
+import '@utils/help-sidebar.js';
 import '@utils/data-management.js';
 //import '@ui/help-sidebar.js';
 //import '@core/features/scrolling/scroll-optimizer.js';
 import { loadoutStore } from '@ts/store/loadout.store.js';
+import { gearLabPage } from './../ts/page/gear-lab-page.js';
 
 // Main calculation orchestration
 export function calculate() {
@@ -328,10 +331,8 @@ window.onload = async function () {
     await loadoutStore.initialize();
     registerPage('setup', loadoutPage);
     registerPage('predictions', statHubPage);
-    // Register other pages here as they migrate to BasePage pattern
-    // registerPage('optimization', optimizationPage);
-    // registerPage('predictions', predictionsPage);
-
+    registerPage('optimization', gearLabPage);
+    
     initializeRouter(); // Initialize routing system first
     loadTheme();
 

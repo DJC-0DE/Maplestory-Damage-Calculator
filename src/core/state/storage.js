@@ -1,5 +1,5 @@
 import { calculate } from '@core/main.js';
-import { renderTheoreticalBest, renderPresetComparison } from '@core/features/inner-ability/inner-ability.js';
+import { renderTheoreticalBest, renderPresetComparison } from '@ts/page/inner-ability/inner-ability-ui.js';
 import { renderArtifactPotential } from '@core/features/artifacts/artifact-potential.js';
 import { clearCubeRankingsCache } from '@core/cube/cube-potential.js';
 import { addEquippedStat } from '@ui/equipment-ui.js';

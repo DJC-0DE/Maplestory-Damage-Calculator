@@ -174,9 +174,6 @@ declare global {
         handleStatEquivalencyInput?: (sourceStat: string) => void;
         toggleStatChart?: (statKey: string, label: string, isFlat: boolean) => void;
         sortStatPredictions?: (tableType: string, colIndex: number, th: HTMLElement) => void;
-
-        // Help
-        openHelpSidebar?: (topic: string) => void;
     }
 }
 
