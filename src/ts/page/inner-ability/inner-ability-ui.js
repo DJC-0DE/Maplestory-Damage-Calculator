@@ -5,11 +5,9 @@ import { StatCalculationService } from "@ts/services/stat-calculation-service.js
 import {
   calculatePresetComparisons,
   calculateTheoreticalBest,
-  calculateBestCombinations
+  calculateBestCombinations,
+  getBaselineStats
 } from "@ts/page/inner-ability/inner-ability.js";
-function getStats() {
-  return window.getStats ? window.getStats("base") : {};
-}
 let presetSortState = { column: 2, ascending: false };
 let theoreticalSortState = { column: 2, ascending: false };
 function generatePresetLineHTML(presetId, lineIndex) {
@@ -178,7 +176,7 @@ function renderTheoreticalBest() {
   if (!container) return;
   const results = calculateTheoreticalBest();
   const combinations = calculateBestCombinations();
-  const baseline = getStats();
+  const baseline = getBaselineStats();
   const baselineService = new StatCalculationService(baseline);
   const baselineBossDamage = baselineService.compute("boss");
   const baselineBossDps = baselineBossDamage.dps;

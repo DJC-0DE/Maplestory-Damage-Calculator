@@ -10,6 +10,7 @@ import { gearLabStore } from '@ts/store/gear-lab-store.js';
 import { StatCalculationService } from '@ts/services/stat-calculation-service.js';
 import type { InnerAbilityLine, PresetComparisonResult, TheoreticalRollResult, BestCombinationResult } from '@ts/types/page/gear-lab/gear-lab.types.js';
 import type { BaseStats } from '@ts/types/loadout.js';
+import { loadoutStore } from '@ts/store/loadout.store';
 
 // ============================================================================
 // STAT MAPPING
@@ -94,8 +95,7 @@ export function applyInnerAbilityLines(baseStats: BaseStats, lines: InnerAbility
  * @returns Baseline stats
  */
 export function getBaselineStats(): BaseStats {
-    // Get base stats from global getStats function
-    const baseStats = (window as any).getStats ? (window as any).getStats('base') : {};
+    const baseStats = loadoutStore.getBaseStats();
     const equippedPresetId = gearLabStore.getEquippedPresetId();
 
     let baseline = { ...baseStats };

@@ -1,6 +1,7 @@
 import { innerAbilitiesData } from "@data/inner-ability-data.js";
 import { gearLabStore } from "@ts/store/gear-lab-store.js";
 import { StatCalculationService } from "@ts/services/stat-calculation-service.js";
+import { loadoutStore } from "@ts/store/loadout.store.js";
 function mapInnerAbilityStat(statName, value, baseStats) {
   const service = new StatCalculationService(baseStats);
   switch (statName) {
@@ -49,7 +50,7 @@ function applyInnerAbilityLines(baseStats, lines) {
   return modifiedStats;
 }
 function getBaselineStats() {
-  const baseStats = window.getStats ? window.getStats("base") : {};
+  const baseStats = loadoutStore.getBaseStats();
   const equippedPresetId = gearLabStore.getEquippedPresetId();
   let baseline = { ...baseStats };
   if (equippedPresetId !== null) {
