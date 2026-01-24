@@ -372,7 +372,7 @@ export function calculateEquipmentSlotDPS() {
 
     // Calculate total DPS gain from all slots using chaining API
     const withoutAllSlotsDPS = new StatCalculationService(baseStats)
-        .subtractAttack(totalAttackFromSlots, true)  // applyWeaponBonus = true
+        .subtractAttack(totalAttackFromSlots)  // applyWeaponBonus = true
         .subtractStat('statDamage', totalStatDamageFromSlots)
         .subtractStat('damageAmp', totalDamageAmpFromSlots)
         .computeDPS('boss');

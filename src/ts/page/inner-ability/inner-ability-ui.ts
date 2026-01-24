@@ -26,8 +26,17 @@ import {
 let presetSortState: TableSortState['preset'] = { column: 2, ascending: false };
 let theoreticalSortState: TableSortState['theoretical'] = { column: 2, ascending: false };
 
+/**
+ * Theoretical Best roll visibility filters
+ */
+interface TheoreticalRollFilters {
+    min: boolean;
+    mid: boolean;
+    max: boolean;
+}
+
 // Theoretical Best roll visibility toggles
-let theoreticalRollFilters = {
+let theoreticalRollFilters: TheoreticalRollFilters = {
     min: true,
     mid: true,
     max: true

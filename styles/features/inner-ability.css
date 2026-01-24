@@ -486,6 +486,47 @@
     margin-bottom: var(--ia-space-2xl);
 }
 
+/* Roll Type Filter Controls */
+.ia-roll-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ia-space-md);
+    padding: var(--ia-space-md);
+    background: var(--ia-surface-subtle);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 10px;
+    margin-bottom: var(--ia-space-md);
+    align-items: center;
+}
+
+.ia-roll-filter-label {
+    display: flex;
+    align-items: center;
+    gap: var(--ia-space-sm);
+    font-family: var(--ia-font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+    padding: var(--ia-space-sm) var(--ia-space-md);
+    border-radius: 8px;
+}
+
+.ia-roll-filter-label:hover {
+    background: var(--ia-surface-base);
+    color: var(--ia-inner-ability);
+}
+
+.ia-roll-filter-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--ia-inner-ability);
+    flex-shrink: 0;
+}
+
 /* Scrollable Table Container - Extends base .table-scrollable with IA theming */
 .ia-table-scrollable {
     max-height: 600px;

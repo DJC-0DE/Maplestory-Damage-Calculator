@@ -4,7 +4,7 @@ function applyEffectsToService(service, effects, isRemoving = false) {
   if (!effects) return service;
   const statTypes = {
     // Flat attack - applies weapon attack bonus
-    attack: (value) => isRemoving ? service.subtractAttack(Math.abs(value), true) : service.addAttack(value, true),
+    attack: (value) => isRemoving ? service.subtractAttack(Math.abs(value)) : service.addAttack(value, true),
     // Flat main stat - converts to stat damage (100 main stat = 1% stat damage)
     mainStat: (value) => service.addMainStat(isRemoving ? -Math.abs(value) : value),
     // Main stat % with diminishing returns

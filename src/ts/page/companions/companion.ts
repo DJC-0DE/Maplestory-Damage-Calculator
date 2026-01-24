@@ -42,7 +42,7 @@ function applyEffectsToService(
     const statTypes: Record<string, (value: number) => void> = {
         // Flat attack - applies weapon attack bonus
         attack: (value) => isRemoving
-            ? service.subtractAttack(Math.abs(value), true)
+            ? service.subtractAttack(Math.abs(value))
             : service.addAttack(value, true),
 
         // Flat main stat - converts to stat damage (100 main stat = 1% stat damage)

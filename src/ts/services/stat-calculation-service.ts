@@ -297,11 +297,68 @@ export class StatCalculationService {
      * @param applyWeaponBonus - Whether to apply weapon attack bonus (default: true)
      * @returns Returns this for chaining
      */
-    subtractAttack(value: number, applyWeaponBonus = true): this {
-        const effective = applyWeaponBonus
-            ? value * (1 + this.weaponAttackBonus / 100)
-            : value;
+    subtractAttack(value: number): this {
+        let finalAttackBonus = 0;
+        let classFinalAttackBonus = 0;
+        const result = calculateJobSkillPassiveGains(this.context.selectedClass, loadoutStore.getCharacterLevel(),
+            {
+                firstJob: this.stats.SKILL_LEVEL_1ST,
+                secondJob: this.stats.SKILL_LEVEL_2ND,
+                thirdJob: this.stats.SKILL_LEVEL_3RD,
+                fourthJob: this.stats.SKILL_LEVEL_4TH
+            });
+
+        if (result.complexStatChanges) {
+            classFinalAttackBonus = result.complexStatChanges['finalAttack'] ?? 0;
+        }
+
+        if (classFinalAttackBonus != 0) {
+            finalAttackBonus = (1 + classFinalAttackBonus / 100);
+        }
+
+        const effective = value * (1 + this.weaponAttackBonus / 100) * finalAttackBonus;
         this.stats.ATTACK -= effective;
+        return this;
+    }
+
+    /**
+     * Subtract main stat (flat value, converts to stat damage)
+     * 100 main stat = 1% stat damage
+     * @param value - Main stat value to subtract
+     * @returns Returns this for chaining
+     */
+    subtractMainStat(value: number): this {
+        const increaseWithMainstatPct = this.calculateMainStatIncreaseWithPct(value);
+        const statDamageIncrease = increaseWithMainstatPct / 100;
+
+        this.stats.PRIMARY_MAIN_STAT -= increaseWithMainstatPct;
+
+        this.subtractAttack(increaseWithMainstatPct);
+
+        this.stats.STAT_DAMAGE -= statDamageIncrease;
+        return this;
+    }
+
+    /**
+     * Subtract main stat % with proper diminishing returns calculation
+     * @param value - Main stat % to subtract
+     * @returns Returns this for chaining
+     */
+    subtractMainStatPct(value: number): this {
+        const mainStatGain = this.calculateMainStatPercentGain(
+            value,
+            this.context.mainStatPct,
+            this.context.primaryMainStat,
+            this.context.defense,
+            this.context.selectedClass
+        );
+
+        const statDamageIncrease = mainStatGain / 100;
+        this.subtractAttack(mainStatGain);
+        this.stats.STAT_DAMAGE -= statDamageIncrease;
+        this.stats.PRIMARY_MAIN_STAT -= mainStatGain;
+
+        this.context.mainStatPct -= value;
         return this;
     }
 

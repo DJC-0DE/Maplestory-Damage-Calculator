@@ -10,6 +10,11 @@ import {
 } from "@ts/page/inner-ability/inner-ability.js";
 let presetSortState = { column: 2, ascending: false };
 let theoreticalSortState = { column: 2, ascending: false };
+let theoreticalRollFilters = {
+  min: true,
+  mid: true,
+  max: true
+};
 function generatePresetLineHTML(presetId, lineIndex) {
   const options = innerAbilityStats.map(
     (stat) => `<option value="${stat}">${stat}</option>`
@@ -183,15 +188,26 @@ function renderTheoreticalBest() {
   const sortedResults = [...results].sort((a, b) => {
     return theoreticalSortState.ascending ? a.dpsGain - b.dpsGain : b.dpsGain - a.dpsGain;
   });
+  const filteredResults = sortedResults.filter((result) => {
+    if (result.roll === "Min" && !theoreticalRollFilters.min) return false;
+    if (result.roll === "Mid" && !theoreticalRollFilters.mid) return false;
+    if (result.roll === "Max" && !theoreticalRollFilters.max) return false;
+    return true;
+  });
   let html = '<div class="ia-theoretical-section">';
   html += '<h3 class="title">All Possible Rolls Ranked</h3>';
+  html += '<div class="ia-roll-filters">';
+  html += `<label class="ia-roll-filter-label"><input type="checkbox" id="roll-filter-min" onchange="toggleTheoreticalRollFilter('min')" ` + (theoreticalRollFilters.min ? "checked" : "") + "> Min Rolls</label>";
+  html += `<label class="ia-roll-filter-label"><input type="checkbox" id="roll-filter-mid" onchange="toggleTheoreticalRollFilter('mid')" ` + (theoreticalRollFilters.mid ? "checked" : "") + "> Mid Rolls</label>";
+  html += `<label class="ia-roll-filter-label"><input type="checkbox" id="roll-filter-max" onchange="toggleTheoreticalRollFilter('max')" ` + (theoreticalRollFilters.max ? "checked" : "") + "> Max Rolls</label>";
+  html += "</div>";
   html += '<div class="table-scrollable">';
   html += '<table class="table"><thead><tr>';
   html += "<th>Stat & Roll</th>";
   html += "<th>Value</th>";
   html += '<th class="sortable" onclick="sortTheoreticalTable(2)">DPS Gain</th>';
   html += "</tr></thead><tbody>";
-  sortedResults.forEach((result) => {
+  filteredResults.forEach((result) => {
     const rarityLetter = result.rarity.charAt(0).toUpperCase();
     const rarityClass = `rarity-${result.rarity.toLowerCase()}`;
     const badge = `<span class="badge badge--rarity ${rarityClass}">${rarityLetter}</span>`;
@@ -353,6 +369,10 @@ function sortTheoreticalTable(column) {
   }
   renderTheoreticalBest();
 }
+function toggleTheoreticalRollFilter(rollType) {
+  theoreticalRollFilters[rollType] = !theoreticalRollFilters[rollType];
+  renderTheoreticalBest();
+}
 function initializeInnerAbilityUI() {
   const container = document.getElementById("optimization-inner-ability");
   if (!container) {
@@ -390,6 +410,7 @@ if (typeof window !== "undefined") {
   window.toggleLineBreakdown = toggleLineBreakdown;
   window.sortPresetTable = sortPresetTable;
   window.sortTheoreticalTable = sortTheoreticalTable;
+  window.toggleTheoreticalRollFilter = toggleTheoreticalRollFilter;
   window.switchPreset = switchPreset;
   window.handlePresetEquipped = handlePresetEquipped;
   window.handlePresetLineChange = handlePresetLineChange;
@@ -407,6 +428,7 @@ export {
   sortTheoreticalTable,
   switchInnerAbilityTab,
   switchPreset,
-  toggleLineBreakdown
+  toggleLineBreakdown,
+  toggleTheoreticalRollFilter
 };
 //# sourceMappingURL=inner-ability-ui.js.map
