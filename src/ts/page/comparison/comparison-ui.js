@@ -53,20 +53,20 @@ function generateComparisonHTML() {
                     <div class="equipped-inputs-row">
                         <div class="input-group equipped-input-group">
                             <label for="equipped-name" class="equipped-label">Name</label>
-                            <input type="text" id="equipped-name" value="Current Item" aria-label="Equipped item name" maxlength="50">
+                            <input type="text" id="equipped-name" value="Current Item" aria-label="Equipped item name" maxlength="50" readonly>
                         </div>
                         <div class="input-group equipped-input-group">
                             <label for="equipped-attack" class="equipped-label">Attack</label>
-                            <input type="number" id="equipped-attack" value="0" aria-label="Equipped item attack value">
+                            <input type="number" id="equipped-attack" value="0" aria-label="Equipped item attack value" readonly>
                         </div>
                         <div id="equipped-main-stat-container" class="input-group equipped-input-group" style="display: none;">
                             <label for="equipped-main-stat" class="equipped-label">Main Stat</label>
-                            <input type="number" step="1" id="equipped-main-stat" value="0" aria-label="Equipped item main stat value">
+                            <input type="number" step="1" id="equipped-main-stat" value="0" aria-label="Equipped item main stat value" readonly>
                         </div>
                     </div>
                     <div class="equipped-stats-header">
                         <label class="equipped-stats-label">Additional Stats</label>
-                        <button id="equipped-add-stat-btn" class="comparison-action-btn comparison-action-btn--add" aria-label="Add stat to equipped item">
+                        <button id="equipped-add-stat-btn" class="comparison-action-btn comparison-action-btn--add" aria-label="Add stat to equipped item" disabled style="opacity: 0.5; cursor: not-allowed;">
                             <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                             </svg>
@@ -147,15 +147,15 @@ function renderEquippedItem() {
       statDiv.innerHTML = `
                 <div class="input-group">
                     <label style="font-size: 0.8em;">Stat</label>
-                    <select class="equipped-stat-type" data-stat-index="${i}">
+                    <select class="equipped-stat-type" data-stat-index="${i}" disabled style="opacity: 0.5; cursor: not-allowed;">
                         ${generateStatTypeOptionsHTML()}
                     </select>
                 </div>
                 <div class="input-group">
                     <label style="font-size: 0.8em;">Value</label>
-                    <input type="number" step="0.1" class="equipped-stat-value" data-stat-index="${i}" value="${statLine?.value || 0}">
+                    <input type="number" step="0.1" class="equipped-stat-value" data-stat-index="${i}" value="${statLine?.value || 0}" readonly>
                 </div>
-                <button class="equipped-stat-remove" data-stat-index="${i}" aria-label="Remove stat line" title="Remove stat line">
+                <button class="equipped-stat-remove" data-stat-index="${i}" aria-label="Remove stat line" title="Remove stat line" disabled style="opacity: 0.5; cursor: not-allowed;">
                     <svg viewBox="0 0 16 16" fill="currentColor">
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg>
@@ -168,7 +168,6 @@ function renderEquippedItem() {
       }
     }
   }
-  attachEquippedItemEventListeners();
 }
 function renderComparisonItems() {
   const items = getComparisonItems(currentSlot);
@@ -340,138 +339,6 @@ function attachEventListeners() {
   const calculateButton = document.querySelector(".comparison-calculate-btn");
   if (calculateButton) {
     calculateButton.onclick = handleCalculate;
-  }
-  const equippedAddStatBtn = document.getElementById("equipped-add-stat-btn");
-  if (equippedAddStatBtn) {
-    equippedAddStatBtn.onclick = handleAddStatLineToEquipped;
-  }
-}
-function debounce(func, wait) {
-  let timeout = null;
-  return function executedFunction(...args) {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-function saveEquippedItemDataFromDOM() {
-  const equipmentData = loadoutStore.getEquipmentData();
-  const slotData = equipmentData[currentSlot];
-  const slotConfig = getSlotConfig(currentSlot);
-  const nameInput = document.getElementById("equipped-name");
-  const name = nameInput ? nameInput.value : slotData?.name || "";
-  const attackInput = document.getElementById("equipped-attack");
-  const attack = attackInput ? parseFloat(attackInput.value) || 0 : 0;
-  let mainStat;
-  if (slotConfig?.hasMainStat) {
-    const mainStatInput = document.getElementById("equipped-main-stat");
-    mainStat = mainStatInput ? parseFloat(mainStatInput.value) || 0 : void 0;
-  }
-  const statLines = [];
-  const statsContainer = document.getElementById("equipped-stats-container");
-  if (statsContainer) {
-    const statElements = statsContainer.querySelectorAll(".equipped-stat-row");
-    statElements.forEach((statElement) => {
-      const typeInput = statElement.querySelector(".equipped-stat-type");
-      const valueInput = statElement.querySelector(".equipped-stat-value");
-      if (typeInput && valueInput && typeInput.value) {
-        statLines.push({
-          type: typeInput.value,
-          value: parseFloat(valueInput.value) || 0
-        });
-      }
-    });
-  }
-  const updatedSlotData = {
-    name,
-    attack,
-    mainStat,
-    statLines
-  };
-  try {
-    loadoutStore.updateEquipment(currentSlot, updatedSlotData);
-  } catch (error) {
-    console.error("Failed to save equipped item data:", error);
-    showToast("Failed to save changes. Please try again.", false);
-  }
-}
-const handleEquippedItemInput = debounce(() => {
-  saveEquippedItemDataFromDOM();
-  triggerAutoCalculate();
-}, 300);
-function attachEquippedItemEventListeners() {
-  const nameInput = document.getElementById("equipped-name");
-  if (nameInput) {
-    nameInput.removeEventListener("input", handleEquippedItemInput);
-    nameInput.addEventListener("input", handleEquippedItemInput);
-  }
-  const attackInput = document.getElementById("equipped-attack");
-  if (attackInput) {
-    attackInput.removeEventListener("input", handleEquippedItemInput);
-    attackInput.addEventListener("input", handleEquippedItemInput);
-  }
-  const mainStatInput = document.getElementById("equipped-main-stat");
-  if (mainStatInput) {
-    mainStatInput.removeEventListener("input", handleEquippedItemInput);
-    mainStatInput.addEventListener("input", handleEquippedItemInput);
-  }
-  const statsContainer = document.getElementById("equipped-stats-container");
-  if (statsContainer) {
-    const typeSelects = statsContainer.querySelectorAll(".equipped-stat-type");
-    typeSelects.forEach((select) => {
-      select.removeEventListener("change", handleEquippedItemInput);
-      select.addEventListener("change", handleEquippedItemInput);
-    });
-    const valueInputs = statsContainer.querySelectorAll(".equipped-stat-value");
-    valueInputs.forEach((input) => {
-      input.removeEventListener("input", handleEquippedItemInput);
-      input.addEventListener("input", handleEquippedItemInput);
-    });
-    const removeButtons = statsContainer.querySelectorAll(".equipped-stat-remove");
-    removeButtons.forEach((button) => {
-      button.onclick = (e) => {
-        const statIndex = parseInt(e.currentTarget.dataset.statIndex || "0");
-        handleRemoveStatLineFromEquipped(statIndex);
-      };
-    });
-  }
-}
-function handleAddStatLineToEquipped() {
-  try {
-    const equipmentData = loadoutStore.getEquipmentData();
-    const slotData = equipmentData[currentSlot];
-    const updatedStatLines = [...slotData?.statLines || [], { type: "attack", value: 0 }];
-    const updatedSlotData = {
-      name: slotData?.name || "",
-      attack: slotData?.attack || 0,
-      mainStat: slotData?.mainStat,
-      statLines: updatedStatLines
-    };
-    loadoutStore.updateEquipment(currentSlot, updatedSlotData);
-    renderEquippedItem();
-    triggerAutoCalculate();
-  } catch (error) {
-    console.error("Failed to add stat line:", error);
-    showToast("Failed to add stat line. Please try again.", false);
-  }
-}
-function handleRemoveStatLineFromEquipped(statIndex) {
-  try {
-    const equipmentData = loadoutStore.getEquipmentData();
-    const slotData = equipmentData[currentSlot];
-    if (!slotData?.statLines || statIndex >= slotData.statLines.length) return;
-    const updatedStatLines = slotData.statLines.filter((_, index) => index !== statIndex);
-    const updatedSlotData = {
-      name: slotData.name || "",
-      attack: slotData.attack || 0,
-      mainStat: slotData.mainStat,
-      statLines: updatedStatLines
-    };
-    loadoutStore.updateEquipment(currentSlot, updatedSlotData);
-    renderEquippedItem();
-    triggerAutoCalculate();
-  } catch (error) {
-    console.error("Failed to remove stat line:", error);
-    showToast("Failed to remove stat line. Please try again.", false);
   }
 }
 function attachItemEventListeners(itemDiv) {

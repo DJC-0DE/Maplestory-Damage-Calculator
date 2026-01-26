@@ -1,7 +1,7 @@
 import { gearLabStore } from "@ts/store/gear-lab-store.js";
 import { StatCalculationService } from "@ts/services/stat-calculation-service.js";
-import { loadoutStore } from "@ts/store/loadout.store.js";
 import { STAT } from "@ts/types";
+import { loadoutStore } from "@ts/store/loadout.store.js";
 import { calculatePassiveGainsForItem } from "@ts/services/item-comparison.service.js";
 const EQUIPMENT_SLOTS = {
   head: { id: "head", name: "Head", hasMainStat: false },
@@ -136,7 +136,40 @@ function calculateEquippedDamage(slotId) {
   const equippedData = getEquippedItemData(slotId);
   if (!equippedData) return null;
   const baseStats = loadoutStore.getBaseStats();
+  const currentClass = loadoutStore.getSelectedClass();
+  const characterLevel = loadoutStore.getCharacterLevel();
   const service = new StatCalculationService(baseStats);
+  let passiveGains = void 0;
+  if (currentClass) {
+    const equippedAsComparisonItem = {
+      guid: "equipped",
+      name: "Equipped Item",
+      attack: equippedData.attack,
+      mainStat: equippedData.mainStat,
+      statLines: equippedData.statLines.map((sl) => ({
+        type: sl.type,
+        value: sl.value
+      }))
+    };
+    const passiveResult = calculatePassiveGainsForItem(equippedAsComparisonItem, {
+      currentClass,
+      characterLevel,
+      baseStats
+    });
+    Object.entries(passiveResult.statChanges).forEach(([stat, value]) => {
+      if (value !== 0) {
+        service.add(stat, value);
+      }
+    });
+    if (passiveResult.breakdown.length > 0 || passiveResult.complexPassives.length > 0) {
+      passiveGains = {
+        statChanges: passiveResult.statChanges,
+        breakdown: passiveResult.breakdown,
+        complexPassives: passiveResult.complexPassives,
+        complexStatChanges: passiveResult.complexStatChanges
+      };
+    }
+  }
   const bossResult = service.compute("boss");
   const normalResult = service.compute("normal");
   return {
@@ -146,7 +179,8 @@ function calculateEquippedDamage(slotId) {
     normalDPS: normalResult.dps,
     bossExpectedDamage: bossResult.expectedDamage,
     normalExpectedDamage: normalResult.expectedDamage,
-    stats: service.getStats()
+    stats: service.getStats(),
+    passiveGains
   };
 }
 function getSlotConfig(slotId) {
