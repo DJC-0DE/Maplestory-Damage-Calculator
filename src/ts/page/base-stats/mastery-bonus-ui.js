@@ -2,7 +2,7 @@ import { selectMasteryTab } from "./class-select-ui.js";
 import { updateMasteryBonuses, calculateMasteryTotals } from "./mastery-bonus.js";
 import { MASTERY_3RD, MASTERY_4TH } from "./mastery-constants.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
-import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS } from "@ts/types/constants.js";
+import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS, STAT } from "@ts/types/constants.js";
 function generateMasteryTableRows(tier, type) {
   const masteryData = tier === JOB_TIER.THIRD ? MASTERY_3RD : MASTERY_4TH;
   const items = masteryData[type];
@@ -76,8 +76,8 @@ function generateMasterySectionHTML() {
 }
 function generateMasteryHiddenInputs() {
   return `
-        <input type="hidden" id="skillMastery" value="21">
-        <input type="hidden" id="skillMasteryBoss" value="0">
+        <input type="hidden" id="mastery" value="21">
+        <input type="hidden" id="bossMastery" value="0">
     `;
 }
 function loadMasteryBonusesUI() {
@@ -122,13 +122,15 @@ function updateMasteryDisplay(tier, allTotal, bossTotal) {
   if (bossTotalDisplay) {
     bossTotalDisplay.textContent = `${bossTotal}%`;
   }
-  const skillMasteryInput = document.getElementById("skillMastery");
-  const skillMasteryBossInput = document.getElementById("skillMasteryBoss");
+  const skillMasteryInput = document.getElementById("mastery");
+  const skillMasteryBossInput = document.getElementById("bossMastery");
   if (skillMasteryInput) {
     skillMasteryInput.value = allTotal.toString();
+    loadoutStore.updateBaseStat(STAT.MASTERY.id, allTotal);
   }
   if (skillMasteryBossInput) {
     skillMasteryBossInput.value = bossTotal.toString();
+    loadoutStore.updateBaseStat(STAT.BOSS_MASTERY.id, bossTotal);
   }
 }
 function attachMasteryTabListeners() {

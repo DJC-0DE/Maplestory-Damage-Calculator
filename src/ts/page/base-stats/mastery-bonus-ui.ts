@@ -9,7 +9,7 @@ import { MASTERY_3RD, MASTERY_4TH } from './mastery-constants';
 import type { MasteryData } from '@ts/types/page/base-stats/base-stats.types';
 import type { JobTier } from '@ts/types/index';
 import { loadoutStore } from '@ts/store/loadout.store';
-import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS } from '@ts/types/constants';
+import { JOB_TIER, MASTERY_TYPE, MASTERY_LEVELS, STAT } from '@ts/types/constants';
 import type { MasteryTypeValue } from '@ts/types/constants';
 
 // ============================================================================
@@ -120,8 +120,8 @@ export function generateMasterySectionHTML(): string {
  */
 export function generateMasteryHiddenInputs(): string {
     return `
-        <input type="hidden" id="skillMastery" value="21">
-        <input type="hidden" id="skillMasteryBoss" value="0">
+        <input type="hidden" id="mastery" value="21">
+        <input type="hidden" id="bossMastery" value="0">
     `;
 }
 
@@ -198,14 +198,16 @@ export function updateMasteryDisplay(tier: JobTier, allTotal: number, bossTotal:
     }
 
     // Update hidden inputs that are used by the calculation engine
-    const skillMasteryInput = document.getElementById('skillMastery') as HTMLInputElement;
-    const skillMasteryBossInput = document.getElementById('skillMasteryBoss') as HTMLInputElement;
+    const skillMasteryInput = document.getElementById('mastery') as HTMLInputElement;
+    const skillMasteryBossInput = document.getElementById('bossMastery') as HTMLInputElement;
 
     if (skillMasteryInput) {
         skillMasteryInput.value = allTotal.toString();
+        loadoutStore.updateBaseStat(STAT.MASTERY.id, allTotal);
     }
     if (skillMasteryBossInput) {
         skillMasteryBossInput.value = bossTotal.toString();
+        loadoutStore.updateBaseStat(STAT.BOSS_MASTERY.id, bossTotal);
     }
 }
 

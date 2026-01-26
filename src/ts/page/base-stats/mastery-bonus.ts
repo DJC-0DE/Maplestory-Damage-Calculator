@@ -3,7 +3,7 @@ import { updateMasteryDisplay } from './mastery-bonus-ui';
 import type { JobTier } from '@ts/types/index';
 import type { MasteryBonuses } from '@ts/types/page/base-stats/base-stats.types';
 import { loadoutStore } from '@ts/store/loadout.store';
-import { MASTERY_TYPE } from '@ts/types/constants';
+import { MASTERY_TYPE, STAT } from '@ts/types/constants';
 
 if (typeof window !== 'undefined') {
     window.updateMasteryBonuses = updateMasteryBonuses;
@@ -25,7 +25,6 @@ export function updateMasteryBonuses(): void {
 
     // Save mastery checkbox states via loadout store (auto dual-writes to localStorage)
     saveMasteryCheckboxesToStore(currentTier);
-   // updateAnalysisTabs();
 }
 
 /**

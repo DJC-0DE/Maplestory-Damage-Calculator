@@ -81,7 +81,7 @@ export function createStatConfig(
         },
         'skillMastery': {
             label: 'Skill Mastery',
-            getValue: () => getValueFn('skillMastery'),
+            getValue: () => getValueFn('mastery'),
             applyToStats: (stats: BaseStats, value: number) => {
                 const service = new StatCalculationService(stats);
                 service.add(STAT.MASTERY.id, value);

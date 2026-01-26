@@ -8,7 +8,7 @@ const EQUIVALENCY_INPUTS = {
   ],
   percentage: [
     { id: `${EQUIV_PREFIX}SkillCoeff`, label: "Skill Coefficient (%)", default: 10, step: 1, min: 0 },
-    { id: `${EQUIV_PREFIX}SkillMastery`, label: "Skill Mastery (%)", default: 5, step: 1, min: 0 },
+    { id: `${EQUIV_PREFIX}Mastery`, label: "Skill Mastery (%)", default: 5, step: 1, min: 0 },
     { id: `${EQUIV_PREFIX}Damage`, label: "Damage (%)", default: 10, step: 1, min: 0 },
     { id: `${EQUIV_PREFIX}FinalDamage`, label: "Final Damage (%)", default: 10, step: 1, min: 0, info: "Increases to this stat are multiplicative rather than additive." },
     { id: `${EQUIV_PREFIX}BossDamage`, label: "Boss Damage (%)", default: 10, step: 1, min: 0 },
