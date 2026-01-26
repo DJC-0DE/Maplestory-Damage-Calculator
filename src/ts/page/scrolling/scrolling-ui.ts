@@ -123,10 +123,6 @@ function generateSimulationHTML(): string {
 
         <div class="scrolling-inputs-grid">
             <div class="input-group">
-                <label>Spell Trace Budget</label>
-                <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
-            </div>
-            <div class="input-group">
                 <label>Number of Simulations</label>
                 <input type="number" id="scroll-simulations" value="1000" min="100" max="10000" step="100">
             </div>
@@ -650,7 +646,7 @@ export function displayScrollResults(
                 <td>${data.avgDamageAmp.toFixed(2)}%</td>
                 <td>${data.avgSuccess.toFixed(1)} / 10</td>
                 <td>${data.avgResets.toFixed(1)}</td>
-                <td>${data.avgTraceUsed.toFixed(0)} / ${budget}</td>
+                <td>${data.avgTraceUsed.toFixed(0)}</td>
             </tr>
         `;
     }
@@ -795,12 +791,11 @@ export function switchScrollStrategyTab(strategyId: string): void {
  * Main simulation runner
  */
 export async function runScrollSimulation(): Promise<void> {
-    const budgetInput = document.getElementById('scroll-spell-trace-budget') as HTMLInputElement;
     const numSimsInput = document.getElementById('scroll-simulations') as HTMLInputElement;
 
-    if (!budgetInput || !numSimsInput) return;
+    if (!numSimsInput) return;
 
-    const budget = parseInt(budgetInput.value);
+    const budget = 500000;
     const numSimulations = parseInt(numSimsInput.value);
     const scrolls = getScrollsForLevel(currentScrollLevel);
 

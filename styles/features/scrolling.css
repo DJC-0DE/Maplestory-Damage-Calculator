@@ -222,12 +222,6 @@
     margin-bottom: 1rem;
 }
 
-@media (min-width: 640px) {
-    .scrolling-inputs-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 /* Input Group */
 .scrolling-inputs-grid .input-group {
     display: flex;
@@ -522,7 +516,6 @@
 }
 
 .scrolling-results-table thead {
-    background: var(--accent-primary);
     color: white;
 }
 

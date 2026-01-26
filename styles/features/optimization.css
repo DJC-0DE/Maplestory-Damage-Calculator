@@ -159,7 +159,7 @@
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     transition: all var(--opt-duration-base) var(--opt-ease-smooth);
     position: relative;
     overflow: hidden;

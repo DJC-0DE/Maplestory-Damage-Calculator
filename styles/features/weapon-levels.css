@@ -185,9 +185,7 @@
 }
 
 .wl-summary-card {
-    background: linear-gradient(135deg,
-        rgba(16, 185, 129, 0.12),
-        rgba(6, 182, 212, 0.08));
+    background: linear-gradient(135deg, rgb(185 77 16 / 12%), rgb(63 6 212 / 8%));
     border: 1px solid rgba(16, 185, 129, 0.25);
     border-radius: 12px;
     padding: var(--wl-space-lg);

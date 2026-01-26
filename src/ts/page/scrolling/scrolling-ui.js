@@ -81,10 +81,6 @@ function generateSimulationHTML() {
 
         <div class="scrolling-inputs-grid">
             <div class="input-group">
-                <label>Spell Trace Budget</label>
-                <input type="number" id="scroll-spell-trace-budget" value="7000" min="500" max="50000" step="100">
-            </div>
-            <div class="input-group">
                 <label>Number of Simulations</label>
                 <input type="number" id="scroll-simulations" value="1000" min="100" max="10000" step="100">
             </div>
@@ -461,7 +457,7 @@ function displayScrollResults(results, budget, numSimulations) {
                 <td>${data.avgDamageAmp.toFixed(2)}%</td>
                 <td>${data.avgSuccess.toFixed(1)} / 10</td>
                 <td>${data.avgResets.toFixed(1)}</td>
-                <td>${data.avgTraceUsed.toFixed(0)} / ${budget}</td>
+                <td>${data.avgTraceUsed.toFixed(0)}</td>
             </tr>
         `;
   }
@@ -576,10 +572,9 @@ function switchScrollStrategyTab(strategyId) {
   }
 }
 async function runScrollSimulation() {
-  const budgetInput = document.getElementById("scroll-spell-trace-budget");
   const numSimsInput = document.getElementById("scroll-simulations");
-  if (!budgetInput || !numSimsInput) return;
-  const budget = parseInt(budgetInput.value);
+  if (!numSimsInput) return;
+  const budget = 5e5;
   const numSimulations = parseInt(numSimsInput.value);
   const scrolls = getScrollsForLevel(currentScrollLevel);
   const button = document.getElementById("scroll-run-btn");

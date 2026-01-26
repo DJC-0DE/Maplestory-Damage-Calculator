@@ -150,7 +150,6 @@
 
 .dark .bgstats-stat-input:focus {
     border-color: var(--accent-primary, #10b981);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 /* ========================================
@@ -277,7 +276,6 @@
 
 .dark .bgstats-class-card.active,
 .dark .bgstats-class-card.selected {
-    background: rgba(16, 185, 129, 0.12);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
@@ -415,12 +413,10 @@
 
 .bgstats-tier-btn.active {
     border-color: var(--accent-primary, #10b981);
-    background: rgba(16, 185, 129, 0.1);
     color: var(--accent-primary, #059669);
 }
 
 .dark .bgstats-tier-btn.active {
-    background: rgba(16, 185, 129, 0.15);
     color: var(--accent-primary, #10b981);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
@@ -527,12 +523,10 @@
 
 .bgstats-mastery-tab.active {
     border-color: var(--accent-primary, #10b981);
-    background: rgba(16, 185, 129, 0.1);
     color: var(--accent-primary, #059669);
 }
 
 .dark .bgstats-mastery-tab.active {
-    background: rgba(16, 185, 129, 0.15);
     color: var(--accent-primary, #10b981);
 }
 
@@ -733,7 +727,6 @@
 
 .dark .bgstats-content-card.active,
 .dark .bgstats-content-card.selected {
-    background: rgba(16, 185, 129, 0.12);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
