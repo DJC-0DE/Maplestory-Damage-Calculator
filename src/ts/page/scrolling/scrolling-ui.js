@@ -86,7 +86,7 @@ function generateSimulationHTML() {
             </div>
             <div class="input-group">
                 <label>Number of Simulations</label>
-                <input type="number" id="scroll-simulations" value="500" min="100" max="10000" step="100">
+                <input type="number" id="scroll-simulations" value="1000" min="100" max="10000" step="100">
             </div>
         </div>
 

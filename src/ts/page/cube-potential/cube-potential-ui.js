@@ -292,7 +292,7 @@ function generateSimulationTabHTML() {
                 </div>
                 <div class="cube-sim-input-group">
                     <label for="simulation-count" class="cube-sim-label">Number of Simulations</label>
-                    <input type="number" id="simulation-count" value="1000" min="100" max="10000" step="100" class="cube-sim-input">
+                    <input type="number" id="simulation-count" value="10" min="100" max="10000" step="100" class="cube-sim-input">
                 </div>
             </div>
             <button class="cube-sim-run-btn" id="cube-simulation-run-btn">

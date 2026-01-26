@@ -90,7 +90,6 @@ function attachAppSidebarEventListeners() {
 }
 function updateDps() {
   const statCalculationService = new StatCalculationService(loadoutStore.getBaseStats());
-  console.log(loadoutStore.getBaseStats());
   const dpsValue = document.getElementById(`sidebar-dps-value`);
   dpsValue.innerText = formatDPS(statCalculationService.baseBossDPS);
 }
