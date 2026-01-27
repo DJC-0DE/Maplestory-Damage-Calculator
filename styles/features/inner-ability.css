@@ -219,7 +219,11 @@
     overflow: hidden;
 }
 
-/* Top Accent Bar */
+/* Top Accent Bar - Now uses glow-card system
+   Inner Ability tab is position 2 in Gear Lab (Red)
+   Use .glow-card[data-tab-index="2"] for this styling
+   or customize via --glow-card-color variable
+*/
 .ia-preset-card::before {
     content: '';
     position: absolute;
@@ -227,14 +231,20 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--ia-gradient-primary);
+    background: var(--glow-card-color, var(--ia-gradient-primary));
     opacity: 0.9;
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
 }
 
 .ia-preset-card:hover {
     border-color: var(--ia-border-hover);
-    box-shadow: var(--ia-glow-medium),
+    box-shadow: var(--glow-card-glow, var(--ia-glow-medium)),
                 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.ia-preset-card:hover::before {
+    opacity: 1;
+    height: 4px;
 }
 
 /* Currently Equipped Checkbox - Premium Toggle */

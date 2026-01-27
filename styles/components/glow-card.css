@@ -1,0 +1,148 @@
+/* ========================================
+   GLOW CARD SYSTEM
+   Reusable glowing card component with
+   position-based tab colors
+   ======================================== */
+
+/* ========================================
+   DESIGN TOKENS - Tab Position Colors
+   ======================================== */
+
+:root {
+    /* Tab Position Colors - Applied consistently across all pages */
+    --tab-color-1: #3b82f6;  /* Blue */
+    --tab-color-2: #ef4444;  /* Red */
+    --tab-color-3: #f59e0b;  /* Orange */
+    --tab-color-4: #14b8a6;  /* Teal */
+    --tab-color-5: #a855f7;  /* Purple */
+
+    /* Default fallback */
+    --glow-card-color: var(--tab-color-1);
+    --glow-card-glow: 0 0 30px rgba(59, 130, 246, 0.25);
+}
+
+/* ========================================
+   BASE GLOW CARD
+   ======================================== */
+
+.glow-card {
+    background: var(--ia-surface-base);
+    backdrop-filter: var(--ia-glass-blur);
+    -webkit-backdrop-filter: var(--ia-glass-blur);
+    border: 1px solid var(--ia-glass-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+/* Top Accent Bar */
+.glow-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--glow-card-color);
+    opacity: 0.9;
+    transition: all var(--ia-duration-base) var(--ia-ease-smooth);
+}
+
+/* Hover Effect */
+.glow-card:hover {
+    border-color: var(--ia-border-hover);
+    box-shadow: var(--glow-card-glow),
+                0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.glow-card:hover::before {
+    opacity: 1;
+    height: 4px;
+}
+
+/* ========================================
+   POSITION-BASED COLOR MAPPING
+   Maps to tab positions 1-5
+   ======================================== */
+
+.glow-card[data-tab-index="1"] {
+    --glow-card-color: var(--tab-color-1);
+    --glow-card-glow: 0 0 30px rgba(59, 130, 246, 0.25);
+}
+
+.glow-card[data-tab-index="2"] {
+    --glow-card-color: var(--tab-color-2);
+    --glow-card-glow: 0 0 30px rgba(239, 68, 68, 0.25);
+}
+
+.glow-card[data-tab-index="3"] {
+    --glow-card-color: var(--tab-color-3);
+    --glow-card-glow: 0 0 30px rgba(245, 158, 11, 0.25);
+}
+
+.glow-card[data-tab-index="4"] {
+    --glow-card-color: var(--tab-color-4);
+    --glow-card-glow: 0 0 30px rgba(20, 184, 166, 0.25);
+}
+
+.glow-card[data-tab-index="5"] {
+    --glow-card-color: var(--tab-color-5);
+    --glow-card-glow: 0 0 30px rgba(168, 85, 247, 0.25);
+}
+
+/* ========================================
+   CUSTOM COLOR OVERRIDE
+   Allows inline style overrides
+   ======================================== */
+
+/* Example usage:
+   <div class="glow-card" style="--glow-card-color: #8b5cf6;">
+   */
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.glow-card:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--glow-card-color),
+                var(--glow-card-glow);
+}
+
+/* ========================================
+   DARK MODE ENHANCEMENTS
+   ======================================== */
+
+.dark .glow-card {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .glow-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ========================================
+   USAGE EXAMPLES
+   ======================================== */
+
+/*
+   HTML Usage:
+
+   <!-- By tab position (recommended) -->
+   <div class="glow-card" data-tab-index="1">
+       Card content (blue accent)
+   </div>
+
+   <!-- With custom color -->
+   <div class="glow-card" style="--glow-card-color: #ec4899;
+                                     --glow-card-glow: 0 0 30px rgba(236, 72, 153, 0.3);">
+       Card content (custom pink accent)
+   </div>
+
+   <!-- Extending existing cards -->
+   <div class="ia-preset-card glow-card" data-tab-index="2">
+       Preset content (red accent)
+   </div>
+ */
