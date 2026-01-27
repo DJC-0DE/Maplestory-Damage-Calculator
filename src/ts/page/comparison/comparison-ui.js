@@ -258,7 +258,7 @@ function createItemCard(item, itemNumber) {
                     </svg>
                     <span>Add Stat</span>
                 </button>
-                <button class="comparison-action-btn comparison-action-btn--equip" aria-label="Equip this item" data-guid="${item.guid}">
+                <button style="display:none;" class="comparison-action-btn comparison-action-btn--equip" aria-label="Equip this item" data-guid="${item.guid}">
                     <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                         <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 1 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
                     </svg>

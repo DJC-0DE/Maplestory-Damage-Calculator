@@ -604,8 +604,8 @@ function formatStatForDisplay(statId: string): string {
  * Check if a stat should display as a percentage
  */
 function isStatPercentage(statId: string): boolean {
-    // Raw value stats (not divided by 10): HitChance, MaxHp, Attack, MainStat
-    return !['hitChance', 'maxHp', 'attack', 'primaryMainStat'].includes(statId);
+    // Raw value stats (not shown as percentage): HitChance, MaxHp, Attack, MainStat, Defense
+    return !['hitChance', 'maxHp', 'attack', 'mainStat', 'defense'].includes(statId);
 }
 
 /**

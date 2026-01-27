@@ -258,7 +258,7 @@ function formatStatForDisplay(statId) {
   return statEntry?.label || statId;
 }
 function isStatPercentage(statId) {
-  return !["hitChance", "maxHp", "attack", "primaryMainStat"].includes(statId);
+  return !["hitChance", "maxHp", "attack", "mainStat", "defense"].includes(statId);
 }
 function createEquipStatComparisonTable(statChanges) {
   const { directStats: { old: oldDirect, new: newDirect, diff: directDiff }, passiveGains } = statChanges;
