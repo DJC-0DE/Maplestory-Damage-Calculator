@@ -3,7 +3,13 @@
  * This file handles all HTML generation and rendering for the artifact potential tab
  */
 
-import { calculateArtifactPotentialRankings, getArtifactSortAsc, getArtifactSortColumn } from './artifact-potential.js';
+import {
+    calculateArtifactPotentialRankings,
+    getArtifactSortAsc,
+    getArtifactSortColumn,
+    setArtifactSortColumn,
+    toggleArtifactSortAsc
+} from './artifact-potential.js';
 import { formatNumber } from '@ts/utils/formatters.js';
 import type { ArtifactRankingResult } from '@ts/types/page/artifact-potential/artifact-potential.types.js';
 import { loadoutStore } from '@ts/store/loadout.store.js';
@@ -133,4 +139,27 @@ export function initializeArtifactPotential(): void {
     loadoutStore.on('stat:changed', debounce((_) => {
         renderArtifactPotential();
     }, 3500));
+}
+
+/**
+ * Sort artifact potential table by column and re-render
+ * @param column - Column index to sort by
+ */
+export function sortArtifactTable(column: number): void {
+    const currentColumn = getArtifactSortColumn();
+    if (currentColumn === column) {
+        toggleArtifactSortAsc();
+    } else {
+        setArtifactSortColumn(column);
+    }
+    renderArtifactPotential();
+}
+
+// ============================================================================
+// WINDOW EXPORTS
+// ============================================================================
+
+// Export sort function to window for HTML onclick attributes
+if (typeof window !== 'undefined') {
+    (window as any).sortArtifactTable = sortArtifactTable;
 }

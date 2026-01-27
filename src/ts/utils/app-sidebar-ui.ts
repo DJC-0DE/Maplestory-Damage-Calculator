@@ -99,6 +99,10 @@ export function generateAppSidebarHTML(): string {
                 <span>💝</span>
                 <span>Support</span>
             </a>
+            <button onclick="openCreditsModal()" class="sidebar-footer-btn credits-btn">
+                <span>✨</span>
+                <span>Credits</span>
+            </button>
         </div>`;
 }
 

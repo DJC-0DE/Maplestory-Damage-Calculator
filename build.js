@@ -10,6 +10,7 @@ const rootDir = process.cwd();
 // These should NOT get .js appended during build
 const EXPLICIT_IMPORT_MAP_PATHS = [
   '@ts/types',
+  'fireworks-js',
 ];
 
 // Path aliases from import map

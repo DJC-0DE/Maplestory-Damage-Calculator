@@ -96,17 +96,6 @@ function getArtifactSortAsc() {
 function toggleArtifactSortAsc() {
   artifactSortAsc = !artifactSortAsc;
 }
-function sortArtifactTable(column) {
-  if (artifactSortColumn === column) {
-    toggleArtifactSortAsc();
-  } else {
-    setArtifactSortColumn(column);
-    artifactSortAsc = false;
-  }
-}
-if (typeof window !== "undefined") {
-  window.sortArtifactTable = sortArtifactTable;
-}
 export {
   calculateArtifactPotentialRankings,
   getArtifactSortAsc,
@@ -114,7 +103,6 @@ export {
   getBaselineStats,
   mapArtifactStat,
   setArtifactSortColumn,
-  sortArtifactTable,
   toggleArtifactSortAsc
 };
 //# sourceMappingURL=artifact-potential.js.map

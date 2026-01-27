@@ -69,6 +69,10 @@ function generateAppSidebarHTML() {
                 <span>\u{1F49D}</span>
                 <span>Support</span>
             </a>
+            <button onclick="openCreditsModal()" class="sidebar-footer-btn credits-btn">
+                <span>\u2728</span>
+                <span>Credits</span>
+            </button>
         </div>`;
 }
 function initializeAppSidebarUI() {

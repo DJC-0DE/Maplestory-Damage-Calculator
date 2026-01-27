@@ -182,25 +182,6 @@ export function toggleArtifactSortAsc(): void {
     artifactSortAsc = !artifactSortAsc;
 }
 
-/**
- * Sort artifact potential table by column
- * @param column - Column index to sort by
- */
-export function sortArtifactTable(column: number): void {
-    if (artifactSortColumn === column) {
-        toggleArtifactSortAsc();
-    } else {
-        setArtifactSortColumn(column);
-        artifactSortAsc = false;
-    }
-    // Note: Actual re-rendering is handled by the UI module
-}
-
 // ============================================================================
 // WINDOW EXPORTS
 // ============================================================================
-
-// Export functions to window for HTML onclick attributes
-if (typeof window !== 'undefined') {
-    (window as any).sortArtifactTable = sortArtifactTable;
-}

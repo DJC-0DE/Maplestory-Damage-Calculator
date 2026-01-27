@@ -43,6 +43,10 @@ function generateComparisonHTML() {
             <!-- Equipped Item Card -->
             <div class="comparison-column">
                 <h3 class="comparison-column-header comparison-column-header--equipped">Currently Equipped</h3>
+                <p class="equipped-description">
+                    Equipped item stats are assumed to be included in your Base Stats tab inputs.
+                    To edit equipped items, go to the <a href="#equipment" class="equipped-link" data-navigable="true">Equipment tab</a>.
+                </p>
                 <div class="equipped-item-card">
                     <div class="equipped-card-header">
                         <div class="equipped-card-title-row">

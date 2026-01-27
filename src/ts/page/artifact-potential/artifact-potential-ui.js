@@ -1,4 +1,10 @@
-import { calculateArtifactPotentialRankings, getArtifactSortAsc, getArtifactSortColumn } from "./artifact-potential.js";
+import {
+  calculateArtifactPotentialRankings,
+  getArtifactSortAsc,
+  getArtifactSortColumn,
+  setArtifactSortColumn,
+  toggleArtifactSortAsc
+} from "./artifact-potential.js";
 import { formatNumber } from "@ts/utils/formatters.js";
 import { loadoutStore } from "@ts/store/loadout.store.js";
 import { debounce } from "@ts/utils/event-emitter.js";
@@ -83,8 +89,21 @@ function initializeArtifactPotential() {
     renderArtifactPotential();
   }, 3500));
 }
+function sortArtifactTable(column) {
+  const currentColumn = getArtifactSortColumn();
+  if (currentColumn === column) {
+    toggleArtifactSortAsc();
+  } else {
+    setArtifactSortColumn(column);
+  }
+  renderArtifactPotential();
+}
+if (typeof window !== "undefined") {
+  window.sortArtifactTable = sortArtifactTable;
+}
 export {
   initializeArtifactPotential,
-  renderArtifactPotential
+  renderArtifactPotential,
+  sortArtifactTable
 };
 //# sourceMappingURL=artifact-potential-ui.js.map

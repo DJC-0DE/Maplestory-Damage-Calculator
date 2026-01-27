@@ -33,6 +33,7 @@ import '@utils/data-management.js';
 import { loadoutStore } from '@ts/store/loadout.store.js';
 import { gearLabPage } from '@page/gear-lab-page.js';
 import { initializeAppSidebarUI } from '@utils/app-sidebar-ui.js';
+import '@ts/utils/credits-modal.js';
 
 /*
 // Main calculation orchestration

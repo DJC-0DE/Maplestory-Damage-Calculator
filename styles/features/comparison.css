@@ -146,6 +146,43 @@
 }
 
 /* ========================================
+   EQUIPPED DESCRIPTION BLURB
+   ======================================== */
+
+.equipped-description {
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin: 0;
+    padding: 0;
+    letter-spacing: -0.01em;
+}
+
+.equipped-link {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all var(--comp-duration) var(--comp-ease-out);
+    border-bottom: 1px solid transparent;
+}
+
+.dark .equipped-link {
+    color: #60a5fa;
+}
+
+.equipped-link:hover {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+}
+
+.dark .equipped-link:hover {
+    color: #93c5fd;
+    border-bottom-color: #93c5fd;
+}
+
+/* ========================================
    CARDS - Premium Breakdown Style
    ======================================== */
 
