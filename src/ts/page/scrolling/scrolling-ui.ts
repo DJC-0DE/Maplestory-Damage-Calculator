@@ -76,10 +76,9 @@ function generateScrollLevelInfoHTML(level: ScrollLevel, enhancementBonus: Enhan
  */
 function generateMySlotPerformanceHTML(): string {
     return `
-        <div class="optimization-info-banner">
-            <span class="optimization-info-banner-icon">ℹ️</span>
+        <div class="scrolling-banner">
             <div class="optimization-info-banner__text">
-                <strong>Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot. DPS updates automatically as you type.
+                <strong>Equipment Slot Analysis:</strong> Track individual equipment slot values in isolation. Each slot's DPS gain is calculated by comparing damage WITH that slot's stats vs damage WITH zero stats from that slot.
             </div>
         </div>
 
@@ -114,8 +113,7 @@ function generateMySlotPerformanceHTML(): string {
  */
 function generateSimulationHTML(): string {
     return `
-        <div class="optimization-info-banner">
-            <span class="optimization-info-banner-icon">⚡</span>
+        <div class="scrolling-banner">
             <div class="optimization-info-banner__text">
                 <strong>Scroll Optimizer:</strong> Simulates different scrolling strategies using Level 65 scrolls to find the optimal approach. The damage gain shows how much your DPS will increase from the average scroll results.
             </div>

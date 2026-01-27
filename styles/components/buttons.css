@@ -6,7 +6,7 @@
     width: 100%;
     padding: 15px;
     font-size: 1.1em;
-    background: linear-gradient(135deg, #2563eb, #5856d6);
+    background: var(--gradient-primary);
     border: none;
     border-radius: 12px;
     color: white;
@@ -18,7 +18,7 @@
 }
 
 .dark .calculate-btn {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
 }
 
 .calculate-btn:hover {
@@ -38,78 +38,78 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    background: white;
-    border: 2px solid #d1d5db;
-    color: #6b7280;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-secondary);
+    color: var(--text-secondary);
 }
 
 .job-tier-btn:hover {
     background: rgba(37, 99, 235, 0.08);
-    border-color: #3b82f6;
-    color: #2563eb;
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
     transform: translateY(-1px);
 }
 
 .job-tier-btn.active {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(88, 86, 214, 0.1));
-    border-color: #2563eb;
-    color: #2563eb;
+    border-color: var(--color-primary-dark);
+    color: var(--color-primary-dark);
     font-weight: 700;
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
 .dark .job-tier-btn {
-    background: #374151;
-    border-color: #4b5563;
-    color: #9ca3af;
+    background: var(--bg-secondary);
+    border-color: var(--border-tertiary);
+    color: var(--text-tertiary);
 }
 
 .dark .job-tier-btn:hover {
     background: rgba(96, 165, 250, 0.12);
-    border-color: #60a5fa;
-    color: #60a5fa;
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-light);
 }
 
 .dark .job-tier-btn.active {
     background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(147, 137, 230, 0.15));
-    border-color: #60a5fa;
-    color: #60a5fa;
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-light);
     font-weight: 700;
     box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
 }
 
 /* Toggle details button */
 .toggle-details {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 12px;
     margin: 12px 0;
     text-align: center;
     cursor: pointer;
-    color: #2563eb;
+    color: var(--color-primary-dark);
     transition: all 0.3s ease;
     user-select: none;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .dark .toggle-details {
-    background: #1f2937;
-    border-color: #374151;
-    color: #60a5fa;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: var(--bg-secondary);
+    border-color: var(--border-tertiary);
+    color: var(--color-primary-light);
+    box-shadow: var(--shadow-lg);
 }
 
 .toggle-details:hover {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(88, 86, 214, 0.1));
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .dark .toggle-details:hover {
     background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(147, 137, 230, 0.1));
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-xl);
 }
 
 .toggle-details::after {

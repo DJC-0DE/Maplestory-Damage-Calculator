@@ -105,7 +105,7 @@
 }
 
 .bgstats-info-inline:hover {
-    background: var(--accent-primary, #3b82f6);
+    background: var(--color-primary);
     color: white;
     transform: scale(1.1);
 }
@@ -144,12 +144,12 @@
 
 .bgstats-stat-input:focus {
     outline: none;
-    border-color: var(--accent-primary, #10b981);
+    border-color: var(--color-success);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
 }
 
 .dark .bgstats-stat-input:focus {
-    border-color: var(--accent-primary, #10b981);
+    border-color: var(--color-success);
 }
 
 /* ========================================

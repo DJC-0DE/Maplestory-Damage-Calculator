@@ -58,7 +58,7 @@ function generateRankingRowHTML(result: ArtifactRankingResult, index: number): s
  */
 function generateRankingsTableHTML(results: ArtifactRankingResult[]): string {
     let html = '<h3 class="title">All Possible Rolls Ranked</h3>';
-    html += '<div class="table-scrollable"><div class="artifact-table-container">';
+    html += '<div class="table-wrapper table-scrollable"><div class="artifact-table-container">';
     html += '<table class="table"><thead><tr>';
     html += '<th>Rank</th>';
     html += '<th>Rarity & Stat</th>';

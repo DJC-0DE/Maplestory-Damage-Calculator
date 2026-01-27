@@ -135,7 +135,7 @@ function generateStatLineHTML(slotId: string, statIndex: number): string {
 export function generateEquipmentHTML(): string {
     return `
         <div id="equipment-summary-container" class="mb-8">
-            <div class="equipment-summary-header">Equipment Summary</div>
+            <div class="mb-4">Equipment Summary</div>
             <div id="equipment-summary-content" class="equipment-summary-content">
                 <span class="equipment-summary-empty">No equipment configured</span>
             </div>

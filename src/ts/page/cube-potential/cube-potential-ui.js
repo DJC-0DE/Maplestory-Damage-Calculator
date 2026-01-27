@@ -1039,7 +1039,8 @@ function displayRankings(rankings, rarity) {
                 Showing ${startIdx + 1}-${endIdx} of ${rankings.length} unique combinations
             </p>
         </div>
-        <table class="stat-weight-table">
+        <div class="table-wrapper">        
+        <table class="table">
             <thead>
                 <tr>
                     <th>Rank</th>
@@ -1072,6 +1073,7 @@ function displayRankings(rankings, rarity) {
   html += `
             </tbody>
         </table>
+        </div>
         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
             <button onclick="window.changeCubeRankingsPage(${currentRankingsPage - 1})"
                     ${currentRankingsPage === 1 ? "disabled" : ""}
@@ -1217,7 +1219,8 @@ function displayAllSlotsSummary() {
   const regularSortIndicator = summarySortColumn === "regular" ? summarySortDescending ? " \u25BC" : " \u25B2" : "";
   const bonusSortIndicator = summarySortColumn === "bonus" ? summarySortDescending ? " \u25BC" : " \u25B2" : "";
   let html = `
-        <table class="stat-weight-table">
+        <div class="table-wrapper">
+        <table class="table">
             <thead>
                 <tr>
                     <th style="text-align: center;">Slot</th>
@@ -1279,6 +1282,7 @@ function displayAllSlotsSummary() {
   html += `
             </tbody>
         </table>
+        </div>
     `;
   resultsDiv.innerHTML = html;
 }

@@ -73,7 +73,7 @@ function generateTableHeader(increases, isPercentage) {
 function generateFlatStatsSection(weights) {
   let html = '<div class="stat-predictions-section">';
   html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Flat Stats</h3>';
-  html += '<div class="">';
+  html += '<div class="table-wrapper">';
   html += `<table class="table" id="stat-pred-table-flat">`;
   html += generateTableHeader(DEFAULT_STAT_INCREASES.flat, false);
   html += "<tbody>";
@@ -91,7 +91,7 @@ function generateFlatStatsSection(weights) {
 function generatePercentageStatsSection(weights) {
   let html = '<div class="stat-predictions-section" style="margin-top: 24px;">';
   html += '<h3 style="margin: 0 0 12px 0; font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em;">Percentage Stats</h3>';
-  html += '<div class="">';
+  html += '<div class="table-wrapper">';
   html += `<table class="table" id="stat-pred-table-percentage">`;
   html += '<thead><tr><th style="padding: 8px 10px; font-size: 0.75rem;">Stat</th>';
   DEFAULT_STAT_INCREASES.percentage.forEach((inc, idx) => {

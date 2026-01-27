@@ -1350,7 +1350,7 @@ function updateSummary(): void {
                 border: 1px solid var(--border-color);
                 white-space: nowrap;
             ">
-                <span style="font-weight: 600; color: var(--accent-primary);">${entry.displayName}:</span>
+                <span style="font-weight: 600; color: var(--tab-teal);">${entry.displayName}:</span>
                 <span style="color: var(--text-primary);">+${entry.value}${entry.isPercentage ? '%' : ''}</span>
             </span>
         `)

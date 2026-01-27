@@ -10,7 +10,7 @@
 }
 
 .stat-hub-highlight {
-    background: #ff9900;
+    background: var(--logo-highlight);
     color: black;
     padding: 2px 4px;
     border-radius: 4px;
@@ -28,7 +28,7 @@
 }
 
 .stat-hub-highlight-large {
-    background: #ff9900;
+    background: var(--logo-highlight);
     color: black;
     padding: 4px 8px;
     border-radius: 6px;

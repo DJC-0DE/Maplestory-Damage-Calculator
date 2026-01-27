@@ -1,0 +1,291 @@
+/* ========================================
+   CONSOLIDATED COLOR SYSTEM
+   Maplestory Damage Calculator
+
+   All color values centralized into CSS custom properties
+   for consistent theming across the application.
+
+   USAGE:
+   @import url('./base/colors.css'); // Add to styles.css
+   var(--color-primary)              // Use in other CSS files
+   ======================================== */
+
+:root {
+    /* ========================================
+       PRIMARY BRAND COLORS
+       ======================================== */
+    --color-primary: #3b82f6;
+    --color-primary-dark: #2563eb;
+    --color-primary-light: #60a5fa;
+
+    --color-secondary: #8b5cf6;
+    --color-secondary-dark: #7c3aed;
+    --color-secondary-light: #a855f7;
+
+    /* ========================================
+       SUCCESS / POSITIVE
+       ======================================== */
+    --color-success: #10b981;
+    --color-success-dark: #059669;
+    --color-success-light: #34d399;
+    --color-success-1200: #22c55e;
+    --color-success-600: #16a34a;
+
+    /* ========================================
+       WARNING / CAUTION
+       ======================================== */
+    --color-warning: #f59e0b;
+    --color-warning-dark: #d97706;
+    --color-warning-light: #fbbf24;
+    --color-warning-400: #fb923c;
+
+    /* ========================================
+       ERROR / DANGER
+       ======================================== */
+    --color-error: #ef4444;
+    --color-error-dark: #dc2626;
+    --color-error-light: #f87171;
+    --color-danger: #ef4444;
+    --color-danger-dark: #dc2626;
+    --color-danger-light: #f87171;
+
+    /* ========================================
+       INFO / NEUTRAL
+       ======================================== */
+    --color-info: #06b6d4;
+    --color-info-dark: #0891b2;
+    --color-info-light: #22d3ee;
+
+    /* ========================================
+       TEXT COLORS
+       ======================================== */
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+    --text-inverse: #ffffff;
+
+    /* ========================================
+       BACKGROUND COLORS
+       ======================================== */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-elevated: #ffffff;
+
+    /* ========================================
+       BORDER COLORS
+       ======================================== */
+    --border-primary: #e5e7eb;
+    --border-secondary: #d1d5db;
+    --border-tertiary: #9ca3af;
+    --border-subtle: rgba(148, 163, 184, 0.1);
+    --border-medium: rgba(148, 163, 184, 0.2);
+    --border-strong: rgba(148, 163, 184, 0.3);
+
+    /* ========================================
+       SURFACE COLORS (Glassmorphic)
+       ======================================== */
+    --surface-primary: rgba(15, 23, 42, 0.4);
+    --surface-secondary: rgba(30, 41, 59, 0.3);
+    --surface-tertiary: rgba(51, 65, 85, 0.2);
+    --surface-elevated: rgba(30, 41, 59, 0.7);
+
+    /* ========================================
+       GRADIENTS - Primary
+       ======================================== */
+    --gradient-primary: linear-gradient(135deg, #3b82f6, #5856d6);
+    --gradient-success: linear-gradient(135deg, #10b981, #059669);
+    --gradient-warning: linear-gradient(135deg, #f59e0b, #d97706);
+    --gradient-error: linear-gradient(135deg, #ef4444, #dc2626);
+    --gradient-secondary: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    --gradient-info: linear-gradient(135deg, #06b6d4, #0891b2);
+    --gradient-pink: linear-gradient(135deg, var(--tab-pink), #db2777);
+    --gradient-teal: linear-gradient(135deg, var(--tab-teal), #0d9488);
+
+    /* ========================================
+       RARITY COLORS
+       Used for item rarity, equipment tiers, etc.
+       ======================================== */
+    --rarity-normal: #a0a0a0;
+    --rarity-rare: #6699ff;
+    --rarity-epic: #9966ff;
+    --rarity-unique: #ffd26d;
+    --rarity-legendary: #33ce85;
+    --rarity-mystic: #ff3f42;
+    --rarity-ancient: #2266cc;
+
+    /* ========================================
+       TAB-SPECIFIC ACCENTS
+       Maps to different tabs/sections in the app
+       ======================================== */
+    --tab-blue: #3b82f6;              /* Item Comparison */
+    --tab-red: #ec4899;               /* Inner Ability */
+    --tab-orange: #f59e0b;             /* Weapon Levels, Artifact */
+    --tab-teal: #14b8a6;              /* Scrolling, Companions */
+    --tab-purple: #a855f7;             /* Cube Potential */
+    --tab-indigo: #667eea;             /* Stat Breakdown */
+    --tab-pink: #ec4899;               /* Extra Stats - Guild */
+    --tab-green: #10b981;              /* Equipment */
+
+    /* ========================================
+       POSITION-BASED TAB COLORS
+       Maps to tab positions 1-5 in navigation
+       ======================================== */
+    --tab-color-1: #3b82f6;  /* Blue - Position 1 */
+    --tab-color-2: #ec4899;  /* Red - Position 2 */
+    --tab-color-3: #f59e0b;  /* Orange - Position 3 */
+    --tab-color-4: #14b8a6;  /* Teal - Position 4 */
+    --tab-color-5: #a855f7;  /* Purple - Position 5 */
+
+    /* ========================================
+       GLOW EFFECTS
+       Predefined glow shadows for elements
+       ======================================== */
+    --glow-primary: 0 0 20px rgba(59, 130, 246, 0.25);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.25);
+    --glow-warning: 0 0 20px rgba(245, 158, 11, 0.25);
+    --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
+    --glow-secondary: 0 0 20px rgba(168, 85, 247, 0.25);
+    --glow-pink: 0 0 20px rgba(236, 72, 153, 0.25);
+    --glow-teal: 0 0 20px rgba(20, 184, 166, 0.25);
+    --glow-info: 0 0 20px rgba(6, 182, 212, 0.25);
+    --glow-danger: 0 0 20px rgba(239, 68, 68, 0.25);
+
+    /* Rarity-specific glows */
+    --glow-rarity-normal: 0 0 8px rgba(160, 160, 160, 0.2);
+    --glow-rarity-rare: 0 0 12px rgba(102, 153, 255, 0.25);
+    --glow-rarity-epic: 0 2px 16px rgba(153, 102, 255, 0.3);
+    --glow-rarity-unique: 0 2px 20px rgba(255, 210, 109, 0.35);
+    --glow-rarity-legendary: 0 4px 24px rgba(51, 206, 133, 0.4);
+    --glow-rarity-mystic: 0 4px 28px rgba(255, 63, 66, 0.45);
+    --glow-rarity-ancient: 0 6px 32px rgba(34, 102, 204, 0.5);
+
+    /* ========================================
+       SHADOWS
+       ======================================== */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.25);
+
+    /* Glassmorphic shadow */
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* ========================================
+       SPECIFIC FEATURE COLORS
+       Used in particular features/sections
+       ======================================== */
+    /* Logo highlight */
+    --logo-highlight: #ff9900;
+
+    /* Upgrade currency input */
+    --upgrade-glow: rgba(16, 185, 129, 0.06);
+
+    /* Histogram bars */
+    --histogram-track: #e0e0e0;
+
+    /* MapleStory contribution colors */
+    --ms-base: #64748b;
+    --ms-equipment: #10b981;
+    --ms-scrolling: #3b82f6;
+    --ms-cube: #f59e0b;
+    --ms-companion: #a855f7;
+    --ms-inner-ability: #ec4899;
+    --ms-main-stat: #ef4444;
+    --ms-unlockable: #14b8a6;
+    --ms-guild: #8b5cf6;
+
+    /* ========================================
+       SEMANTIC COLOR MAPPINGS
+       Common semantic meanings across the app
+       ======================================== */
+    --color-accent: var(--color-primary);
+    --accent-primary: var(--color-primary);
+    --accent-success: var(--color-success);
+    --accent-warning: var(--color-warning);
+    --accent-error: var(--color-error);
+    --accent-info: var(--color-info);
+
+    /* Legacy aliases (for compatibility) */
+    --accent-secondary: var(--text-secondary);
+
+    /* ========================================
+       GLASSMORPHISM
+       Surface effects for premium UI elements
+       ======================================== */
+    --glass-bg: rgba(15, 23, 42, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: var(--shadow-glass);
+    --glass-blur: blur(12px);
+}
+
+/* ========================================
+   DARK MODE OVERRIDES
+   ======================================== */
+
+.dark {
+    /* ========================================
+       PRIMARY BRAND COLORS - Dark Mode
+       ======================================== */
+    --color-primary: #60a5fa;
+    --color-primary-dark: #3b82f6;
+    --color-primary-light: #93c5fd;
+
+    /* ========================================
+       TEXT COLORS - Dark Mode
+       ======================================== */
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --text-tertiary: #6b7280;
+
+    /* ========================================
+       BACKGROUND COLORS - Dark Mode
+       ======================================== */
+    --bg-primary: rgba(17, 24, 39, 0.8);
+    --bg-secondary: rgba(31, 41, 55, 0.6);
+    --bg-tertiary: rgba(55, 65, 81, 0.5);
+    --bg-elevated: rgba(30, 41, 59, 0.8);
+
+    /* ========================================
+       BORDER COLORS - Dark Mode
+       ======================================== */
+    --border-primary: rgba(255, 255, 255, 0.1);
+    --border-secondary: rgba(255, 255, 255, 0.08);
+    --border-tertiary: rgba(156, 163, 175, 0.2);
+    --border-subtle: rgba(148, 163, 184, 0.08);
+    --border-medium: rgba(148, 163, 184, 0.15);
+    --border-strong: rgba(148, 163, 184, 0.25);
+
+    /* ========================================
+       SURFACE COLORS - Dark Mode
+       ======================================== */
+    --surface-primary: rgba(15, 23, 42, 0.75);
+    --surface-secondary: rgba(30, 41, 59, 0.6);
+    --surface-tertiary: rgba(51, 65, 85, 0.4);
+    --surface-elevated: rgba(30, 41, 59, 0.8);
+
+    /* ========================================
+       GLASSMORPHISM - Dark Mode
+       ======================================== */
+    --glass-bg: rgba(15, 23, 42, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.06);
+
+    /* ========================================
+       SHADOWS - Dark Mode (stronger for contrast)
+       ======================================== */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.4);
+    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.5);
+
+    /* ========================================
+       HISTOGRAM - Dark Mode
+       ======================================== */
+    --histogram-track: #374151;
+}
+
+/* ========================================
+   END COLOR SYSTEM
+   ======================================== */

@@ -50,7 +50,7 @@ function getStatValueFromDOM(statId) {
 function generateFlatStatsSection() {
   let html = `
         <div style="margin-bottom: 24px;">
-            <h4 style="color: var(--accent-primary); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Flat Stats</h4>
+            <h4 style="color: var(--tab-pink); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Flat Stats</h4>
             <div class="stats-list-column">
     `;
   EQUIVALENCY_INPUTS.flat.forEach((input) => {
@@ -65,7 +65,7 @@ function generateFlatStatsSection() {
 function generatePercentageStatsSection() {
   let html = `
         <div>
-            <h4 style="color: var(--accent-primary); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Percentage Stats</h4>
+            <h4 style="color: var(--tab-pink); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Percentage Stats</h4>
             <div class="stats-list-column">
     `;
   EQUIVALENCY_INPUTS.percentage.forEach((input) => {
@@ -88,7 +88,7 @@ function generateResultsPlaceholderHTML() {
 function generateStatEquivalencyHTML() {
   let html = `
         <div style="margin-bottom: 20px;">
-            <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
+            <h3 style="color: var(--tab-pink); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
                 Stat Equivalency Calculator
             </h3>
             <p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
@@ -107,7 +107,7 @@ function generateStatEquivalencyHTML() {
 
             <!-- Right Column: Results Display -->
             <div style="position: sticky; top: 20px;">
-                <h4 style="color: var(--accent-success); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Results</h4>
+                <h4 style="color: var(--tab-pink); font-weight: 700; margin-bottom: 12px; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em;">Results</h4>
                 <div id="equivalency-results" style="border-radius: 12px; padding: 20px; min-height: 500px;">
     `;
   html += generateResultsPlaceholderHTML();
@@ -119,15 +119,16 @@ function generateStatEquivalencyHTML() {
   return html;
 }
 function generateEquivalencyResultsHTML(sourceStat, sourceValue, statConfig, targetDPSGain, equivalents) {
-  let html = '<div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(88, 86, 214, 0.05)); border: 2px solid rgba(0, 122, 255, 0.2); border-radius: 16px; padding: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">';
+  let html = "<div>";
   html += '<div style="text-align: center; margin-bottom: 25px;">';
-  html += `<div style="font-size: 1.4em; font-weight: 700; color: var(--accent-primary); margin-bottom: 10px;">`;
+  html += `<div style="font-size: 1.4em; font-weight: 700; color: var(--tab-pink); margin-bottom: 10px;">`;
   html += `${statConfig[sourceStat].formatValue(sourceValue)} ${statConfig[sourceStat].label}`;
   html += "</div>";
   html += `<div style="font-size: 1.1em; color: var(--accent-success); font-weight: 600;">`;
   html += `= ${targetDPSGain.toFixed(2)}% DPS Gain`;
   html += "</div>";
   html += "</div>";
+  html += '<div class="table-wrapper">';
   html += '<table class="table" style="margin: 0;">';
   html += "<thead><tr>";
   html += '<th style="text-align: left; font-size: 1em;">Equivalent Stat</th>';
@@ -145,12 +146,13 @@ function generateEquivalencyResultsHTML(sourceStat, sourceValue, statConfig, tar
       html += `<td style="text-align: right; font-size: 1.05em; color: var(--text-secondary); font-style: italic;">-</td>`;
       html += `<td style="text-align: right; color: var(--text-secondary); font-style: italic;">Unable to match</td>`;
     } else {
-      html += `<td style="text-align: right; font-size: 1.05em; color: var(--accent-primary); font-weight: 600;">${statConfigItem.formatValue(result.value)}</td>`;
+      html += `<td style="text-align: right; font-size: 1.05em; color: var(--tab-pink); font-weight: 600;">${statConfigItem.formatValue(result.value)}</td>`;
       html += `<td style="text-align: right;"><span class="gain-positive">${result.label}</span></td>`;
     }
     html += "</tr>";
   });
   html += "</tbody></table>";
+  html += "</div>";
   html += "</div>";
   return html;
 }

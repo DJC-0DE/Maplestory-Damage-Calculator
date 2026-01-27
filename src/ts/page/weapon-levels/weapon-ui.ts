@@ -57,7 +57,7 @@ function generateWeaponLevelsHTML(): string {
             <!-- Info Banner -->
             <div class="wl-info-banner">
                 <div class="wl-info-banner-content">
-                    <strong>Instructions:</strong> Click stars to set star rating, enter weapon level. Check the "E" button to equip a weapon. The given inventory attack gain % is how much you'd expect if you spent 10k shards on the given weapon.
+                    <strong>Instructions:</strong> Click stars to set star rating, enter weapon level. Check the "E" button to equip a weapon. The given inventory attack gain % is how much you'd expect if you spent 1k shards on the given weapon.
                 </div>
             </div>
 

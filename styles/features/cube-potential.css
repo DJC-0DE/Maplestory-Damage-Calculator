@@ -21,23 +21,15 @@
     --cube-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --cube-duration: 200ms;
 
-    /* Rarity Glow Colors */
-    --cube-rarity-normal-glow: rgba(156, 163, 175, 0.4);
-    --cube-rarity-rare-glow: rgba(59, 130, 246, 0.5);
-    --cube-rarity-epic-glow: rgba(139, 92, 246, 0.6);
-    --cube-rarity-unique-glow: rgba(245, 158, 11, 0.6);
-    --cube-rarity-legendary-glow: rgba(249, 115, 22, 0.7);
-    --cube-rarity-mystic-glow: rgba(236, 72, 153, 0.7);
+    /* Surface Colors - using colors.css */
+    --cube-surface-primary: var(--surface-primary);
+    --cube-surface-secondary: var(--surface-secondary);
+    --cube-surface-tertiary: var(--surface-tertiary);
 
-    /* Surface Colors */
-    --cube-surface-primary: rgba(15, 23, 42, 0.4);
-    --cube-surface-secondary: rgba(30, 41, 59, 0.3);
-    --cube-surface-tertiary: rgba(51, 65, 85, 0.2);
-
-    /* Border Colors */
-    --cube-border-subtle: rgba(148, 163, 184, 0.1);
-    --cube-border-medium: rgba(148, 163, 184, 0.2);
-    --cube-border-strong: rgba(148, 163, 184, 0.3);
+    /* Border Colors - using colors.css */
+    --cube-border-subtle: var(--border-subtle);
+    --cube-border-medium: var(--border-medium);
+    --cube-border-strong: var(--border-strong);
 }
 
 /* Roll count styling to match rarity dropdown */

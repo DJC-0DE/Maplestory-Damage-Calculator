@@ -42,33 +42,33 @@
     --wl-font-display: 'Inter', -apple-system, sans-serif;
     --wl-font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
 
-    /* Rarity Color Palette - Hex values from constants */
-    --wl-rarity-normal: #a0a0a0;
-    --wl-rarity-rare: #6699ff;
-    --wl-rarity-epic: #9966ff;
-    --wl-rarity-unique: #ffd26d;
-    --wl-rarity-legendary: #33ce85;
-    --wl-rarity-mystic: #ff3f42;
-    --wl-rarity-ancient: #2266cc;
+    /* Rarity Color Palette - using colors.css */
+    --wl-rarity-normal: var(--rarity-normal);
+    --wl-rarity-rare: var(--rarity-rare);
+    --wl-rarity-epic: var(--rarity-epic);
+    --wl-rarity-unique: var(--rarity-unique);
+    --wl-rarity-legendary: var(--rarity-legendary);
+    --wl-rarity-mystic: var(--rarity-mystic);
+    --wl-rarity-ancient: var(--rarity-ancient);
 
-    /* Rarity Glow Intensities - Progressive by tier */
-    --wl-glow-normal: 0 0 8px rgba(160, 160, 160, 0.2);
-    --wl-glow-rare: 0 0 12px rgba(102, 153, 255, 0.25);
-    --wl-glow-epic: 0 2px 16px rgba(153, 102, 255, 0.3);
-    --wl-glow-unique: 0 2px 20px rgba(255, 210, 109, 0.35);
-    --wl-glow-legendary: 0 4px 24px rgba(51, 206, 133, 0.4);
-    --wl-glow-mystic: 0 4px 28px rgba(255, 63, 66, 0.45);
-    --wl-glow-ancient: 0 6px 32px rgba(34, 102, 204, 0.5);
+    /* Rarity Glow Intensities - using colors.css */
+    --wl-glow-normal: var(--glow-rarity-normal);
+    --wl-glow-rare: var(--glow-rarity-rare);
+    --wl-glow-epic: var(--glow-rarity-epic);
+    --wl-glow-unique: var(--glow-rarity-unique);
+    --wl-glow-legendary: var(--glow-rarity-legendary);
+    --wl-glow-mystic: var(--glow-rarity-mystic);
+    --wl-glow-ancient: var(--glow-rarity-ancient);
 
-    /* Surfaces - Glassmorphic */
-    --wl-surface-card: rgba(15, 23, 42, 0.5);
-    --wl-surface-card-hover: rgba(15, 23, 42, 0.65);
+    /* Surfaces - Glassmorphic - using colors.css */
+    --wl-surface-card: var(--surface-primary);
+    --wl-surface-card-hover: var(--surface-elevated);
     --wl-surface-equipped: linear-gradient(135deg, rgba(51, 206, 133, 0.12), rgba(16, 185, 129, 0.06));
 
-    /* Borders */
-    --wl-border-subtle: rgba(148, 163, 184, 0.12);
-    --wl-border-medium: rgba(148, 163, 184, 0.2);
-    --wl-border-strong: rgba(148, 163, 184, 0.3);
+    /* Borders - using colors.css */
+    --wl-border-subtle: var(--border-subtle);
+    --wl-border-medium: var(--border-medium);
+    --wl-border-strong: var(--border-strong);
 
     /* Spacing Scale */
     --wl-space-xs: 4px;
@@ -91,11 +91,11 @@
 
 /* Dark Mode Adjustments */
 .dark {
-    --wl-surface-card: rgba(15, 23, 42, 0.7);
-    --wl-surface-card-hover: rgba(15, 23, 42, 0.85);
-    --wl-border-subtle: rgba(148, 163, 184, 0.08);
-    --wl-border-medium: rgba(148, 163, 184, 0.15);
-    --wl-border-strong: rgba(148, 163, 184, 0.25);
+    --wl-surface-card: var(--surface-primary);
+    --wl-surface-card-hover: var(--surface-elevated);
+    --wl-border-subtle: var(--border-subtle);
+    --wl-border-medium: var(--border-medium);
+    --wl-border-strong: var(--border-strong);
 }
 
 /* ========================================
@@ -185,8 +185,6 @@
 }
 
 .wl-summary-card {
-    background: linear-gradient(135deg, rgb(185 77 16 / 12%), rgb(63 6 212 / 8%));
-    border: 1px solid rgba(16, 185, 129, 0.25);
     border-radius: 12px;
     padding: var(--wl-space-lg);
     text-align: center;
@@ -195,22 +193,8 @@
     overflow: hidden;
 }
 
-/* Top accent bar */
-.wl-summary-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #10b981, #06b6d4);
-    opacity: 0.8;
-}
-
 .wl-summary-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
-    border-color: rgba(16, 185, 129, 0.4);
 }
 
 .wl-summary-label {
@@ -228,7 +212,7 @@
     font-size: 1.8rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    color: #10b981;
+    color: var(--tab-orange);
     letter-spacing: -0.03em;
 }
 
@@ -802,7 +786,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #6366f1, #a855f7);
+    background: var(--gradient-warning);
     opacity: 0.8;
 }
 

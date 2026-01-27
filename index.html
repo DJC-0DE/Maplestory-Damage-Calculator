@@ -104,9 +104,6 @@
         <div id="page-setup" class="page-container">
         <!-- Loadout Content -->
         <div id="character-setup-card" class="">
-            <div class="optimization-page-header">
-                <h1 class="optimization-page-title">Loadout</h1>
-            </div>
             <div class="optimization-main-tabs">
                 <button class="setup-tab-button optimization-tab-button active" data-tab="base-stats" onclick="switchTabAndUpdateURL('setup', 'base-stats', event)">Base Stats</button>
                 <button class="setup-tab-button optimization-tab-button" data-tab="equipment" onclick="switchTabAndUpdateURL('setup', 'equipment', event)">Equipment</button>
@@ -143,16 +140,16 @@
 
             <!-- Companions Tab -->
             <div id="setup-companions" class="setup-tab-content optimization-tab-content">
-                <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(88, 86, 214, 0.05)); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--shadow);">
+                <div class="scrolling-banner">
                     <div style="color: var(--text-primary); font-size: 0.9em; line-height: 1.5;">
-                        <strong style="color: var(--accent-primary);">Instructions:</strong> Click on a companion to unlock/activate it. Enter the level for each companion. Unlocked companions provide inventory effects (always active), and you can equip companions for additional equip effects. Worth noting that the active abilities or passives that occur when a companion is summoned is not accounted for in any of the values below when providing % gains in DPS. 
+                        <strong style="color: var(--tab-teal);">Instructions:</strong> Click on a companion to unlock/activate it. Enter the level for each companion. Unlocked companions provide inventory effects (always active), and you can equip companions for additional equip effects. Worth noting that the active abilities or passives that occur when a companion is summoned is not accounted for in any of the values below when providing % gains in DPS. 
                     </div>
                 </div>
 
                 <!-- Summary Section -->
-                <div id="companions-summary" style="background: var(--background); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 10px 15px; margin-bottom: 20px;">
+                <div id="companions-summary" style="background: var(--background); border: 2px solid var(--tab-teal); border-radius: 12px; padding: 10px 15px; margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h3 style="color: var(--accent-primary); margin: 0; font-size: 1em; font-weight: 700;">Total Inventory Effects:</h3>
+                        <h3 style="color: var(--tab-teal); margin: 0; font-size: 1em; font-weight: 700;">Total Inventory Effects:</h3>
                         <div id="companions-summary-content" style="display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 0.85em; align-items: center;">
                             <!-- Populated by JavaScript -->
                         </div>
@@ -192,9 +189,6 @@
         <div id="page-optimization" class="page-container" style="display: none;">
         <!-- Gear Lab Content -->
         <div id="character-optimization-card" class="">
-            <div class="optimization-page-header">
-                <h1 class="optimization-page-title">Gear Lab</h1>
-            </div>
             <div class="optimization-main-tabs">
                 <button class="optimization-tab-button active" data-tab="item-comparison" onclick="switchTabAndUpdateURL('analysis', 'item-comparison', event); checkPendingSlotNavigation();">Item Comparison</button>
                 <button class="optimization-tab-button" data-tab="inner-ability" onclick="switchTabAndUpdateURL('analysis', 'inner-ability', event)">Inner Ability</button>
@@ -244,12 +238,6 @@
         <div id="page-predictions" class="page-container" style="display: none;">
         <!-- Stat Hub Content -->
         <div id="stat-damage-predictions-card" class="">
-            <div class="optimization-page-header">
-                <h1 class="optimization-page-title">
-                    Stat Hub
-                </h1>
-            </div>
-
             <div class="optimization-main-tabs">
                 <button class="predictions-tab-button optimization-tab-button active" data-tab="stat-tables" onclick="switchTabAndUpdateURL('predictions', 'stat-tables', event)">Stat Predictions</button>
                 <button class="predictions-tab-button optimization-tab-button" data-tab="equivalency" onclick="switchTabAndUpdateURL('predictions', 'equivalency', event)">Stat Equivalency</button>
@@ -263,8 +251,8 @@
             <!-- Stat Equivalency Tab -->
             <div id="predictions-equivalency" class="predictions-tab-content optimization-tab-content">
                 <div style="margin-bottom: 20px;">
-                    <h3 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
-                        ✨ Stat Equivalency Calculator
+                    <h3 style="color: var(--tab-pink); margin-bottom: 10px; font-size: 1.2em; font-weight: 600;">
+                        Stat Equivalency Calculator
                     </h3>
                     <p style="color: var(--text-secondary); font-size: 0.9em; line-height: 1.6;">
                         Enter a value for any stat below to see what that gain translates to for all other stats. Perfect for comparing upgrade paths and understanding relative stat values.

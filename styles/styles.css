@@ -3,7 +3,8 @@
    Main Styles Entry Point
    ======================================== */
 
-/* Base - Animations & Keyframes */
+/* Base - Colors & Animations */
+@import url('./base/colors.css');
 @import url('./base/animations.css');
 
 /* Layout */

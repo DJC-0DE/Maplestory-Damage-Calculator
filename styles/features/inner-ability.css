@@ -15,40 +15,21 @@
     --ia-font-display: 'Space Grotesk', -apple-system, sans-serif;
     --ia-font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
 
-    /* Contribution Colors - Premium Palette */
-    --ia-inner-ability: #ec4899;
-    --ia-equipment: #10b981;
-    --ia-scrolling: #3b82f6;
-    --ia-cube: #f59e0b;
-    --ia-companion: #a855f7;
-    --ia-main-stat: #ef4444;
-    --ia-unlockable: #14b8a6;
-    --ia-guild: #8b5cf6;
-    --ia-base: #64748b;
+    /* Glassmorphism Surfaces - using colors.css */
+    --ia-glass-bg: var(--glass-bg);
+    --ia-glass-border: var(--glass-border);
+    --ia-glass-shadow: var(--shadow-glass);
+    --ia-glass-blur: var(--glass-blur);
 
-    /* Premium Gradients */
-    --ia-gradient-primary: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fb7185 100%);
-    --ia-gradient-rank-1: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-    --ia-gradient-rank-2: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%);
-    --ia-gradient-rank-3: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
-    --ia-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --ia-gradient-purple: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    /* Surface Hierarchy - using colors.css */
+    --ia-surface-elevated: var(--surface-elevated);
+    --ia-surface-base: var(--surface-primary);
+    --ia-surface-subtle: var(--surface-tertiary);
 
-    /* Glassmorphism Surfaces */
-    --ia-glass-bg: rgba(15, 23, 42, 0.6);
-    --ia-glass-border: rgba(255, 255, 255, 0.08);
-    --ia-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --ia-glass-blur: blur(12px);
-
-    /* Surface Hierarchy */
-    --ia-surface-elevated: rgba(30, 41, 59, 0.7);
-    --ia-surface-base: rgba(15, 23, 42, 0.5);
-    --ia-surface-subtle: rgba(51, 65, 85, 0.3);
-
-    /* Border System */
-    --ia-border-glass: rgba(255, 255, 255, 0.06);
-    --ia-border-hover: rgba(255, 255, 255, 0.12);
-    --ia-border-active: rgba(255, 255, 255, 0.18);
+    /* Border System - using colors.css */
+    --ia-border-glass: var(--glass-border);
+    --ia-border-hover: var(--border-medium);
+    --ia-border-active: var(--border-strong);
 
     /* Spacing Scale - Precise */
     --ia-space-2xs: 2px;
@@ -67,20 +48,17 @@
     --ia-duration-base: 250ms;
     --ia-duration-slow: 400ms;
 
-    /* Glow Effects */
-    --ia-glow-subtle: 0 0 20px rgba(236, 72, 153, 0.15);
-    --ia-glow-medium: 0 0 30px rgba(236, 72, 153, 0.25);
-    --ia-glow-strong: 0 0 40px rgba(236, 72, 153, 0.35);
-    --ia-glow-rank-1: 0 0 30px rgba(251, 191, 36, 0.4);
+    /* Glow Effects - using colors.css */
+    --ia-glow-subtle: var(--glow-secondary);
 }
 
 /* Dark Mode Premium Adjustments */
 .dark {
-    --ia-glass-bg: rgba(15, 23, 42, 0.75);
-    --ia-glass-border: rgba(255, 255, 255, 0.06);
-    --ia-surface-elevated: rgba(30, 41, 59, 0.8);
-    --ia-surface-base: rgba(15, 23, 42, 0.6);
-    --ia-surface-subtle: rgba(51, 65, 85, 0.4);
+    --ia-glass-bg: var(--glass-bg);
+    --ia-glass-border: var(--glass-border);
+    --ia-surface-elevated: var(--surface-elevated);
+    --ia-surface-base: var(--surface-primary);
+    --ia-surface-subtle: var(--surface-tertiary);
 }
 
 @keyframes gradientShift {
@@ -234,17 +212,6 @@
     background: var(--tab-color-2, var(--ia-gradient-primary));
     opacity: 0.9;
     transition: all var(--ia-duration-base) var(--ia-ease-smooth);
-}
-
-.ia-preset-card:hover {
-    border-color: var(--ia-border-hover);
-    box-shadow: var(--glow-card-glow, var(--ia-glow-medium)),
-                0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.ia-preset-card:hover::before {
-    opacity: 1;
-    height: 4px;
 }
 
 /* Currently Equipped Checkbox - Premium Toggle */

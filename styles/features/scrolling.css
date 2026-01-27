@@ -9,31 +9,8 @@
  */
 
 /* ============================================================================
-   CSS VARIABLES - Global Theme Tokens
+   CSS VARIABLES - Removed, using colors.css instead
    ============================================================================ */
-
-:root {
-    /* Colors */
-    --accent-primary: #3b82f6;
-    --accent-success: #10b981;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-tertiary: #9ca3af;
-    --border-color: #e5e7eb;
-    --background: #ffffff;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dark {
-    --accent-primary: #60a5fa;
-    --accent-success: #34d399;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --text-tertiary: #6b7280;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --background: rgba(17, 24, 39, 0.8);
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
 
 /* ============================================================================
    MY SLOT PERFORMANCE TAB - COMPACT DESIGN
@@ -46,8 +23,6 @@
     gap: 8px;
     margin-bottom: 12px;
     padding: 12px;
-    background: rgba(0, 122, 255, 0.05);
-    border: 1px solid var(--border-color);
     border-radius: 8px;
 }
 
@@ -57,13 +32,12 @@
     align-items: center;
     text-align: center;
     padding: 8px;
-    background: rgba(255, 255, 255, 0.02);
     border-radius: 6px;
     transition: all 0.2s ease;
 }
 
 .summary-metric:hover {
-    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
 }
 
 .summary-metric-label {
@@ -82,9 +56,9 @@
 }
 
 .summary-metric-value.atk { color: #f97316; }
-.summary-metric-value.main { color: #22c55e; }
-.summary-metric-value.amp { color: #a855f7; }
-.summary-metric-value.dps { color: var(--accent-primary); }
+.summary-metric-value.main { color: var(--color-success); }
+.summary-metric-value.amp { color: var(--color-secondary); }
+.summary-metric-value.dps { color: var(--color-primary); }
 
 /* Equipment Slots Grid */
 .scrolling-slots-grid {
@@ -95,17 +69,17 @@
 
 /* Slot Card */
 .slot-card {
-    background: rgba(0, 122, 255, 0.05);
-    border: 1px solid var(--border-color);
+    background: var(--comp-surface-secondary);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 10px;
     transition: all 0.2s ease;
 }
 
 .slot-card:hover {
-    border-color: var(--accent-primary);
-    background: rgba(0, 122, 255, 0.08);
-    box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.15);
+    border-color: var(--tab-teal);
+    background: rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
 }
 
 /* Slot Header - Name + DPS */
@@ -129,7 +103,7 @@
 .slot-dps {
     font-size: 13px;
     font-weight: 700;
-    color: var(--accent-primary);
+    color: var(--tab-teal);
 }
 
 /* Compact Input Rows */
@@ -172,7 +146,7 @@
 
 .slot-input:focus {
     outline: none;
-    border-color: var(--accent-primary);
+    border-color: var(--color-primary);
     background: rgba(0, 0, 0, 0.3);
 }
 
@@ -252,7 +226,7 @@
 
 .scrolling-inputs-grid .input-group input:focus {
     outline: none;
-    border-color: var(--accent-primary);
+    border-color: var(--color-primary);
     background: rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
@@ -289,23 +263,23 @@
     gap: 0.75rem;
     cursor: pointer;
     padding: 0.75rem 1rem;
-    background: rgba(0, 122, 255, 0.05);
-    border: 1px solid var(--border-color);
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid var(--border-primary);
     border-radius: 10px;
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
 
 .scrolling-premium__label:hover {
-    background: rgba(0, 122, 255, 0.1);
-    border-color: var(--accent-primary);
+    background: rgba(37, 99, 235, 0.1);
+    border-color: var(--color-primary);
 }
 
 .scrolling-premium__checkbox {
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
-    accent-color: var(--accent-primary);
+    accent-color: var(--color-primary);
 }
 
 .scrolling-premium__text {
@@ -318,7 +292,7 @@
 
 .scrolling-premium__badge {
     font-size: 0.75em;
-    color: var(--accent-success);
+    color: var(--color-success);
     font-weight: 600;
     margin-top: 0.15rem;
 }
@@ -334,8 +308,8 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    background: rgba(0, 122, 255, 0.05);
-    border: 1px solid var(--border-color);
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid var(--border-primary);
     border-radius: 10px;
     flex: 2;
     min-width: 280px;
@@ -373,7 +347,7 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--accent-primary);
+    background: var(--color-primary);
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s;
@@ -387,7 +361,7 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--accent-primary);
+    background: var(--color-primary);
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -400,14 +374,14 @@
 
 .scrolling-guild__value {
     font-weight: 700;
-    color: var(--accent-primary);
+    color: var(--color-primary);
     font-size: 1.1em;
     min-width: 2.5rem;
     text-align: right;
 }
 
 .scrolling-guild__value.boosted {
-    color: var(--accent-success);
+    color: var(--color-success);
 }
 
 /* ============================================================================
@@ -415,8 +389,8 @@
    ============================================================================ */
 
 .scrolling-level-selector {
-    background: rgba(0, 122, 255, 0.05);
-    border: 1px solid var(--border-color);
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -446,7 +420,7 @@
 .scrolling-level-radio input[type="radio"] {
     margin-right: 0.5rem;
     cursor: pointer;
-    accent-color: var(--accent-primary);
+    accent-color: var(--color-primary);
 }
 
 .scrolling-level-info {
@@ -460,7 +434,7 @@
 }
 
 .scrolling-level-info__bonus {
-    color: var(--accent-success);
+    color: var(--color-success);
 }
 
 /* ============================================================================
@@ -481,7 +455,7 @@
 
 .scrolling-progress__bar {
     height: 100%;
-    background: var(--accent-primary);
+    background: var(--color-primary);
     transition: width 0.3s;
     width: 0%;
 }
@@ -540,7 +514,7 @@
 }
 
 .scrolling-results-table__cell--gain {
-    color: var(--accent-success);
+    color: var(--color-success);
     font-weight: 600;
     text-align: right;
 }
@@ -581,17 +555,17 @@
 }
 
 .scrolling-strategy-tab-btn:hover {
-    background: rgba(0, 122, 255, 0.1);
+    background: rgba(37, 99, 235, 0.1);
 }
 
 .scrolling-strategy-tab-btn.active {
-    background: rgb(37, 99, 235);
+    background: var(--color-primary-dark);
     color: white;
 }
 
 @media (prefers-color-scheme: dark) {
     .scrolling-strategy-tab-btn.active {
-        background: rgb(59, 130, 246);
+        background: var(--color-primary);
     }
 }
 
@@ -635,7 +609,7 @@
 }
 
 .scrolling-metric-card--highlight .scrolling-metric-card__value {
-    color: var(--accent-success);
+    color: var(--color-success);
 }
 
 .scrolling-metric-card__label {

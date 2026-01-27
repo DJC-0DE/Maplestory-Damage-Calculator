@@ -25,28 +25,28 @@
     --sidebar-ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
     /* Tab-specific accent colors - matches optimization.css */
-    --sidebar-tab-base-stats: #3b82f6;
-    --sidebar-tab-equipment: #10b981;
-    --sidebar-tab-weapon-levels: #f59e0b;
-    --sidebar-tab-companions: #a855f7;
-    --sidebar-tab-item-comparison: #3b82f6;
-    --sidebar-tab-inner-ability: #ec4899;
-    --sidebar-tab-artifact-potential: #f59e0b;
-    --sidebar-tab-scroll-optimizer: #14b8a6;
-    --sidebar-tab-cube-potential: #a855f7;
+    --sidebar-tab-base-stats: var(--color-primary);
+    --sidebar-tab-equipment: var(--color-success);
+    --sidebar-tab-weapon-levels: var(--color-warning);
+    --sidebar-tab-companions: var(--color-secondary);
+    --sidebar-tab-item-comparison: var(--color-primary);
+    --sidebar-tab-inner-ability: var(--color-pink);
+    --sidebar-tab-artifact-potential: var(--color-warning);
+    --sidebar-tab-scroll-optimizer: var(--color-info);
+    --sidebar-tab-cube-potential: var(--color-secondary);
     --sidebar-tab-stat-breakdown: #667eea;
-    --sidebar-tab-stat-tables: #3b82f6;
-    --sidebar-tab-equivalency: #ec4899;
+    --sidebar-tab-stat-tables: var(--color-primary);
+    --sidebar-tab-equivalency: var(--color-pink);
 
     /* Surface Depths */
-    --sidebar-surface-base: rgba(15, 23, 42, 0.8);
-    --sidebar-surface-elevated: rgba(30, 41, 59, 0.6);
-    --sidebar-surface-glass: rgba(51, 65, 85, 0.4);
+    --sidebar-surface-base: var(--surface-primary);
+    --sidebar-surface-elevated: var(--surface-elevated);
+    --sidebar-surface-glass: var(--surface-tertiary);
 
     /* Border System */
-    --sidebar-border-subtle: rgba(148, 163, 184, 0.08);
-    --sidebar-border-medium: rgba(148, 163, 184, 0.12);
-    --sidebar-border-strong: rgba(148, 163, 184, 0.2);
+    --sidebar-border-subtle: var(--border-subtle);
+    --sidebar-border-medium: var(--border-medium);
+    --sidebar-border-strong: var(--border-strong);
 }
 
 /* ─────────────────────────────────────
@@ -62,7 +62,7 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--backdrop-overlay);
     backdrop-filter: blur(4px);
     z-index: 998;
     opacity: 0;
@@ -125,7 +125,7 @@ body {
 
     /* Custom scrollbar */
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -137,12 +137,12 @@ body {
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
+    background: var(--scrollbar-thumb);
     border-radius: 4px;
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.3);
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* ─────────────────────────────────────

@@ -4,18 +4,18 @@
 
 /* Damage boxes and panels */
 .damage-box {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 15px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-lg);
     transition: all 0.3s ease;
 }
 
 .dark .damage-box {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--bg-secondary);
+    border-color: var(--border-tertiary);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -28,30 +28,30 @@
 }
 
 .damage-box h3 {
-    color: #10b981;
+    color: var(--color-success);
     margin-bottom: 10px;
     font-size: 1.2em;
     font-weight: 600;
 }
 
 .dark .damage-box h3 {
-    color: #34d399;
+    color: var(--color-success-light);
 }
 
 /* Weapon cards */
 .weapon-card {
-    background: white;
+    background: var(--bg-primary);
     border-radius: 12px;
     padding: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-primary);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     position: relative;
 }
 
 .dark .weapon-card {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--bg-secondary);
+    border-color: var(--border-tertiary);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -64,17 +64,17 @@
 }
 
 .weapon-card.equipped {
-    border-color: #10b981;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    border-color: var(--color-success);
+    box-shadow: var(--glow-success);
 }
 
 .dark .weapon-card.equipped {
-    border-color: #34d399;
+    border-color: var(--color-success-light);
     box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
 }
 
 .weapon-header {
-    color: #2563eb;
+    color: var(--color-primary-dark);
     font-size: 0.85em;
     font-weight: 600;
     margin-bottom: 8px;
@@ -82,13 +82,13 @@
 }
 
 .dark .weapon-header {
-    color: #60a5fa;
+    color: var(--color-primary-light);
 }
 
 /* Combo cards */
 .combo-card {
-    background: white;
-    border: 2px solid #e5e7eb;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-primary);
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
@@ -96,40 +96,40 @@
 }
 
 .dark .combo-card {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--bg-secondary);
+    border-color: var(--border-tertiary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .combo-card h4 {
-    color: #2563eb;
+    color: var(--color-primary-dark);
     margin-bottom: 12px;
     font-size: 1.1em;
 }
 
 .dark .combo-card h4 {
-    color: #60a5fa;
+    color: var(--color-primary-light);
 }
 
 /* Total DPS Gain display */
 .combo-total {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(37, 99, 235, 0.1));
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
     border-radius: 12px;
     padding: 20px;
     margin-top: 20px;
     text-align: center;
     font-size: 1.2em;
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
     transition: all 0.3s ease;
 }
 
 .dark .combo-total {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(37, 99, 235, 0.08));
-    border-color: #34d399;
-    color: #34d399;
+    border-color: var(--color-success-light);
+    color: var(--color-success-light);
     box-shadow: 0 4px 16px rgba(52, 211, 153, 0.2);
 }
 
@@ -145,7 +145,7 @@
 /* Expected damage boxes in results */
 .expected-damage {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(37, 99, 235, 0.15));
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     padding: 15px;
     margin-top: 10px;
@@ -154,7 +154,7 @@
 }
 
 .dark .expected-damage {
-    border-color: #374151;
+    border-color: var(--border-tertiary);
 }
 
 .expected-damage:hover {
@@ -167,24 +167,24 @@
 }
 
 .expected-damage .label {
-    color: #10b981;
+    color: var(--color-success);
     font-size: 0.9em;
     margin-bottom: 5px;
     font-weight: 600;
 }
 
 .dark .expected-damage .label {
-    color: #34d399;
+    color: var(--color-success-light);
 }
 
 .expected-damage .value {
     font-size: 1.5em;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .dark .expected-damage .value {
-    color: #f3f4f6;
+    color: var(--bg-tertiary);
 }
 
 /* Result panels */
@@ -197,12 +197,12 @@
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-primary);
     transition: all 0.2s ease;
 }
 
 .dark .damage-row {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--border-tertiary);
 }
 
 .damage-row:hover {
@@ -214,22 +214,22 @@
 }
 
 .damage-label {
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.95em;
 }
 
 .dark .damage-label {
-    color: #9ca3af;
+    color: var(--text-tertiary);
 }
 
 .damage-value {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
     font-size: 1.05em;
 }
 
 .dark .damage-value {
-    color: #f3f4f6;
+    color: var(--bg-tertiary);
 }
 
 /* Rarity badges */
@@ -247,41 +247,41 @@
 }
 
 .rarity-legendary {
-    background: #33ce85;
+    background: var(--rarity-legendary);
     color: #000;
 }
 
 .rarity-unique {
-    background: #ffd26d;
+    background: var(--rarity-unique);
     color: #000;
 }
 
 .rarity-epic {
-    background: #9966ff;
-    color: #fff;
+    background: var(--rarity-epic);
+    color: var(--text-inverse);
 }
 
 .rarity-rare {
-    background: #6699ff;
-    color: #fff;
+    background: var(--rarity-rare);
+    color: var(--text-inverse);
 }
 
 .rarity-normal {
-    background: #ffffff;
+    background: var(--bg-primary);
     color: #000;
 }
 
 .dark .rarity-normal {
     background: #4b5563;
-    color: #fff;
+    color: var(--text-inverse);
 }
 
 .rarity-mystic {
-    background: #ff3f42;
-    color: #fff;
+    background: var(--rarity-mystic);
+    color: var(--text-inverse);
 }
 
 .rarity-ancient {
-    background: #ff9500;
-    color: #fff;
+    background: var(--rarity-ancient);
+    color: var(--text-inverse);
 }

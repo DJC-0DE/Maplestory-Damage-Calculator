@@ -10,8 +10,8 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #3b82f6;
-    color: white;
+    background: var(--color-primary);
+    color: var(--text-inverse);
     font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
@@ -21,17 +21,17 @@
 }
 
 .info-icon:hover {
-    background: #2563eb;
+    background: var(--color-primary-dark);
     transform: scale(1.1);
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .dark .info-icon {
-    background: #60a5fa;
+    background: var(--color-primary-light);
 }
 
 .dark .info-icon:hover {
-    background: #3b82f6;
+    background: var(--color-primary);
 }
 
 /* Help Sidebar */
@@ -59,7 +59,7 @@
     align-items: center;
     padding: 16px 20px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05));
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .help-sidebar-title {
@@ -88,7 +88,7 @@
 
 .help-close-btn:hover {
     background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    color: var(--color-error);
 }
 
 .help-sidebar-content {
@@ -104,7 +104,7 @@
     margin: 0 0 12px 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--accent-primary);
+    color: var(--color-primary);
 }
 
 .help-sidebar-content p {
@@ -174,7 +174,7 @@
     }
 
     .left-nav-item {
-        color: #6b7280;
+        color: var(--text-secondary);
         font-size: 0.95rem;
         font-weight: 500;
         cursor: pointer;
@@ -185,17 +185,17 @@
     }
 
     .left-nav-item:hover {
-        color: #3b82f6;
+        color: var(--color-primary);
         background: rgba(59, 130, 246, 0.1);
         transform: translateX(4px);
     }
 
     .dark .left-nav-item {
-        color: #9ca3af;
+        color: var(--text-tertiary);
     }
 
     .dark .left-nav-item:hover {
-        color: #60a5fa;
+        color: var(--color-primary-light);
         background: rgba(96, 165, 250, 0.1);
     }
 }
@@ -203,19 +203,19 @@
 /* Donate notification theme styles */
 .donate-notification-theme {
     background: #fef3c7;
-    border: 2px solid #fbbf24;
-    color: #f59e0b;
+    border: 2px solid var(--color-warning-light);
+    color: var(--color-warning);
 }
 
 .dark .donate-notification-theme {
-    background: #1f2937;
-    border: 2px solid #f59e0b;
-    color: #fbbf24;
+    background: var(--bg-secondary);
+    border: 2px solid var(--color-warning);
+    color: var(--color-warning-light);
 }
 
 .donate-notification-close {
     background: rgba(251, 191, 36, 0.2);
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .donate-notification-close:hover {
@@ -224,7 +224,7 @@
 
 .dark .donate-notification-close {
     background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
+    color: var(--color-warning-light);
 }
 
 .dark .donate-notification-close:hover {
@@ -234,7 +234,7 @@
 .paste-image-section {
     max-width: 520px;
     padding: 3px;
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed var(--border-secondary);
     border-radius: 14px;
     text-align: center;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

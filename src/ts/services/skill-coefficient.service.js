@@ -548,7 +548,7 @@ function calculateJobSkillPassiveGains(className, characterLevel, skillLevelBonu
         if (calculatorStat === "defense") {
           const defenseValue = statGain;
           const mainStatIncrease = (baseStats.DEFENSE || 0) * (defenseValue / 100);
-          const statService = new StatCalculationService(baseStats);
+          const statService = new StatCalculationService(baseStats, 0);
           const beforeStats = statService.getStats();
           statService.add(STAT.PRIMARY_MAIN_STAT.id, mainStatIncrease);
           const afterStats = statService.getStats();

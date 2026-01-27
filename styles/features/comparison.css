@@ -15,33 +15,22 @@
     --comp-font-display: 'Space Grotesk', -apple-system, sans-serif;
     --comp-font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
 
-    /* Contribution Color Palette (matches stat-breakdown) */
-    --comp-base: #64748b;
-    --comp-equipment: #10b981;
-    --comp-scrolling: #3b82f6;
-    --comp-cube: #f59e0b;
-    --comp-companion: #a855f7;
-    --comp-inner-ability: #ec4899;
-    --comp-main-stat: #ef4444;
-    --comp-unlockable: #14b8a6;
-    --comp-guild: #8b5cf6;
-
     /* Premium Gradients */
-    --comp-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --comp-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --comp-gradient-accent: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --comp-gradient-purple: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-    --comp-gradient-teal: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    --comp-gradient-primary: var(--gradient-secondary);
+    --comp-gradient-success: var(--gradient-success);
+    --comp-gradient-accent: var(--gradient-warning);
+    --comp-gradient-purple: var(--gradient-secondary);
+    --comp-gradient-teal: var(--gradient-info);
 
-    /* Surface Colors */
-    --comp-surface-primary: rgba(15, 23, 42, 0.4);
-    --comp-surface-secondary: rgba(30, 41, 59, 0.3);
-    --comp-surface-tertiary: rgba(51, 65, 85, 0.2);
+    /* Surface Colors - using colors.css */
+    --comp-surface-primary: var(--surface-primary);
+    --comp-surface-secondary: var(--surface-secondary);
+    --comp-surface-tertiary: var(--surface-tertiary);
 
-    /* Border System */
-    --comp-border-subtle: rgba(148, 163, 184, 0.1);
-    --comp-border-medium: rgba(148, 163, 184, 0.2);
-    --comp-border-strong: rgba(148, 163, 184, 0.3);
+    /* Border System - using colors.css */
+    --comp-border-subtle: var(--border-subtle);
+    --comp-border-medium: var(--border-medium);
+    --comp-border-strong: var(--border-strong);
 
     /* Spacing Scale */
     --comp-space-xs: 4px;
@@ -57,12 +46,12 @@
 
 /* Dark Mode Adjustments */
 .dark {
-    --comp-surface-primary: rgba(15, 23, 42, 0.6);
-    --comp-surface-secondary: rgba(30, 41, 59, 0.5);
-    --comp-surface-tertiary: rgba(51, 65, 85, 0.4);
-    --comp-border-subtle: rgba(148, 163, 184, 0.08);
-    --comp-border-medium: rgba(148, 163, 184, 0.15);
-    --comp-border-strong: rgba(148, 163, 184, 0.25);
+    --comp-surface-primary: var(--surface-primary);
+    --comp-surface-secondary: var(--surface-secondary);
+    --comp-surface-tertiary: var(--surface-tertiary);
+    --comp-border-subtle: var(--border-subtle);
+    --comp-border-medium: var(--border-medium);
+    --comp-border-strong: var(--border-strong);
 }
 
 /* ========================================
@@ -156,11 +145,11 @@
 }
 
 .comparison-column-header--equipped {
-    color: var(--comp-equipment);
+    color: var(--color-success);
 }
 
 .comparison-column-header--comparison {
-    color: var(--accent-primary);
+    color: var(--color-primary);
 }
 
 /* ========================================
@@ -186,7 +175,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: var(--comp-equipment);
+    background: var(--color-success);
     opacity: 0.8;
 }
 
@@ -197,7 +186,7 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: var(--accent-primary);
+    background: var(--color-primary);
     opacity: 0.8;
 }
 
@@ -397,8 +386,6 @@
     grid-template-columns: 1fr 1fr auto;
     gap: var(--comp-space-sm);
     padding: var(--comp-space-sm);
-    background: var(--comp-surface-tertiary);
-    border-left: 3px solid var(--accent-primary);
     border-radius: 0 6px 6px 0;
     margin-bottom: var(--comp-space-sm);
     align-items: end;

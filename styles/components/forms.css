@@ -11,32 +11,32 @@
 .input-group label {
     margin-bottom: 0.25rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 500;
     letter-spacing: 0.025em;
 }
 
 .dark .input-group label {
-    color: #9ca3af;
+    color: var(--text-tertiary);
 }
 
 .input-group input,
 .input-group select {
     padding: 0.625rem 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-secondary);
     border-radius: 0.5rem;
-    background-color: white;
-    color: #111827;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-size: 1rem;
     transition: all 0.3s;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .dark .input-group input,
 .dark .input-group select {
-    border-color: #4b5563;
-    background-color: #374151;
-    color: #f3f4f6;
+    border-color: var(--border-tertiary);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .input-group input:focus,
@@ -44,30 +44,30 @@
     outline: none;
     ring: 4px;
     ring-color: rgba(59, 130, 246, 0.2);
-    border-color: #3b82f6;
+    border-color: var(--color-primary);
     transform: translateY(-1px);
 }
 
 .dark .input-group input:focus,
 .dark .input-group select:focus {
     ring-color: rgba(96, 165, 250, 0.2);
-    border-color: #60a5fa;
+    border-color: var(--color-primary-light);
 }
 
 select option {
-    background-color: white;
-    color: #111827;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .dark select option {
-    background-color: #374151;
-    color: #f3f4f6;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 /* Highlight the upgrade currency input to make it more obvious and accessible */
 #upgrade-currency-input {
     border: 2px solid transparent;
     border-radius: 6px;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.06);
+    box-shadow: var(--upgrade-glow);
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }

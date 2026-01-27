@@ -32,8 +32,8 @@
 /* Dark mode for extra stats tab buttons */
 .dark .extra-stats-tab-button {
     background: rgba(96, 165, 250, 0.05);
-    color: #9ca3af;
-    border-color: rgba(156, 163, 175, 0.2);
+    color: var(--text-tertiary);
+    border-color: var(--border-medium);
 }
 
 .dark .extra-stats-tab-button:hover {
@@ -42,7 +42,7 @@
 
 .dark .extra-stats-tab-button[data-tab="special-stats"].active {
     background: rgba(20, 184, 166, 0.1);
-    color: #5eead4;
+    color: var(--color-info-light);
     border-color: rgba(20, 184, 166, 0.3);
 }
 
@@ -52,7 +52,7 @@
 
 .dark .extra-stats-tab-button[data-tab="guild-bonuses"].active {
     background: rgba(168, 85, 247, 0.1);
-    color: #c4b5fd;
+    color: var(--color-secondary-light);
     border-color: rgba(168, 85, 247, 0.3);
 }
 
@@ -62,7 +62,7 @@
 
 .dark .extra-stats-tab-button[data-tab="level-stats"].active {
     background: rgba(249, 115, 22, 0.1);
-    color: #fdba74;
+    color: var(--color-warning-light);
     border-color: rgba(249, 115, 22, 0.3);
 }
 
