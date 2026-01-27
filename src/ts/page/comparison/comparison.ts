@@ -612,66 +612,147 @@ function isStatPercentage(statId: string): boolean {
  * Create stat comparison table HTML for equip modal
  */
 function createEquipStatComparisonTable(statChanges: EquipStatChanges): string {
-    const { directStats: { diff }, passiveGains } = statChanges;
-    const hasPassiveGains = passiveGains.old.breakdown.length > 0 || passiveGains.new.breakdown.length > 0;
+    const { directStats: { old: oldDirect, new: newDirect, diff: directDiff }, passiveGains } = statChanges;
 
-    if (!hasPassiveGains && Object.keys(diff).length === 0) {
-        return '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No stat changes</div>';
-    }
+    // Calculate passive stat differences
+    const passiveDiff: Record<string, number> = {};
+    const allPassiveStats = new Set([
+        ...Object.keys(passiveGains.old.statChanges),
+        ...Object.keys(passiveGains.new.statChanges)
+    ]);
 
-    let rows = '';
+    allPassiveStats.forEach(stat => {
+        const oldValue = passiveGains.old.statChanges[stat] || 0;
+        const newValue = passiveGains.new.statChanges[stat] || 0;
+        passiveDiff[stat] = newValue - oldValue;
+    });
 
-    // Show passive gains breakdown if available
-    if (hasPassiveGains) {
-        // Combine all passive stat changes
-        const allPassives = new Set([
-            ...Object.keys(passiveGains.old.statChanges),
-            ...Object.keys(passiveGains.new.statChanges)
-        ]);
+    // Filter direct stats to only show affected ones (where diff != 0)
+    const affectedDirectStats = Object.entries(directDiff).filter(([stat, diff]) => diff !== 0);
 
-        if (allPassives.size > 0) {
-            rows += '<tr><td colspan="3" style="background: rgba(0, 122, 255, 0.1); padding: 12px; text-align: center; font-weight: 600; color: var(--text-primary);">Passive Stat Gains (Job Skills)</td></tr>';
+    // Filter passive stats to only show affected ones
+    const affectedPassiveStats = Object.entries(passiveDiff).filter(([stat, diff]) => diff !== 0);
 
-            for (const stat of allPassives) {
-                const oldValue = passiveGains.old.statChanges[stat] || 0;
-                const newValue = passiveGains.new.statChanges[stat] || 0;
-                const diffValue = newValue - oldValue;
+    const hasDirectChanges = affectedDirectStats.length > 0;
+    const hasPassiveChanges = affectedPassiveStats.length > 0;
 
-                const isPercent = isStatPercentage(stat);
-                const formatValue = (val: number): string => {
-                    if (val === 0) return '-';
-                    const displayValue = isPercent ? val.toFixed(1).replace(/\.0$/, '') : val;
-                    return `${displayValue}${isPercent ? '%' : ''}`;
-                };
-
-                const oldClass = oldValue > 0 ? 'stat-value-negative' : 'stat-value-neutral';
-                const newClass = newValue > 0 ? 'stat-value-positive' : 'stat-value-neutral';
-                const diffClass = diffValue > 0 ? 'stat-value-positive' : diffValue < 0 ? 'stat-value-negative' : 'stat-value-neutral';
-
-                rows += `
-                    <tr>
-                        <td>${formatStatForDisplay(stat)}</td>
-                        <td class="${oldClass}">${formatValue(oldValue)}</td>
-                        <td class="${newClass}">${formatValue(newValue)}</td>
-                    </tr>
-                `;
-            }
+    // Create direct stats table
+    const createDirectStatsTable = () => {
+        if (!hasDirectChanges) {
+            return '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No direct stat changes</div>';
         }
-    }
+
+        let rows = '';
+        affectedDirectStats.forEach(([stat, diffValue]) => {
+            const oldValue = oldDirect[stat] || 0;
+            const newValue = newDirect[stat] || 0;
+            const isPercent = isStatPercentage(stat);
+
+            const formatValue = (val: number): string => {
+                const displayValue = isPercent ? val.toFixed(1).replace(/\.0$/, '') : Math.floor(val).toString();
+                return `${displayValue}${isPercent ? '%' : ''}`;
+            };
+
+            const oldClass = oldValue > 0 ? 'stat-value-negative' : 'stat-value-neutral';
+            const newClass = newValue > 0 ? 'stat-value-positive' : 'stat-value-neutral';
+            const diffClass = diffValue > 0 ? 'stat-value-positive' : diffValue < 0 ? 'stat-value-negative' : 'stat-value-neutral';
+
+            rows += `
+                <tr>
+                    <td>${formatStatForDisplay(stat)}</td>
+                    <td class="${oldClass}">${formatValue(oldValue)}</td>
+                    <td class="${newClass}">${formatValue(newValue)}</td>
+                    <td class="${diffClass}">${diffValue > 0 ? '+' : ''}${formatValue(diffValue)}</td>
+                </tr>
+            `;
+        });
+
+        return `
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        <th>Losing</th>
+                        <th>Gaining</th>
+                        <th>Net Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
+        `;
+    };
+
+    // Create passive stats table
+    const createPassiveStatsTable = () => {
+        if (!hasPassiveChanges) {
+            return '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No passive stat changes</div>';
+        }
+
+        let rows = '';
+        affectedPassiveStats.forEach(([stat, diffValue]) => {
+            const oldValue = passiveGains.old.statChanges[stat] || 0;
+            const newValue = passiveGains.new.statChanges[stat] || 0;
+            const isPercent = isStatPercentage(stat);
+
+            const formatValue = (val: number): string => {
+                const displayValue = isPercent ? val.toFixed(1).replace(/\.0$/, '') : Math.floor(val).toString();
+                return `${displayValue}${isPercent ? '%' : ''}`;
+            };
+
+            const oldClass = oldValue > 0 ? 'stat-value-negative' : 'stat-value-neutral';
+            const newClass = newValue > 0 ? 'stat-value-positive' : 'stat-value-neutral';
+            const diffClass = diffValue > 0 ? 'stat-value-positive' : diffValue < 0 ? 'stat-value-negative' : 'stat-value-neutral';
+
+            rows += `
+                <tr>
+                    <td>${formatStatForDisplay(stat)}</td>
+                    <td class="${oldClass}">${formatValue(oldValue)}</td>
+                    <td class="${newClass}">${formatValue(newValue)}</td>
+                    <td class="${diffClass}">${diffValue > 0 ? '+' : ''}${formatValue(diffValue)}</td>
+                </tr>
+            `;
+        });
+
+        return `
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th>Passive Stat</th>
+                        <th>Losing</th>
+                        <th>Gaining</th>
+                        <th>Net Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
+        `;
+    };
 
     return `
-        <table class="stat-table">
-            <thead>
-                <tr>
-                    <th>Passive Stat</th>
-                    <th>Losing</th>
-                    <th>Gaining</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${rows || '<tr><td colspan="3" style="text-align: center; color: var(--text-secondary); padding: 20px;">No passive stat changes</td></tr>'}
-            </tbody>
-        </table>
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-tab="direct" onclick="window.switchEquipModalTab('direct')">
+                Direct Stats (${affectedDirectStats.length})
+            </button>
+            <button class="modal-tab" data-tab="passive" onclick="window.switchEquipModalTab('passive')">
+                Passive Stats (${affectedPassiveStats.length})
+            </button>
+        </div>
+
+        <div class="modal-tab-content active" id="modal-tab-direct">
+            <div class="stat-comparison-table">
+                ${createDirectStatsTable()}
+            </div>
+        </div>
+
+        <div class="modal-tab-content" id="modal-tab-passive">
+            <div class="stat-comparison-table">
+                ${createPassiveStatsTable()}
+            </div>
+        </div>
     `;
 }
 
@@ -742,7 +823,7 @@ export function showEquipConfirmModal(
         yesBtn.textContent = 'Equip - Apply Stats';
         yesBtn.onclick = () => {
             overlay.remove();
-            resolve('yes');
+            wrappedResolve('yes');
         };
 
         // Create No button
@@ -751,7 +832,7 @@ export function showEquipConfirmModal(
         noBtn.textContent = 'Equip - Keep Stats';
         noBtn.onclick = () => {
             overlay.remove();
-            resolve('no');
+            wrappedResolve('no');
         };
 
         // Create Cancel button
@@ -760,7 +841,7 @@ export function showEquipConfirmModal(
         cancelBtn.textContent = 'Cancel';
         cancelBtn.onclick = () => {
             overlay.remove();
-            resolve('cancel');
+            wrappedResolve('cancel');
         };
 
         // Assemble modal
@@ -776,12 +857,40 @@ export function showEquipConfirmModal(
         overlay.appendChild(modalBox);
         document.body.appendChild(overlay);
 
+        // Add tab switching function to window
+        (window as any).switchEquipModalTab = (tabName: 'direct' | 'passive') => {
+            // Update tab buttons
+            document.querySelectorAll('.modal-tab').forEach(tab => {
+                if (tab instanceof HTMLElement && tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Update tab content
+            document.querySelectorAll('.modal-tab-content').forEach(content => {
+                if (content instanceof HTMLElement && content.id === `modal-tab-${tabName}`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        };
+
+        // Clean up window function on modal close
+        const originalResolve = resolve;
+        const wrappedResolve = (value: 'yes' | 'no' | 'cancel') => {
+            delete (window as any).switchEquipModalTab;
+            originalResolve(value);
+        };
+
         // Handle ESC key
         const escHandler = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 overlay.remove();
                 document.removeEventListener('keydown', escHandler);
-                resolve('cancel');
+                wrappedResolve('cancel');
             }
         };
         document.addEventListener('keydown', escHandler);

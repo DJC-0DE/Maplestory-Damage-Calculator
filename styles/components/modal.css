@@ -4,12 +4,12 @@
    ======================================== */
 
 .modal-overlay {
-    position: fixed;
+    position: fixed !important;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85) !important;
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
@@ -28,11 +28,11 @@
 }
 
 .modal-box {
-    background: var(--background);
+    background: var(--background) !important;
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 24px;
-    max-width: 500px;
+    max-width: 600px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
@@ -65,6 +65,45 @@
     color: var(--text-secondary);
     text-align: center;
     line-height: 1.5;
+}
+
+/* Modal Tabs */
+.modal-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-tab {
+    flex: 1;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.modal-tab.active {
+    color: #10b981;
+    border-bottom-color: #10b981;
+}
+
+.modal-tab-content {
+    display: none;
+}
+
+.modal-tab-content.active {
+    display: block;
 }
 
 /* Stat Comparison Table */
