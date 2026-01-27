@@ -28,7 +28,7 @@
 }
 
 .modal-box {
-    background: var(--background) !important;
+    background: var(--bg-elevated) !important;
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 24px;
@@ -67,12 +67,21 @@
     line-height: 1.5;
 }
 
+.modal-message a {
+    color: var(--accent-teal);
+    text-decoration: none;
+}
+
+.modal-message a:hover {
+    text-decoration: underline;
+}
+
 /* Modal Tabs */
 .modal-tabs {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--border-primary);
 }
 
 .modal-tab {
@@ -111,7 +120,7 @@
     margin: 20px 0;
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-primary);
 }
 
 .stat-table {
@@ -133,7 +142,7 @@
 }
 
 .stat-table tbody tr {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-primary);
 }
 
 .stat-table tbody tr:last-child {
@@ -230,7 +239,7 @@
 }
 
 .modal-box::-webkit-scrollbar-track {
-    background: var(--background);
+    background: var(--bg-tertiary);
     border-radius: 4px;
 }
 
