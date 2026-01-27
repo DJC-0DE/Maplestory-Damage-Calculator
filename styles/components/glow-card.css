@@ -11,7 +11,7 @@
 :root {
     /* Tab Position Colors - Applied consistently across all pages */
     --tab-color-1: #3b82f6;  /* Blue */
-    --tab-color-2: #ef4444;  /* Red */
+    --tab-color-2: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fb7185 100%);  /* Red */
     --tab-color-3: #f59e0b;  /* Orange */
     --tab-color-4: #14b8a6;  /* Teal */
     --tab-color-5: #a855f7;  /* Purple */
@@ -64,31 +64,42 @@
 /* ========================================
    POSITION-BASED COLOR MAPPING
    Maps to tab positions 1-5
+
+   NOTE: RGB values in --glow-card-glow must match --tab-color-X
+   Vanilla CSS cannot convert hex to rgba, so these are maintained
+   manually. When updating --tab-color-X, update the corresponding
+   --glow-card-glow rgba() value.
    ======================================== */
 
 .glow-card[data-tab-index="1"] {
     --glow-card-color: var(--tab-color-1);
-    --glow-card-glow: 0 0 30px rgba(59, 130, 246, 0.25);
+    --glow-card-glow: 0 0 30px rgba(59, 130, 246, 0.25); /* #3b82f6 */
 }
 
 .glow-card[data-tab-index="2"] {
     --glow-card-color: var(--tab-color-2);
-    --glow-card-glow: 0 0 30px rgba(239, 68, 68, 0.25);
+    --glow-card-glow: 0 0 30px rgba(239, 68, 68, 0.25); /* #ef4444 */
 }
 
 .glow-card[data-tab-index="3"] {
     --glow-card-color: var(--tab-color-3);
-    --glow-card-glow: 0 0 30px rgba(245, 158, 11, 0.25);
+    --glow-card-glow: 0 0 30px rgba(245, 158, 11, 0.25); /* #f59e0b */
 }
 
 .glow-card[data-tab-index="4"] {
     --glow-card-color: var(--tab-color-4);
-    --glow-card-glow: 0 0 30px rgba(20, 184, 166, 0.25);
+    --glow-card-glow: 0 0 30px rgba(20, 184, 166, 0.25); /* #14b8a6 */
 }
 
 .glow-card[data-tab-index="5"] {
     --glow-card-color: var(--tab-color-5);
-    --glow-card-glow: 0 0 30px rgba(168, 85, 247, 0.25);
+    --glow-card-glow: 0 0 30px rgba(168, 85, 247, 0.25); /* #a855f7 */
+}
+
+/* Invalid tab index fallback - uses default blue */
+.glow-card[data-tab-index]:not([data-tab-index="1"]):not([data-tab-index="2"]):not([data-tab-index="3"]):not([data-tab-index="4"]):not([data-tab-index="5"]) {
+    --glow-card-color: var(--tab-color-1);
+    --glow-card-glow: 0 0 30px rgba(59, 130, 246, 0.25);
 }
 
 /* ========================================
@@ -121,6 +132,27 @@
 
 .dark .glow-card:hover {
     border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Stronger glows in dark mode for better visibility */
+.dark .glow-card[data-tab-index="1"] {
+    --glow-card-glow: 0 0 40px rgba(59, 130, 246, 0.35);
+}
+
+.dark .glow-card[data-tab-index="2"] {
+    --glow-card-glow: 0 0 40px rgba(239, 68, 68, 0.35);
+}
+
+.dark .glow-card[data-tab-index="3"] {
+    --glow-card-glow: 0 0 40px rgba(245, 158, 11, 0.35);
+}
+
+.dark .glow-card[data-tab-index="4"] {
+    --glow-card-glow: 0 0 40px rgba(20, 184, 166, 0.35);
+}
+
+.dark .glow-card[data-tab-index="5"] {
+    --glow-card-glow: 0 0 40px rgba(168, 85, 247, 0.35);
 }
 
 /* ========================================

@@ -231,7 +231,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: var(--glow-card-color, var(--ia-gradient-primary));
+    background: var(--tab-color-2, var(--ia-gradient-primary));
     opacity: 0.9;
     transition: all var(--ia-duration-base) var(--ia-ease-smooth);
 }

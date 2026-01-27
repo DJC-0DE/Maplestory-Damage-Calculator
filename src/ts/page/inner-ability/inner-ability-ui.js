@@ -47,7 +47,7 @@ function generatePresetContentHTML(presetId, isActive = false) {
   ).join("");
   return `
         <div class="ia-preset-content ${activeClass}" id="preset-${presetId}-content">
-            <div class="ia-preset-card">
+            <div class="ia-preset-card glow-card" data-tab-index="2">
                 <!-- Currently Equipped Checkbox -->
                 <div class="ia-equipped-checkbox-wrapper">
                     <input type="checkbox" id="preset-${presetId}-equipped" onchange="handlePresetEquipped(${presetId})">
@@ -208,7 +208,7 @@ function renderTheoreticalBest() {
   html += `<label class="ia-roll-filter-label"><input type="checkbox" id="roll-filter-mid" onchange="toggleTheoreticalRollFilter('mid')" ` + (theoreticalRollFilters.mid ? "checked" : "") + "> Mid Rolls</label>";
   html += `<label class="ia-roll-filter-label"><input type="checkbox" id="roll-filter-max" onchange="toggleTheoreticalRollFilter('max')" ` + (theoreticalRollFilters.max ? "checked" : "") + "> Max Rolls</label>";
   html += "</div>";
-  html += '<div class="table-scrollable">';
+  html += '<div class="table-wrapper table-scrollable">';
   html += '<table class="table"><thead><tr>';
   html += "<th>Stat & Roll</th>";
   html += "<th>Value</th>";

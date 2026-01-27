@@ -100,11 +100,6 @@
 #character-setup-card,
 #stat-damage-predictions-card,
 #character-optimization-card {
-    background: var(--opt-glass-bg);
-    backdrop-filter: var(--opt-glass-blur);
-    -webkit-backdrop-filter: var(--opt-glass-blur);
-    border: 1px solid var(--opt-glass-border);
-    box-shadow: var(--opt-glass-shadow);
     position: relative;
     overflow: hidden;
 }
@@ -118,14 +113,6 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg,
-        rgba(59, 130, 246, 0.1),
-        rgba(236, 72, 153, 0.1),
-        rgba(20, 184, 166, 0.1));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
     opacity: 0.5;
     pointer-events: none;
 }
@@ -311,10 +298,6 @@
 .optimization-tab-content {
     display: none;
     position: relative;
-    background: linear-gradient(135deg,
-        rgba(236, 72, 153, 0.02) 0%,
-        rgba(168, 85, 247, 0.02) 50%,
-        rgba(20, 184, 166, 0.02) 100%);
     border-radius: 12px;
     padding: var(--opt-space-xl);
     animation: fadeIn var(--opt-duration-base) var(--opt-ease-smooth);

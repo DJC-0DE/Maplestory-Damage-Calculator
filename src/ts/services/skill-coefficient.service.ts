@@ -1087,7 +1087,8 @@ export function calculateJobSkillPassiveGains(
                     // Use StatCalculationService to apply defense core
                     // The circular dependency is avoided by using calculateFinalAttackBonusFromJobSkills
                     // which doesn't create a StatCalculationService
-                    const statService = new StatCalculationService(baseStats);
+                    // Pass 0 for weaponAttackBonus to avoid double-application (bonus will be applied later)
+                    const statService = new StatCalculationService(baseStats, 0);
                     const beforeStats = statService.getStats();
 
                     // Add the defense - for Dark Knight this will convert to main stat, attack, and stat damage

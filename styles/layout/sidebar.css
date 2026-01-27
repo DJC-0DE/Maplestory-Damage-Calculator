@@ -755,6 +755,7 @@ body {
    MAIN CONTENT AREA
    ───────────────────────────────────── */
 .main-content {
+    background: #00030e;
     margin-left: 240px;
     padding: 40px;
     min-height: 100vh;
