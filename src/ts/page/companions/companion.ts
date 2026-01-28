@@ -20,6 +20,21 @@ import type { MonsterType, BaseStats } from '@ts/types';
 import { loadoutStore } from '@ts/store/loadout.store';
 
 // ============================================================================
+// IGNORED STATS
+// ============================================================================
+
+/**
+ * Stats that exist in companion data but should NOT be processed for DPS calculation.
+ * These are either non-DPS stats (like MaxHp) or stats not supported by StatCalculationService.
+ */
+const IGNORED_STATS = new Set<string>([
+    'damageInCc',      // Damage in Chaos Chrono - not a DPS stat
+    'MaxHp',           // Max HP - survivability, not DPS
+    'MaxHpR',          // Max HP % - survivability, not DPS
+    'HitChance',       // Hit chance - accuracy, not directly DPS
+]);
+
+// ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
@@ -82,13 +97,24 @@ function applyEffectsToService(
     Object.entries(effects).forEach(([statKey, value]) => {
         if (value === 0 || value === undefined || value === null) return;
 
-        // Use type-specific handler if available, otherwise default to percentage stat
+        // Skip stats that are not relevant for DPS calculation
+        if (IGNORED_STATS.has(statKey)) {
+            return;
+        }
+
+        // Use type-specific handler if available
         if (statTypes[statKey]) {
             statTypes[statKey](value);
         } else {
-            // Default: treat as additive percentage stat
-            const adjustedValue = isRemoving ? -Math.abs(value) : value;
-            service.add(statKey, adjustedValue);
+            // Check if stat has a valid mapping before attempting to add
+            const mappedId = COMPANION_STAT_KEY_TO_STAT_ID[statKey];
+            if (mappedId) {
+                const adjustedValue = isRemoving ? -Math.abs(value) : value;
+                service.add(mappedId, adjustedValue);
+            } else {
+                // Unknown stat - log for debugging but don't throw
+                console.debug(`[applyEffectsToService] Unknown companion stat key: ${statKey}, skipping`);
+            }
         }
     });
 
